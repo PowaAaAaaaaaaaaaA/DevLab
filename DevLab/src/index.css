@@ -1,1 +1,10 @@
+@font-face {
+    font-family: Exo;
+    src: url("../src/assets/Fonts/Exo2-Regular.ttf");
+}
+
 @import "tailwindcss";
+
+@theme{
+    --font-exo:Exo;
+}
