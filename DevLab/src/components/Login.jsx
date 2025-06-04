@@ -1,5 +1,5 @@
 
-import Image from '../assets/Images/Login-bg.png';
+import Image from '../assets/Images/Login-Image.jpg';
 
 function Login() {
     
@@ -37,16 +37,16 @@ function Login() {
                 </svg>
         </div>
         <div  className='m-[2%]'>
-            <input type="checkbox" name="remember" id="" />
-            <label htmlFor="remember" className='text-white pl-1'>Remember Me</label>
+            <input type="checkbox" name="remember" id="" className='hover: cursor-pointer'/>
+            <label htmlFor="remember" className='text-white pl-1 '>Remember Me</label>
         </div>
         <div className='m-[2%] w-[35%]'>
-            <button className='bg-[#7F5AF0] w-[100%] text-[1.2rem] rounded-4xl text-white p-4 font-bold'>Login</button>
+            <button className='bg-[#7F5AF0] w-[100%] text-[1.2rem] rounded-4xl text-white p-4 font-bold hover:cursor-pointer'>Login</button>
         </div>                
             </form>
 
         <div className='text-white'>
-            <p>Dont have an account? <span className='text-blue-200'>Register here</span></p>
+            <p>Dont have an account? <span className='text-blue-200 hover:cursor-pointer'>Register here</span></p>
         </div>
 
             </div>
