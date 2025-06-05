@@ -4,6 +4,7 @@ import { auth, db } from '../Firebase/Firebase'
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { setDoc, doc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 
 function Register() {
@@ -26,9 +27,17 @@ function Register() {
                     age: age,
                 });
             }
+            toast.success("Registered Successfully",{
+                position:"top-center",
+                theme: "colored"
+            })
             navigate('/');
         }catch(error){
-            console.log(error.message);
+            
+            toast.error(error.message,{
+                position:"bottom-center",
+                theme: "colored"
+            })
         }
     }
     return (

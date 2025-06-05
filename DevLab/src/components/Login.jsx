@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../Firebase/Firebase';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 function Login() {
 
@@ -16,7 +17,10 @@ function Login() {
         await signInWithEmailAndPassword(auth, email, password);
         console.log("Logged id")
     }catch(error){
-        console.log(error.message);
+        toast.error(error.message,{
+                        position:"bottom-center",
+                        theme: "colored"
+                    })
     }
    }
 
