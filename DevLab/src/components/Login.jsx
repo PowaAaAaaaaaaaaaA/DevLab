@@ -1,7 +1,25 @@
 
 import Image from '../assets/Images/Login-Image.jpg';
+import { Link } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../Firebase/Firebase';
+import { useState } from 'react';
 
 function Login() {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+   const handleSubmit = async (e)=>{
+    e.preventDefault();
+    try{
+        await signInWithEmailAndPassword(auth, email, password);
+        console.log("Logged id")
+    }catch(error){
+        console.log(error.message);
+    }
+   }
+
     
     return (
         <div className="min-h-screen bg-[#0D1117] flex justify-center items-center">
@@ -22,16 +40,24 @@ function Login() {
             </svg>
         
 
-            <form className='w-[100%] flex flex-col items-center p-3.5'>
+            <form className='w-[100%] flex flex-col items-center p-3.5' onSubmit={handleSubmit}>
 
 
         <div className='w-[70%] flex justify-center relative'>
-                <input type="text" name="" id="" placeholder='Username' className='relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl  pl-[50px] '/>
+                <input 
+                value={email}
+                onChange={(e) =>
+                setEmail(e.target.value)}
+                type="Email" name="email" id="Email" placeholder='Username' className='relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl  pl-[50px] '/>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className=' absolute h-[50%] w-[10%] text-[white] left-0 top-3 pl-[10px]'>
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
         </div>
         <div className='w-[70%] flex justify-center relative m-[3%]'>
-                <input type="Password" name="" id="" placeholder='Password' className='relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl  pl-[50px] '/>
+                <input 
+                value={password}
+                onChange={(e) =>
+                setPassword(e.target.value)}
+                type="Password" name="password" id="Password" placeholder='Password' className='relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl  pl-[50px] '/>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className=' absolute h-[50%] w-[10%] text-[white] left-0 top-3 pl-[10px]'>
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
@@ -41,12 +67,13 @@ function Login() {
             <label htmlFor="remember" className='text-white pl-1 '>Remember Me</label>
         </div>
         <div className='m-[2%] w-[35%]'>
-            <button className='bg-[#7F5AF0] w-[100%] text-[1.2rem] rounded-4xl text-white p-4 font-bold hover:cursor-pointer'>Login</button>
+            <button 
+            className='bg-[#7F5AF0] w-[100%] text-[1.2rem] rounded-4xl text-white p-4 font-bold hover:cursor-pointer'>Login</button>
         </div>                
             </form>
 
         <div className='text-white'>
-            <p>Dont have an account? <span className='text-blue-200 hover:cursor-pointer'>Register here</span></p>
+            <p>Dont have an account? <Link to='/Register'className='text-blue-200 hover:cursor-pointer'>Register here</Link></p>
         </div>
 
             </div>
