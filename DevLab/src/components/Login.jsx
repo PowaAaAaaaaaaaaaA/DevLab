@@ -15,7 +15,7 @@ function Login() {
     e.preventDefault();
     try{
         await signInWithEmailAndPassword(auth, email, password);
-        console.log("Logged id")
+        window.location.href='/Main'
     }catch(error){
         toast.error(error.message,{
                         position:"bottom-center",

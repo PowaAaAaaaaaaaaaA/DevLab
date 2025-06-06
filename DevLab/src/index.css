@@ -1,10 +1,19 @@
 @font-face {
     font-family: Exo;
     src: url("../src/assets/Fonts/Exo2-Regular.ttf");
-}
 
-@import "tailwindcss";
+}
+@font-face {
+    font-family: Inter;
+    src: url("../src/assets/Fonts/Inter_28pt-Regular.ttf")
+}
 
 @theme{
     --font-exo:Exo;
 }
+@theme{
+    --font-inter:Inter;
+}
+
+@import "tailwindcss";
+

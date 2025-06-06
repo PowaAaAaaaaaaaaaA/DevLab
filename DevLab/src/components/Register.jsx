@@ -108,7 +108,7 @@ function Register() {
             {/*Register Button*/}
             <div className='m-[2%] w-[35%]'>
                     <button 
-                    onClick={(e)=>{HandleRegister(e)}}
+                    onClick={(e)=>{handleRegister(e)}}
                     className='bg-[#7F5AF0] w-[100%] text-[1.2rem] rounded-4xl text-white p-4 font-bold hover:cursor-pointer'>Register</button>
             </div>        
             {/*------FORM END-------*/}        
