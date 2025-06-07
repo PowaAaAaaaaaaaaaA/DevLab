@@ -24,20 +24,24 @@ function App() {
   })
     */}
 
+  const isLoggedIn = window.localStorage.getItem("loggedIn");
+
   return (
     <>
-    <Routes>
+  <Routes>
       <Route path="/" element={/*user ?  <Navigate to={'/Main'}/>:*/<Login/>}/>
       <Route path="/Register" element={<Register/>}/>
       <Route path="/" element={<Layout/>}/>
 
-      <Route path="/Main" element={<Layout/>}>
-        <Route path="/Main" element={<Dashboard/>}/>
+
+{/*Protected Routes*/}
+    <Route path="/Main" element={<Layout/>}>
+        <Route index element={<Dashboard/>}/>
         <Route path="Lessons" element={<Lessons/>}/>
-        <Route path="Achivements" element={<Achievements/>}/>
+        <Route path="Achievements" element={<Achievements/>}/>
         <Route path="Shop" element={<Shop/>}/>
     </Route>
-    </Routes>
+  </Routes>
 
     <ToastContainer/>
     </>

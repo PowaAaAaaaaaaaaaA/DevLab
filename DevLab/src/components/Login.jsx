@@ -15,6 +15,7 @@ function Login() {
     e.preventDefault();
     try{
         await signInWithEmailAndPassword(auth, email, password);
+        window.localStorage.setItem("loggedIn", true);
         window.location.href='/Main'
     }catch(error){
         toast.error(error.message,{

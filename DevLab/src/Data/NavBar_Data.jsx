@@ -18,27 +18,27 @@ export const Navbar_Data=[
     },{
         key:'lessons',
         label:'Lessons',
-        path:'/Lessons',
+        path:'/Main/Lessons',
         icon:<IoLibraryOutline />
     },{
         key:'achievements',
         label:'Achievements',
-        path:'/Achievements',
+        path:'/Main/Achievements',
         icon:<IoTrophyOutline />
     },{
         key:'shop',
         label:'Shop',
-        path:'/Shop',
+        path:'/Main/Shop',
         icon:<IoCartOutline />
     },{
         key:'coding',
         label:'Coding Playground',
-        path:'/codingPlay',
+        path:'/Main/codingPlay',
         icon:<IoCodeSlash />
     },{
         key:'data',
         label:'Database Playground',
-        path:'/dataPlayground',
+        path:'/Main/dataPlayground',
         icon:<IoLayersOutline />
 
     },
