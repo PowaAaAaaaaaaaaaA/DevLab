@@ -1,5 +1,8 @@
 import React from 'react'
-import HtmlIcons from '../assets/Images/html Icon.png'
+import HtmlIcons from '../assets/Images/html-Icon.png'
+import CssIcons from '../assets/Images/css-Icon.png'
+import JsIcons from '../assets/Images/js-Icon.png'
+
 
 function Dashboard() {
   return (
@@ -40,10 +43,35 @@ function Dashboard() {
         <div className='h-[70%] flex flex-col p-3 gap-5'>
           <h2 className='text-white font-exo font-bold text-[2rem]'>View Your Progress</h2>
           <div className='w-[100%] h-[80%] flex items-center justify-around'>
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2'><div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#FFD700_0%,_#FF4500_100%)] m-auto mt-0 rounded-2xl'></div></div>
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2'><div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#00CFFF_0%,_#1E90FF_100%)]  m-auto mt-0 rounded-2xl'></div></div>
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2'><div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#fef102_0%,_#ff8000_100%)] m-auto mt-0 rounded-2xl'></div></div>
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2'><div className='w-[95%] h-[60%]  bg-[radial-gradient(circle,_#4cd137_0%,_#218c74_100%)] m-auto mt-0 rounded-2xl'></div></div>
+
+            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+              <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#FFD700_0%,_#FF4500_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
+                <img src={HtmlIcons} alt="" />
+              </div>
+              <p className='font-exo text-white'>HTML Development</p>
+            </div>
+
+            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+              <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#00CFFF_0%,_#1E90FF_100%)]  m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
+                <img src={CssIcons} alt="" />
+              </div>
+              <p className='font-exo text-white'>CSS Development</p>
+            </div>
+
+            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+              <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#fef102_0%,_#ff8000_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
+                <img src={JsIcons} alt="" />
+              </div>
+              <p className='font-exo text-white'>JavaScript Development</p>
+            </div>
+
+            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+              <div className='w-[95%] h-[60%]  bg-[radial-gradient(circle,_#4cd137_0%,_#218c74_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
+                <img src={HtmlIcons} alt="" />
+              </div>
+              <p className='font-exo text-white'>Database Development</p>
+
+            </div>
           </div>
         </div>
       </div>
