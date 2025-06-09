@@ -9,7 +9,7 @@ function Dashboard() {
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
     {/*Profile*/}
-    <div className='bg-[#111827] w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
+    <div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
       <div className='w-[30%] h-[90%] flex items-center flex-col gap-5 p-2'>
         <div className='bg-amber-300 w-[60%] h-[100%] rounded-[100%]'></div>
         <div className='text-white font-inter font-bold'>Bio</div>
@@ -18,15 +18,21 @@ function Dashboard() {
         <p className='text-white font-inter font-bold'>Good to see you!</p>
         <h1 className='text-[5.6rem] text-white font-inter font-bold'>This is User</h1>
         <p className='text-white font-inter font-bold'>Level 10</p>
-        <div>User Progess Bar</div>
-          <div className='flex w-[40%] justify-around mt-[10px]'>
-            <p className='text-white font-inter font-bold'>User Xp</p>
-            <div className='text-white font-inter font-bold'>User Money</div>
-          </div>
+            {/*Progress Bar*/}
+        <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
+          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}></div>
+        </div>
+            {/*Progress Bar*/}
+        <div className='flex w-[40%] justify-around mt-[10px]'>
+          <p className='text-white font-inter font-bold'>User Xp</p>
+          <div className='text-white font-inter font-bold'>User Money</div>
+        </div>
       </div>
     </div>
 
+    {/*Bottom Part*/}
     <div className='h-[100%] flex gap-2'>
+
       <div className='w-[70%] h-[100%] flex flex-col'>
         <div className='h-[40%] p-3 flex flex-col gap-5'>
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
@@ -43,40 +49,40 @@ function Dashboard() {
         <div className='h-[70%] flex flex-col p-3 gap-5'>
           <h2 className='text-white font-exo font-bold text-[2rem]'>View Your Progress</h2>
           <div className='w-[100%] h-[80%] flex items-center justify-around'>
-
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+            
+            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
               <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#FFD700_0%,_#FF4500_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
                 <img src={HtmlIcons} alt="" />
               </div>
               <p className='font-exo text-white'>HTML Development</p>
             </div>
 
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
               <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#00CFFF_0%,_#1E90FF_100%)]  m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
                 <img src={CssIcons} alt="" />
               </div>
               <p className='font-exo text-white'>CSS Development</p>
             </div>
 
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
               <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#fef102_0%,_#ff8000_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
                 <img src={JsIcons} alt="" />
               </div>
               <p className='font-exo text-white'>JavaScript Development</p>
             </div>
 
-            <div className='border w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
+            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
               <div className='w-[95%] h-[60%]  bg-[radial-gradient(circle,_#4cd137_0%,_#218c74_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
                 <img src={HtmlIcons} alt="" />
               </div>
               <p className='font-exo text-white'>Database Development</p>
-
             </div>
           </div>
         </div>
       </div>
+        <div className=' bg-[#111827] border-2  w-[30%] h-[100%] rounded-3xl'>
 
-      <div className=' bg-amber-700 w-[30%] h-[100%]'></div>
+        </div>
     </div>
 
 
