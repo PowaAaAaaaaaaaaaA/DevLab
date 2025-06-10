@@ -1,22 +1,44 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import HtmlIcons from '../assets/Images/html-Icon.png'
 import CssIcons from '../assets/Images/css-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
+import {auth, db} from "../Firebase/Firebase"
+import {doc, getDoc } from 'firebase/firestore';
 
 
 function Dashboard() {
+
+const [userDetails, setUserDetails] = useState("");
+
+const fetchUserData =async()=>{
+  auth.onAuthStateChanged(async (user)=>{
+    const docRef = doc(db, "Users", user.uid);
+    const docSnap =await getDoc(docRef);
+
+    if(docSnap.exists()){
+      setUserDetails(docSnap.data());
+      console.log(docSnap.data());
+    }else{
+      console.log("USer not Logged In")
+    }
+  })
+}
+useEffect(()=>{
+  fetchUserData();
+}, [])
+
   return (
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
-    {/*Profile*/}
-    <div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
+    {userDetails ? 
+    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
       <div className='w-[30%] h-[90%] flex items-center flex-col gap-5 p-2'>
         <div className='bg-amber-300 w-[60%] h-[100%] rounded-[100%]'></div>
         <div className='text-white font-inter font-bold'>Bio</div>
       </div>
       <div className='h-[80%] w-[100%] flex flex-col p-2'>
         <p className='text-white font-inter font-bold'>Good to see you!</p>
-        <h1 className='text-[5.6rem] text-white font-inter font-bold'>This is User</h1>
+        <h1 className='text-[5.6rem] text-white font-inter font-bold'>{userDetails.username}</h1>
         <p className='text-white font-inter font-bold'>Level 10</p>
             {/*Progress Bar*/}
         <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
@@ -28,7 +50,9 @@ function Dashboard() {
           <div className='text-white font-inter font-bold'>User Money</div>
         </div>
       </div>
-    </div>
+    </div>): (<p>Loading</p>)}
+    {/*Profile*/}
+    
 
     {/*Bottom Part*/}
     <div className='h-[100%] flex gap-2'>
