@@ -1,6 +1,6 @@
 import React from 'react'
 import Example from '../assets/Images/Example1.jpg'
-import { Achievements_Data } from '../Data/Achievements_Data'
+import { HTML_Data,CSS_Data,Js_Data,Query_Data } from '../Data/Achievements_Data'
 
 function Achievements() {
   return (
@@ -45,10 +45,10 @@ function Achievements() {
   dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 p-5'>
 
       <div className='flex flex-col items-center gap-10'>
-        <h1 className='text-[#FF5733] font-exo font-bold text-5xl'>HTML ACHIEVEMENTS</h1>
+        <h1 className='text-[#FF5733] font-exo font-bold text-5xl text-shadow-lg/30'>HTML ACHIEVEMENTS</h1>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
-          {Achievements_Data.map((item)=>(
+          {HTML_Data.map((item)=>(
         <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
           <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
             <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
@@ -60,10 +60,10 @@ function Achievements() {
         </div>
           ))}
         </div>
-         <h1 className='text-[#FF5733] font-exo font-bold text-5xl'>HTML ACHIEVEMENTS</h1>
+        <h1 className='text-[#1E90FF] font-exo font-bold text-5xl text-shadow-lg/30'>CSS ACHIEVEMENTS</h1>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
-          {Achievements_Data.map((item)=>(
+          {CSS_Data.map((item)=>(
         <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
           <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
             <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
@@ -75,10 +75,25 @@ function Achievements() {
         </div>
           ))}
         </div>
-         <h1 className='text-[#FF5733] font-exo font-bold text-5xl'>HTML ACHIEVEMENTS</h1>
+         <h1 className='text-[#F7DF1E] font-exo font-bold text-5xl text-shadow-lg/30'>JAVASCRIPT ACHIEVEMENTS</h1>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
-          {Achievements_Data.map((item)=>(
+          {Js_Data.map((item)=>(
+        <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
+          <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
+            <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
+            <hr className="border-t border-gray-700 w-full" />
+            <h3 className="text-white text-lg font-bold">{item.label}</h3>
+            <p className="text-gray-400 text-sm">{item.desc}</p>
+            <span className="bg-green-500 text-white px-4 py-1 rounded-full font-semibold">COMPLETED</span>
+          </div>
+        </div>
+          ))}
+        </div>
+        <h1 className='text-[#4CAF50] font-exo font-bold text-5xl text-shadow-lg/30'>DATA QUERYING ACHIEVEMENTS</h1>
+
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
+          {Query_Data.map((item)=>(
         <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
           <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
             <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
