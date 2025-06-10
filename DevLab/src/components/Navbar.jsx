@@ -1,19 +1,10 @@
-import React from 'react'
+
 import { Link } from 'react-router-dom'
 import { Navbar_Data } from '../Data/NavBar_Data'
 import { auth } from '../Firebase/Firebase'
+import { LuCog } from "react-icons/lu";
 
 
-async function logout (){
-    try{
-        await auth.signOut();
-        window.location.href='/';
-        window.localStorage.setItem("loggedIn", false);
-
-    }catch (error){
-        console.log(error);
-    }
-}
 
 function Navbar() {
   return (
@@ -29,8 +20,8 @@ function Navbar() {
                 </Link>
             ))}
         </div>
-        <Link>
-        <div className='flex justify-center w-full overflow-hidden group relative hover:bg-gradient-to-r hover:from-[#0D1117]] hover:to-[#9333EA] text-white hover:ring-3 hover:ring-offset-0 hover:ring-[#9333EA] transition-all ease-out duration-300"font-inter text-[1.3rem] rounded-4xl'><button onClick={logout}>Temp Logout </button></div></Link>
+        <Link to={'Settings'}>
+        <div className='flex justify-center  items-center  gap-3.5 w-full overflow-hidden group relative hover:bg-gradient-to-r hover:from-[#0D1117]] hover:to-[#9333EA] text-white font-bold font-inter hover:ring-3 hover:ring-offset-0 hover:ring-[#9333EA] transition-all ease-out duration-300"font-inter text-[1.3rem] rounded-4xl'>  <LuCog /> <p>Settings</p></div></Link>
     </div>
   )
 }

@@ -11,6 +11,7 @@ import Dashboard from './components/Dashboard'
 import Lessons from './components/Lessons'
 import Achievements from './components/Achievements'
 import Shop from './components/Shop'
+import Settings from './components/Settings'
 
 
 function App() {
@@ -40,6 +41,8 @@ function App() {
         <Route path="Lessons" element={<Lessons/>}/>
         <Route path="Achievements" element={<Achievements/>}/>
         <Route path="Shop" element={<Shop/>}/>
+
+        <Route path="Settings" element={<Settings/>}/>
     </Route>
   </Routes>
 
