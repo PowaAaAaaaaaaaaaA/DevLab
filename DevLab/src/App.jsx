@@ -12,6 +12,7 @@ import Lessons from './components/Lessons'
 import Achievements from './components/Achievements'
 import Shop from './components/Shop'
 import Settings from './components/Settings'
+import CodePlayground from "./components/CodePlayground";
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
 
         <Route path="Settings" element={<Settings/>}/>
     </Route>
+      <Route path="/codingPlay" element={<CodePlayground/>}/>
   </Routes>
 
     <ToastContainer/>
