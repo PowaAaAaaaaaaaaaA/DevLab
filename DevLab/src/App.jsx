@@ -15,38 +15,39 @@ import Settings from './components/Settings'
 import CodePlayground from "./components/CodePlayground";
 
 
+
 function App() {
-{/*
+
   const[user, setUser] = useState();
 
-  useEffect(()=>{
-    auth.onAuthStateChanged((user)=>{
-      setUser(user);
-    })
-  })
-    */}
+useEffect(() => {
+  const unsubscribe = auth.onAuthStateChanged((user) => {
+    setUser(user);
+  });
+  return () => unsubscribe(); // cleanup
+}, []);
 
-  const isLoggedIn = window.localStorage.getItem("loggedIn");
+const isLoggedIn = !!user;
 
   return (
     <>
   <Routes>
-      <Route path="/" element={/*user ?  <Navigate to={'/Main'}/>:*/<Login/>}/>
-      <Route path="/Register" element={<Register/>}/>
-      <Route path="/" element={<Layout/>}/>
+  {/* Public Routes */}
+  <Route path="/" element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />} />
+  <Route path="/Login" element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />} />
+  <Route path="/Register" element={!isLoggedIn ? <Register /> : <Navigate to="/Main" replace />} />
 
+  {/* Protected Routes */}
+  <Route path="/Main" element={isLoggedIn ? <Layout /> : <Navigate to="/Login" replace />}>
+    <Route index element={<Dashboard />} />
+    <Route path="Lessons" element={<Lessons />} />
+    <Route path="Achievements" element={<Achievements />} />
+    <Route path="Shop" element={<Shop />} />
+    <Route path="codingPlay" element={<CodePlayground />} />
+    <Route path="Settings" element={<Settings />} />
+  </Route>
+</Routes>
 
-{/*Protected Routes*/}
-    <Route path="/Main" element={<Layout/>}>
-        <Route index element={<Dashboard/>}/>
-        <Route path="Lessons" element={<Lessons/>}/>
-        <Route path="Achievements" element={<Achievements/>}/>
-        <Route path="Shop" element={<Shop/>}/>
-
-        <Route path="Settings" element={<Settings/>}/>
-    </Route>
-      <Route path="/codingPlay" element={<CodePlayground/>}/>
-  </Routes>
 
     <ToastContainer/>
     </>

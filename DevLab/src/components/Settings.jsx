@@ -1,21 +1,24 @@
 import React from 'react'
 import { IoPerson } from "react-icons/io5";
 import { auth } from '../Firebase/Firebase'
+import { useNavigate } from 'react-router-dom';
 
 
-async function logout (){
-    try{
-        await auth.signOut();
-        window.location.href='/';
-        window.localStorage.setItem("loggedIn", false);
 
-    }catch (error){
-        console.log(error);
-    }
-}
+
 
 function Settings() {
-  return (
+    const logout = async () => {
+    try {
+    await auth.signOut();
+      navigate('/Login', { replace: true }); // ✅ Use navigate instead of window.location
+    } catch (error) {
+    console.log(error);
+    }
+};
+
+    const navigate = useNavigate();
+return (
     <div className='bg-[#111827] flex flex-col items-center gap-5 p-5 h-[95%] w-[40%] m-auto mt-5 rounded-3xl border-2 shadow-2xl shadow-black'>
 
     <div className='w-[35%] h-[25%] bg-amber-300 rounded-[100px]'></div>

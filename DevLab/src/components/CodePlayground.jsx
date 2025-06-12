@@ -3,21 +3,19 @@ import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
+import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night';
 
 function CodePlayground() {
 const tabs = ["HTML", "CSS", "JavaScript"];
 const [activeTab, setActiveTab] = useState("HTML");
-
-
+// useRef
 const iFrame = useRef(null);
-
-// Store code for each tab
+// Initial Text Each Tab
 const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
     JavaScript: "// Write your JavaScript code here",
 });
-
 // Handle code change based on active tab
 const onChange = useCallback((val) => {
     setCode((prev) => ({
@@ -25,7 +23,6 @@ const onChange = useCallback((val) => {
     [activeTab]: val,
 }));
 }, [activeTab]);
-
 // Determine the CodeMirror extension based on active tab
 const getLanguageExtension = () => {
     switch (activeTab) {
@@ -39,8 +36,7 @@ const getLanguageExtension = () => {
     return javascript();
     }
 };
-
-
+// This will run the code when the Button is pressed hehe
 const runCode = () => {
     const fullCode = 
     `<!DOCTYPE html>
@@ -55,6 +51,7 @@ const runCode = () => {
     </script>
     </body>
     </html>`;
+// Display code in the DIV MODOFAKA
     const iframe =  iFrame.current;
     if (iframe) {
     const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -63,12 +60,11 @@ const runCode = () => {
     doc.close();
     }
 };
-
 return (
-    <div className="bg-[#16161A] h-screen text-white font-exo flex flex-col">
+    <div className="bg-[#16161A] h-screen text-white font-exo flex flex-col p-3">
     <div className="text-3xl font-bold p-10">DEVLAB</div>
 
-    <div className="flex p-1 gap-1.5 h-full">
+    <div className="flex p-1 gap-5 h-full">
         {/* Left Panel */}
         <div className="flex flex-col w-[60%]">
           {/* Tabs */}
@@ -77,39 +73,34 @@ return (
             <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`font-exo font-bold rounded-2xl w-[17%] h-full bg-[#1E1E2E] transition ${
+                className={`font-exo font-bold rounded-2xl w-[17%] h-full bg-[#1E1E2E]  ${
                 activeTab === tab
                     ? "text-[#9333EA]"
-                    : "text-gray-100 hover:text-gray-200"
+                    : "text-gray-100 hover:text-gray-200 hover:cursor-pointer "
                 }`}>
                 {tab}
             </button>
             ))}
         </div>
-
-          {/* Code Editor */}
-        <div className="px-4 w-full h-full">
+        {/* Code Editor wrapper */}
+        <div className="px-4 w-full h-[92%] flex flex-col gap-3 rounded-3xl p-3 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
             <CodeMirror
+                className='text-xl'
                 value={code[activeTab]}
-                height="400px"
+                height="660px"
                 extensions={[getLanguageExtension()]}
                 onChange={onChange}
-                theme="dark"
-            />
+                theme={tokyoNight}/>
+            <button onClick={runCode} className="ml-auto px-4 py-2 bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[15%]">Run Code</button>
         </div>
-            <button
-                onClick={runCode}
-                className="ml-auto px-4 py-2 bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 transition">Run Code</button>
         </div>
-
         {/* Output Panel */}
-        <div className="bg-[#D9D9D9] w-[39%] h-full rounded-2xl border-2 border-black shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="bg-[#D9D9D9] w-[39%] h-full rounded-2xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
         <iframe
             title="output"
             ref={iFrame}
             className="w-full h-full"
-            sandbox="allow-scripts allow-same-origin"
-        />
+            sandbox="allow-scripts allow-same-origin allow-modals"/>
         </div>
     </div>
     </div>
