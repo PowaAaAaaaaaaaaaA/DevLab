@@ -95,11 +95,11 @@ return (
         </div>
         </div>
         {/* Output Panel */}
-        <div className="bg-[#D9D9D9] w-[39%] h-full rounded-2xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="bg-[#1c1e36] w-[39%] h-full rounded-2xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
         <iframe
             title="output"
             ref={iFrame}
-            className="w-full h-full"
+            className="w-full h-full rounded-3xl"
             sandbox="allow-scripts allow-same-origin allow-modals"/>
         </div>
     </div>

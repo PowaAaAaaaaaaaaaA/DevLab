@@ -11,7 +11,7 @@ function Settings() {
     const logout = async () => {
     try {
     await auth.signOut();
-      navigate('/Login', { replace: true }); // ✅ Use navigate instead of window.location
+      navigate('/Login'); // Use navigate 
     } catch (error) {
     console.log(error);
     }

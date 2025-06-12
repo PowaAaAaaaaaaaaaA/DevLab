@@ -14,18 +14,16 @@ import Shop from './components/Shop'
 import Settings from './components/Settings'
 import CodePlayground from "./components/CodePlayground";
 
-
-
 function App() {
 
   const[user, setUser] = useState();
 
-useEffect(() => {
+useEffect(() => { //
   const unsubscribe = auth.onAuthStateChanged((user) => {
     setUser(user);
   });
   return () => unsubscribe(); // cleanup
-}, []);
+}, []); //
 
 const isLoggedIn = !!user;
 
@@ -43,12 +41,12 @@ const isLoggedIn = !!user;
     <Route path="Lessons" element={<Lessons />} />
     <Route path="Achievements" element={<Achievements />} />
     <Route path="Shop" element={<Shop />} />
-    <Route path="codingPlay" element={<CodePlayground />} />
     <Route path="Settings" element={<Settings />} />
   </Route>
+
+  <Route path="/codingPlay" element={isLoggedIn ? <CodePlayground /> : <Navigate to="/Login" replace />} />
+
 </Routes>
-
-
     <ToastContainer/>
     </>
   )

@@ -33,7 +33,7 @@ export const Navbar_Data=[
     },{
         key:'coding',
         label:'Coding Playground',
-        path:'/Main/codingPlay',
+        path:'/codingPlay',
         icon:<IoCodeSlash />
     },{
         key:'data',
