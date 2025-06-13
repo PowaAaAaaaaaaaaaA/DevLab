@@ -1,7 +1,6 @@
 
 import { Link } from 'react-router-dom'
 import { Navbar_Data } from '../Data/NavBar_Data'
-import { auth } from '../Firebase/Firebase'
 import { LuCog } from "react-icons/lu";
 
 

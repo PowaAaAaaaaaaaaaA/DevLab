@@ -1,3 +1,4 @@
+// Database Querying Playground 
 import React, { useEffect, useRef, useState } from "react";
 import initSqlJs from "sql.js";
 import CodeMirror from '@uiw/react-codemirror';
