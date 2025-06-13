@@ -38,7 +38,7 @@ export const Navbar_Data=[
     },{
         key:'data',
         label:'Database Playground',
-        path:'/Main/dataPlayground',
+        path:'/dataPlayground',
         icon:<IoLayersOutline />
 
     },

@@ -13,6 +13,7 @@ import Achievements from './components/Achievements'
 import Shop from './components/Shop'
 import Settings from './components/Settings'
 import CodePlayground from "./components/CodePlayground";
+import DataqueriesPlayground from "./components/DataqueriesPlayground";
 
 function App() {
 
@@ -45,6 +46,7 @@ const isLoggedIn = !!user;
   </Route>
 
   <Route path="/codingPlay" element={isLoggedIn ? <CodePlayground /> : <Navigate to="/Login" replace />} />
+  <Route path="/dataPlayground" element={isLoggedIn ? <DataqueriesPlayground /> : <Navigate to="/Login" replace />} />
 
 </Routes>
     <ToastContainer/>

@@ -8,7 +8,9 @@ function Layout() {
 
  if (location.pathname === '/codePlay') {
     return <Outlet />;
-  }
+  }else if (location.pathname ==='/dataPlayground') {
+    return <Outlet/>
+  } 
 
     return (
     <div className='flex flex-row bg-[#0D1117] w-screen h-screen overflow-hidden gap-15 items-center p-5'>
