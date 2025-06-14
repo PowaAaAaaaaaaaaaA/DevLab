@@ -38,7 +38,7 @@ const isLoggedIn = !!user;
 
   {/* Protected Routes */}
   <Route path="/Main" element={isLoggedIn ? <Layout /> : <Navigate to="/Login" replace />}>
-    <Route index element={<Dashboard />} />
+    <Route path="Dashboard" element={<Dashboard />} />
     <Route path="Lessons" element={<Lessons />} />
     <Route path="Achievements" element={<Achievements />} />
     <Route path="Shop" element={<Shop />} />

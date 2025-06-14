@@ -13,13 +13,18 @@ export const Navbar_Data=[
     {
         key:'dashboard',
         label:'Dashbaord',
-        path:'/Main',
+        path:'/Main/Dashboard',
         icon:<IoHomeOutline />
     },{
         key:'lessons',
         label:'Lessons',
         path:'/Main/Lessons',
-        icon:<IoLibraryOutline />
+        icon:<IoLibraryOutline />,
+        children: [
+    { key: 'html', label: 'HTML Basics', path: '/Main/Lessons/HTML' },
+    { key: 'css', label: 'CSS Basics', path: '/Main/Lessons/CSS' },
+    { key: 'js', label: 'JavaScript Basics', path: '/Main/Lessons/JavaScript' },
+    ]
     },{
         key:'achievements',
         label:'Achievements',
