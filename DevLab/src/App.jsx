@@ -14,6 +14,8 @@ import Shop from './components/Shop'
 import Settings from './components/Settings'
 import CodePlayground from "./components/CodePlayground";
 import DataqueriesPlayground from "./components/DataqueriesPlayground";
+import HtmlLessons from "./Lessons/HtmlLessons";
+import LessonPage from "./Lessons/LessonPage";
 
 function App() {
 
@@ -38,8 +40,12 @@ const isLoggedIn = !!user;
 
   {/* Protected Routes */}
   <Route path="/Main" element={isLoggedIn ? <Layout /> : <Navigate to="/Login" replace />}>
-    <Route path="Dashboard" element={<Dashboard />} />
-    <Route path="Lessons" element={<Lessons />} />
+    <Route index element={<Dashboard />} />
+    <Route path="Lessons" element={<Lessons />} > 
+      <Route path="HTML" element={<HtmlLessons/>}>
+      <Route path="view/:id" element={<LessonPage />} />
+      </Route>
+    </Route>
     <Route path="Achievements" element={<Achievements />} />
     <Route path="Shop" element={<Shop />} />
     <Route path="Settings" element={<Settings />} />

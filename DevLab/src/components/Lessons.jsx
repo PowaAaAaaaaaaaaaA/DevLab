@@ -1,8 +1,9 @@
 import React from 'react'
+import { Outlet } from 'react-router-dom'
 
 function Lessons() {
   return (
-    <div>Lessons Helloooo</div>
+    <Outlet></Outlet>
   )
 }
 

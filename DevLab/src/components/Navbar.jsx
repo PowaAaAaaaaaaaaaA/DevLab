@@ -24,10 +24,7 @@ return (
             <div onClick={() => item.children ? toggleDropdown(item.key) : null}>
             <NavLink
                 to={item.path}
-                    className={({ isActive }) =>
-                    `flex items-center gap-3 font-inter text-[1.3rem] relative rounded px-5 py-2.5 overflow-hidden group hover:bg-gradient-to-r hover:from-[#0D1117] hover:to-[#9333EA] hover:ring-3 hover:ring-offset-0 hover:ring-[#9333EA] transition-all ease-out duration-300 ${
-                    isActive ? 'text-[#9333EA]' : 'text-white'
-                }`}>
+                    className= 'flex items-center gap-3 font-inter text-[1.3rem] relative rounded px-5 py-2.5 overflow-hidden group hover:bg-gradient-to-r hover:from-[#0D1117] hover:to-[#9333EA] hover:ring-3 hover:ring-offset-0 hover:ring-[#9333EA] transition-all ease-out duration-300 '>
                 <span className='text-xl'>{item.icon}</span>
                 {item.label}
                 {item.children && (
@@ -43,9 +40,9 @@ return (
                 <NavLink
                     to={sub.path}
                     key={sub.key}
-                    className={({ isActive }) =>
-                    `text-sm font-inter px-3 py-1.5 rounded hover:bg-[#1a1a1a] transition ${
-                    isActive ? 'text-[#9333EA]' : 'text-white'}`}>{sub.label}
+                    className='flex items-center p-2 gap-3 text-[1.1rem] font-inter '>
+                    <span className='text-xl'>{item.icon}</span>
+                    {sub.label}
                 </NavLink>))}
             </div>
             )}

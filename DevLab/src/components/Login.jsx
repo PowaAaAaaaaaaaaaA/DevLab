@@ -19,7 +19,7 @@ function Login() {
     e.preventDefault();
     try{
         await signInWithEmailAndPassword(auth, email, password);
-        navigate('/Main', { replace: true });
+        navigate('/Main/Dashboard', { replace: true });
     }catch(error){
         toast.error(error.message,{
                         position:"bottom-center",
