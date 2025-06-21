@@ -4,10 +4,14 @@ import { db } from "../Firebase/Firebase";
 import { useNavigate} from "react-router-dom"; 
 import HtmlImage from "../assets/Images/html-Icon-Big.png"
 import { MdOutlineLock } from "react-icons/md";
+import Lottie from "lottie-react";
+import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 function HtmlLessons() {
 
     const navigate = useNavigate();
     const [lessons, setLessons] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showLevels, setShowLevels] = useState(false);
 useEffect(() => {
     const fetchData = async () => {
       const htmlRef = collection(db, "Html");
@@ -27,6 +31,8 @@ useEffect(() => {
         })
       );
       setLessons(lessonData);
+      setTimeout(() => setShowLevels(true), 100);
+      setLoading(false);
     };
 
     fetchData();
@@ -56,7 +62,10 @@ useEffect(() => {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
         {/*Left Panel*/}
-        <div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
+        {loading?
+        /*Loading*/
+      (<Lottie animationData={Animation} loop={true} className="w-[60%] h-[70%] mt-[30px]" />):
+      (<div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
           [&::-webkit-scrollbar]:w-2
           [&::-webkit-scrollbar-track]:rounded-full
         [&::-webkit-scrollbar-track]:bg-gray-100
@@ -67,15 +76,17 @@ useEffect(() => {
       {lessons.map((lesson) => (
         <div key={lesson.id} className="flex flex-col gap-4">
           <h2 className="font-exo text-[3rem] font-bold text-white">{lesson.title}</h2> 
-
           <div className="flex flex-col gap-4">
             {lesson.levels.map((level) => (
-              <div key={level.id}  
+              <div key={level.id} 
+              className= {`w-full border flex gap-5 rounded-4xl transition-all duration-2400 ease-out transform
+                    ${showLevels ? 'translate-y-0' : ' translate-y-20'}
+                    ${level.status === false
+                    ? "bg-[#060505] opacity-30 cursor-not-allowed"
+                    : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
               onClick={() => {
               if (level.status) {
-              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);}}}
-className={`w-full border flex gap-5 rounded-4xl ${
-        level.status === false ? "bg-[#060505] opacity-30 cursor-not-allowed" : "bg-[#111827] hover:scale-102 transition duration-300 cursor-pointer"}`}>
+              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);}}}>
                 <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
                   <div className="p-4 text-white font-exo"> 
                     <p className="text-[1.4rem]">{level.title}</p>
@@ -84,9 +95,9 @@ className={`w-full border flex gap-5 rounded-4xl ${
               </div> 
             ))}
             </div>
-        </div>
-      ))}
-        </div>
+        </div>))}
+      </div>)
+      }
         {/*Right Panel*/}
           <div className="w-[40%] flex flex-col gap-4 p-5">
             <h2 className="text-[2.5rem] font-exo font-bold text-white text-shadow-sm text-shadow-black  tracking-wider">About <span className="text-[#FF5733]">HTML</span></h2>

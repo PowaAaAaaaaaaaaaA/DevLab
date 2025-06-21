@@ -4,12 +4,15 @@ import initSqlJs from "sql.js";
 import CodeMirror from '@uiw/react-codemirror';
 import { sql } from "@codemirror/lang-sql";
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night';
+import Lottie from "lottie-react";
+import Animation from '../assets/Lottie/OutputLottie.json'
 
 function DataqueriesPlayground() {
 const dbRef = useRef(null);
 const [query, setQuery] = useState("SELECT users.name, orders.item FROM users JOIN orders ON users.id = orders.user_id;");
 const [outputHtml, setOutputHtml] = useState("Write a query and click Run.");
 const [tablesHtml, setTablesHtml] = useState("");
+const [hasRunQuery, setHasRunQuery] = useState(false);
 
 useEffect(() => {
     initSqlJs({
@@ -30,7 +33,7 @@ useEffect(() => {
     renderAllTables();
     });
 }, []);
-
+// Display the Table
 const renderAllTables = () => {
     if (!dbRef.current) return;
     try {
@@ -43,11 +46,11 @@ const renderAllTables = () => {
         const result = dbRef.current.exec(`SELECT * FROM ${tableName}`);
         if (result.length) {
         const { columns, values } = result[0];
-        html += `<div class='mb-6'><h3 class='text-lg font-semibold mb-2'>${tableName}</h3>`;
-        html += `<div class="overflow-auto">
-            <table class="table-auto border-collapse border border-gray-400 w-full text-sm">
+        html += `<div class='mb-6 '><h3 class='text-lg font-semibold mb-2 '>${tableName}</h3>`;
+        html += `<div class="overflow-auto ">
+            <table class="table-auto border-collapse border border-gray-400 bg-[#1A1B26] w-full text-sm">
             <thead>
-                <tr class="bg-gray-200">
+                <tr class="bg-[#1A1B26]">
                 ${columns.map(col => `<th class="border px-4 py-2">${col}</th>`).join("")}
                 </tr>
             </thead>
@@ -68,18 +71,19 @@ const renderAllTables = () => {
 
 const runQuery = () => {
     try {
+    setHasRunQuery(true);
     const res = dbRef.current.exec(query);
     if (res.length === 0) {
-        setOutputHtml("✅ Query executed successfully. No results.");
+        setOutputHtml("Query executed successfully. No results.");
         renderAllTables();
         return;
     }
     const { columns, values } = res[0];
     const table = `
-        <div class="overflow-auto">
-        <table class="table-auto border-collapse border border-gray-400 w-full text-sm">
+        <div class="overflow-auto ">
+        <table class="table-auto border-collapse border border-gray-400 w-full text-sm ">
             <thead>
-            <tr class="bg-gray-100">
+            <tr class="bg-[#F8F3FF] p-3">
                 ${columns.map(col => `<th class="border px-4 py-2">${col}</th>`).join("")}
             </tr>
             </thead>
@@ -102,8 +106,8 @@ return (
     <div className="flex w-[100%] h-[100%] gap-10">
     <div className="flex flex-col w-[60%] h-[80%] gap-4">
         <div className=" h-[30%] overflow-scroll overflow-x-hidden p-4 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl">
-            <h2 className="text-xl font-semibold mb-2">Database Tables</h2>
-            <div dangerouslySetInnerHTML={{ __html: tablesHtml }} />
+            <h2 className="text-[1.5rem] font-semibold mb-2 text-white font-exo">Database Tables</h2>
+            <div dangerouslySetInnerHTML={{ __html: tablesHtml }} className="text-white" />
         </div>
         <div className="w-[100%] h-[100%] bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl flex flex-col p-4 justify-between">
             <CodeMirror
@@ -115,9 +119,17 @@ return (
             <button onClick={runQuery} className="ml-auto px-4 py-2 bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[15%]">Run Query</button>
         </div>
     </div>
-        <div
-            className="bg-[#1A1B26] h-[80%] w-[37%] p-4 text-2xl text-white font-exo rounded-3xl  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]"
-            dangerouslySetInnerHTML={{ __html: outputHtml }}/>
+    {/*Output Panel*/}
+    
+        <div className="bg-[#F8F3FF] h-[80%] w-[37%] text-2xl p-4 text-white font-exo rounded-3xl  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+            {!hasRunQuery ? (
+                <div className=" flex items-center justify-center w-full h-full flex-col">
+                <Lottie animationData={Animation} loop={true} className="w-[60%] h-[60%]" />
+                <p className="text-gray-700 font-bold w-[75%] text-[0.95rem]">YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT</p>
+                </div>
+        ) : (
+        <div className="text-2xl font-exo w-full h-full overflow-auto text-black "dangerouslySetInnerHTML={{ __html: outputHtml }}/>)}
+        </div>
     </div>
 </div>
 )}
