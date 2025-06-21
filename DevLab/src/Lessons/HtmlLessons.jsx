@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, orderBy,doc } from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
-import { useNavigate,Outlet } from "react-router-dom"; 
+import { useNavigate} from "react-router-dom"; 
 import HtmlImage from "../assets/Images/html-Icon-Big.png"
-
+import { MdOutlineLock } from "react-icons/md";
 function HtmlLessons() {
 
+    const navigate = useNavigate();
     const [lessons, setLessons] = useState([]);
 useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +36,7 @@ useEffect(() => {
     <>
         <div className="h-[100%]">
           {/*Upper Panel*/}
-          <div className="border-1 h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#FF5733] to-[#FFC300]">
+          <div className=" h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#FF5733] to-[#FFC300]">
             <div className="w-[80%] flex flex-col gap-7">
               <div className="p-3 flex flex-col gap-4">
                   <h1 className="font-exo text-white text-[3.5rem] font-bold text-shadow-lg text-shadow-black"> HTML: The Gateway to Web Adventure</h1>
@@ -55,16 +56,26 @@ useEffect(() => {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
         {/*Left Panel*/}
-        <div className="border w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden">
+        <div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
+          [&::-webkit-scrollbar]:w-2
+          [&::-webkit-scrollbar-track]:rounded-full
+        [&::-webkit-scrollbar-track]:bg-gray-100
+          [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-thumb]:bg-gray-300
+        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
       {lessons.map((lesson) => (
-          
         <div key={lesson.id} className="flex flex-col gap-4">
           <h2 className="font-exo text-[3rem] font-bold text-white">{lesson.title}</h2> 
 
           <div className="flex flex-col gap-4">
             {lesson.levels.map((level) => (
-              <div key={level.id} className={`w-full border flex gap-5 rounded-4xl ${
-        level.status === false ? "bg-[#060505] opacity-40 cursor-not-allowed" : "bg-[#111827]"}`}>
+              <div key={level.id}  
+              onClick={() => {
+              if (level.status) {
+              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);}}}
+className={`w-full border flex gap-5 rounded-4xl ${
+        level.status === false ? "bg-[#060505] opacity-30 cursor-not-allowed" : "bg-[#111827] hover:scale-102 transition duration-300 cursor-pointer"}`}>
                 <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
                   <div className="p-4 text-white font-exo"> 
                     <p className="text-[1.4rem]">{level.title}</p>
@@ -85,6 +96,7 @@ useEffect(() => {
         </div>
 
         </div>
+
     </>
   )
 }

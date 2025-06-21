@@ -18,6 +18,7 @@ const fetchUserData =async()=>{
     if(docSnap.exists()){
       setUserDetails(docSnap.data());
       console.log(docSnap.data());
+
     }else{
       console.log("USer not Logged In")
     }

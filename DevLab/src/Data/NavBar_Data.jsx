@@ -18,11 +18,11 @@ export const Navbar_Data=[
     },{
         key:'lessons',
         label:'Lessons',
-        path:'/Main/Lessons',
+        path:'/Main/Lessons/Html',
         icon:<IoLibraryOutline />,
         children: [
-    { key: 'html', label: 'HTML', path: '/Main/Lessons/HTML', icon:<IoLibraryOutline /> },
-    { key: 'css', label: 'CSS', path: '/Main/Lessons/CSS' , icon:<IoLibraryOutline />},
+    { key: 'html', label: 'HTML', path: '/Main/Lessons/Html', icon:<IoLibraryOutline /> },
+    { key: 'css', label: 'CSS', path: '/Main/Lessons/Css' , icon:<IoLibraryOutline />},
     { key: 'js', label: 'JavaScript', path: '/Main/Lessons/JavaScript', icon:<IoLibraryOutline /> },
     ]
     },{

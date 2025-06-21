@@ -5,6 +5,15 @@ import { useEffect, useState } from 'react'
 
 function Layout() {
     const location = useLocation();
+    const isLessonView =
+  location.pathname.startsWith("/Main/Lessons/Html/") ||
+  location.pathname.startsWith("/Main/Lessons/Css/") ||
+  location.pathname.startsWith("/Main/Lessons/JavaScript/");
+     const shouldSkipLayout = isLessonView;
+     
+     if (shouldSkipLayout) {
+    return <Outlet />;
+  }
 
  if (location.pathname === '/codePlay') {
     return <Outlet />;

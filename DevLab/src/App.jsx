@@ -15,7 +15,11 @@ import Settings from './components/Settings'
 import CodePlayground from "./components/CodePlayground";
 import DataqueriesPlayground from "./components/DataqueriesPlayground";
 import HtmlLessons from "./Lessons/HtmlLessons";
+import CssLessons from './Lessons/CssLessons'
+import JavaScriptLessons from "./Lessons/JavaScriptLessons";
 import LessonPage from "./Lessons/LessonPage";
+import LessonPage2 from "./Lessons/LessonPage2";
+
 
 function App() {
 
@@ -41,16 +45,18 @@ const isLoggedIn = !!user;
   {/* Protected Routes */}
   <Route path="/Main" element={isLoggedIn ? <Layout /> : <Navigate to="/Login" replace />}>
     <Route index element={<Dashboard />} />
-    <Route path="Lessons" element={<Lessons />} > 
-      <Route path="HTML" element={<HtmlLessons/>}>
-      <Route path="view/:id" element={<LessonPage />} />
-      </Route>
-    </Route>
+    <Route path="Lessons/Html" element={<HtmlLessons/>} />
+    <Route path="Lessons/Css" element={<CssLessons/>} /> 
+    <Route path="Lessons/JavaScript" element={<JavaScriptLessons/>} />  
+    
     <Route path="Achievements" element={<Achievements />} />
     <Route path="Shop" element={<Shop />} />
     <Route path="Settings" element={<Settings />} />
   </Route>
 
+  <Route path="/Main/Lessons/Html/:lessonId/:levelId" element={<LessonPage />} />
+  <Route path="/Main/Lessons/Css/:lessonId/:levelId" element={<LessonPage2 />} />
+  <Route path="/Main/Lessons/JavaScript/:lessonId/:levelId" element={<LessonPage />} />
   <Route path="/codingPlay" element={isLoggedIn ? <CodePlayground /> : <Navigate to="/Login" replace />} />
   <Route path="/dataPlayground" element={isLoggedIn ? <DataqueriesPlayground /> : <Navigate to="/Login" replace />} />
 

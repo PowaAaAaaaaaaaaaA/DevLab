@@ -4,10 +4,15 @@ import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night';
+import Lottie from "lottie-react";
+import Animation from '../assets/Lottie/OutputLottie.json'
 
 function CodePlayground() {
 const tabs = ["HTML", "CSS", "JavaScript"];
 const [activeTab, setActiveTab] = useState("HTML");
+const [run, setRun] = useState(false);
+
+
 // useRef
 const iFrame = useRef(null);
 // Initial Text Each Tab
@@ -16,6 +21,7 @@ const [code, setCode] = useState({
     CSS: "/* Write your CSS code here */",
     JavaScript: "// Write your JavaScript code here",
 });
+
 // Handle code change based on active tab
 const onChange = useCallback((val) => {
     setCode((prev) => ({
@@ -23,6 +29,8 @@ const onChange = useCallback((val) => {
     [activeTab]: val,
 }));
 }, [activeTab]);
+
+
 // Determine the CodeMirror extension based on active tab
 const getLanguageExtension = () => {
     switch (activeTab) {
@@ -36,8 +44,13 @@ const getLanguageExtension = () => {
     return javascript();
     }
 };
+
 // This will run the code when the Button is pressed hehe
 const runCode = () => {
+  setRun(true); // trigger iframe to appear
+
+  // Slight delay to allow iframe to mount first ( kase kelangan double click yung "run" btn kapag wlaang delay TT)
+setTimeout(() => {
     const fullCode = 
     `<!DOCTYPE html>
     <html lang="en">
@@ -47,18 +60,19 @@ const runCode = () => {
     <body>
     ${code.HTML}
     <script>
-        ${code.JavaScript}
+    ${code.JavaScript}
     </script>
     </body>
     </html>`;
-// Display code in the DIV MODOFAKA
-    const iframe =  iFrame.current;
+
+    const iframe = iFrame.current;
     if (iframe) {
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     doc.open();
     doc.write(fullCode);
     doc.close();
     }
+}, 0);
 };
 return (
     <div className="bg-[#16161A] h-screen text-white font-exo flex flex-col p-3">
@@ -95,12 +109,18 @@ return (
         </div>
         </div>
         {/* Output Panel */}
-        <div className="bg-[#1c1e36] w-[39%] h-full rounded-2xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-        <iframe
+        <div className="bg-[#F8F3FF] w-[39%] h-full rounded-2xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        {run ?(
+            <iframe
             title="output"
             ref={iFrame}
             className="w-full h-full rounded-3xl"
-            sandbox="allow-scripts allow-same-origin allow-modals"/>
+            sandbox="allow-scripts allow-same-origin allow-modals"/>):(
+            <div className='w-full h-full flex flex-col justify-center items-center rounded-3xl bg-[#F8F3FF]'>
+            <Lottie animationData={Animation} className='w-[50%] h-[50%]'></Lottie>
+            <p className='text-gray-700 font-bold'>YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT</p>
+            </div>
+        )}
         </div>
     </div>
     </div>
