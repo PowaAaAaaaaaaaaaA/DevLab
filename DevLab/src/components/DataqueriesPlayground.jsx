@@ -10,7 +10,7 @@ import Animation from '../assets/Lottie/OutputLottie.json'
 function DataqueriesPlayground() {
 const dbRef = useRef(null);
 const [query, setQuery] = useState("SELECT users.name, orders.item FROM users JOIN orders ON users.id = orders.user_id;");
-const [outputHtml, setOutputHtml] = useState("Write a query and click Run.");
+const [outputHtml, setOutputHtml] = useState();
 const [tablesHtml, setTablesHtml] = useState("");
 const [hasRunQuery, setHasRunQuery] = useState(false);
 

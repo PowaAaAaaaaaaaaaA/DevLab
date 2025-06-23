@@ -21,7 +21,7 @@ const iFrame = useRef(null);
 useEffect(() => {
     const fetchLevel = async () => {
     try {
-        const docRef = doc(db, "Css", lessonId, `${lessonId}Levels`, levelId);
+        const docRef = doc(db, "Css", lessonId, `Levels`, levelId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
         setLevelData(docSnap.data());
@@ -35,6 +35,7 @@ useEffect(() => {
 
     fetchLevel();
 }, [lessonId, levelId]);
+
 const runCode = () => {
     const fullCode = 
     `<!DOCTYPE html>
@@ -45,7 +46,7 @@ const runCode = () => {
     </style>
     </head>
     <body>
-    ${levelData?.preHtml || "<h1>Hello world</h1>"}
+    ${levelData.preHtml}
     </body>
     </html>`;
 // Display code in the DIV MODOFAKA
@@ -58,8 +59,14 @@ const runCode = () => {
     }
 };
 useEffect(() => {
-  runCode(); // shows "Hello world" even before styling
-}, []);
+if (levelData) {
+    const timeout = setTimeout(() => {
+    runCode();
+}, 400); // delay after data is available
+
+    return () => clearTimeout(timeout); // cleanup
+    }
+}, [levelData]); // runs only when levelData is loaded
 
 
 
@@ -83,7 +90,7 @@ return (
         {levelData ? (
             <div className='p-8 text-white'>
             <h2 className='text-2xl font-bold mb-2 font-exo text-[2.5rem]'>{levelData.order}. {levelData.title}</h2>
-            <p className='w-[90%]'>{levelData.Instruction}</p>
+            <p className='w-[90%]'>{levelData.instruction}</p>
             </div>
         ) : (
             <p>Loading...</p>

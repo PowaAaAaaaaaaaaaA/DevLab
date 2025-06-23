@@ -18,8 +18,7 @@ useEffect(() => {
       const htmlSnapshot = await getDocs(htmlRef);
       const lessonData = await Promise.all(
         htmlSnapshot.docs.map(async (lessonDoc) => {
-          const subcollectionName = `${lessonDoc.id}Levels`;
-          const levelsRef = collection(db, "Html", lessonDoc.id, subcollectionName);
+          const levelsRef = collection(db, "Html", lessonDoc.id, "Levels");
           const levelsSnapshot = await getDocs(levelsRef);
           const levels = levelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 

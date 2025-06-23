@@ -1,4 +1,4 @@
-// Lesson Page for Css
+// Lesson Page for HTMl
 
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
@@ -22,7 +22,7 @@ function LessonPage() {
   useEffect(() => {
     const fetchLevel = async () => {
       try {
-        const docRef = doc(db, "Html", lessonId, `${lessonId}Levels`, levelId);
+        const docRef = doc(db, "Html", lessonId, `Levels`, levelId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setLevelData(docSnap.data());
@@ -78,7 +78,7 @@ const runCode = () => {
         {levelData ? (
             <div className='p-8 text-white'>
               <h2 className='text-2xl font-bold mb-2 font-exo text-[2.5rem]'>{levelData.order}. {levelData.title}</h2>
-              <p className='w-[90%]'>{levelData.Instruction}</p>
+              <p className='w-[90%]'>{levelData.instruction}</p>
             </div>
           ) : (
             <p>Loading...</p>

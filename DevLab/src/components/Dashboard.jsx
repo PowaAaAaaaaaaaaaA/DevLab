@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import HtmlIcons from '../assets/Images/html-Icon.png'
 import CssIcons from '../assets/Images/css-Icon.png'
+import DataIcons from '../assets/Images/Data-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
 import {auth, db} from "../Firebase/Firebase"
 import {doc, getDoc } from 'firebase/firestore';
@@ -117,7 +118,7 @@ useEffect(()=>{
 
             <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-7'>
               <div className='w-[95%] h-[60%]  bg-[radial-gradient(circle,_#4cd137_0%,_#218c74_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
-                <img src={HtmlIcons} alt="" />
+                <img src={DataIcons} alt="" />
               </div>
               <p className='font-exo text-white'>Database Development</p>
             </div>

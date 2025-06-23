@@ -13,6 +13,7 @@ function JavaScriptLessons() {
     const [lessons, setLessons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showLevels, setShowLevels] = useState(false);
+    const [filterType, setFilterType] = useState("frontend");
 useEffect(() => {
     const fetchData = async () => {
     const htmlRef = collection(db, "JavaScript");
@@ -62,7 +63,16 @@ return (
             <div className="h-[60%] flex p-3">
             {/*Left Panel*/}
             {loading ? (<Lottie animationData={Animation} loop={true} className="w-[60%] h-[70%] mt-[30px]" />):
-    (<div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
+(<div className="w-[60%]">
+        <div className="w-[60%] px-3 mt-4">
+            <label className="text-white font-exo mr-3">Select Type:</label>
+                <select className="bg-[#1f2937] text-white p-2 rounded-md hover:cursor-pointer"value={filterType}
+                    onChange={(e) => setFilterType(e.target.value)}>
+                    <option value="frontend" className="hover:cursor-pointer">Frontend</option>
+                    <option value="backend" className="hover:cursor-pointer">Backend</option>
+                </select>
+        </div>  
+    <div className="w-[100%] p-3 h-[90%] overflow-scroll overflow-x-hidden
             [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:rounded-full
         [&::-webkit-scrollbar-track]:bg-gray-100
@@ -83,7 +93,7 @@ return (
                     : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
                     onClick={() => {
                     if (level.status) {
-                    navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);}}}>
+                    navigate(`/Main/Lessons/JavaScript/${lesson.id}/${level.id}`);}}}>
                     <div className=" text-white bg-black w-[15%] flex justify-center items-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
                     <div className="p-4 text-white font-exo"> 
                         <p className="text-[1.4rem]">{level.title}</p>
@@ -93,7 +103,9 @@ return (
                 ))}
             </div>
         </div>))}
-    </div>)}
+    </div>
+</div>
+    )}
             {/*Right Panel*/}
             <div className="w-[40%] flex flex-col gap-4 p-5">
                 <h2 className="text-[2.5rem] font-exo font-bold text-white text-shadow-sm text-shadow-black  tracking-wider">About <span className="text-[#F7DF1E]">JavaScript</span></h2>

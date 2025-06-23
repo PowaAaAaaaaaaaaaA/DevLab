@@ -17,8 +17,11 @@ import DataqueriesPlayground from "./components/DataqueriesPlayground";
 import HtmlLessons from "./Lessons/HtmlLessons";
 import CssLessons from './Lessons/CssLessons'
 import JavaScriptLessons from "./Lessons/JavaScriptLessons";
+import DataLessons  from "./Lessons/DataLessons";
 import LessonPage from "./Lessons/LessonPage";
 import LessonPage2 from "./Lessons/LessonPage2";
+import LessonPage3 from "./Lessons/LessonPage3";
+import LessonPage4 from "./Lessons/LessonPage4";
 
 
 function App() {
@@ -48,6 +51,7 @@ const isLoggedIn = !!user;
     <Route path="Lessons/Html" element={<HtmlLessons/>} />
     <Route path="Lessons/Css" element={<CssLessons/>} /> 
     <Route path="Lessons/JavaScript" element={<JavaScriptLessons/>} />  
+    <Route path="Lessons/DataBase" element={<DataLessons/>} />  
     
     <Route path="Achievements" element={<Achievements />} />
     <Route path="Shop" element={<Shop />} />
@@ -56,7 +60,8 @@ const isLoggedIn = !!user;
 
   <Route path="/Main/Lessons/Html/:lessonId/:levelId" element={<LessonPage />} />
   <Route path="/Main/Lessons/Css/:lessonId/:levelId" element={<LessonPage2 />} />
-  <Route path="/Main/Lessons/JavaScript/:lessonId/:levelId" element={<LessonPage />} />
+  <Route path="/Main/Lessons/JavaScript/:lessonId/:levelId" element={<LessonPage3 />} />
+  <Route path="/Main/Lessons/DataBase/:lessonId/:levelId" element={<LessonPage4 />} />
   <Route path="/codingPlay" element={isLoggedIn ? <CodePlayground /> : <Navigate to="/Login" replace />} />
   <Route path="/dataPlayground" element={isLoggedIn ? <DataqueriesPlayground /> : <Navigate to="/Login" replace />} />
 

@@ -14,12 +14,11 @@ function CssLessons() {
     const [showLevels, setShowLevels] = useState(false);
 useEffect(() => {
     const fetchData = async () => {
-    const htmlRef = collection(db, "Css");
-    const htmlSnapshot = await getDocs(htmlRef);
+    const cssRef = collection(db, "Css");
+    const cssSnapshot = await getDocs(cssRef);
     const lessonData = await Promise.all(
-        htmlSnapshot.docs.map(async (lessonDoc) => {
-        const subcollectionName = `${lessonDoc.id}Levels`;
-        const levelsRef = collection(db, "Css", lessonDoc.id, subcollectionName);
+        cssSnapshot.docs.map(async (lessonDoc) => {
+        const levelsRef = collection(db, "Css", lessonDoc.id, "Levels");
         const levelsSnapshot = await getDocs(levelsRef);
         const levels = levelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
