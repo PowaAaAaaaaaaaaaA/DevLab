@@ -105,7 +105,14 @@ return (
     <h1 className="text-[1.9rem] font-bold font-exo text-white p-8">DEVLAB</h1>
     <div className="flex w-[100%] h-[100%] gap-10">
     <div className="flex flex-col w-[60%] h-[80%] gap-4">
-        <div className=" h-[30%] overflow-scroll overflow-x-hidden p-4 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl">
+        <div className=" h-[30%] overflow-scroll overflow-x-hidden p-4 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl 
+        [&::-webkit-scrollbar]:w-1
+        [&::-webkit-scrollbar-track]:rounded-full
+        [&::-webkit-scrollbar-track]:bg-gray-100
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-thumb]:bg-gray-300
+        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             <h2 className="text-[1.5rem] font-semibold mb-2 text-white font-exo">Database Tables</h2>
             <div dangerouslySetInnerHTML={{ __html: tablesHtml }} className="text-white" />
         </div>

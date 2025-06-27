@@ -1,8 +1,8 @@
 // Lesson Page for HTMl
 
 import { useParams } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../Firebase/Firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db,auth } from '../Firebase/Firebase';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MdArrowBackIos } from "react-icons/md";
@@ -55,6 +55,60 @@ const runCode = () => {
     doc.close();
     }
 };
+
+// Exp and Coins
+  const addExp = async (userId, amount, coinsAmmount) => {
+  const userRef = doc(db, 'Users', userId);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    const userData = userSnap.data();
+    let newExp = (userData.exp || 0) + amount;
+    let newLevel = userData.level || 1;
+    let newCoins = userData.coins + coinsAmmount;
+
+    if (newExp >= 100) {
+      const levelsGained = Math.floor(newExp / 100);
+      newLevel += levelsGained;
+      newExp = newExp % 100;
+    }
+    // Update the Firebase (Coins and EXP)
+    await updateDoc(userRef, {
+      exp: newExp,
+      level: newLevel,
+      coins: newCoins
+    });
+
+    console.log(`User leveled up to ${newLevel} with ${newExp} EXP`);
+  }
+};
+const onNextClick = async () => {
+  const user = auth.currentUser;
+  if (!user || !levelData) return;
+
+  const expReward = levelData.expReward;
+  const coinsReward = levelData.coinsReward;
+  await addExp(user.uid, expReward, coinsReward);
+
+  // Optional: Navigate to next level
+  console.log("Next level logic here...");
+};
+// Getting the User Details to
+  const [userDetails, setUserDetails] = useState("")
+  useEffect(()=>{
+    const fetchUserData = async ()=>{
+      auth.onAuthStateChanged (async (user)=>{
+        if(user){
+          const getUser = doc(db, "Users", user.uid);
+          const userSnap = await getDoc(getUser);
+          if (userSnap.exists){
+            setUserDetails(userSnap.data());
+          }
+        }
+      });
+    };
+    fetchUserData();
+  },[]);
 
 
   
@@ -116,14 +170,16 @@ const runCode = () => {
           <MdDensityMedium className='text-[2.3rem] text-white'/>
           <div className='font-exo font-bold'>
             <p className='text-white '> {levelData ? `${levelData.order}. ${levelData.title}` : "Loading..."}</p>
-            <p className='text-[#58D28F]'>100xp</p>
+            <p className='text-[#58D28F]'>{levelData ? `${levelData.expReward}xp`: "Loading..."}</p>
           </div>
         </div>
         <div className='w-[10%]'>
-          <button  className=" bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[100%] font-exo font-bold p-2 ">Next</button>
+          <button  
+          onClick={onNextClick}
+          className=" bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[100%] font-exo font-bold p-2 ">Next</button>
         </div>
         <div>
-          <p className='text-white font-exo text-[1.5rem]'>$999</p>
+          <p className='text-white font-exo text-[1.5rem]'>{userDetails? `${userDetails.coins} Coins` : "Loading..."}</p>
         </div>
     </div>
   </div>

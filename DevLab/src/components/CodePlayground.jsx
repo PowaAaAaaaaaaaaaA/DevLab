@@ -82,19 +82,16 @@ return (
         {/* Left Panel */}
         <div className="flex flex-col w-[60%]">
           {/* Tabs */}
-        <div className="flex p-4 text-2xl gap-10 h-[8%] w-full">
+        <div className="flex p-4 text-2xl gap-10 h-[10%] w-full">
             {tabs.map((tab) => (
-            <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`font-exo font-bold rounded-2xl w-[17%] h-full bg-[#1E1E2E]  ${
-                activeTab === tab
-                    ? "text-[#9333EA]"
-                    : "text-gray-100 hover:text-gray-200 hover:cursor-pointer "
-                }`}>
-                {tab}
-            </button>
-            ))}
+                <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`font-exo font-bold rounded-2xl w-[17%] h-full bg-[#1E1E2E]  transition-all duration-300 ease-in-out transform${activeTab === tab  
+                            ? "text-[#9333EA] scale-105 shadow-[0_0_10px_#9333EA]"
+                            : "text-gray-100 hover:text-[#C084FC] hover:scale-105 hover:shadow-lg hover:border-[#9333EA] cursor-pointer"}`}>
+                            {tab}
+                </button>))}
         </div>
         {/* Code Editor wrapper */}
         <div className="px-4 w-full h-[92%] flex flex-col gap-3 rounded-3xl p-3 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">

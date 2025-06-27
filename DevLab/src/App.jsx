@@ -24,6 +24,7 @@ import LessonPage3 from "./Lessons/LessonPage3";
 import LessonPage4 from "./Lessons/LessonPage4";
 
 
+
 function App() {
 
   const[user, setUser] = useState();
@@ -65,6 +66,8 @@ const isLoggedIn = !!user;
   <Route path="/codingPlay" element={isLoggedIn ? <CodePlayground /> : <Navigate to="/Login" replace />} />
   <Route path="/dataPlayground" element={isLoggedIn ? <DataqueriesPlayground /> : <Navigate to="/Login" replace />} />
 
+  {/*ADmin*/}
+    <Route path="/AdminLogin" element={<AdminLogin/>}/>
 </Routes>
     <ToastContainer/>
     </>

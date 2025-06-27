@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy,doc } from "firebase/firestore";
-import { db } from "../Firebase/Firebase";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../Firebase/Firebase";
 import { useNavigate,Outlet } from "react-router-dom"; 
 import CssImage from "../assets/Images/css-Icon-Big.png"
 import { MdOutlineLock } from "react-icons/md";
@@ -80,9 +80,22 @@ useEffect(() => {
                     ${level.status === false
                     ? "bg-[#060505] opacity-30 cursor-not-allowed"
                     : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
-                onClick={() => {
+                onClick={async() => {
                 if (level.status) {
-                navigate(`/Main/Lessons/Css/${lesson.id}/${level.id}`);}}}>
+                    const user = auth.currentUser;
+                    if (user){
+                        const userRef = doc(db, "Users", user.uid);
+                            await updateDoc(userRef,{
+                                lastOpenedLevel: {
+                                    lessonId: "Css",    // since nasa CSS lesson Page, Hardcoded nalang   
+                                    lessonDocId: lesson.id,    
+                                    levelId: level.id          
+                                }
+                            })
+                        }
+                navigate(`/Main/Lessons/Css/${lesson.id}/${level.id}`);
+                }
+            }}>
                     <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
                     <div className="p-4 text-white font-exo"> 
                         <p className="text-[1.4rem]">{level.title}</p>

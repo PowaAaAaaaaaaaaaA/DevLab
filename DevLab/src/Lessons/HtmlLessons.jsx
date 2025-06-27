@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy,doc } from "firebase/firestore";
-import { db } from "../Firebase/Firebase";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { db, auth } from "../Firebase/Firebase";
 import { useNavigate} from "react-router-dom"; 
 import HtmlImage from "../assets/Images/html-Icon-Big.png"
 import { MdOutlineLock } from "react-icons/md";
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
+
+
+
+
 function HtmlLessons() {
 
     const navigate = useNavigate();
@@ -36,6 +40,9 @@ useEffect(() => {
 
     fetchData();
   }, []);
+
+
+// Updater for the "Jump Back in Button"
     
   return (
     <>
@@ -78,14 +85,28 @@ useEffect(() => {
           <div className="flex flex-col gap-4">
             {lesson.levels.map((level) => (
               <div key={level.id} 
-              className= {`w-full border flex gap-5 rounded-4xl transition-all duration-2400 ease-out transform
-                    ${showLevels ? 'translate-y-0' : ' translate-y-20'}
+              className= {`group w-full border flex gap-5 rounded-4xl  trasnform ease-out
+                    ${showLevels ? 'translate-y-0 transition-transform duration-1000' : ' translate-y-20 transition-transform duration-1000'}
                     ${level.status === false
                     ? "bg-[#060505] opacity-30 cursor-not-allowed"
-                    : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
-              onClick={() => {
+                    : "bg-[#111827] hover:scale-102 cursor-pointer transition-transform duration-200"}`}
+              onClick={async() => {
+              // This button will navigate to "LevelPage" and Update the "Jump Back in" sa Dashboard
               if (level.status) {
-              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);}}}>
+                const user = auth.currentUser;
+                if(user) {
+                  const userRef = doc(db, "Users", user.uid);
+                    await updateDoc(userRef,{
+                      lastOpenedLevel: {
+                        lessonId: "Html",    // since nasa HTML lesson Page, Hardcoded nalang   
+                        lessonDocId: lesson.id,    
+                        levelId: level.id          
+                    }
+                    })
+                }
+              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);
+            }
+          }}>
                 <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
                   <div className="p-4 text-white font-exo"> 
                     <p className="text-[1.4rem]">{level.title}</p>

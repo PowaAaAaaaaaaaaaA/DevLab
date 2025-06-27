@@ -5,12 +5,14 @@ import DataIcons from '../assets/Images/Data-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
 import {auth, db} from "../Firebase/Firebase"
 import {doc, getDoc } from 'firebase/firestore';
+import { Link } from 'react-router-dom'
 
 
 function Dashboard() {
 
 const [userDetails, setUserDetails] = useState("");
-
+const [levelInfo, setLevelInfo] =useState();
+// Getting the User details
 const fetchUserData =async()=>{
   auth.onAuthStateChanged(async (user)=>{
     const docRef = doc(db, "Users", user.uid);
@@ -29,6 +31,48 @@ useEffect(()=>{
   fetchUserData();
 }, [])
 
+// THis will get the last open lesson 
+useEffect(() => {
+  const fetchLevelInfo = async () => {
+    if (userDetails?.lastOpenedLevel) {
+      const { lessonId, lessonDocId, levelId } = userDetails.lastOpenedLevel;
+
+      // Full dynamic path
+      const docRef = doc(db, lessonId, lessonDocId, "Levels", levelId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setLevelInfo(docSnap.data());
+      } else {
+        console.log("Level document not found");
+      }
+    }
+  };
+
+  fetchLevelInfo();
+}, [userDetails]);
+
+// PROGRESS BAR ANINATION
+const [animatedExp, setAnimatedExp] = useState(0);
+useEffect(() => {
+  if (userDetails?.exp >= 0) {
+    let start = animatedExp;
+    const target = userDetails.exp;
+    const step = () => {
+      if (start < target) {
+        start += 0.4; // increase this for faster fill
+        setAnimatedExp(start);
+        requestAnimationFrame(step);
+      } else {
+        setAnimatedExp(target); // lands exactly
+      }
+    };
+    requestAnimationFrame(step);
+  }
+}, [userDetails?.exp]);
+
+
+
   return (
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
@@ -41,21 +85,21 @@ useEffect(()=>{
       <div className='h-[80%] w-[100%] flex flex-col p-2'>
         <p className='text-white font-inter font-bold'>Good to see you!</p>
         <h1 className='text-[5.6rem] text-white font-inter font-bold'>{userDetails.username}</h1>
-        <p className='text-white font-inter font-bold'>Level 10</p>
+        <p className='text-white font-inter font-bold mb-0.5'>Level {userDetails.level}</p>
             {/*Progress Bar*/}
-        <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}></div>
+        <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700 ">
+          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
         </div>
             {/*Progress Bar*/}
         <div className='flex w-[40%] justify-around mt-[10px]'>
-          <p className='text-white font-inter font-bold'>User Xp</p>
-          <div className='text-white font-inter font-bold'>User Money</div>
+          <p className='text-white font-inter font-bold'>User Xp: {userDetails.exp}</p>
+          <div className='text-white font-inter font-bold'>User Money: {userDetails.coins}</div>
         </div>
       </div>
     </div>): 
     /*LOADING*/
 (<div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
-  <div role="status" className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center">
+  <div role="status" className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center h-[100%]">
     <div className="flex items-center justify-center w-full h-48 bg-gray-300 rounded-sm sm:w-96 dark:bg-gray-700">
         <svg className="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
             <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z"/>
@@ -67,7 +111,6 @@ useEffect(()=>{
         <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
         <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
         <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
     </div>
       <span className="sr-only">Loading...</span>
     </div>
@@ -81,14 +124,30 @@ useEffect(()=>{
       <div className='w-[70%] h-[100%] flex flex-col'>
         <div className='h-[40%] p-3 flex flex-col gap-5'>
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
-          {/*Jump back in Button (JUST ADD BLINK TAG MYKE)*/}
-          <div className='w-[100%] bg-[#111827] h-[60%] flex rounded-3xl border-black border-2'>
-            <div className='bg-black w-[15%] h-[100%] text-white rounded-3xl flex items-center justify-center'>Lesson Symbol</div>
+          {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
+
+          {levelInfo ? (<Link to={`/Main/Lessons/${userDetails.lastOpenedLevel.lessonId}/${userDetails.lastOpenedLevel.lessonDocId}/${userDetails.lastOpenedLevel.levelId}`} className='h-full'>
+          <div className='w-[100%] bg-[#111827] h-[100%] flex rounded-3xl border-black border-2 gap-4  hover:scale-102 cursor-pointer duration-500'>
+            <div className='bg-black w-[15%] h-[100%] text-white rounded-3xl flex items-center justify-center  text-[4rem] p-1'> {levelInfo.symbol}</div>
             <div className='p-2'>
-              <p className='font-exo text-[1.4rem] text-white font-bold'>Lesson Name</p>
-              <p className='font-exo text-gray-500 text-[0.8rem]'>Lesson Description</p>
+              <p className='font-exo text-[1.4rem] text-white font-bold'> {levelInfo.title}</p>
+              <p className='font-exo text-gray-500 text-[0.8rem]'> {levelInfo.desc}</p>
             </div>
           </div>
+          </Link>):(   <div className='w-[100%] bg-[#111827] h-[100%] rounded-3xl border-black border-2 p-4'>
+            
+<div role="status" class="max-w-sm animate-pulse">
+    <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
+    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
+    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+    <span class="sr-only">Loading...</span>
+</div>
+
+
+          </div>)}
+          
         </div>
 
         <div className='h-[70%] flex flex-col p-3 gap-5'>
