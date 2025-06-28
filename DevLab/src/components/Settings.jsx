@@ -1,18 +1,18 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import { IoPerson } from "react-icons/io5";
-import { auth } from '../Firebase/Firebase'
+import { auth,db } from '../Firebase/Firebase'
 import { Link, useNavigate } from 'react-router-dom';
-import AdminLogin from './AdminLogin';
-import { and } from 'firebase/firestore';
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
-
-
- 
 function Settings() {
- const [showPopup, setShowPopup] = useState(false);
- const [showAdminPopup, setAdminPopup] =useState(false);
+    const [showPopup, setShowPopup] = useState(false);
+    const [showAdminPopup, setAdminPopup] =useState(false);
+    const [userDetails, setUserDetails] = useState("");
+    const navigate = useNavigate();
 
 
+    // Logout
     const logout = async () => {
     try {
     await auth.signOut();
@@ -22,16 +22,63 @@ function Settings() {
     }
 };
 
+    // Admin Login and Logout for user Aswell
     const admin = async()=>{
         try {
     await auth.signOut();
       navigate('/AdminLogin'); // Use navigate 
     } catch (error) {
     console.log(error);
+    }}
+    // Getting the user details 
+  const fetchUserData = async () => {
+    const user = auth.currentUser;
+    try {
+        const getUser = doc(db, "Users", user.uid);
+        const docSnap = await getDoc(getUser);
+        if (docSnap.exists()) {
+            setUserDetails(docSnap.data());
+        } else {
+            console.log("No such document!");
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
     }
+};
+
+    useEffect(()=>{
+        fetchUserData();
+    },[])
+
+    const [newUserName, setUserName] = useState("")
+    const [newBio, setBio] = useState("")
+    useEffect(() => {
+    if (userDetails) {
+        setUserName(userDetails.username || "");
+        setBio(userDetails.bio || "");
+    }
+}, [userDetails]);
+    // Save Button
+    const saveDetails = async(e)=>{
+        e.preventDefault();
+        const user = auth.currentUser;
+        const getUser = doc(db, "Users", user.uid)
+        console.log("Saving:", newUserName, newBio);
+        toast.success("Save Changes",{
+                        position:"top-center",
+                        theme: "colored"
+                        
+                    })
+        try{
+            await updateDoc(getUser,{
+                username: newUserName || userDetails.username,
+                bio: newBio || userDetails.bio
+            })
+        }catch(error){
+            console.log(error)
+        }
     }
 
-    const navigate = useNavigate();
 return (
     <>
 <div className='bg-[#111827] flex flex-col items-center gap-5 p-5 h-[95%] w-[40%] m-auto mt-5 rounded-3xl border-2 shadow-2xl shadow-black'>
@@ -39,17 +86,27 @@ return (
     <div className='w-[35%] h-[25%] bg-amber-300 rounded-[100px]'></div>
     <div className='w-[70%] h-[10%] bg-amber-300 rounded-3xl '></div>
     <p className='text-white font-exo font-light'>Update profile picture</p>
-    <form action="" className='w-[55%] h-[45%] flex flex-col gap-4 p-1'>
+    <form action="" className='w-[55%] h-[50%] flex flex-col gap-4 p-1 ' onSubmit={saveDetails}   >
         <label htmlFor="" className='text-white font-exo font-light'>Username</label>
             <div className='relative w-[100%] h-[15%]' >
-        <input type="text" className='w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl pl-10' />
+        <input type="text" 
+        placeholder={userDetails ? userDetails.username : "Loading..."} 
+        onChange={(e)=>setUserName(e.target.value)}
+        className='w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl pl-10' />
         <IoPerson className='absolute top-2 left-2 text-white text-2xl' />
             </div>
         <label htmlFor="" className='text-white font-exo font-light'>Bio</label>
             <div className='w-[100%] h-[50%]' >
-        <textarea name="" id="" maxlength="25"  className='w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl p-2 resize-none '></textarea>
+        <textarea name="" 
+        id="" 
+        maxLength="50"  
+        placeholder ={userDetails? userDetails.bio : "Loading..."}
+        onChange={(e)=>setBio(e.target.value)}
+        className='w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl p-2 resize-none '></textarea>
             </div>
-        <button className='bg-[#7F5AF0] w-[80%] font-exo p-2 m-auto rounded-4xl text-[1rem] font-bold text-white hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.8)]'>Save Changes</button>
+        <button 
+        type="submit"
+        className='bg-[#7F5AF0] w-[80%] font-exo p-2 m-auto rounded-4xl text-[1rem] font-bold text-white hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.8)]'>Save Changes</button>
     </form>
         <button className='bg-[#FF6166] p-3 w-[43%] rounded-3xl font-exo font-bold text-white mt-1.5 hover:cursor-pointerhover:bg-[#6A4CD4] hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]
  hover:cursor-pointer'

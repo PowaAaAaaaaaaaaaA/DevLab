@@ -15,13 +15,11 @@ const [levelInfo, setLevelInfo] =useState();
 // Getting the User details
 const fetchUserData =async()=>{
   auth.onAuthStateChanged(async (user)=>{
-    const docRef = doc(db, "Users", user.uid);
-    const docSnap =await getDoc(docRef);
+    const getUser = doc(db, "Users", user.uid);
+    const docSnap =await getDoc(getUser);
 
     if(docSnap.exists()){
       setUserDetails(docSnap.data());
-      console.log(docSnap.data());
-
     }else{
       console.log("USer not Logged In")
     }
@@ -79,8 +77,8 @@ useEffect(() => {
     {userDetails ? 
     (<div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
       <div className='w-[30%] h-[90%] flex items-center flex-col gap-5 p-2'>
-        <div className='bg-amber-300 w-[60%] h-[100%] rounded-[100%]'></div>
-        <div className='text-white font-inter font-bold'>Bio</div>
+        <div className='bg-amber-300 w-[55%] h-[90%] rounded-[100%]'></div>
+        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className=' text-center'>{userDetails.bio}</p></div>
       </div>
       <div className='h-[80%] w-[100%] flex flex-col p-2'>
         <p className='text-white font-inter font-bold'>Good to see you!</p>
@@ -92,7 +90,7 @@ useEffect(() => {
         </div>
             {/*Progress Bar*/}
         <div className='flex w-[40%] justify-around mt-[10px]'>
-          <p className='text-white font-inter font-bold'>User Xp: {userDetails.exp}</p>
+          <p className='text-white font-inter font-bold'>User Xp: {userDetails.exp} / 100</p>
           <div className='text-white font-inter font-bold'>User Money: {userDetails.coins}</div>
         </div>
       </div>
@@ -136,13 +134,13 @@ useEffect(() => {
           </div>
           </Link>):(   <div className='w-[100%] bg-[#111827] h-[100%] rounded-3xl border-black border-2 p-4'>
             
-<div role="status" class="max-w-sm animate-pulse">
-    <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-    <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-    <span class="sr-only">Loading...</span>
+<div role="status" className="max-w-sm animate-pulse">
+    <div className ="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
+    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
+    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+    <span className ="sr-only">Loading...</span>
 </div>
 
 

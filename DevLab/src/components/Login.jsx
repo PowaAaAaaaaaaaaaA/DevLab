@@ -57,7 +57,7 @@ function Login() {
             </svg>
         
 
-            <form className='w-[100%] flex flex-col items-center p-3.5' onSubmit={handleSubmit} autocomplete="off">
+            <form className='w-[100%] flex flex-col items-center p-3.5' onSubmit={handleSubmit} autoComplete="off">
 
         {/*Email Input*/}
         <div className='w-[70%] flex justify-center relative'>

@@ -1,23 +1,28 @@
-import Login from "./components/Login"
-import Register from './components/Register'
-import AdminLogin from "./components/AdminLogin"
+// REACt
 import { Navigate, Route, Routes } from "react-router-dom"
 import { ToastContainer } from 'react-toastify';
-import Home from "./components/Home";
 import { useEffect, useState } from "react";
+// FIREBASE
 import { auth } from "./Firebase/Firebase";
+// COMPONENTS
+import LandingPage from "./components/LandingPage";
+import Login from "./components/Login"
+import Register from './components/Register'
 import Layout from "./Layout/Layout";
 import Dashboard from './components/Dashboard'
-import Lessons from './components/Lessons'
 import Achievements from './components/Achievements'
 import Shop from './components/Shop'
 import Settings from './components/Settings'
 import CodePlayground from "./components/CodePlayground";
 import DataqueriesPlayground from "./components/DataqueriesPlayground";
+// ADMIN
+import AdminLogin from "./components/AdminLogin"
+// DISPLAY LESSON/LEVELS PAGE
 import HtmlLessons from "./Lessons/HtmlLessons";
 import CssLessons from './Lessons/CssLessons'
 import JavaScriptLessons from "./Lessons/JavaScriptLessons";
 import DataLessons  from "./Lessons/DataLessons";
+// LESSON PAGES
 import LessonPage from "./Lessons/LessonPage";
 import LessonPage2 from "./Lessons/LessonPage2";
 import LessonPage3 from "./Lessons/LessonPage3";
@@ -42,7 +47,7 @@ const isLoggedIn = !!user;
     <>
   <Routes>
   {/* Public Routes */}
-  <Route path="/" element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />} />
+  <Route path="/" element={!isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />} />
   <Route path="/Login" element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />} />
   <Route path="/Register" element={!isLoggedIn ? <Register /> : <Navigate to="/Main" replace />} />
 

@@ -28,6 +28,7 @@ function Register() {
                     exp: 0,
                     level: 1,
                     coins:0,
+                    bio: "",
                     lastOpenedLevel: {
                         lessonId: "Html",          // Firestore collection
                         lessonDocId: "Lesson1",    // Firestore document inside collection
