@@ -28,7 +28,7 @@ function Login() {
         await setPersistence(auth, persistence);
         
         await signInWithEmailAndPassword(auth, email, password);
-        navigate('/Main/Dashboard', { replace: true });
+        navigate('/Main/Dashboard');
     }catch(error){
         toast.error(error.message,{
                         position:"bottom-center",

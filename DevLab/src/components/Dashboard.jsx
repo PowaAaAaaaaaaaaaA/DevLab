@@ -77,7 +77,7 @@ useEffect(() => {
     {userDetails ? 
     (<div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
       <div className='w-[30%] h-[90%] flex items-center flex-col gap-5 p-2'>
-        <div className='bg-amber-300 w-[55%] h-[90%] rounded-[100%]'></div>
+        <div className='bg-amber-300 w-[65%] h-[90%] rounded-[100%]'></div>
         <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className=' text-center'>{userDetails.bio}</p></div>
       </div>
       <div className='h-[80%] w-[100%] flex flex-col p-2'>

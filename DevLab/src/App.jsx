@@ -4,6 +4,8 @@ import { ToastContainer } from 'react-toastify';
 import { useEffect, useState } from "react";
 // FIREBASE
 import { auth } from "./Firebase/Firebase";
+import { db } from "./Firebase/Firebase";
+import {doc} from 'firebase/firestore';
 // COMPONENTS
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login"
@@ -17,6 +19,9 @@ import CodePlayground from "./components/CodePlayground";
 import DataqueriesPlayground from "./components/DataqueriesPlayground";
 // ADMIN
 import AdminLogin from "./components/AdminLogin"
+import AdminLayout from './Layout/AdminLayout'
+import ContentManagement from './AdminComponents/ContentManagement'
+import UserManagement from './AdminComponents/UserManagement'
 // DISPLAY LESSON/LEVELS PAGE
 import HtmlLessons from "./Lessons/HtmlLessons";
 import CssLessons from './Lessons/CssLessons'
@@ -27,21 +32,45 @@ import LessonPage from "./Lessons/LessonPage";
 import LessonPage2 from "./Lessons/LessonPage2";
 import LessonPage3 from "./Lessons/LessonPage3";
 import LessonPage4 from "./Lessons/LessonPage4";
+import { getDoc } from "firebase/firestore";
+
+
 
 
 
 function App() {
 
   const[user, setUser] = useState();
+    const [loading, setLoading] = useState(true);
+  const[isAdmin, setAdmin] = useState(null)
 
 useEffect(() => { //
-  const unsubscribe = auth.onAuthStateChanged((user) => {
+  const unsubscribe = auth.onAuthStateChanged(async(user) => {
     setUser(user);
+
+    try{
+      const userRef = doc(db, "Users", user.uid)
+      const userSnap = await getDoc(userRef);
+
+      if(userSnap.data().isAdmin){
+        setAdmin(true);
+      }else{
+        setAdmin(false);
+      }
+
+    }catch(error){
+      console.log(error)
+    }
+    setLoading(false);
   });
   return () => unsubscribe(); // cleanup
 }, []); //
 
 const isLoggedIn = !!user;
+
+  // Loading (Para Hindi bumalik sa Main Dashboard and mag stay lang sa Adming Dashboard pag nirerefresh yung webapp)
+  // !! LAGYAN LOADING ANIMATION !!
+  if (loading) return null;
 
   return (
     <>
@@ -73,6 +102,19 @@ const isLoggedIn = !!user;
 
   {/*ADmin*/}
     <Route path="/AdminLogin" element={<AdminLogin/>}/>
+    <Route path="/Admin" element={
+    isLoggedIn && isAdmin ? (
+      <AdminLayout />
+    ) : isLoggedIn && !isAdmin ? (
+      <Navigate to="/Main" replace />
+    ) : (
+      <Navigate to="/Login" replace />
+    )
+  }>  
+  <Route index element={<Navigate to="ContentManagement"/>} />
+  <Route path="ContentManagement" element={<ContentManagement />} />
+  <Route path="UserManagement" element={<UserManagement />} />
+  </Route>
 </Routes>
     <ToastContainer/>
     </>

@@ -25,7 +25,7 @@ function Settings() {
     // Admin Login and Logout for user Aswell
     const admin = async()=>{
         try {
-    await auth.signOut();
+            await auth.signOut();
       navigate('/AdminLogin'); // Use navigate 
     } catch (error) {
     console.log(error);
