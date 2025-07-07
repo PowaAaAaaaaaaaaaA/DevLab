@@ -3,9 +3,9 @@ import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
 import { useNavigate} from "react-router-dom"; 
 import HtmlImage from "../assets/Images/html-Icon-Big.png"
-import { MdOutlineLock } from "react-icons/md";
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
+import LockAnimation from '../assets/Lottie/LockItem.json'
 
 
 
@@ -16,6 +16,7 @@ function HtmlLessons() {
     const [lessons, setLessons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showLevels, setShowLevels] = useState(false);
+    const [showLockedModal, setShowLockedModal] = useState(false);
 useEffect(() => {
     const fetchData = async () => {
       const htmlRef = collection(db, "Html");
@@ -40,6 +41,8 @@ useEffect(() => {
 
     fetchData();
   }, []);
+
+  
 
 
 
@@ -88,9 +91,12 @@ useEffect(() => {
               className= {`group w-full border flex gap-5 rounded-4xl  trasnform ease-out
                     ${showLevels ? 'translate-y-0 transition-transform duration-1000' : ' translate-y-20 transition-transform duration-1000'}
                     ${level.status === false
-                    ? "bg-[#060505] opacity-30 cursor-not-allowed"
+                    ? "bg-[#060505] opacity-30 hover:scale-102"
                     : "bg-[#111827] hover:scale-102 cursor-pointer transition-transform duration-200"}`}
               onClick={async() => {
+                if (!level.status) {
+                  setShowLockedModal(true);         // show the modal
+                  return;}
               // This button will navigate to "LevelPage" and Update the "Jump Back in" sa Dashboard
               if (level.status) {
                 const user = auth.currentUser;
@@ -125,6 +131,19 @@ useEffect(() => {
           </div>
 
         </div>
+
+        {showLockedModal && (  
+      <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex justify-center items-center">
+        <div className="bg-[#1E1E2E] text-white p-8 rounded-2xl w-[400px] text-center shadow-lg border border-gray-600 flex flex-col items-center">
+          <Lottie animationData={LockAnimation} className="w-[50%] h-[50%]"></Lottie>
+          <h2 className="text-2xl font-bold mb-4">Level Locked</h2>
+          <p className="mb-6">You must complete the previous levels to unlock <span className="text-[#FF5733] font-bold"></span>.</p>
+      <button
+        className="bg-[#7F5AF0] px-6 py-2 rounded-2xl text-white font-bold hover:bg-[#6A4CD4] transition w-[90%]"
+        onClick={() => setShowLockedModal(false)}>Okay</button>
+        </div>
+      </div>)}
+
 
         </div>
 
