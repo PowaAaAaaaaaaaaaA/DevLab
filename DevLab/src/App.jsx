@@ -117,7 +117,7 @@ const isLoggedIn = !!user;
   <Route path="UserManagement" element={<UserManagement />} />
   </Route>
 
-  <Route path="/Admin/ContentManagement/LessonEdit" element={ isLoggedIn && isAdmin ?(<LessonEdit/>):(<Login/>)}/>
+  <Route path="/Admin/ContentManagement/LessonEdit/:subject/:lessonId/:levelId" element={ isLoggedIn && isAdmin ?(<LessonEdit/>):(<Login/>)}/>
 </Routes>
     <ToastContainer/>
     </>

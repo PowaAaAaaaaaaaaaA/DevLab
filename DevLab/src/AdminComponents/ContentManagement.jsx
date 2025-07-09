@@ -15,7 +15,9 @@ function ContentManagement() {
   const [activeTab, setActiveTab] = useState("Html");
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [show, setShow] = useState(false);
   const subjects = ["Html", "Css", "JavaScript", "Database"];
+
 
   useEffect(() => {
     if (activeTab) {
@@ -26,6 +28,7 @@ function ContentManagement() {
   const fetchLessons = async (subject) => {
     try {
       setLoading(true);
+      setShow(false);
       const subjectDb = collection(db, subject);
       const subjDocs = await getDocs(subjectDb);
 
@@ -58,7 +61,8 @@ function ContentManagement() {
         })
       );
       setLessons(lessonData);
-  setLoading(false);
+      setLoading(false);
+      setTimeout(()=> setShow(true), 100)
     } catch (error) {
       console.error("Error fetching lessons:", error);
     }
@@ -103,7 +107,8 @@ function ContentManagement() {
             <div className="flex flex-wrap justify-center gap-10">
             {lesson.levels.map((level)=>(
           <>
-            <div key={level.id} className="border-[#56EBFF] border w-[42%] p-10 flex flex-col gap-4 rounded-2xl bg-[#111827] relative">
+          {/*Lesson Card*/}
+            <div key={level.id} className={`border-[#56EBFF] border w-[42%] p-10 flex flex-col gap-4 rounded-2xl bg-[#111827] relative transition-all duration-400 ${show ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
               <h2 className="text-3xl font-exo font-bold text-white">{level.title}</h2>
               <p className="text-white font-exo text-[0.8rem]">{level.desc}</p>
               <div className="flex gap-5">
@@ -113,8 +118,9 @@ function ContentManagement() {
                 </div>
               ))}
               </div>
-              <div className="absolute text-white bottom-5 right-5 text-2xl"><button className="hover:cursor-pointer hover:bg-gray-600 rounded p-2" onClick={()=>{Navigate('/Admin/ContentManagement/LessonEdit')}}><HiOutlinePencilSquare /></button></div>
+              <div className="absolute text-white bottom-5 right-5 text-2xl"><button className="hover:cursor-pointer hover:bg-gray-600 rounded p-2" onClick={()=>{Navigate(`/Admin/ContentManagement/LessonEdit/${activeTab}/${lesson.id}/${level.id}`)}}><HiOutlinePencilSquare /></button></div>
             </div>
+          {/*Lesson Card*/}
           </>
             ))}
             </div>
