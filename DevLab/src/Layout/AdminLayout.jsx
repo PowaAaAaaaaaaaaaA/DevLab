@@ -16,7 +16,7 @@ function AdminLayout() {
         {/*NavBar*/}
       <AdminNavbar/>
         {/*Content*/}
-      <div className=' w-[100%] h-[100%] bg-[#25293B] p-2 rounded-4xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
+      <div className=' w-[100%] h-[100%] bg-[#25293B] p-4 rounded-4xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
         <Outlet/>
 
       </div>

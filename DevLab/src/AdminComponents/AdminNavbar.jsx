@@ -1,5 +1,6 @@
 import React from 'react'
 import { HiFolder } from "react-icons/hi2";
+import { auth } from '../Firebase/Firebase';
 import { HiUserCircle } from "react-icons/hi2";
 import { HiOutlineArrowLeftOnRectangle } from "react-icons/hi2";
 import { NavLink } from 'react-router-dom'
@@ -15,6 +16,11 @@ function AdminNavbar() {
         }catch(error){
 
         }
+    }
+
+    
+    if (location.pathname.startsWith === '/Admin/ContentManagement/LessonEdit') {
+    return <Outlet />;
     }
     return (
         <div className='w-[15%] flex flex-col p-5 font-exo text-white'>

@@ -16,10 +16,10 @@ const [levelInfo, setLevelInfo] =useState();
 const fetchUserData =async()=>{
   auth.onAuthStateChanged(async (user)=>{
     const getUser = doc(db, "Users", user.uid);
-    const docSnap =await getDoc(getUser);
+    const userDocs =await getDoc(getUser);
 
-    if(docSnap.exists()){
-      setUserDetails(docSnap.data());
+    if(userDocs.exists()){
+      setUserDetails(userDocs.data());
     }else{
       console.log("USer not Logged In")
     }
@@ -36,11 +36,11 @@ useEffect(() => {
       const { lessonId, lessonDocId, levelId } = userDetails.lastOpenedLevel;
 
       // Full dynamic path
-      const docRef = doc(db, lessonId, lessonDocId, "Levels", levelId);
-      const docSnap = await getDoc(docRef);
+      const getUser = doc(db, lessonId, lessonDocId, "Levels", levelId);
+      const userDocs = await getDoc(getUser);
 
-      if (docSnap.exists()) {
-        setLevelInfo(docSnap.data());
+      if (userDocs.exists()) {
+        setLevelInfo(userDocs.data());
       } else {
         console.log("Level document not found");
       }

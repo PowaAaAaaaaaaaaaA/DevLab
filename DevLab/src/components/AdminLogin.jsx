@@ -20,10 +20,10 @@
                 const userCredentials = await signInWithEmailAndPassword(auth, email, password)
                 const user = userCredentials.user;
 
-                const userDocs = doc(db, "Users", user.uid)
-                const docSnap = await getDoc(userDocs);
+                const userDb = doc(db, "Users", user.uid)
+                const UserDocs = await getDoc(userDb);
 
-                if(docSnap.data().isAdmin && docSnap.exists){
+                if(UserDocs.data().isAdmin && UserDocs.exists){
                     navigate('/Admin')
                     console.log("sad")
                 }else{

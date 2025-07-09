@@ -52,13 +52,13 @@ return (
     <NavLink
         to='Settings'
         className={({ isActive }) =>
-          `flex justify-center items-center gap-3.5 w-full overflow-hidden group relative hover:bg-gradient-to-r hover:from-[#0D1117] hover:to-[#9333EA] font-bold font-inter hover:ring-3 hover:ring-offset-0 hover:ring-[#9333EA] transition-all ease-out duration-300 text-[1.3rem] rounded-4xl	
-           ${isActive ? 'text-[#9333EA]' : 'text-white'}`
+        `flex justify-center items-center gap-3.5 w-full overflow-hidden group relative hover:bg-gradient-to-r hover:from-[#0D1117] hover:to-[#9333EA] font-bold font-inter hover:ring-3 hover:ring-offset-0 hover:ring-[#9333EA] transition-all ease-out duration-300 text-[1.3rem] rounded-4xl	
+        ${isActive ? 'text-[#9333EA]' : 'text-white'}`
         }
-      >
+    >
         <LuCog className='text-xl' />
         <span>Settings</span>
-      </NavLink>
+    </NavLink>
     </div>
 );
 }

@@ -35,9 +35,9 @@ function Settings() {
     const user = auth.currentUser;
     try {
         const getUser = doc(db, "Users", user.uid);
-        const docSnap = await getDoc(getUser);
-        if (docSnap.exists()) {
-            setUserDetails(docSnap.data());
+        const userDocs = await getDoc(getUser);
+        if (userDocs.exists()) {
+            setUserDetails(userDocs.data());
         } else {
             console.log("No such document!");
         }
@@ -86,7 +86,7 @@ return (
     <div className='w-[35%] h-[25%] bg-amber-300 rounded-[100px]'></div>
     <div className='w-[70%] h-[10%] bg-amber-300 rounded-3xl '></div>
     <p className='text-white font-exo font-light'>Update profile picture</p>
-    <form action="" className='w-[55%] h-[50%] flex flex-col gap-4 p-1 ' onSubmit={saveDetails}   >
+    <form action="" className='w-[55%] h-[50%] flex flex-col gap-4 p-1 ' onSubmit={saveDetails}>
         <label htmlFor="" className='text-white font-exo font-light'>Username</label>
             <div className='relative w-[100%] h-[15%]' >
         <input type="text" 

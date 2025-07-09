@@ -16,17 +16,27 @@ function LessonPage() {
 
   const { lessonId, levelId } = useParams();
   const [levelData, setLevelData] = useState(null);
+  const [lessonGamemode, setLessonGamemode] = useState(null);
   const [code, setCode] =useState("<!--Hello world-->")
   const iFrame = useRef(null);
 
   useEffect(() => {
     const fetchLevel = async () => {
       try {
+        // get the Level Data 
         const docRef = doc(db, "Html", lessonId, `Levels`, levelId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setLevelData(docSnap.data());
         } else {
+          console.log("No level");
+        }
+      // get the data from the Gamemode "Lesson" Only (1st phase of the Level)
+      const gamemodeRef = doc(db, "Html", lessonId, "Levels", levelId, "Gamemode", "Lesson");
+      const gamemodeSnap = await getDoc(gamemodeRef);
+      if (gamemodeSnap.exists()) {
+        setLessonGamemode(gamemodeSnap.data());
+      }else {
           console.log("No level");
         }
       } catch (err) {
@@ -129,10 +139,10 @@ const onNextClick = async () => {
     <div className='h-[83%] flex justify-around items-center p-4'>
       {/*instruction Panel*/}
       <div className='h-[95%] w-[32%] rounded-2xl bg-[#393F59]  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
-        {levelData ? (
+        {levelData && lessonGamemode ? (
             <div className='p-8 text-white'>
               <h2 className='text-2xl font-bold mb-2 font-exo text-[2.5rem]'>{levelData.order}. {levelData.title}</h2>
-              <p className='w-[90%]'>{levelData.instruction}</p>
+              <p className='w-[90%]'>{ lessonGamemode.instruction}</p>
             </div>
           ) : (
             <p>Loading...</p>

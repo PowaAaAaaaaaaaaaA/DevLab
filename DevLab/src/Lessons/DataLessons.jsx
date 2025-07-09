@@ -15,10 +15,10 @@ function DataLessons() {
     const [showLevels, setShowLevels] = useState(false);
 useEffect(() => {
     const fetchData = async () => {
-    const htmlRef = collection(db, "Database");
-    const htmlSnapshot = await getDocs(htmlRef);
+    const dataRef = collection(db, "Database");
+    const dataSnapshot = await getDocs(dataRef);
     const lessonData = await Promise.all(
-        htmlSnapshot.docs.map(async (lessonDoc) => {
+        dataSnapshot.docs.map(async (lessonDoc) => {
         const levelsRef = collection(db, "Database", lessonDoc.id, "Levels");
         const levelsSnapshot = await getDocs(levelsRef);
         const levels = levelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
