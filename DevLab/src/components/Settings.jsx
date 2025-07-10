@@ -4,6 +4,9 @@ import { auth,db } from '../Firebase/Firebase'
 import { Link, useNavigate } from 'react-router-dom';
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+import Lottie from "lottie-react";
+import AdminLogin from '../assets/Lottie/AdminLogin.json'
+import LogoutAnimation from '../assets/Lottie/SadSignout.json'
 
 function Settings() {
     const [showPopup, setShowPopup] = useState(false);
@@ -74,9 +77,11 @@ function Settings() {
                 username: newUserName || userDetails.username,
                 bio: newBio || userDetails.bio
             })
+            
         }catch(error){
             console.log(error)
         }
+        
     }
 
 return (
@@ -119,9 +124,10 @@ return (
         </Link>
 </div>
 {showPopup && (
-    <div className="fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50">
-        <div className="bg-[#1E212F] text-white p-6 rounded-2xl text-center shadow-lg w-[20%] opacity-100">
-            <h2 className="text-xl font-bold mb-4 font-exo">Confirm Logout</h2>
+    <div className="fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center ">
+        <div className="bg-[#1E212F] text-white p-6 rounded-2xl text-center shadow-lg w-[20%] opacity-100 flex flex-col items-center">
+            <h2 className="text-xl font-bold font-exo">Confirm Logout</h2>
+            <Lottie animationData={LogoutAnimation} loop={true} className="w-[40%] h-[50%] mt-[30px]" />
             <p className="mb-6 font-exo">Are you sure you want to log out?</p>
             <div className="flex justify-center gap-4">
             <button
@@ -140,10 +146,11 @@ return (
 }{
     showAdminPopup && (
         <div className="fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50">
-            <div className='bg-[#1E212F] w-[25%] h-[25%] text-white rounded-2xl text-center p-4'>
+            <div className='bg-[#1E212F] w-[25%] h-[40%] text-white rounded-2xl text-center p-4 flex flex-col items-center'>
                 <h2 className='font-exo text-3xl'>Admin Login</h2>
+                <Lottie animationData={AdminLogin} loop={true} className="w-[40%] h-[50%] mt-[30px]" />
                 <p className='font-exo text-[1rem] mt-1.5'>Confirm Admin Login</p>
-                <div className='flex justify-center gap-2.5'>
+                <div className='flex justify-center gap-5 mt-5'>
                     <button 
                     onClick={admin}
                     className='bg-[#1edb3e] px-4 py-2 rounded-xl font-exo font-bold hover:bg-[#79ff79] transition hover:cursor-pointer'>Proceed</button>

@@ -74,7 +74,7 @@ function ContentManagement() {
       <div className='border-b border-white h-[25%] flex flex-col justify-between p-5'>
         <div className='flex text-white font-exo justify-between p-10'>
           <h1 className='text-[3.2rem] font-bold'>Content Management</h1>
-          <button className='rounded-2xl w-[15%] h-[60%] flex gap-5 items-center justify-center bg-[#4CAF50] font-bold'><span className=" text-2xl"><HiArrowDownTray /></span>New Activity</button>
+          <button className='rounded-2xl w-[15%] h-[60%] flex gap-5 items-center justify-center bg-[#4CAF50] font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]'><span className=" text-2xl"><HiArrowDownTray /></span>New Activity</button>
         </div>
         <div className="flex justify-around">
           {subjects.map((subject)=>(

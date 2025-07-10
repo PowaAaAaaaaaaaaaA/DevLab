@@ -66,3 +66,35 @@ const fetchLessons = async (subject) => {
     console.error("Error fetching lessons:", error);
   }
 };
+
+
+{activeTab === "CodeRush" && (
+  <div className='border-cyan-400 border rounded-2xl w-[45%] h-[30%] p-4 bg-[#111827]'>
+    <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Time Limit:</h1>
+    <textarea
+      name="timeLimit"
+      id="timeLimit"
+      className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none'
+      placeholder={gamemodeData?.timeLimit || 'Enter time limit (in seconds)'}
+    ></textarea>
+  </div>
+)}
+
+// LEsson eDit
+   const newGamemodeData = {
+      instruction: "Enter your instruction here...",
+      topic: "Sample topic...",
+      preCode: "",
+      hint: "",
+      timer: 0,
+      type: activeTab, // optional, for identifying
+    }; 
+    // Only create if it doesn't exist
+    const gmSnapshot = await getDoc(gamemodeRef);
+    if (!gmSnapshot.exists()) {
+      await setDoc(gamemodeDb, newGamemodeData);
+      toast.success(`New ${activeTab} mode added!`, {
+        position: "top-center",
+        theme: "colored",
+      });
+    }
