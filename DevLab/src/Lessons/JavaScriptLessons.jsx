@@ -13,17 +13,20 @@ function JavaScriptLessons() {
     const [lessons, setLessons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showLevels, setShowLevels] = useState(false);
-    const [filterType, setFilterType] = useState("frontend");
+    const [filterType, setFilterType] = useState("JavaScript(FrontEnd)");
+    const [animateChange, setAnimateChange] = useState(false);
 useEffect(() => {
+        setAnimateChange(true); // trigger fade-out
+        setShowLevels(false);   // hide levels
     const fetchData = async () => {
-    const htmlRef = collection(db, "JavaScript");
+    const htmlRef = collection(db, filterType);
     const htmlSnapshot = await getDocs(htmlRef);
     const lessonData = await Promise.all(
         htmlSnapshot.docs.map(async (lessonDoc) => {
-        const levelsRef = collection(db, "JavaScript", lessonDoc.id, "Levels");
+        const levelsRef = collection(db, filterType, lessonDoc.id, "Levels");
         const levelsSnapshot = await getDocs(levelsRef);
         const levels = levelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
+            console.log(levels)
         return {
             id: lessonDoc.id,
             ...lessonDoc.data(),
@@ -32,12 +35,13 @@ useEffect(() => {
     })
     );
     setLessons(lessonData);
-    setTimeout(() => setShowLevels(true), 100);
+    setTimeout(() => {setShowLevels(true); setAnimateChange(false);}, 100);
     setLoading(false);
 };
 
     fetchData();
-}, []);
+}, [filterType]);
+
 return (
 <>
     <div className="h-[100%]">
@@ -67,8 +71,8 @@ return (
             <label className="text-white font-exo mr-3">Select Type:</label>
                 <select className="bg-[#1f2937] text-white p-2 rounded-md hover:cursor-pointer"value={filterType}
                     onChange={(e) => setFilterType(e.target.value)}>
-                    <option value="frontend" className="hover:cursor-pointer">Frontend</option>
-                    <option value="backend" className="hover:cursor-pointer">Backend</option>
+                    <option value="JavaScript(FrontEnd)" className="hover:cursor-pointer">Frontend</option>
+                    <option value="JavaScript(BackEnd)" className="hover:cursor-pointer">Backend</option>
                 </select>
         </div>  
     <div className="w-[100%] p-3 h-[90%] overflow-scroll overflow-x-hidden
@@ -85,11 +89,12 @@ return (
             <div className="flex flex-col gap-4">
                 {lesson.levels.map((level) => (
                 <div key={level.id}  
-                    className= {`w-full border flex gap-5 rounded-4xl transition-all duration-2400 ease-out transform
+                    className= {`w-full border flex gap-5 rounded-4xl transition-all duration-300 ease-out transform
                     ${showLevels ? 'translate-y-0' : ' translate-y-20'}
                     ${level.status === false
                     ? "bg-[#060505] opacity-30 cursor-not-allowed"
-                    : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
+                    : "bg-[#111827] hover:scale-102 cursor-pointer"}
+                    ${animateChange ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
                     onClick={async() => {
                     if (level.status) {
                         const user = auth.currentUser;

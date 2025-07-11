@@ -23,6 +23,7 @@ import AdminLayout from './Layout/AdminLayout'
 import ContentManagement from './AdminComponents/ContentManagement'
 import UserManagement from './AdminComponents/UserManagement'
 import LessonEdit from './AdminComponents/LessonEdit'
+import AddContent from "./AdminComponents/AddContent";
 // DISPLAY LESSON/LEVELS PAGE
 import HtmlLessons from "./Lessons/HtmlLessons";
 import CssLessons from './Lessons/CssLessons'
@@ -118,6 +119,7 @@ const isLoggedIn = !!user;
   </Route>
 
   <Route path="/Admin/ContentManagement/LessonEdit/:subject/:lessonId/:levelId" element={ isLoggedIn && isAdmin ?(<LessonEdit/>):(<Login/>)}/>
+    <Route path="/Admin/ContentManagement/:subject/AddContent" element={ isLoggedIn && isAdmin ?(<AddContent/>):(<Login/>)}/>
 </Routes>
     <ToastContainer/>
     </>
