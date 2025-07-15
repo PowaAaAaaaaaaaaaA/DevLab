@@ -16,7 +16,7 @@ function ContentManagement() {
   const Navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Html");
   const [lessons, setLessons] = useState([]);
-const subjects = ["Html", "Css", "JavaScript(FrontEnd)","JavaScript(BackEnd)", "Database"];
+const subjects = ["Html", "Css", "JavaScript-FrontEnd","JavaScript-BackEnd", "Database"];
 
   // Card PopUp Animation AND for Lottie Loading
   const [show, setShow] = useState(false);
@@ -31,7 +31,7 @@ const openPopup = () => {
 };
 const closePopup = () => {
   setPopupVisible(false);
-  setTimeout(() => setShowPopup(false), 20); 
+  setTimeout(() => setShowPopup(false), 100); 
 };
 // For PopUP(Adding Level/Lesson) Transition (End)
 
@@ -134,7 +134,7 @@ const closePopup = () => {
               <p className="text-white font-exo text-[0.8rem]">{level.desc}</p>
               <div className="flex gap-5">
                 {level.gamemodes && level.gamemodes.map((gm) => (
-                <div key={gm} className="rounded bg-[#1F2937] p-3  ">
+                <div key={gm.id} className="rounded bg-[#1F2937] p-3  ">
                   <p className="text-white text-sm">{gm.id}</p>
                 </div>
               ))}
@@ -151,7 +151,7 @@ const closePopup = () => {
       </div>)}
       
       {showPopup &&(
-        <div className={`fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50 transition-all duration-300 ${popupVisible ? 'opacity-100' : 'opacity-0 '}`}
+        <div className={`fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50 transition-all duration-300 ${popupVisible ? 'opacity-100 ' : 'opacity-0 '}`}
         onClick={closePopup}>
             <div 
             onClick={(e)=> e.stopPropagation()}

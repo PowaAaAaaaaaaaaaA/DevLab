@@ -88,10 +88,10 @@ useEffect(() => {
           <div className="flex flex-col gap-4">
             {lesson.levels.map((level) => (
               <div key={level.id} 
-              className= {`group w-full border flex gap-5 rounded-4xl  trasnform ease-out
+              className= {`group w-full border flex gap-5 rounded-4xl  trasnform ease-out h-[120px]
                     ${showLevels ? 'translate-y-0 transition-transform duration-1000' : ' translate-y-20 transition-transform duration-1000'}
                     ${level.status === false
-                    ? "bg-[#060505] opacity-30 hover:scale-102"
+                    ? "bg-[#060505] opacity-30 hover:scale-102  cursor-not-allowed"
                     : "bg-[#111827] hover:scale-102 cursor-pointer transition-transform duration-200"}`}
               onClick={async() => {
                 if (!level.status) {
@@ -113,10 +113,10 @@ useEffect(() => {
               navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);
             }
           }}>
-                <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
+                <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center"><span className="pb-4">{level.symbol}</span></div>
                   <div className="p-4 text-white font-exo"> 
                     <p className="text-[1.4rem]">{level.title}</p>
-                    <p className="text-[0.8rem]">{level.desc}</p>
+                    <p className="text-[0.7rem] line-clamp-3">{level.desc}</p>
                   </div>
               </div> 
             ))}

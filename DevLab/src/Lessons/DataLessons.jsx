@@ -77,7 +77,7 @@ return (
         <div className="flex flex-col gap-4">
             {lesson.levels.map((level) => (
             <div key={level.id} 
-            className= {`w-full border flex gap-5 rounded-4xl transition-all duration-2400 ease-out transform
+            className= {`w-full border flex gap-5 rounded-4xl transition-all duration-2400 ease-out transform h-[120px]
                     ${showLevels ? 'translate-y-0' : ' translate-y-20'}
                     ${level.status === false
                     ? "bg-[#060505] opacity-30 cursor-not-allowed"

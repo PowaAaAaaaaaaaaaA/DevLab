@@ -1,10 +1,10 @@
-// Lesson Page for HTMl
+// GamePage / Lesson Page for HTMl
 
 import { useParams } from 'react-router-dom';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc,getDocs, updateDoc, collection } from 'firebase/firestore';
 import { db,auth } from '../Firebase/Firebase';
 import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MdArrowBackIos } from "react-icons/md";
 import CodeMirror from '@uiw/react-codemirror';
 import { html } from '@codemirror/lang-html';
@@ -13,7 +13,8 @@ import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night';
 import { MdDensityMedium } from "react-icons/md";
 
 function LessonPage() {
-
+  const subject = "Html"
+  const navigate = useNavigate();
   const { lessonId, levelId } = useParams();
   const [levelData, setLevelData] = useState(null);
   const [lessonGamemode, setLessonGamemode] = useState(null);
@@ -24,7 +25,7 @@ function LessonPage() {
     const fetchLevel = async () => {
       try {
         // get the Level Data 
-        const docRef = doc(db, "Html", lessonId, `Levels`, levelId);
+        const docRef = doc(db, subject, lessonId, `Levels`, levelId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setLevelData(docSnap.data());
@@ -32,7 +33,7 @@ function LessonPage() {
           console.log("No level");
         }
       // get the data from the Gamemode "Lesson" Only (1st phase of the Level)
-      const gamemodeRef = doc(db, "Html", lessonId, "Levels", levelId, "Gamemode", "Lesson");
+      const gamemodeRef = doc(db, subject, lessonId, "Levels", levelId, "Gamemode", "Lesson");
       const gamemodeSnap = await getDoc(gamemodeRef);
       if (gamemodeSnap.exists()) {
         setLessonGamemode(gamemodeSnap.data());
@@ -93,17 +94,31 @@ const runCode = () => {
   }
 };
 const onNextClick = async () => {
-  const user = auth.currentUser;
+
+  const gamemodeRef = collection(db, subject, lessonId, "Levels", levelId, "Gamemode");
+  const gamemodeSnap = await getDocs(gamemodeRef);
+
+  const nextModes = gamemodeSnap.docs.filter(doc => doc.id !== "Lesson");
+
+  if (nextModes.length > 0) {
+    const nextGameMode = nextModes[0].id; // e.g., "CodeRush", "BugBust"
+    // Navigate based on that game mode
+    navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${nextGameMode}`);
+  } else {
+    console.log("No next game mode found");
+  }
+  // This for the Reward when clicked and Exp
+  /*const user = auth.currentUser;
   if (!user || !levelData) return;
 
   const expReward = levelData.expReward;
   const coinsReward = levelData.coinsReward;
-  await addExp(user.uid, expReward, coinsReward);
+  await addExp(user.uid, expReward, coinsReward);*/
 
   // Optional: Navigate to next level
   console.log("Next level logic here...");
 };
-// Getting the User Details to
+// Getting the User Details 
   const [userDetails, setUserDetails] = useState("")
   useEffect(()=>{
     const fetchUserData = async ()=>{
@@ -119,6 +134,17 @@ const onNextClick = async () => {
     };
     fetchUserData();
   },[]);
+
+  console.log(subject)
+
+  // Color hindi pa final (Hindi sha efficient (for the meantime lang to))
+  function highlightKeywords(text) {
+  return text
+    .replace(/HTML/g, '<span class="text-orange-400 font-semibold">HTML</span>')
+    .replace(/CSS/g, '<span class="text-blue-400 font-semibold">CSS</span>')
+    .replace(/JavaScript/g, '<span class="text-yellow-300 font-semibold">JavaScript</span>')
+    .replace(/Databases?/gi, '<span class="text-green-400 font-semibold">Database</span>');
+} 
 
 
   
@@ -138,32 +164,47 @@ const onNextClick = async () => {
     {/*Contents*/}
     <div className='h-[83%] flex justify-around items-center p-4'>
       {/*instruction Panel*/}
-      <div className='h-[95%] w-[32%] rounded-2xl bg-[#393F59]  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
+      <div className='h-[95%] w-[32%] rounded-2xl bg-[#393F59] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] overflow-scroll overflow-x-hidden
+      [&::-webkit-scrollbar]:w-2
+      [&::-webkit-scrollbar-track]:rounded-full
+    [&::-webkit-scrollbar-track]:bg-gray-100  
+      [&::-webkit-scrollbar-thumb]:rounded-full
+    dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
+    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500
+      '>
         {levelData && lessonGamemode ? (
-            <div className='p-8 text-white'>
+            <div className='p-8 text-white flex flex-col gap-5'>
               <h2 className='text-2xl font-bold mb-2 font-exo text-[2.5rem]'>{levelData.order}. {levelData.title}</h2>
-              <p className='w-[90%]'>{ lessonGamemode.instruction}</p>
+              <p className='w-[90%] leading-relaxed  text-[1rem] text-justify whitespace-pre-line' dangerouslySetInnerHTML={{ __html: highlightKeywords(lessonGamemode.topic) }}
+                />
+              <div className='bg-[#25293B] w-[95%] self-center p-5 rounded-2xl '>
+                <h1 className='font-exo font-bold text-[1.5rem] p-2'>Instruction</h1>
+                <p className='p-2 font-exo text-[0.9rem]'>{lessonGamemode.instruction}</p>
+                <div className='bg-[#191C2B] rounded-2xl p-5'> 
+                  <p className='font-exo font-bold text-[0.8rem]' >{lessonGamemode.preCode}</p>
+                </div>
+
+              </div>
             </div>
           ) : (
             <p>Loading...</p>
           )}
       </div>
       {/*Coding Panel*/}
-      <div className='bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex items-center justify-center flex-col p- shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
+      <div className='bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex items-center justify-center flex-col gap-2 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
           <CodeMirror
-              className='text-xl '
+              className='text-xl border-none'
               value={code}
-              height="650px"
-              width='604px'
+              height="640px"
+              width='600px'
               extensions={[html()]}
               theme={tokyoNight}
               onChange={(value) => setCode(value)}/>
 
-              <div className='w-[100%] flex justify-around'> 
+              <div className='w-[100%] flex justify-around '> 
                 <button onClick={runCode} className="bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[30%] font-exo font-bold p-4 ">RUN</button>
                 <button  className=" bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[30%] font-exo font-bold p-4 ">EVALUATE</button>
               </div>
-             
       </div>
       {/*Output Panel*/}
       <div className='bg-[#D9D9D9] h-[95%] w-[32%] rounded-2xl  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
