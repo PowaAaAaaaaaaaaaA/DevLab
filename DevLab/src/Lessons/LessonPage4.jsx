@@ -48,16 +48,16 @@ useEffect(() => {
     locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/${file}`,
     }).then((SQL) => {
     const db = new SQL.Database();
-    db.run(`
-        CREATE TABLE users (id INTEGER, name TEXT);
-        CREATE TABLE orders (id INTEGER, user_id INTEGER, item TEXT);
+            db.run(`
+                CREATE TABLE users (id INTEGER, name TEXT);
+                CREATE TABLE orders (id INTEGER, user_id INTEGER, item TEXT);
 
-        INSERT INTO users VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie')
-                                ,(4, 'Jhon'), (5, 'Sahur'), (6, 'Dongskie')
-                                ,(7, 'Barlo'), (8, 'Mirana'), (9, 'Meeps');
-        INSERT INTO orders VALUES (1, 1, 'Laptop'), (2, 2, 'Phone'), (3, 1, 'Tablet')
-                                , (4, 1, 'Shabu'), (5, 2, 'Dildo'), (6, 1, 'Mouse')
-                                , (7, 1, 'Laptop'), (8, 2, 'Phone'), (9, 1, 'Tablet');`);
+                INSERT INTO users VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie')
+                                        ,(4, 'Jhon'), (5, 'Sahur'), (6, 'Dongskie')
+                                        ,(7, 'Barlo'), (8, 'Mirana'), (9, 'Meeps');
+                INSERT INTO orders VALUES (1, 1, 'Laptop'), (2, 2, 'Phone'), (3, 1, 'Tablet')
+                                        , (4, 1, 'Shabu'), (5, 2, 'Dildo'), (6, 1, 'Mouse')
+                                        , (7, 1, 'Laptop'), (8, 2, 'Phone'), (9, 1, 'Tablet');`);
     dbRef.current = db;
     renderAllTables();
     });

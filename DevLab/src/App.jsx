@@ -31,9 +31,7 @@ import JavaScriptLessons from "./Lessons/JavaScriptLessons";
 import DataLessons  from "./Lessons/DataLessons";
 // LESSON PAGES
 import LessonPage from "./Lessons/LessonPage";
-import LessonPage2 from "./Lessons/LessonPage2";
-import LessonPage3 from "./Lessons/LessonPage3";
-import LessonPage4 from "./Lessons/LessonPage4";
+
 import { getDoc } from "firebase/firestore";
 // GAME MODES
 import GameModeRouter from "./gameMode/GameModeRouter";
@@ -97,11 +95,6 @@ const isLoggedIn = !!user;
     <Route path="Settings" element={<Settings />} />
   </Route>
   
-  <Route path="/Main/Lessons/Html/:lessonId/:levelId" element={<LessonPage />} />
-  <Route path="/Main/Lessons/Css/:lessonId/:levelId" element={<LessonPage2 />} />
-  <Route path="/Main/Lessons/JavaScript-FrontEnd/:lessonId/:levelId" element={<LessonPage3 />} />
-  <Route path="/Main/Lessons/DataBase/:lessonId/:levelId" element={<LessonPage4 />} />
-
   <Route path="/Main/Lessons/:subject/:lessonId/:levelId/:gamemodeId" element={<GameModeRouter />} /> 
 
   <Route path="/codingPlay" element={isLoggedIn ? <CodePlayground /> : <Navigate to="/Login" replace />} />

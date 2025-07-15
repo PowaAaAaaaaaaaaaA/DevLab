@@ -110,7 +110,7 @@ useEffect(() => {
                     }
                     })
                 }
-              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}`);
+              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}/Lesson`);
             }
           }}>
                 <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center"><span className="pb-4">{level.symbol}</span></div>

@@ -23,3 +23,35 @@ const onNextClick = async () => {
     console.error("Failed to fetch gamemodes:", err);
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+{/* 
+{levelComplete && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+    <div className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
+      <h2 className="text-3xl font-bold text-[#9333EA] mb-4">🎉 Congratulations!</h2>
+      <p className="text-lg text-gray-800 mb-6">
+        You have completed all game modes for this level.
+      </p>
+      <button
+        onClick={() => {
+          setLevelComplete(false);
+          navigate('/Main'); // or navigate to next level, summary, or dashboard
+        }}
+        className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700"
+      >
+        Back to Main
+      </button>
+    </div>
+  </div>
+)}*/}
