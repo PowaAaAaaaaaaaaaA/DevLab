@@ -39,7 +39,7 @@ function CodeRush() {
     const [timer, setTimer] = useState(null); 
 
 
-
+// Langunage each Subj
     const languageMap = {
     Html: html(),
     Css: css(),
@@ -57,12 +57,10 @@ function CodeRush() {
         const gamemodeRef = doc(db, subject, lessonId, 'Levels', levelId, 'Gamemode', gamemodeId);
         const gamemodeSnap = await getDoc(gamemodeRef);
         if (gamemodeSnap.exists()) {
-          setLessonGamemode(gamemodeSnap.data());
-          const gamemodeData = gamemodeSnap.data();
-          setTimer(gamemodeData.timer);
+            setLessonGamemode(gamemodeSnap.data());
+            const gamemodeData = gamemodeSnap.data();
+            setTimer(gamemodeData.timer);
         }
-          
-          
     };
     fetchLevel();
 }, [subject, lessonId, levelId]);
@@ -191,13 +189,13 @@ useEffect(() => {
         setTimer(prev => {
             if (prev <= 1) {
                 clearInterval(countdown);
-                // trigger timeout behavior here
+                // Here when Time ran outt
                 console.log("Time's up!");
                 return 0;
             }
             return prev - 1;
         });
-    }, 1000);
+    }, 100);
     return () => clearInterval(countdown);
   }
 
@@ -207,7 +205,7 @@ console.log(gamemodeId )
 return subject !== "DataBase" ? (
     <>
     {showPopup && (
-  <GameMode_Instruction_PopUp
+    <GameMode_Instruction_PopUp
     title="Hey Dev!!"
     message={`Welcome to **CodeRush** — a fast-paced challenge where you’ll write and run code before time runs out! . 
     Your mission:  
@@ -215,8 +213,7 @@ return subject !== "DataBase" ? (
 💻 Write your code  
 🚀 Run it before the timer hits zero!`}
     onClose={() => setShowPopup(false)}
-    buttonText="Start Challenge"
-  />
+    buttonText="Start Challenge"/>
 )}
     <div className="h-screen bg-[#0D1117] flex flex-col">
       {/* Header */}
@@ -241,11 +238,11 @@ return subject !== "DataBase" ? (
             {levelData && lessonGamemode ? (
             <>
                 <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>
-                <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.desc}</p>
+                <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.topic}</p>
             <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
                 <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">Instruction</h3>
                 <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.instruction}</p>
-                <p className="bg-[#191C2B] p-3 rounded-xl">{lessonGamemode.preCode}</p>
+                <p className="bg-[#191C2B] p-3 rounded-xl text-white overflow-auto whitespace-pre-wrap">{lessonGamemode.preCode}</p>
             </div>
             <div className="font-bold text-[3.2rem] w-[40%] m-auto p-3 flex flex-col justify-center items-center ">  
               <p className='font-exo text-shadow-lg text-shadow-black text-[1.5rem]'>Time:</p>

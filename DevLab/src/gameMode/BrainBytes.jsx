@@ -7,18 +7,19 @@ import { sql } from '@codemirror/lang-sql';
 import initSqlJs from 'sql.js';
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night';
 import { db, auth } from '../Firebase/Firebase';
-import { doc, getDoc,} from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/OutputLottie.json';
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
 import { goToNextGamemode } from '../gameMode/Util_Navigation';
+import GameMode_Instruction_PopUp from './GameMode_Instruction_PopUp';
+    function BrainBytes() {
 
-
-function LessonPage() {
 
     const navigate = useNavigate();
     const { subject, lessonId, levelId,gamemodeId} = useParams();
+    const [levelComplete, setLevelComplete] = useState(false);
     const [levelData, setLevelData] = useState(null);
     const [lessonGamemode, setLessonGamemode] = useState(null);
     const [code, setCode] = useState('');
@@ -29,8 +30,15 @@ function LessonPage() {
     const [hasRunQuery, setHasRunQuery] = useState(false);
     const [hasRunCode, setRunCode] = useState(false);
     const [tablesHtml, setTablesHtml] = useState('');
+        //Pop up
+    const [showPopup, setShowPopup] = useState(true)
+        // Brain Bytes UseStates
+const [options, setOptions] = useState({});
+const [selectedOption, setSelectedOption] = useState(null);
+const [isSubmitted, setIsSubmitted] = useState(false);
+const [correctAnswer, setCorrectAnswer] = useState(null);
 
-
+// Language each Subj
     const languageMap = {
     Html: html(),
     Css: css(),
@@ -38,21 +46,28 @@ function LessonPage() {
     DataBase: sql(),
 };
 
-// Getting data Lesson Data
+// Getting the Level Data (BrainBytes)
     useEffect(() => {
     const fetchLevel = async () => {
         const docRef = doc(db, subject, lessonId, 'Levels', levelId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) setLevelData(docSnap.data());
 
-        const gamemodeRef = doc(db, subject, lessonId, 'Levels', levelId, 'Gamemode', 'Lesson');
+        const gamemodeRef = doc(db, subject, lessonId, 'Levels', levelId, 'Gamemode', gamemodeId);
         const gamemodeSnap = await getDoc(gamemodeRef);
-        if (gamemodeSnap.exists()) setLessonGamemode(gamemodeSnap.data());
+        if (gamemodeSnap.exists()) {
+            setLessonGamemode(gamemodeSnap.data());
+            const gamemodeData = gamemodeSnap.data();
+                setLessonGamemode(gamemodeData);
+                setOptions(gamemodeData.options || {});
+                setCorrectAnswer(gamemodeData.correctAnswer); 
+                setTimer(gamemodeData.timer);
+
+        }
     };
     fetchLevel();
 }, [subject, lessonId, levelId]);
-// 
-// Data Base (Subject)
+// Table for Database Subject
 useEffect(() => {
     if (subject === 'DataBase') {
     initSqlJs({
@@ -74,6 +89,7 @@ useEffect(() => {
     });
     }
 }, [subject]);
+// Display Table for Database Subject
 const renderAllTables = () => {
     if (!dbRef.current) return;
     try {
@@ -107,10 +123,7 @@ const renderAllTables = () => {
     console.error("Error displaying tables:", err);
     }
 };
-// Data Base (Subject(END))
-
-
-// Run Code (Dynammic)
+// Run Button for Both (Query and Code)
 const runCode = () => {
     if (subject === 'DataBase'){
     try {
@@ -158,7 +171,6 @@ const runCode = () => {
         doc.open(); doc.write(fullCode); doc.close();   
     }
 };
-
 // Getting the User Info
 useEffect(() => {
     auth.onAuthStateChanged(async user => {
@@ -169,10 +181,20 @@ useEffect(() => {
     });
 }, []);
 
-console.log(gamemodeId )
-
-
+    console.log(gamemodeId)
 return subject !== "DataBase" ? (
+    <>
+    {showPopup && (
+    <GameMode_Instruction_PopUp
+    title="Hey Dev!!"
+    message={`Welcome to **CodeRush** — a fast-paced challenge where you’ll write and run code before time runs out! . 
+    Your mission:  
+🧩 Read the task  
+💻 Write your code  
+🚀 Run it before the timer hits zero!`}
+    onClose={() => setShowPopup(false)}
+    buttonText="Start Challenge"/>
+)}
     <div className="h-screen bg-[#0D1117] flex flex-col">
       {/* Header */}
     <div className="flex justify-between h-[10%] p-3">
@@ -186,28 +208,37 @@ return subject !== "DataBase" ? (
       {/* Content */}
     <div className="h-[83%] flex justify-around items-center p-4">
         {/* Instruction */}
-        <div className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5
+        <div className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl flex flex-col gap-5 text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]
         [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:rounded-full
-        [&::-webkit-scrollbar-track]:bg-gray-100  
+      [&::-webkit-scrollbar-track]:bg-gray-100  
         [&::-webkit-scrollbar-thumb]:rounded-full
-        dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+      dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
+      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             {levelData && lessonGamemode ? (
             <>
-            {subject ==="Html" &&(<h2 className="text-[2rem] text-[#FF5733] font-bold text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>)}
-            {subject ==="Css" &&(<h2 className="text-[2rem] text-[#1E90FF] font-bold text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>)}
-            {subject ==="DataBase" &&(<h2 className="text-[2rem] text-[#4CAF50] font-bold text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>)}
-            {subject ==="JavaScript " &&(<h2 className="text-[2rem] text-[#F7DF1E] font-bold text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>)}
-                <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem]">{lessonGamemode.topic}</p>
-            <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
-                <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">Instruction</h3>
-                <p className="mb-2">{lessonGamemode.instruction}</p>
-                <pre className="bg-[#191C2B] p-3 rounded-xl">{lessonGamemode.preCode}</pre>
+                <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>
+                <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.topic}</p>
+        <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
+                <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">Instruction</h3>
+                <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.instruction}</p>
+            {/*FIX THE UI  hindi pa ito Final (Bukas nalng)*/}
+            <div className='bg-[#191C2B] p-3 rounded-xl text-white overflow-auto whitespace-pre-wrap'>
+                {lessonGamemode?.options && Object.entries(lessonGamemode.options).map(([key, value]) => (
+                    <label key={key} className="flex items-start gap-3 mb-3 cursor-pointer">
+                        <input
+                            type="radio"
+                            name="option"
+                            value={key}
+                            checked={selectedOption === key}
+                            onChange={() => setSelectedOption(key)}
+                            className="accent-purple-600 mt-1"/>
+                        <span className="font-mono text-sm break-all">{value}{key }</span>
+                    </label>))}
             </div>
+        </div>
             </>) : <p>Loading...</p>}
         </div>
-
         {/* Code Editor */}
     <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
         <CodeMirror
@@ -222,12 +253,9 @@ return subject !== "DataBase" ? (
             <button className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%]">EVALUATE</button>
         </div>
     </div>
-
         {/* Output */}
         <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
             {hasRunCode?(<iframe ref={iFrame} title="output" className="w-full h-full rounded-xl" sandbox="allow-scripts allow-same-origin" />):(<div className='w-full h-full flex items-center flex-col'><Lottie animationData={Animation} loop={true} className="w-[70%] h-[70%]"/><p className='text-[0.8rem]'>YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT</p></div>)}
-            
-            
         </div>
         </div>
       {/* Footer */}
@@ -241,7 +269,9 @@ return subject !== "DataBase" ? (
         </div>
         <div className="w-[10%]">
         <button
-            onClick={() => goToNextGamemode({ subject, lessonId, levelId, gamemodeId, navigate })}
+            onClick={() => goToNextGamemode({ subject, lessonId, levelId, gamemodeId, navigate, 
+            // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
+            onComplete: () => setLevelComplete(true) })}
             className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2">
             Next
         </button>
@@ -251,8 +281,40 @@ return subject !== "DataBase" ? (
         </div>
     </div>
     </div>
-
-):(<div className='h-screen bg-[#0D1117] flex flex-col'>
+{levelComplete && (
+  <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+    <div className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
+      <h2 className="text-3xl font-bold text-[#9333EA] mb-4">🎉 Congratulations!</h2>
+      <p className="text-lg text-gray-800 mb-6">
+        You have completed all game modes for this level.
+      </p>
+      <button
+        onClick={() => {
+          setLevelComplete(false);
+          navigate('/Main'); // or navigate to next level, summary, or dashboard
+        }}
+        className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700">
+        Back to Main
+      </button>
+    </div>
+  </div>
+)}
+</>
+):(
+<>
+{showPopup && (
+  <GameMode_Instruction_PopUp
+    title="Hey Dev!!"
+    message={`Welcome to **CodeRush** — a fast-paced challenge where you’ll write and run code before time runs out! . 
+    Your mission:  
+🧩 Read the task  
+💻 Write your code  
+🚀 Run it before the timer hits zero!`}
+    onClose={() => setShowPopup(false)}
+    buttonText="Start Challenge"
+  />
+)}
+<div className='h-screen bg-[#0D1117] flex flex-col'>
     {/*Header*/}
     <div className=' border-white flex justify-between h-[10%] p-3'>
         <div className=' flex items-center p-3'>
@@ -266,13 +328,27 @@ return subject !== "DataBase" ? (
     {/*Contents*/}
     <div className='h-[83%] flex justify-around items-center p-4'>
         {/*Instruction*/}
-        <div className='h-[95%] w-[32%] rounded-2xl bg-[#393F59]  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
-        {levelData ? (
-            <div className='p-8 text-white'>
-                <h2 className='text-2xl font-bold mb-2 font-exo text-[2.5rem] text-shadow-lg text-shadow-black '>{levelData.order}. {levelData.title}</h2>
-                <p className='w-[90%]'>{levelData.instruction}</p>
-            </div>) : (
-            <p>Loading...</p>)}
+        <div className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl flex flex-col gap-5 text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]
+        [&::-webkit-scrollbar]:w-2
+        [&::-webkit-scrollbar-track]:rounded-full
+      [&::-webkit-scrollbar-track]:bg-gray-100  
+        [&::-webkit-scrollbar-thumb]:rounded-full
+      dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
+      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+            {levelData && lessonGamemode ? (
+            <>
+                <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>
+                <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.topic}</p>
+            <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
+                <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">Instruction</h3>
+                <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.instruction}</p>
+                <div className='bg-[#191C2B] p-3 rounded-xl text-white overflow-auto whitespace-pre-wrap'>
+                    
+                </div>
+            </div>
+            <div className="font-bold text-[3.2rem] w-[40%] m-auto p-3 flex flex-col justify-center items-center ">  
+            </div>
+            </>) : <p>Loading...</p>}
         </div>
         {/*Coding Panel*/}
         <div className='bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex items-center justify-center flex-col p- shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
@@ -321,8 +397,8 @@ return subject !== "DataBase" ? (
             <p className='text-white font-exo text-[1.5rem]'>$999</p>
         </div>
     </div>
+</div>
+</>
+)}
 
-</div>)
-}
-
-export default LessonPage
+    export default BrainBytes

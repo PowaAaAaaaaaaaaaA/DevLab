@@ -95,7 +95,7 @@ return (
                             }
                         })
                     }
-            navigate(`/Main/Lessons/DataBase/${lesson.id}/${level.id}`);
+            navigate(`/Main/Lessons/DataBase/${lesson.id}/${level.id}/Lesson`);
         }
     }}>
                 <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>

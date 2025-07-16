@@ -55,3 +55,19 @@ const onNextClick = async () => {
     </div>
   </div>
 )}*/}
+
+            <div className='border-cyan-400 border rounded-2xl w-[55%] h-[20%] p-4 bg-[#111827]'>
+              <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Level Title: </h1>
+              <textarea 
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              name="" id="" className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none' placeholder={levelData?.title || 'Loading'}></textarea>
+            </div>
+
+            {/*Level Description*/}
+            <div className='border-cyan-400 border rounded-2xl w-[35%] h-[20%] p-4 bg-[#111827]'>
+              <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Level Description:</h1>
+              <textarea 
+              onChange={(e) => setEditedDesc(e.target.value)}
+              name="" id="" className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={levelData?.desc || 'Loading'}></textarea>
+            </div> 

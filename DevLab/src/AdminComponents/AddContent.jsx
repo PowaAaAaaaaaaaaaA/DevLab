@@ -31,23 +31,24 @@ const fetchLessonsData = async(subject)=>{
 const [title, setTitle] = useState()
 const [desc, setDesc] = useState()
 const [coins, setCoins] = useState();
-const [symbol, setSymbol] = useState("");
+
 
 const handleAdd = async () => {
-
+     let defaultS = "";
     switch(subject){
+       
         case "Html":
-            setSymbol("< >");
+        defaultS = "< >";
         break;
         case "Css":
-            setSymbol("#");
+        defaultS = "#";
         break;
         case "JavaScript-FrontEnd":
         case "JavaScript-BackEnd":
-            setSymbol("{ }");
+        defaultS = "{ }";
         break;
         case "Database":
-            setSymbol("||||");
+        defaultS = "||||";
         break;
     }
 
@@ -98,8 +99,9 @@ const handleAdd = async () => {
     title,
     desc,
     coinReward: parseInt(coins),
-    symbol,
+    symbol: defaultS,
     status: false,
+    order: nextLevelNum
     });
 
     toast.success("Level Added",{

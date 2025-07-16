@@ -93,10 +93,10 @@ useEffect(() => {
                                 }
                             })
                         }
-                navigate(`/Main/Lessons/Css/${lesson.id}/${level.id}`);
+                navigate(`/Main/Lessons/Css/${lesson.id}/${level.id}/Lesson`);
                 }
             }}>
-                    <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
+                    <div className=" text-white bg-black min-w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">{level.symbol}</div>
                     <div className="p-4 text-white font-exo"> 
                         <p className="text-[1.4rem]">{level.title}</p>
                         <p className="text-[0.8rem]">{level.desc}</p>
