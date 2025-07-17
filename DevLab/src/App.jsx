@@ -35,13 +35,14 @@ import LessonPage from "./Lessons/LessonPage";
 import { getDoc } from "firebase/firestore";
 // GAME MODES
 import GameModeRouter from "./gameMode/GameModeRouter";
+//
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 
 
-
+const queryClient = new QueryClient();
 
 function App() {
-
   const[user, setUser] = useState();
     const [loading, setLoading] = useState(true);
   const[isAdmin, setAdmin] = useState(null)
@@ -76,6 +77,7 @@ const isLoggedIn = !!user;
 
   return (
     <>
+<QueryClientProvider client={queryClient}>
   <Routes>
   {/* Public Routes */}
   <Route path="/" element={!isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />} />
@@ -120,6 +122,7 @@ const isLoggedIn = !!user;
     <Route path="/Admin/ContentManagement/:subject/AddContent" element={ isLoggedIn && isAdmin ?(<AddContent/>):(<Login/>)}/>
 </Routes>
     <ToastContainer/>
+</QueryClientProvider>
     </>
   )
 }

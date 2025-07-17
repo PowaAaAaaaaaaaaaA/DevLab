@@ -7,18 +7,22 @@ import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 import LockAnimation from '../assets/Lottie/LockItem.json'
 
-
+import { useQuery } from "@tanstack/react-query";
 
 
 function HtmlLessons() {
 
+  const { data, isLoading } = useQuery({
+    queryKey: ["Html_Levels"],
+    queryFn: () => fetchData(),
+  });
+
+
     const navigate = useNavigate();
-    const [lessons, setLessons] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [showLevels, setShowLevels] = useState(false);
     const [showLockedModal, setShowLockedModal] = useState(false);
-useEffect(() => {
-    const fetchData = async () => {
+
+      const fetchData = async () => {
       const htmlRef = collection(db, "Html");
       const htmlSnapshot = await getDocs(htmlRef);
       const lessonData = await Promise.all(
@@ -34,13 +38,10 @@ useEffect(() => {
           };
         })
       );
-      setLessons(lessonData);
-      setTimeout(() => setShowLevels(true), 100);
-      setLoading(false);
+      setShowLevels(true)
+      return lessonData   
     };
 
-    fetchData();
-  }, []);
 
   
 
@@ -71,7 +72,7 @@ useEffect(() => {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
         {/*Left Panel*/}
-        {loading?
+        {isLoading?
         /*Loading*/
       (<Lottie animationData={Animation} loop={true} className="w-[60%] h-[70%] mt-[30px]" />):
       (<div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
@@ -82,7 +83,7 @@ useEffect(() => {
         [&::-webkit-scrollbar-thumb]:bg-gray-300
         dark:[&::-webkit-scrollbar-track]:bg-neutral-700
         dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-      {lessons.map((lesson) => (
+      {data.map((lesson) => (
         <div key={lesson.id} className="flex flex-col gap-4">
           <h2 className="font-exo text-[3rem] font-bold text-white">{lesson.title}</h2> 
           <div className="flex flex-col gap-4">

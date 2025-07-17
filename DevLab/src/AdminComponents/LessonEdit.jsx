@@ -17,7 +17,6 @@
 
   const { subject,lessonId, levelId } = useParams()
   const [levelData, setLevelData] = useState(null);
-  const [show, SetShow] = useState(false);
   const [activeTab, setActiveTab] = useState("Lesson");
   const [gamemodeData, setGameModeData] = useState();
 
@@ -38,16 +37,16 @@
     const gmData = await getDoc(gmDb);
     if (gmData.exists()){
       setGameModeData(gmData.data())
+    }else{
+      setGameModeData(null);
     }
   }
-
-
   useEffect (()=>{
     fetchLessons();
     if (activeTab){
       fetchGameModes(activeTab);
     }
-    SetShow(true)
+
   }, [activeTab])
 
   const [editedTitle, setEditedTitle] = useState(null);
@@ -87,29 +86,29 @@
       if ( activeTab === "BugBust" || activeTab === "CodeCrafter") {
         gamemodePayload = {
           ...gamemodePayload,
-          title: gameModeTitle || gamemodeData?.title,
-          instruction: instruction || gamemodeData?.instruction,
-          topic: topic || gamemodeData?.topic,
-          preCode: preCode || gamemodeData?.preCode,
-          hint: hint || gamemodeData?.hint,
+          title: gameModeTitle || gamemodeData?.title || null,
+          instruction: instruction || gamemodeData?.instruction || null,
+          topic: topic || gamemodeData?.topic || null,
+          preCode: preCode || gamemodeData?.preCode || null,
+          hint: hint || gamemodeData?.hint || null,
         };
       }if(activeTab === "Lesson"){
         gamemodePayload = {
           ...gamemodePayload,
-          title: gameModeTitle || gamemodeData?.title,
-          instruction: instruction || gamemodeData?.instruction,
-          topic: topic || gamemodeData?.topic,
-          preCode: preCode || gamemodeData?.preCode,
+          title: gameModeTitle || gamemodeData?.title || null,
+          instruction: instruction || gamemodeData?.instruction || null,
+          topic: topic || gamemodeData?.topic|| null ,
+          preCode: preCode || gamemodeData?.preCode|| null ,
         };
       }if (activeTab === "CodeRush") {
         gamemodePayload = {
           ...gamemodePayload,
-          title: gameModeTitle || gamemodeData?.title,
-          instruction: instruction || gamemodeData?.instruction,
-          topic: topic || gamemodeData?.topic,
-          preCode: preCode || gamemodeData?.preCode,
-          hint: hint || gamemodeData?.hint,
-          timer: timer || gamemodeData?.timer,
+          title: gameModeTitle || gamemodeData?.title || null,
+          instruction: instruction || gamemodeData?.instruction || null,
+          topic: topic || gamemodeData?.topic || null,
+          preCode: preCode || gamemodeData?.preCode || null,
+          hint: hint || gamemodeData?.hint || null,
+          timer: timer || gamemodeData?.timer || null,
         };
       }if (activeTab === "BrainBytes") {
     gamemodePayload = {
@@ -140,6 +139,8 @@
       console.log(error)
     }
   }
+
+  console.log(activeTab)
     return (
       <div className='bg-[#25293B] h-fit p-2 overflow-hidden'>
       {/*Header*/}
@@ -288,19 +289,19 @@
                     <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827] flex flex-col justify-around'>
                       <input 
                       onChange={(e) => setAnswers(prev => ({...prev, A: e.target.value}))}
-                      type="text" placeholder='Answer A' className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
+                      type="text" placeholder={`A:  ${gamemodeData?.options?.A}`}className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
                       <input 
                       onChange={(e) => setAnswers(prev => ({...prev, B: e.target.value}))}
-                      type="text" placeholder='Answer B' className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
+                      type="text" placeholder={`B:  ${gamemodeData?.options?.B}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
                       <input 
                       onChange={(e) => setAnswers(prev => ({...prev, C: e.target.value}))}
-                      type="text" placeholder='Answer C' className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
+                      type="text" placeholder={`C:  ${gamemodeData?.options?.C}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
                       <input 
                       onChange={(e) => setAnswers(prev => ({...prev, D: e.target.value}))}
-                      type="text" placeholder='Answer D' className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
+                      type="text" placeholder={`D:  ${gamemodeData?.options?.D}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
                       <input 
                       onChange={(e) => setAnswers(prev => ({...prev, correct: e.target.value}))}
-                      type="text" placeholder='Correct Answer' className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
+                      type="text" placeholder={`Correct Answer:  ${gamemodeData?.correctAnswer}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
                     </div>
                   </>
                 ):null}

@@ -195,7 +195,7 @@ useEffect(() => {
             }
             return prev - 1;
         });
-    }, 100);
+    }, 1000);
     return () => clearInterval(countdown);
   }
 
@@ -239,7 +239,7 @@ return subject !== "DataBase" ? (
             <>
                 <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">{levelData.order}. {lessonGamemode.title}</h2>
                 <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.topic}</p>
-            <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
+            <div className="mt-4 p-4 bg-[#25293B] rounded-2xl flex flex-col gap-3">
                 <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">Instruction</h3>
                 <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.instruction}</p>
                 <p className="bg-[#191C2B] p-3 rounded-xl text-white overflow-auto whitespace-pre-wrap">{lessonGamemode.preCode}</p>
