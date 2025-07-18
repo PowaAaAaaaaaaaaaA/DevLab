@@ -18,7 +18,7 @@ import GameMode_Instruction_PopUp from './GameMode_Instruction_PopUp';
 
 function CodeRush() {
 
-        const { subject, lessonId, levelId, gamemodeId } = useParams();
+        const { subject, lessonId, levelId, topicId,gamemodeId } = useParams();
         const navigate = useNavigate();
         const [levelComplete, setLevelComplete] = useState(false);
 
@@ -54,7 +54,7 @@ function CodeRush() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) setLevelData(docSnap.data());
 
-        const gamemodeRef = doc(db, subject, lessonId, 'Levels', levelId, 'Gamemode', gamemodeId);
+        const gamemodeRef = doc(db, subject, lessonId, 'Levels', levelId, 'Topics', topicId, 'Gamemodes', gamemodeId);
         const gamemodeSnap = await getDoc(gamemodeRef);
         if (gamemodeSnap.exists()) {
             setLessonGamemode(gamemodeSnap.data());
@@ -281,7 +281,7 @@ return subject !== "DataBase" ? (
         </div>
         <div className="w-[10%]">
         <button
-            onClick={() => goToNextGamemode({ subject, lessonId, levelId, gamemodeId, navigate, 
+            onClick={() => goToNextGamemode({ subject, lessonId, levelId, topicId,gamemodeId, navigate, 
             // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
             onComplete: () => setLevelComplete(true) })}
             className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2">

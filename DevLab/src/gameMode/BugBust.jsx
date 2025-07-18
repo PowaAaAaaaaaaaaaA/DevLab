@@ -20,7 +20,7 @@ import { LanguageSupport } from '@codemirror/language';
 
 
     const navigate = useNavigate();
-    const { subject, lessonId, levelId,gamemodeId} = useParams();
+    const { subject, lessonId, levelId,gamemodeId,topicId} = useParams();
     const [levelComplete, setLevelComplete] = useState(false);
     const [levelData, setLevelData] = useState(null);
     const [lessonGamemode, setLessonGamemode] = useState(null);
@@ -257,7 +257,7 @@ return subject !== "DataBase" ? (
         </div>
         <div className="w-[10%]">
         <button
-            onClick={() => goToNextGamemode({ subject, lessonId, levelId, gamemodeId, navigate, 
+            onClick={() => goToNextGamemode({ subject, lessonId, levelId, topicId,gamemodeId, navigate, 
             // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
             onComplete: () => setLevelComplete(true) })}
             className="bg-[#7F5AF0] text-white font-bold rounded-xl w-full py-2 hover: cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]">

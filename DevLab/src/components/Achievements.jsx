@@ -49,7 +49,8 @@ function Achievements() {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
           {HTML_Data.map((item)=>(
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
+        <div key={item.key}
+        className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
           <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
             <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
             <hr className="border-t border-gray-700 w-full" />
@@ -64,7 +65,9 @@ function Achievements() {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
           {CSS_Data.map((item)=>(
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
+        <div 
+        key={item.key}
+        className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
           <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
             <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
             <hr className="border-t border-gray-700 w-full" />
@@ -79,7 +82,9 @@ function Achievements() {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
           {Js_Data.map((item)=>(
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
+        <div 
+        key={item.key}
+        className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
           <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
             <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
             <hr className="border-t border-gray-700 w-full" />
@@ -94,7 +99,9 @@ function Achievements() {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
           {Query_Data.map((item)=>(
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
+        <div 
+        key={item.key}
+        className="p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500  transition duration-500 hover:scale-110 hover:shadow-lg hover:shadow-gray-400">
           <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
             <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
             <hr className="border-t border-gray-700 w-full" />

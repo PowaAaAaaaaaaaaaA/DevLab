@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs,setDoc, doc } from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
 
 import { HiArrowDownTray } from "react-icons/hi2";
@@ -35,47 +35,52 @@ const closePopup = () => {
 };
 // For PopUP(Adding Level/Lesson) Transition (End)
 
-  const fetchLessons = async (subject) => {
-    try {
-      setLoading(true);
-      setShow(false);
-      const subjectDb = collection(db, subject);
-      const subjDocs = await getDocs(subjectDb);
-      
-      const lessonData = await Promise.all(
-        subjDocs.docs.map(async (lessonDoc) => {
-          const levelsDb = collection(db, subject, lessonDoc.id, "Levels");
-          const levelsDocs = await getDocs(levelsDb);
-          const levels = await Promise.all(
+const fetchLessons = async (subject) => {
+  try {
+    setLoading(true);
+    setShow(false);
+
+    const subjectDb = collection(db, subject);
+    const subjDocs = await getDocs(subjectDb);
+
+    const lessonData = await Promise.all(
+      subjDocs.docs.map(async (lessonDoc) => {
+        const levelsDb = collection(db, subject, lessonDoc.id, "Levels");
+        const levelsDocs = await getDocs(levelsDb);
+
+        const levels = await Promise.all(
           levelsDocs.docs.map(async (levelDoc) => {
-            const gamemodeRef = collection(db, subject, lessonDoc.id, "Levels", levelDoc.id, "Gamemode");
-            const gamemodeSnap = await getDocs(gamemodeRef);
-            const gamemodes = gamemodeSnap.docs.map((gm) => ({
-              id: gm.id,
-              ...gm.data(),
+            const topicsRef = collection(db, subject, lessonDoc.id, "Levels", levelDoc.id, "Topics");
+            const topicsSnap = await getDocs(topicsRef);
+
+            const topics = topicsSnap.docs.map((topicDoc) => ({
+              id: topicDoc.id,
+              ...topicDoc.data(),
             }));
+
             return {
               id: levelDoc.id,
               ...levelDoc.data(),
-              gamemodes, // Add gamemodes to each level
+              topics, //  add topics to each level
             };
           })
         );
-          return {
-            id: lessonDoc.id,
-            title: lessonDoc.data().title,
-            levels,
-          };
-        })
-      );
-      
-      setLessons(lessonData);
-      setLoading(false);
-      setTimeout(()=> setShow(true), 100)
-    } catch (error) {
-      console.error("Error fetching lessons:", error);
-    }
-  };
+
+        return {
+          id: lessonDoc.id,
+          title: lessonDoc.data().title,
+          levels,
+        };
+      })
+    );
+
+    setLessons(lessonData);
+    setLoading(false);
+    setTimeout(() => setShow(true), 100);
+  } catch (error) {
+    console.error("Error fetching lessons:", error);
+  }
+};
 
 
   useEffect(() => {
@@ -84,6 +89,31 @@ const closePopup = () => {
     }
   }, [activeTab]);
 
+
+  const addNewTopic = async (subject, lessonId, levelId) => {
+  try {
+    const topicsRef = collection(db, subject, lessonId, "Levels", levelId, "Topics");
+    const snapshot = await getDocs(topicsRef);
+
+    // Get highest numbered Topic
+    const topicNumbers = snapshot.docs.map(doc => {
+      const match = doc.id.match(/Topic(\d+)/);
+      return match ? parseInt(match[1]) : 0;
+    });
+
+    const nextNumber = (topicNumbers.length > 0 ? Math.max(...topicNumbers) : 0) + 1;
+    const newTopicId = `Topic${nextNumber}`;
+
+    await setDoc(doc(topicsRef, newTopicId), {
+      title: newTopicId,
+      createdAt: new Date()
+    });
+
+    fetchLessons(subject); // Refresh the lessons
+  } catch (error) {
+    console.error("Error adding topic:", error);
+  }
+};
 
 
 
@@ -126,23 +156,25 @@ const closePopup = () => {
           <div key={lesson.id} className="p-5 flex flex-col gap-15">
             <h2 className="text-white font-exo text-5xl">{lesson.title}</h2>
             <div className="flex flex-wrap justify-center gap-10">
-            {lesson.levels.map((level)=>(
-          <>
-          {/*Lesson Card*/}
-            <div key={level.id} className={`border-[#56EBFF] border w-[42%] p-10 flex flex-col gap-4 rounded-2xl bg-[#111827] relative transition-all duration-400 ${show ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+            {lesson.levels.map((level)=>(  
+          /*Lesson Card*/
+            <div key={level.id} className={`border-[#56EBFF] border w-[42%] p-10 flex flex-col gap-4 min-h-[150px] rounded-2xl bg-[#111827] relative transition-all duration-400 ${show ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
               <h2 className="text-3xl font-exo font-bold text-white">{level.title}</h2>
               <p className="text-white font-exo text-[0.8rem]">{level.desc}</p>
               <div className="flex gap-5">
-                {level.gamemodes && level.gamemodes.map((gm) => (
-                <div key={gm.id} className="rounded bg-[#1F2937] p-3  ">
-                  <p className="text-white text-sm">{gm.id}</p>
+                {level.topics && level.topics.map((topic) => (
+                <div key={topic.id} className="rounded bg-[#1F2937] p-3">
+                  <button 
+                  onClick={()=>{
+                    {Navigate(`/Admin/ContentManagement/LessonEdit/${activeTab}/${lesson.id}/${level.id}/${topic.id}`)}
+                  }}
+                  className="font-exo text-white cursor-pointer">{topic.id}</button>
                 </div>
               ))}
               </div>
-              <div className="absolute text-white bottom-5 right-5 text-2xl"><button className="hover:cursor-pointer hover:bg-gray-600 rounded p-2" onClick={()=>{Navigate(`/Admin/ContentManagement/LessonEdit/${activeTab}/${lesson.id}/${level.id}`)}}><HiOutlinePencilSquare /></button></div>
+              <div className="absolute text-white bottom-5 right-5 text-2xl"><button className="hover:cursor-pointer hover:bg-gray-600 rounded p-2" onClick={() => addNewTopic(activeTab, lesson.id, level.id)}>plUS</button></div>
             </div>
-          {/*Lesson Card*/}
-          </>
+          /*Lesson Card*/
             ))}
             </div>
           </div>

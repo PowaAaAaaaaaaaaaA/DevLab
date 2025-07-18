@@ -15,7 +15,7 @@
 
   const gameModes = ["Lesson", "BugBust", "CodeRush", "CodeCrafter", "BrainBytes"];
 
-  const { subject,lessonId, levelId } = useParams()
+  const { subject,lessonId, levelId ,topicId} = useParams()
   const [levelData, setLevelData] = useState(null);
   const [activeTab, setActiveTab] = useState("Lesson");
   const [gamemodeData, setGameModeData] = useState();
@@ -33,7 +33,7 @@
     }
   }
   const fetchGameModes = async (activeTab)=>{
-    const gmDb = doc(db,subject, lessonId, "Levels", levelId,"Gamemode", activeTab);
+    const gmDb = doc(db,subject, lessonId, "Levels", levelId,"Topics", topicId, "Gamemodes", activeTab);
     const gmData = await getDoc(gmDb);
     if (gmData.exists()){
       setGameModeData(gmData.data())
@@ -78,44 +78,33 @@
         desc: editedDesc || levelData.desc
       })
 
-      const gamemodeDb = doc(db, subject, lessonId, "Levels", levelId, "Gamemode", activeTab);
+      const gamemodeDb = doc(db,subject, lessonId, "Levels", levelId,"Topics", topicId, "Gamemodes", activeTab);
 
       let gamemodePayload = {
-        type: activeTab, 
+        type: activeTab,
+        title: gameModeTitle || gamemodeData?.title || null,
+        instruction: instruction || gamemodeData?.instruction || null,
+        topic: topic || gamemodeData?.topic || null,
+        preCode: preCode || gamemodeData?.preCode || null 
       };
       if ( activeTab === "BugBust" || activeTab === "CodeCrafter") {
         gamemodePayload = {
           ...gamemodePayload,
-          title: gameModeTitle || gamemodeData?.title || null,
-          instruction: instruction || gamemodeData?.instruction || null,
-          topic: topic || gamemodeData?.topic || null,
-          preCode: preCode || gamemodeData?.preCode || null,
           hint: hint || gamemodeData?.hint || null,
         };
       }if(activeTab === "Lesson"){
         gamemodePayload = {
           ...gamemodePayload,
-          title: gameModeTitle || gamemodeData?.title || null,
-          instruction: instruction || gamemodeData?.instruction || null,
-          topic: topic || gamemodeData?.topic|| null ,
-          preCode: preCode || gamemodeData?.preCode|| null ,
         };
       }if (activeTab === "CodeRush") {
         gamemodePayload = {
           ...gamemodePayload,
-          title: gameModeTitle || gamemodeData?.title || null,
-          instruction: instruction || gamemodeData?.instruction || null,
-          topic: topic || gamemodeData?.topic || null,
-          preCode: preCode || gamemodeData?.preCode || null,
           hint: hint || gamemodeData?.hint || null,
           timer: timer || gamemodeData?.timer || null,
         };
       }if (activeTab === "BrainBytes") {
     gamemodePayload = {
       ...gamemodePayload,
-      title: gameModeTitle || gamemodeData?.title,
-      instruction: instruction || gamemodeData?.question,
-      topic: topic || gamemodeData?.topic,
       options: {
         A: answers.A || gamemodeData?.options.A,
         B: answers.B || gamemodeData?.options.B,

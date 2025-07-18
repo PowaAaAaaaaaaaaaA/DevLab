@@ -18,7 +18,7 @@ import { goToNextGamemode } from '../gameMode/Util_Navigation';
 function LessonPage() {
 
     const navigate = useNavigate();
-    const { subject, lessonId, levelId,gamemodeId} = useParams();
+    const { subject, lessonId, levelId,topicId,gamemodeId} = useParams();
     const [levelData, setLevelData] = useState(null);
     const [lessonGamemode, setLessonGamemode] = useState(null);
     const [code, setCode] = useState('');
@@ -45,12 +45,12 @@ function LessonPage() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) setLevelData(docSnap.data());
 
-        const gamemodeRef = doc(db, subject, lessonId, 'Levels', levelId, 'Gamemode', 'Lesson');
+        const gamemodeRef = doc(db, subject, lessonId, 'Levels', levelId, 'Topics', topicId, 'Gamemodes', gamemodeId);
         const gamemodeSnap = await getDoc(gamemodeRef);
         if (gamemodeSnap.exists()) setLessonGamemode(gamemodeSnap.data());
     };
     fetchLevel();
-}, [subject, lessonId, levelId]);
+}, [subject, lessonId, levelId, topicId]);
 // 
 // Data Base (Subject)
 useEffect(() => {
@@ -169,7 +169,8 @@ useEffect(() => {
     });
 }, []);
 
-console.log(gamemodeId )
+console.log(topicId)
+console.log(gamemodeId)
 
 
 return subject !== "DataBase" ? (
@@ -241,7 +242,7 @@ return subject !== "DataBase" ? (
         </div>
         <div className="w-[10%]">
         <button
-            onClick={() => goToNextGamemode({ subject, lessonId, levelId, gamemodeId, navigate })}
+            onClick={() => goToNextGamemode({ subject, lessonId, levelId, topicId,gamemodeId, navigate })}
             className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2">
             Next
         </button>

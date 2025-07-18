@@ -6,6 +6,7 @@ import HtmlImage from "../assets/Images/html-Icon-Big.png"
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 import LockAnimation from '../assets/Lottie/LockItem.json'
+import {motion} from "framer-motion"
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -19,35 +20,47 @@ function HtmlLessons() {
 
 
     const navigate = useNavigate();
-    const [showLevels, setShowLevels] = useState(false);
     const [showLockedModal, setShowLockedModal] = useState(false);
 
-      const fetchData = async () => {
-      const htmlRef = collection(db, "Html");
-      const htmlSnapshot = await getDocs(htmlRef);
-      const lessonData = await Promise.all(
-        htmlSnapshot.docs.map(async (lessonDoc) => {
-          const levelsRef = collection(db, "Html", lessonDoc.id, "Levels");
-          const levelsSnapshot = await getDocs(levelsRef);
-          const levels = levelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const fetchData = async () => {
+  const htmlRef = collection(db, "Html");
+  const htmlSnapshot = await getDocs(htmlRef);
+
+  const lessonData = await Promise.all(
+    htmlSnapshot.docs.map(async (lessonDoc) => {
+      const levelsRef = collection(db, "Html", lessonDoc.id, "Levels");
+      const levelsSnapshot = await getDocs(levelsRef);
+
+      const levels = await Promise.all(
+        levelsSnapshot.docs.map(async (levelDoc) => {
+          const topicsRef = collection(db, "Html", lessonDoc.id, "Levels", levelDoc.id, "Topics");
+          const topicsSnapshot = await getDocs(topicsRef);
+          const topics = topicsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
 
           return {
-            id: lessonDoc.id,
-            ...lessonDoc.data(),
-            levels
+            id: levelDoc.id,
+            ...levelDoc.data(),
+            topics, 
           };
         })
       );
-      setShowLevels(true)
-      return lessonData   
-    };
+
+      return {
+        id: lessonDoc.id,
+        ...lessonDoc.data(),
+        levels,
+      };
+    })
+  );
+
+  return lessonData;
+};
 
 
-  
 
-
-
-    
   return (
     <>
         <div className="h-[100%]">
@@ -86,17 +99,24 @@ function HtmlLessons() {
       {data.map((lesson) => (
         <div key={lesson.id} className="flex flex-col gap-4">
           <h2 className="font-exo text-[3rem] font-bold text-white">{lesson.title}</h2> 
-          <div className="flex flex-col gap-4">
+          <motion.div  
+          variants={{hidden:{opacity: 0}, 
+              show:{opacity:1, 
+                transition:{staggerChildren:0.30,duration: 1, ease: "easOut",}},
+              }}
+              initial = "hidden"
+              animate="show"
+          className="flex flex-col gap-4">
             {lesson.levels.map((level) => (
-              <div key={level.id} 
-              className= {`group w-full border flex gap-5 rounded-4xl  trasnform ease-out h-[120px]
-                    ${showLevels ? 'translate-y-0 transition-transform duration-1000' : ' translate-y-20 transition-transform duration-1000'}
+              <motion.div key={level.id}
+              variants={{hidden:{opacity:0, y:100}, show:{opacity: level.status ? 1 : 0.3, y:0 }}}
+              className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
                     ${level.status === false
-                    ? "bg-[#060505] opacity-30 hover:scale-102  cursor-not-allowed"
-                    : "bg-[#111827] hover:scale-102 cursor-pointer transition-transform duration-200"}`}
+                    ? "bg-[#060505] hover:scale-102 transition-transform duration-500  cursor-not-allowed"
+                    : "bg-[#111827] hover:scale-102 cursor-pointer transition-transform duration-500"}`}
               onClick={async() => {
                 if (!level.status) {
-                  setShowLockedModal(true);         // show the modal
+                  setShowLockedModal(true);// show the modal
                   return;}
               // This button will navigate to "LevelPage" and Update the "Jump Back in" sa Dashboard
               if (level.status) {
@@ -111,7 +131,14 @@ function HtmlLessons() {
                     }
                     })
                 }
-              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}/Lesson`);
+                
+    const firstTopic = level.topics?.[0]; // ← get the first topic if it exists
+    if (!firstTopic) {
+      alert("No topics found for this level.");
+      return;
+    }
+    console.log(firstTopic)
+              navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`);
             }
           }}>
                 <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center"><span className="pb-4">{level.symbol}</span></div>
@@ -119,9 +146,9 @@ function HtmlLessons() {
                     <p className="text-[1.4rem]">{level.title}</p>
                     <p className="text-[0.7rem] line-clamp-3">{level.desc}</p>
                   </div>
-              </div> 
+              </motion.div> 
             ))}
-            </div>
+            </motion.div>
         </div>))}
       </div>)
       }
@@ -132,7 +159,7 @@ function HtmlLessons() {
           </div>
 
         </div>
-
+          {/*This is PopUp for the Locked Levels*/}
         {showLockedModal && (  
       <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex justify-center items-center">
         <div className="bg-[#1E1E2E] text-white p-8 rounded-2xl w-[400px] text-center shadow-lg border border-gray-600 flex flex-col items-center">
@@ -140,7 +167,7 @@ function HtmlLessons() {
           <h2 className="text-2xl font-bold mb-4">Level Locked</h2>
           <p className="mb-6">You must complete the previous levels to unlock <span className="text-[#FF5733] font-bold"></span>.</p>
       <button
-        className="bg-[#7F5AF0] px-6 py-2 rounded-2xl text-white font-bold hover:bg-[#6A4CD4] transition w-[90%]"
+        className="bg-[#7F5AF0] px-6 py-2 rounded-2xl text-white font-bold hover:bg-[#6A4CD4] transition w-[90%] cursor-pointer"
         onClick={() => setShowLockedModal(false)}>Okay</button>
         </div>
       </div>)}
