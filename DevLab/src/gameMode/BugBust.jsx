@@ -21,21 +21,23 @@ import { LanguageSupport } from '@codemirror/language';
 
     const navigate = useNavigate();
     const { subject, lessonId, levelId,gamemodeId,topicId} = useParams();
-    const [levelComplete, setLevelComplete] = useState(false);
+
+    // Data
+    const [userDetails, setUserDetails] = useState('');
     const [levelData, setLevelData] = useState(null);
     const [lessonGamemode, setLessonGamemode] = useState(null);
+    
     const [code, setCode] = useState('');
-    const [userDetails, setUserDetails] = useState('');
     const iFrame = useRef(null);
     const dbRef = useRef(null);
     const [outputHtml, setOutputHtml] = useState('');
+    const [tablesHtml, setTablesHtml] = useState('');
+    //Pop up
+    const [levelComplete, setLevelComplete] = useState(false);
+    const [showPopup, setShowPopup] = useState(true)
+    // Lottie show        
     const [hasRunQuery, setHasRunQuery] = useState(false);
     const [hasRunCode, setRunCode] = useState(false);
-    const [tablesHtml, setTablesHtml] = useState('');
-        //Pop up
-    const [showPopup, setShowPopup] = useState(true)
-
-
 
 const type = "Bug Bust"
 

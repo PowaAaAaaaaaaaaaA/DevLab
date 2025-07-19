@@ -122,8 +122,8 @@
         toast.success("Save Changes",{
             position:"top-center",
             theme: "colored"})
-          setTimeout(()=>{
-            window.location.reload();},500)
+          await fetchLessons();
+          await fetchGameModes(activeTab)
     }catch(error){
       console.log(error)
     }

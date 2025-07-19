@@ -13,16 +13,12 @@ import { useQuery } from "@tanstack/react-query";
 
 function HtmlLessons() {
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["Html_Levels"],
-    queryFn: () => fetchData(),
-  });
 
 
     const navigate = useNavigate();
     const [showLockedModal, setShowLockedModal] = useState(false);
 
-    const fetchData = async () => {
+  const fetchData = async () => {
   const htmlRef = collection(db, "Html");
   const htmlSnapshot = await getDocs(htmlRef);
 
@@ -59,7 +55,13 @@ function HtmlLessons() {
   return lessonData;
 };
 
+  const { data, isLoading } = useQuery({
+    queryKey: ["Html_Levels"],
+    queryFn: () => fetchData(),
+  });
 
+
+console.log(isLoading)
 
   return (
     <>
@@ -102,8 +104,7 @@ function HtmlLessons() {
           <motion.div  
           variants={{hidden:{opacity: 0}, 
               show:{opacity:1, 
-                transition:{staggerChildren:0.30,duration: 1, ease: "easOut",}},
-              }}
+              transition:{staggerChildren:0.3,duration: 1, ease: "easeOut",}},}}
               initial = "hidden"
               animate="show"
           className="flex flex-col gap-4">
@@ -112,8 +113,8 @@ function HtmlLessons() {
               variants={{hidden:{opacity:0, y:100}, show:{opacity: level.status ? 1 : 0.3, y:0 }}}
               className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
                     ${level.status === false
-                    ? "bg-[#060505] hover:scale-102 transition-transform duration-500  cursor-not-allowed"
-                    : "bg-[#111827] hover:scale-102 cursor-pointer transition-transform duration-500"}`}
+                    ? "bg-[#060505]  cursor-pointer"
+                    : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
               onClick={async() => {
                 if (!level.status) {
                   setShowLockedModal(true);// show the modal
@@ -132,12 +133,7 @@ function HtmlLessons() {
                     })
                 }
                 
-    const firstTopic = level.topics?.[0]; // ← get the first topic if it exists
-    if (!firstTopic) {
-      alert("No topics found for this level.");
-      return;
-    }
-    console.log(firstTopic)
+    const firstTopic = level.topics?.[0]; //  get the first topic if it exists
               navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`);
             }
           }}>

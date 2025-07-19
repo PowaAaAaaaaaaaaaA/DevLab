@@ -8,37 +8,54 @@ import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import {motion} from "framer-motion"
 
+import { useQuery } from "@tanstack/react-query";
+
 function CssLessons() {
-  const navigate = useNavigate();
-  const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showLevels, setShowLevels] = useState(false);
-  useEffect(() => {
-    const fetchData = async () => {
-      const cssRef = collection(db, "Css");
-      const cssSnapshot = await getDocs(cssRef);
-      const lessonData = await Promise.all(
-        cssSnapshot.docs.map(async (lessonDoc) => {
-          const levelsRef = collection(db, "Css", lessonDoc.id, "Levels");
-          const levelsSnapshot = await getDocs(levelsRef);
-          const levels = levelsSnapshot.docs.map((doc) => ({
+ const { data, isLoading } = useQuery({
+    queryKey: ["Css_Levels"],
+    queryFn: () => fetchData(),
+  });
+
+    const navigate = useNavigate();
+    const [showLockedModal, setShowLockedModal] = useState(false);
+
+  const fetchData = async () => {
+  const CssRef = collection(db, "Css");
+  const CssSnapshot = await getDocs(CssRef);
+
+  const lessonData = await Promise.all(
+    CssSnapshot.docs.map(async (lessonDoc) => {
+      const levelsRef = collection(db, "Css", lessonDoc.id, "Levels");
+      const levelsSnapshot = await getDocs(levelsRef);
+
+      const levels = await Promise.all(
+        levelsSnapshot.docs.map(async (levelDoc) => {
+          const topicsRef = collection(db, "Css", lessonDoc.id, "Levels", levelDoc.id, "Topics");
+          const topicsSnapshot = await getDocs(topicsRef);
+          const topics = topicsSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
 
           return {
-            id: lessonDoc.id,
-            ...lessonDoc.data(),
-            levels,
+            id: levelDoc.id,
+            ...levelDoc.data(),
+            topics, 
           };
         })
       );
-      setLessons(lessonData);
-      setTimeout(() => setShowLevels(true), 100);
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
+
+
+      return {
+        id: lessonDoc.id,
+        ...lessonDoc.data(),
+        levels,
+      };
+    })
+  );
+
+  return lessonData;
+};
 
   return (
     <>
@@ -77,7 +94,7 @@ function CssLessons() {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
-          {loading ? (
+          {isLoading ? (
             <Lottie
               animationData={Animation}
               loop={true}
@@ -94,29 +111,26 @@ function CssLessons() {
             dark:[&::-webkit-scrollbar-track]:bg-neutral-700
             dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
             >
-              {lessons.map((lesson) => (
-                <div key={lesson.id} className="flex flex-col gap-4">
+              {data.map((lesson) => (
+                <div key={lesson.id||  "sad"} className="flex flex-col gap-4">
                   <h2 className="font-exo text-[3rem] font-bold text-white">
                     {lesson.title}
                   </h2>
                   <motion.div
                   variants={{hidden:{opacity: 0}, 
                   show:{opacity:1, 
-                  transition:{staggerChildren:0.30,duration: 1, ease: "easOut",}},}}
+                  transition:{staggerChildren:0.3,duration: 1, ease: "easeOut",}},}}
                   initial = "hidden"
                   animate="show"
                   className="flex flex-col gap-4">
                     {lesson.levels.map((level) => (
                       <motion.div
                       variants={{hidden:{opacity:0, y:100}, show:{opacity: level.status ? 1 : 0.3, y:0 }}}
-                      key={level.id} 
-                      className={`w-full border flex gap-5 rounded-4xl transition-all duration-2400 ease-out transform h-[120px] 
-                    ${showLevels ? "translate-y-0" : " translate-y-20"}
-                    ${
-                      level.status === false
+                      key={level.id||  "sad"} 
+                      className={`group w-full border flex gap-5 rounded-4xl h-[120px] 
+                    ${level.status === false
                         ? "bg-[#060505] opacity-30   hover:scale-102 cursor-not-allowed"
-                        : "bg-[#111827] hover:scale-102 cursor-pointer"
-                    }`}
+                        : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
                         onClick={async () => {
                           if (level.status) {
                             const user = auth.currentUser;
@@ -131,17 +145,17 @@ function CssLessons() {
                               });
                             }
                             navigate(
-                              `/Main/Lessons/Css/${lesson.id}/${level.id}/Lesson`
+                              `/Main/Lessons/Html/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`
                             );
                           }
                         }}
                       >
                         <div className=" text-white bg-black min-w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">
-                          {level.symbol}
+                          {level.symbol||  "sad"}
                         </div>
                         <div className="p-4 text-white font-exo">
-                          <p className="text-[1.4rem]">{level.title}</p>
-                          <p className="text-[0.8rem]">{level.desc}</p>
+                          <p className="text-[1.4rem]">{level.title||  "sad"}</p>
+                          <p className="text-[0.8rem]">{level.desc||  "sad"}</p>
                         </div>
                       </motion.div>
                     ))}
