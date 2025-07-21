@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import DataImage from "../assets/Images/Database-Icon-Big.png";
 import { MdOutlineLock } from "react-icons/md";
 import Lottie from "lottie-react";
+import LockAnimation from '../assets/Lottie/LockItem.json'
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 
 import { motion } from "framer-motion";
@@ -137,22 +138,22 @@ function DataLessons() {
                     }}
                     initial="hidden"
                     animate="show"
-                    className="flex flex-col gap-4"
-                  >
+                    className="flex flex-col gap-4">
                     {lesson.levels.map((level) => (
                       <motion.div
                         variants={{
                           hidden: { opacity: 0, y: 100 },
-                          show: { opacity: level.status ? 1 : 0.3, y: 0 },
-                        }}
-                        key={level.id}
-                        className={`w-full border flex gap-5 rounded-4xl h-[120px]
-              ${
-                level.status === false
-                  ? "bg-[#060505] opacity-30 cursor-pointer"
-                  : "bg-[#111827] hover:scale-102 cursor-pointer"
-              }`}
+                          show: { opacity: level.status ? 1 : 0.3, y: 0 },}}
+                          key={level.id}
+                          whileHover={{scale:1.02}}
+              className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
+                    ${level.status === false
+                    ? "bg-[#060505]  cursor-pointer"
+                    : "bg-[#111827]  cursor-pointer "}`}
                         onClick={async () => {
+                          if (!level.status) {
+                            setShowLockedModal(true);// show the modal
+                            return;}
                           if (level.status) {
                             const user = auth.currentUser;
                             if (user) {
@@ -170,14 +171,13 @@ function DataLessons() {
                               `/Main/Lessons/Html/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`
                             );
                           }
-                        }}
-                      >
+                        }}>
                         <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">
                           {level.symbol}
                         </div>
                         <div className="p-4 text-white font-exo">
                           <p className="text-[1.4rem]">{level.title}</p>
-                          <p className="text-[0.8rem]">{level.desc}</p>
+                          <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -201,7 +201,19 @@ function DataLessons() {
             </p>
           </div>
         </div>
-      </div>
+{/*This is PopUp for the Locked Levels*/}
+    {showLockedModal && (  
+      <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex justify-center items-center">
+        <div className="bg-[#1E1E2E] text-white p-8 rounded-2xl w-[400px] text-center shadow-lg border border-gray-600 flex flex-col items-center">
+          <Lottie animationData={LockAnimation} className="w-[50%] h-[50%]"></Lottie>
+          <h2 className="text-2xl font-bold mb-4">Level Locked</h2>
+          <p className="mb-6">You must complete the previous levels to unlock <span className="text-[#FF5733] font-bold"></span>.</p>
+          <button
+          className="bg-[#7F5AF0] px-6 py-2 rounded-2xl text-white font-bold hover:bg-[#6A4CD4] transition w-[90%] cursor-pointer"
+          onClick={() => setShowLockedModal(false)}>Okay</button>
+        </div>
+      </div>)}
+    </div>
     </>
   );
 }

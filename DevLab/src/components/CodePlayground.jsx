@@ -6,6 +6,7 @@ import { css } from '@codemirror/lang-css';
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night';
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/OutputLottie.json'
+import {  motion } from "framer-motion";
 
 function CodePlayground() {
 const tabs = ["HTML", "CSS", "JavaScript"];
@@ -102,7 +103,11 @@ return (
                 extensions={[getLanguageExtension()]}
                 onChange={onChange}
                 theme={tokyoNight}/>
-            <button onClick={runCode} className="ml-auto px-4 py-2 bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[15%]">Run Code</button>
+            <motion.button 
+            whileTap={{scale:0.95}}
+            whileHover={{scale:1.05, background:"#7e22ce"}}
+            transition={{bounceDamping:100}}
+            onClick={runCode} className="ml-auto px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">Run Code</motion.button>
         </div>
         </div>
         {/* Output Panel */}

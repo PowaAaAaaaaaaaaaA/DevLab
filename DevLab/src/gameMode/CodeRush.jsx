@@ -14,6 +14,8 @@ import Animation from "../assets/Lottie/OutputLottie.json";
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
 import { goToNextGamemode } from "../gameMode/Util_Navigation";
 import GameMode_Instruction_PopUp from "./GameMode_Instruction_PopUp";
+import { AnimatePresence, motion } from "framer-motion";
+import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
 
 function CodeRush() {
   const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
@@ -47,7 +49,6 @@ function CodeRush() {
     JavaScript: javascript(),
     DataBase: sql(),
   };
-
   // Getting the Level Data (CodeRush)
   useEffect(() => {
     const fetchLevel = async () => {
@@ -128,7 +129,6 @@ function CodeRush() {
     }
   };
   // Data Base (Subject(END))
-
   // Run Code (Dynammic)
   const runCode = () => {
     if (subject === "DataBase") {
@@ -192,7 +192,6 @@ function CodeRush() {
       doc.close();
     }
   };
-
   // Getting the User Info
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
@@ -203,6 +202,24 @@ function CodeRush() {
       }
     });
   }, []);
+  // Format the Code to Display
+  const [formattedCode, setFormattedCode] = useState("");
+  useEffect(() => {
+  if (!lessonGamemode || !subject) return;
+  const rawCode = lessonGamemode?.preCode || "";
+  switch (subject) {
+      case "Html":
+          setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
+          break;
+      case "Css":
+          setFormattedCode(beautifyCSS(rawCode, { indent_size: 2 }));
+          break;
+      case "JavaScript":
+          setFormattedCode(beautifyJS(rawCode, { indent_size: 2 }));
+          break;
+      default:
+          setFormattedCode(rawCode);
+  }}, [lessonGamemode, subject]);
   // Timer Funtion
   useEffect(() => {
     if (!showPopup) {
@@ -220,10 +237,11 @@ function CodeRush() {
       return () => clearInterval(countdown);
     }
   }, [showPopup, timer]);
+  
 
-  console.log(gamemodeId);
   return subject !== "DataBase" ? (
     <>
+    <AnimatePresence>
       {showPopup && (
         <GameMode_Instruction_PopUp
           title="Hey Dev!!"
@@ -236,6 +254,7 @@ function CodeRush() {
           buttonText="Start Challenge"
         />
       )}
+    </AnimatePresence>
       <div className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
         <div className="flex justify-between h-[10%] p-3">
@@ -277,8 +296,8 @@ function CodeRush() {
                   <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">
                     {lessonGamemode.instruction}
                   </p>
-                  <p className="bg-[#191C2B] p-3 rounded-xl text-white overflow-auto whitespace-pre-wrap">
-                    {lessonGamemode.preCode}
+                  <p className="bg-[#191C2B] p-3 rounded-xl text-white overflow-auto whitespace-pre-wrap ">
+                    {formattedCode}
                   </p>
                 </div>
                 <div className="font-bold text-[3.2rem] w-[40%] m-auto p-3 flex flex-col justify-center items-center ">
@@ -306,15 +325,17 @@ function CodeRush() {
               theme={tokyoNight}
             />
             <div className="flex justify-around w-full">
-              <button
-                onClick={runCode}
-                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer"
-              >
-                RUN
-              </button>
-              <button className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%]">
-                EVALUATE
-              </button>
+            <motion.button 
+            whileTap={{scale:0.95}}
+            whileHover={{scale:1.05, background:"#7e22ce"}}
+            transition={{bounceDamping:100}}
+            onClick={runCode} 
+            className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">RUN</motion.button>
+            <motion.button 
+            whileTap={{scale:0.95}}
+            whileHover={{scale:1.05, background:"#7e22ce"}}
+            transition={{bounceDamping:100}}
+            className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">EVALUATE</motion.button>
             </div>
           </div>
           {/* Output */}
@@ -324,15 +345,13 @@ function CodeRush() {
                 ref={iFrame}
                 title="output"
                 className="w-full h-full rounded-xl"
-                sandbox="allow-scripts allow-same-origin"
-              />
+                sandbox="allow-scripts allow-same-origin"/>
             ) : (
               <div className="w-full h-full flex items-center flex-col">
                 <Lottie
                   animationData={Animation}
                   loop={true}
-                  className="w-[70%] h-[70%]"
-                />
+                  className="w-[70%] h-[70%]"/>
                 <p className="text-[0.8rem]">
                   YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
                 </p>
@@ -356,23 +375,16 @@ function CodeRush() {
             </div>
           </div>
           <div className="w-[10%]">
-            <button
-              onClick={() =>
-                goToNextGamemode({
-                  subject,
-                  lessonId,
-                  levelId,
-                  topicId,
-                  gamemodeId,
-                  navigate,
-                  // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
-                  onComplete: () => setLevelComplete(true),
-                })
-              }
-              className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2"
-            >
-              Next
-            </button>
+        <motion.button
+            whileTap={{scale:0.95}}
+            whileHover={{scale:1.05, background:"#7e22ce"}}
+            transition={{bounceDamping:100}}
+            onClick={() => goToNextGamemode({ subject, lessonId, levelId, topicId,gamemodeId, navigate,
+                // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
+            onComplete: () => setLevelComplete(true), })}
+            className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
+            Next
+        </motion.button>
           </div>
           <div>
             <p className="text-xl">
@@ -381,27 +393,36 @@ function CodeRush() {
           </div>
         </div>
       </div>
+      {/*Level Complete PopUp*/}
+      <AnimatePresence>
       {levelComplete && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
             <h2 className="text-3xl font-bold text-[#9333EA] mb-4">
               🎉 Congratulations!
             </h2>
             <p className="text-lg text-gray-800 mb-6">
               You have completed all game modes for this level.
             </p>
-            <button
+            <motion.button
+                whileTap={{scale:0.95}}
+                whileHover={{scale:1.05}}
+                transition={{bounceDamping:100}}
               onClick={() => {
                 setLevelComplete(false);
                 navigate("/Main"); // or navigate to next level, summary, or dashboard
               }}
-              className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700"
-            >
+              className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
               Back to Main
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
-      )}
+        )}
+      </AnimatePresence>
     </>
   ) : (
     <>
@@ -456,13 +477,11 @@ function CodeRush() {
               width="604px"
               extensions={[sql()]}
               theme={tokyoNight}
-              onChange={(value) => setQuery(value)}
-            />
+              onChange={(value) => setQuery(value)}/>
             <div className="w-[100%] flex justify-around">
               <button
                 onClick={runCode}
-                className="bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[30%] font-exo font-bold p-4 "
-              >
+                className="bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[30%] font-exo font-bold p-4 ">
                 RUN
               </button>
               <button className=" bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[30%] font-exo font-bold p-4 ">
@@ -525,6 +544,36 @@ function CodeRush() {
           </div>
         </div>
       </div>
+            {/*Level Complete PopUp*/}
+      <AnimatePresence>
+      {levelComplete && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
+            <h2 className="text-3xl font-bold text-[#9333EA] mb-4">
+              🎉 Congratulations!
+            </h2>
+            <p className="text-lg text-gray-800 mb-6">
+              You have completed all game modes for this level.
+            </p>
+            <motion.button
+                whileTap={{scale:0.95}}
+                whileHover={{scale:1.05}}
+                transition={{bounceDamping:100}}
+              onClick={() => {
+                setLevelComplete(false);
+                navigate("/Main"); // or navigate to next level, summary, or dashboard
+              }}
+              className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
+              Back to Main
+            </motion.button>
+          </motion.div>
+        </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

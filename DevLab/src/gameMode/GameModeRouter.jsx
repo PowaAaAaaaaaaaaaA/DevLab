@@ -3,6 +3,7 @@
     import BrainBytes from '../gameMode/BrainBytes';
     import LessonPage from '../Lessons/LessonPage';
     import BugBust from '../gameMode/BugBust'
+    import CodeCrafter from './CodeCrafter';
 
     // Game Mode Layout
     const GameModeRouter = () => {
@@ -12,7 +13,8 @@
         CodeRush: <CodeRush />,
         BrainBytes: <BrainBytes />,
         BugBust: <BugBust/>,
-        Lesson: <LessonPage />
+        Lesson: <LessonPage />,
+        CodeCrafter: <CodeCrafter/>
 
         };
 

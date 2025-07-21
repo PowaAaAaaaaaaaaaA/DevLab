@@ -111,10 +111,11 @@ console.log(isLoading)
             {lesson.levels.map((level) => (
               <motion.div key={level.id}
               variants={{hidden:{opacity:0, y:100}, show:{opacity: level.status ? 1 : 0.3, y:0 }}}
+              whileHover={{scale:1.02}}
               className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
                     ${level.status === false
                     ? "bg-[#060505]  cursor-pointer"
-                    : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
+                    : "bg-[#111827]  cursor-pointer "}`}
               onClick={async() => {
                 if (!level.status) {
                   setShowLockedModal(true);// show the modal
@@ -140,7 +141,7 @@ console.log(isLoading)
                 <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center"><span className="pb-4">{level.symbol}</span></div>
                   <div className="p-4 text-white font-exo"> 
                     <p className="text-[1.4rem]">{level.title}</p>
-                    <p className="text-[0.7rem] line-clamp-3">{level.desc}</p>
+                    <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                   </div>
               </motion.div> 
             ))}
@@ -155,7 +156,7 @@ console.log(isLoading)
           </div>
 
         </div>
-          {/*This is PopUp for the Locked Levels*/}
+{/*This is PopUp for the Locked Levels*/}
         {showLockedModal && (  
       <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex justify-center items-center">
         <div className="bg-[#1E1E2E] text-white p-8 rounded-2xl w-[400px] text-center shadow-lg border border-gray-600 flex flex-col items-center">

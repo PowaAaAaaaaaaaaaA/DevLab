@@ -7,10 +7,10 @@ import { toast } from "react-toastify";
 import Lottie from "lottie-react";
 import AdminLogin from "../assets/Lottie/AdminLogin.json";
 import LogoutAnimation from "../assets/Lottie/SadSignout.json";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 function Settings() {
-  const [showPopup, setShowPopup] = useState(false);
+  const [showLogoutPopUp, setShowLogoutPopUp] = useState(false);
   const [showAdminPopup, setAdminPopup] = useState(false);
   const [userDetails, setUserDetails] = useState("");
   const navigate = useNavigate();
@@ -131,7 +131,9 @@ function Settings() {
           transition={{bounceDamping:100}}
           className="bg-[#FF6166] p-3 w-[43%] rounded-3xl font-exo font-bold text-white mt-1.5 hover:cursor-pointerhover:bg-[#6A4CD4] hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)]
 hover:cursor-pointer"
-          onClick={() => setShowPopup(true)}>
+          onClick={()=>{setTimeout(() => {
+            setShowLogoutPopUp(true)
+          },300)}}>
           Logout
         </motion.button>
 
@@ -143,54 +145,85 @@ hover:cursor-pointer"
           </button>
         </Link>
       </div>
-      {showPopup && (
+    <AnimatePresence initial={false}>
+      {showLogoutPopUp && (
         <div className="fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center ">
-          <div className="bg-[#1E212F] text-white p-6 rounded-2xl text-center shadow-lg w-[20%] opacity-100 flex flex-col items-center">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          className="bg-[#1E212F] text-white p-6 rounded-2xl text-center shadow-lg w-[20%] opacity-100 flex flex-col items-center">
             <h2 className="text-xl font-bold font-exo">Confirm Logout</h2>
             <Lottie
               animationData={LogoutAnimation}
               loop={true}
               className="w-[40%] h-[50%] mt-[30px]"/>
             <p className="mb-6 font-exo">Are you sure you want to log out?</p>
-            <div className="flex justify-center gap-4">
-              <button
+            <div className="flex justify-center gap-4 w-[100%]">
+              <motion.button
+                whileTap={{scale:0.95}}
+                whileHover={{scale:1.05}}
+                transition={{bounceDamping:100}}                
                 onClick={logout}
-                className="bg-[#FF6166] px-4 py-2 rounded-xl font-exo font-bold hover:bg-red-600 transition hover:cursor-pointer">
+                className="bg-[#FF6166] p-3 w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)]
+hover:cursor-pointer">
                 Yes, Logout
-              </button>
-              <button
-                onClick={() => setShowPopup(false)}
-                className="bg-gray-500 px-4 py-2 rounded-xl font-exo font-bold hover:bg-gray-600 transition hover:cursor-pointer">
+              </motion.button>
+              <motion.button
+                whileTap={{scale:0.95}}
+                whileHover={{scale:1.05}}
+                transition={{bounceDamping:100}}  
+                onClick={() => setTimeout(() => {
+                  setShowLogoutPopUp(false)
+                }, 200)}
+                className="bg-gray-500 p-3 w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(128,128,128,0.4)]
+hover:cursor-pointer">
                 Cancel
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
-      {showAdminPopup && (
-        <div className="fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50">
-          <div className="bg-[#1E212F] w-[25%] h-[40%] text-white rounded-2xl text-center p-4 flex flex-col items-center">
+    </AnimatePresence>
+    <AnimatePresence initial={false}>
+      {showAdminPopup ? (
+        <div 
+        className="fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          className="bg-[#1E212F] w-[25%] h-[40%] text-white rounded-2xl text-center p-4 flex flex-col items-center">
             <h2 className="font-exo text-3xl">Admin Login</h2>
             <Lottie
               animationData={AdminLogin}
               loop={true}
               className="w-[40%] h-[50%] mt-[30px]"/>
             <p className="font-exo text-[1rem] mt-1.5">Confirm Admin Login</p>
-            <div className="flex justify-center gap-5 mt-5">
-              <button
+            <div className="flex justify-center gap-5 mt-5 w-[100%]">
+              <motion.button
+                whileTap={{scale:0.95}}
+                whileHover={{scale:1.05}}
+                transition={{bounceDamping:100}} 
                 onClick={admin}
-                className="bg-[#1edb3e] px-4 py-2 rounded-xl font-exo font-bold hover:bg-[#79ff79] transition hover:cursor-pointer">
+                className="bg-[#1EDB3E] p-3 w-[40%] rounded-3xl font-exo font-bold text-white   hover:drop-shadow-[0_0_6px_rgba(30,219,62,0.4)]
+hover:cursor-pointer">
                 Proceed
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileTap={{scale:0.95}}
+                whileHover={{scale:1.05}}
+                transition={{bounceDamping:100}} 
                 onClick={() => setAdminPopup(false)}
-                className="bg-[#FF6166] px-4 py-2 rounded-xl font-exo font-bold hover:bg-red-600 transition hover:cursor-pointer">
+                className="bg-[#FF6166] p-3 w-[40%] rounded-3xl font-exo font-bold text-white   hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)]
+hover:cursor-pointer">
                 Cancel
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         </div>
-      )}
+      ):null}
+    </AnimatePresence>
     </>
   );
 }

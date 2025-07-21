@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
 
 
-function LessonPage() {
+function CodeCrafter() {
 
     const navigate = useNavigate();
     const { subject, lessonId, levelId,topicId,gamemodeId} = useParams();
@@ -111,8 +111,6 @@ const renderAllTables = () => {
     }
 };
 // Data Base (Subject(END))
-
-
 // Run Code (Dynammic)
 const runCode = () => {
     if (subject === 'DataBase'){
@@ -363,4 +361,4 @@ return subject !== "DataBase" ? (
 </div>)
 }
 
-export default LessonPage
+export default CodeCrafter

@@ -129,10 +129,11 @@ function JavaScriptLessons() {
                             hidden: { opacity: 0, y: 100 },
                             show: { opacity: level.status ? 1 : 0.3, y: 0 },
                           }}
-                          className={`w-full border flex gap-5 rounded-4xl transition-all duration-200 ease-out transform h-[120px]  
+                            whileHover={{scale:1.02}}
+                            className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
                     ${level.status === false
-                        ? "bg-[#060505] opacity-30  cursor-pointer"
-                        : "bg-[#111827] hover:scale-102 cursor-pointer"}`}
+                    ? "bg-[#060505]  cursor-pointer"
+                    : "bg-[#111827]  cursor-pointer "}`}
                           onClick={async () => {
                             if (!level.status) {
                               setShowLockedModal(true); // show the modal
@@ -156,14 +157,14 @@ function JavaScriptLessons() {
                             }
                           }}>
                           <div className=" text-white bg-black w-[15%] flex justify-center items-center  text-[4rem] font-bold rounded-4xl">
-                            {level?.symbol || "sad"}
+                            {level?.symbol}
                           </div>
                           <div className="p-4 text-white font-exo">
                             <p className="text-[1.4rem]">
-                              {level?.title || "sad"}
+                              {level?.title}
                             </p>
-                            <p className="text-[0.8rem]">
-                              {level?.desc || "sads"}
+                            <p className="text-[0.7rem] line-clamp-3 text-gray-500">
+                              {level?.desc }
                             </p>
                           </div>
                         </motion.div>
