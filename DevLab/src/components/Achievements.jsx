@@ -2,20 +2,25 @@ import React from 'react'
 import Example from '../assets/Images/Example1.jpg'
 import { HTML_Data,CSS_Data,Js_Data,Query_Data } from '../Data/Achievements_Data'
 
+import useUserDetails from './Custom Hooks/useUserDetails'
+
 function Achievements() {
+
+  const {Userdata, isLoading } = useUserDetails();
+
   return (
     
 <>
     {/*Profile Top*/}
-    <div className='bg-cover bg-no-repeat bg-[#111827] w-[100%] h-[40%] rounded-3xl flex flex-col p-3' /*style={{ backgroundImage: `url(${Example})` }}*/>
+    <div className='bg-cover bg-no-repeat bg-[#111827] w-[100%] h-[43%] rounded-3xl flex flex-col p-3' /*style={{ backgroundImage: `url(${Example})` }}*/>
 
-      <div className='h-[65%] flex flex-col items-center gap-1'>
+      <div className='h-[65%] flex flex-col items-center gap-3'>
         <div className='bg-amber-300 w-[10%] h-[80%] rounded-[100%]'></div>
-        <p className='font-exo font-bold text-white text-shadow-lg/30'>User</p>
-        <p className='font-exo font-bold text-white tracking-wider text-shadow-lg/30'>HALL OF ACHIEVEMENTS</p>
+        <p className='font-exo font-bold text-white text-shadow-lg/30'>{Userdata.username}</p>
+        <p className='font-exo font-bold text-white tracking-wider text-shadow-lg/30 text-2xl'>HALL OF ACHIEVEMENTS</p>
       </div>
-      <div className='h-[35%] w-[95%] m-auto'>
-        <div className='flex justify-around items-center h-[100%] w-[100%]'>
+      <div className='h-[35%] w-[95%] m-auto flex items-end'>
+        <div className='flex justify-around items-center h-[80%] w-[100%]'>
           <div className='w-[20%] h-[80%] font-exo font-bold text-white text-shadow-lg/30 backdrop-blur-[20px] rounded-xl flex flex-col gap-2 items-center justify-center'>HTML ACHIEVEMENTS  <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
           <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}></div>
         </div></div>
@@ -35,7 +40,7 @@ function Achievements() {
 
     {/**/}
     <div className=' mt-[5px]'>
-    <div className='max-h-[500px] overflow-y-scroll overflow-x-hidden  
+    <div className='max-h-[470px] overflow-y-scroll overflow-x-hidden
     [&::-webkit-scrollbar]:w-2
     [&::-webkit-scrollbar-track]:rounded-full
   [&::-webkit-scrollbar-track]:bg-gray-100

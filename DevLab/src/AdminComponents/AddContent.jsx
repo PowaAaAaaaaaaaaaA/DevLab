@@ -11,6 +11,7 @@ function AddContent({subject,closePopup}) {
 
 const [Lessons, setLessons] = useState([]);
 const [selectedLesson, setSelectedLesson] = useState("");
+const [selectedType, setSelectedType] = useState("FrontEnd");
 
 // Mapping the Existing Lesson of the selected Subj
 const fetchLessonsData = async(subject)=>{
@@ -38,13 +39,12 @@ const handleAdd = async () => {
     switch(subject){
        
         case "Html":
-        defaultS = "< >";
+        defaultS = "<>";
         break;
         case "Css":
         defaultS = "#";
         break;
-        case "JavaScript-FrontEnd":
-        case "JavaScript-BackEnd":
+        case "JavaScript":
         defaultS = "{ }";
         break;
         case "Database":
@@ -95,14 +95,19 @@ const handleAdd = async () => {
     const levelId = `Level${nextLevelNum}`;
 
     const levelDocRef = doc(db, subject, lessonId, "Levels", levelId);
-    await setDoc(levelDocRef, {
-    title,
-    desc,
-    coinReward: parseInt(coins),
-    symbol: defaultS,
-    status: false,
-    order: nextLevelNum
-    });
+
+    const levelData = {
+        title,
+        desc,
+        coinReward: parseInt(coins),
+        symbol: defaultS,
+        status: false,
+        order: nextLevelNum,};
+
+if (subject === "JavaScript") {
+    levelData.type = selectedType; 
+}
+await setDoc(levelDocRef, levelData);
 
     toast.success("Level Added",{
         position:"top-center",
@@ -145,6 +150,18 @@ return (
                 </option>))}
                 <option value="LessonAdd">Add Lesson</option>
             </select>
+            {subject === "JavaScript" && (
+                <div className='ml-5'>
+                    <label htmlFor="" className="text-white font-exo mr-3">Type:</label>
+                <select 
+                onChange={(e) =>setSelectedType(e.target.value)}
+                name="" id="" className="bg-[#1f2937] text-white p-2 rounded-md focus:outline-0 hover: cursor-pointer">
+                    <option value="FrontEnd">Front End</option>
+                    <option value="BackEnd">Back End</option>
+                </select>
+                </div>
+            )}
+            
             </div>
 
         <div className={`mt-4 rounded-2xl bg-[#0d13207c] p-5 border-gray-700 border flex flex-col font-exo text-white h-[82%]  ${selectedLesson ===""?"opacity-30 pointer-events-none":""}`}>

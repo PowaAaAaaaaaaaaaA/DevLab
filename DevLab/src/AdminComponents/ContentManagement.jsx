@@ -16,7 +16,7 @@ function ContentManagement() {
   const Navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Html");
   const [lessons, setLessons] = useState([]);
-const subjects = ["Html", "Css", "JavaScript-FrontEnd","JavaScript-BackEnd", "Database"];
+const subjects = ["Html","Css", "JavaScript","Database"];
 
   // Card PopUp Animation AND for Lottie Loading
   const [show, setShow] = useState(false);
@@ -158,7 +158,7 @@ const fetchLessons = async (subject) => {
             <div className="flex flex-wrap justify-center gap-10">
             {lesson.levels.map((level)=>(  
           /*Lesson Card*/
-            <div key={level.id} className={`border-[#56EBFF] border w-[42%] p-10 flex flex-col gap-4 min-h-[150px] rounded-2xl bg-[#111827] relative transition-all duration-400 ${show ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+            <div key={level.id} className={`border-[#56EBFF] border w-[42%] p-10 flex flex-col gap-4 min-h-[180px] rounded-2xl bg-[#111827] relative transition-all duration-400 ${show ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
               <h2 className="text-3xl font-exo font-bold text-white">{level.title}</h2>
               <p className="text-white font-exo text-[0.8rem]">{level.desc}</p>
               <div className="flex gap-5">

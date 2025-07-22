@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../Firebase/Firebase";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import CssImage from "../assets/Images/css-Icon-Big.png";
 import { MdOutlineLock } from "react-icons/md";
 import Lottie from "lottie-react";
@@ -9,54 +9,15 @@ import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import LockAnimation from '../assets/Lottie/LockItem.json'
 import {motion} from "framer-motion"
 
-import { useQuery } from "@tanstack/react-query";
+import useLevelsData from "../components/Custom Hooks/useLevelsData";
 
 function CssLessons() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["Css_Levels"],
-    queryFn: () => fetchData(),
-  });
+    // Level Fetch (Custom Hooks)
+    const { data, isLoading } = useLevelsData("Css");
 
     const navigate = useNavigate();
     const [showLockedModal, setShowLockedModal] = useState(false);
 
-  const fetchData = async () => {
-  const CssRef = collection(db, "Css");
-  const CssSnapshot = await getDocs(CssRef);
-
-  const lessonData = await Promise.all(
-    CssSnapshot.docs.map(async (lessonDoc) => {
-      const levelsRef = collection(db, "Css", lessonDoc.id, "Levels");
-      const levelsSnapshot = await getDocs(levelsRef);
-
-      const levels = await Promise.all(
-        levelsSnapshot.docs.map(async (levelDoc) => {
-          const topicsRef = collection(db, "Css", lessonDoc.id, "Levels", levelDoc.id, "Topics");
-          const topicsSnapshot = await getDocs(topicsRef);
-          const topics = topicsSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          return {
-            id: levelDoc.id,
-            ...levelDoc.data(),
-            topics, 
-          };
-        })
-      );
-
-
-      return {
-        id: lessonDoc.id,
-        ...lessonDoc.data(),
-        levels,
-      };
-    })
-  );
-
-  return lessonData;
-};
 
   return (
     <>
@@ -110,8 +71,7 @@ function CssLessons() {
             [&::-webkit-scrollbar-thumb]:rounded-full
             [&::-webkit-scrollbar-thumb]:bg-gray-300
             dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
-            >
+            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
               {data.map((lesson) => (
                 <div key={lesson.id} className="flex flex-col gap-4">
                   <h2 className="font-exo text-[3rem] font-bold text-white">

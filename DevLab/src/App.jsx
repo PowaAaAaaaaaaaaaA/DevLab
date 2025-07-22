@@ -69,7 +69,7 @@ function App() {
 
   const isLoggedIn = !!user;
 
-  // Loading (Para Hindi bumalik sa Main Dashboard and mag stay lang sa Adming Dashboard pag nirerefresh yung webapp)
+  // Loading (Para Hindi bumalik sa Main Dashboard and mag stay lang sa Admin Dashboard pag nirerefresh yung webapp)
   // !! LAGYAN LOADING ANIMATION !!
   if (loading) return null;
 

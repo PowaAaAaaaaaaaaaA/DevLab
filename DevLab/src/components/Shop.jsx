@@ -1,9 +1,16 @@
-import React from 'react'
+import {useState, useEffect}from 'react'
 import ShopIcon from '../assets/Images/Shop_Icon.png'
 import MoneyIcon from '../assets/Images/Money_Icon.png'
 import ItemIcon from '../assets/Images/Item_Icon.png'
+import useUserDetails from './Custom Hooks/useUserDetails'
+
+
 
 function Shop() {
+
+  // User Details (Custom Hook)
+  const {Userdata, isLoading } = useUserDetails();
+
   return (
     <>
     {/*Upper Pannel*/}
@@ -17,7 +24,7 @@ function Shop() {
         </div>
         <div className='flex h-[100%] w-[20%] justify-center items-center gap-3.5'>
           <img src={MoneyIcon} alt="" className='h-[20%]' />
-          <p className='font-exo font-bold text-[#2CB67D] text-4xl'>D 1000</p>
+          <p className='font-exo font-bold text-[#2CB67D] text-4xl'>{Userdata?.coins}</p>
         </div>
       </div>
 

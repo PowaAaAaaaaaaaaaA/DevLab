@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
 import { useNavigate} from "react-router-dom"; 
 import HtmlImage from "../assets/Images/html-Icon-Big.png"
@@ -8,60 +8,22 @@ import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 import LockAnimation from '../assets/Lottie/LockItem.json'
 import {motion} from "framer-motion"
 
-import { useQuery } from "@tanstack/react-query";
+import useLevelsData from "../components/Custom Hooks/useLevelsData";
+
+
 
 
 function HtmlLessons() {
 
 
-
+    // Level Fetch (Custom Hooks)
+    const { data, isLoading } = useLevelsData("Html");
+  
     const navigate = useNavigate();
     const [showLockedModal, setShowLockedModal] = useState(false);
 
-  const fetchData = async () => {
-  const htmlRef = collection(db, "Html");
-  const htmlSnapshot = await getDocs(htmlRef);
 
-  const lessonData = await Promise.all(
-    htmlSnapshot.docs.map(async (lessonDoc) => {
-      const levelsRef = collection(db, "Html", lessonDoc.id, "Levels");
-      const levelsSnapshot = await getDocs(levelsRef);
-
-      const levels = await Promise.all(
-        levelsSnapshot.docs.map(async (levelDoc) => {
-          const topicsRef = collection(db, "Html", lessonDoc.id, "Levels", levelDoc.id, "Topics");
-          const topicsSnapshot = await getDocs(topicsRef);
-          const topics = topicsSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          return {
-            id: levelDoc.id,
-            ...levelDoc.data(),
-            topics, 
-          };
-        })
-      );
-
-      return {
-        id: lessonDoc.id,
-        ...lessonDoc.data(),
-        levels,
-      };
-    })
-  );
-
-  return lessonData;
-};
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["Html_Levels"],
-    queryFn: () => fetchData(),
-  });
-
-
-console.log(isLoading)
+console.log(data)
 
   return (
     <>

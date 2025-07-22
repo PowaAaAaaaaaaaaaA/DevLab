@@ -3,37 +3,26 @@ import HtmlIcons from '../assets/Images/html-Icon.png'
 import CssIcons from '../assets/Images/css-Icon.png'
 import DataIcons from '../assets/Images/Data-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
-import {auth, db} from "../Firebase/Firebase"
+import { db} from "../Firebase/Firebase"
 import {doc, getDoc } from 'firebase/firestore';
 import { Link } from 'react-router-dom'
+
+import useUserDetails from './Custom Hooks/useUserDetails'
 
 
 function Dashboard() {
 
-const [userDetails, setUserDetails] = useState("");
-const [levelInfo, setLevelInfo] =useState();
-// Getting the User details
-const fetchUserData =async()=>{
-  auth.onAuthStateChanged(async (user)=>{
-    const getUser = doc(db, "Users", user.uid);
-    const userDocs =await getDoc(getUser);
+  // User Details (Custom Hook)
+  const {Userdata, isLoading } = useUserDetails();
 
-    if(userDocs.exists()){
-      setUserDetails(userDocs.data());
-    }else{
-      console.log("USer not Logged In")
-    }
-  })
-}
-useEffect(()=>{
-  fetchUserData();
-}, [])
+
 
 // THis will get the last open lesson 
+  const [levelInfo, setLevelInfo] =useState();
 useEffect(() => {
   const fetchLevelInfo = async () => {
-    if (userDetails?.lastOpenedLevel) {
-      const { lessonId, lessonDocId, levelId } = userDetails.lastOpenedLevel;
+    if (Userdata?.lastOpenedLevel) {
+      const { lessonId, lessonDocId, levelId } = Userdata.lastOpenedLevel;
 
       // Full dynamic path
       const getUser = doc(db, lessonId, lessonDocId, "Levels", levelId);
@@ -48,14 +37,13 @@ useEffect(() => {
   };
 
   fetchLevelInfo();
-}, [userDetails]);
-
+}, [Userdata]);
 // PROGRESS BAR ANINATION
 const [animatedExp, setAnimatedExp] = useState(0);
 useEffect(() => {
-  if (userDetails?.exp >= 0) {
+  if (Userdata?.exp >= 0) {
     let start = animatedExp;
-    const target = userDetails.exp;
+    const target = Userdata.exp;
     const step = () => {
       if (start < target) {
         start += 0.4; // increase this for faster fill
@@ -67,36 +55,34 @@ useEffect(() => {
     };
     requestAnimationFrame(step);
   }
-}, [userDetails?.exp]);
-
-
+}, [Userdata?.exp]);
 
   return (
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
-    {userDetails ? 
-    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
+    { !isLoading ? 
+    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-10'>
       <div className='w-[30%] h-[90%] flex items-center flex-col gap-5 p-2'>
         <div className='bg-amber-300 w-[65%] h-[90%] rounded-[100%]'></div>
-        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className=' text-center'>{userDetails.bio}</p></div>
+        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className=' text-center'>{Userdata.bio}</p></div>
       </div>
       <div className='h-[80%] w-[100%] flex flex-col p-2'>
         <p className='text-white font-inter font-bold'>Good to see you!</p>
-        <h1 className='text-[5.6rem] text-white font-inter font-bold'>{userDetails.username}</h1>
-        <p className='text-white font-inter font-bold mb-0.5'>Level {userDetails.level}</p>
+        <h1 className='text-[5.6rem] text-white font-inter font-bold'>{Userdata.username}</h1>
+        <p className='text-white font-inter font-bold mb-0.5'>Level {Userdata.level}</p>
             {/*Progress Bar*/}
         <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700 ">
           <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
         </div>
             {/*Progress Bar*/}
         <div className='flex w-[40%] justify-around mt-[10px]'>
-          <p className='text-white font-inter font-bold'>User Xp: {userDetails.exp} / 100</p>
-          <div className='text-white font-inter font-bold'>User Money: {userDetails.coins}</div>
+          <p className='text-white font-inter font-bold'>User Xp: {Userdata.exp} / 100</p>
+          <div className='text-white font-inter font-bold'>User Money: {Userdata.coins}</div>
         </div>
       </div>
     </div>): 
     /*LOADING*/
-(<div className='bg-[#111827] shadow-black shadow-md w-[100%] h-[40%] rounded-3xl flex items-center gap-5 p-10'>
+(<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-10'>
   <div role="status" className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center h-[100%]">
     <div className="flex items-center justify-center w-full h-48 bg-gray-300 rounded-sm sm:w-96 dark:bg-gray-700">
         <svg className="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
@@ -108,7 +94,6 @@ useEffect(() => {
         <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
         <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
         <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
     </div>
       <span className="sr-only">Loading...</span>
     </div>
@@ -124,22 +109,21 @@ useEffect(() => {
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
 
-          {levelInfo ? (<Link to={`/Main/Lessons/${userDetails.lastOpenedLevel.lessonId}/${userDetails.lastOpenedLevel.lessonDocId}/${userDetails.lastOpenedLevel.levelId}`} className='h-full'>
-          <div className='w-[100%] bg-[#111827] h-[100%] flex rounded-3xl border-black border-2 gap-4  hover:scale-102 cursor-pointer duration-500'>
+          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.lessonDocId}/${Userdata.lastOpenedLevel.levelId}`} className='h-full'>
+          <div className='w-[100%] bg-[#111827] min-h-[90%] flex rounded-3xl border-black border-2 gap-4  hover:scale-102 cursor-pointer duration-500'>
             <div className='bg-black w-[15%] h-[100%] text-white rounded-3xl flex items-center justify-center  text-[4rem] p-1'> {levelInfo.symbol}</div>
             <div className='p-2'>
               <p className='font-exo text-[1.4rem] text-white font-bold'> {levelInfo.title}</p>
               <p className='font-exo text-gray-500 text-[0.8rem]'> {levelInfo.desc}</p>
             </div>
           </div>
-          </Link>):(   <div className='w-[100%] bg-[#111827] h-[100%] rounded-3xl border-black border-2 p-4'>
+          </Link>):(   <div className='w-[100%] bg-[#111827] min-h-[60%] rounded-3xl border-black border-2 p-5'>
             
-<div role="status" className="max-w-sm animate-pulse">
+<div role="status" className="max-w-sm animate-pulse  min-h-[60%]">
     <div className ="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
     <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
     <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
     <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
     <span className ="sr-only">Loading...</span>
 </div>
 

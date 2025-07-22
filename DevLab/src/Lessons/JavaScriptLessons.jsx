@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
 import { useNavigate } from "react-router-dom";
 import JsImage from "../assets/Images/js-Icon-Big.png";
@@ -8,50 +8,19 @@ import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import LockAnimation from "../assets/Lottie/LockItem.json";
 import { motion } from "framer-motion";
 
-import { useQuery } from "@tanstack/react-query";
+import useLevelsData from "../components/Custom Hooks/useLevelsData";
+
+
 
 function JavaScriptLessons() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["Js_Levels"],
-    queryFn: () => fetchData(),
-  });
+
+
+     // Level Fetch (Custom Hooks)
+      const { data, isLoading } = useLevelsData("JavaScript");
 
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
-
-  const fetchData = async () => {
-    const JavaScriptRef = collection(db, "JavaScript");
-    const JavaScriptSnapshot = await getDocs(JavaScriptRef);
-
-    const lessonData = await Promise.all(
-      JavaScriptSnapshot.docs.map(async (lessonDoc) => {
-        const levelsRef = collection(db, "JavaScript", lessonDoc.id, "Levels");
-        const levelsSnapshot = await getDocs(levelsRef);
-
-        const levels = await Promise.all(
-          levelsSnapshot.docs.map(async (levelDoc) => {
-            const topicsRef = collection(db,"JavaScript",lessonDoc.id,"Levels",levelDoc.id,"Topics");
-            const topicsSnapshot = await getDocs(topicsRef);
-            const topics = topicsSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            return {
-              id: levelDoc.id,
-              ...levelDoc.data(),
-              topics,
-            };
-          })
-        );
-        return {
-          id: lessonDoc.id,
-          ...lessonDoc.data(),
-          levels,
-        };
-      })
-    );
-    return lessonData;
-  };
+  
 
   return (
     <>

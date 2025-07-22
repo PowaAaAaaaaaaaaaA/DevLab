@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../Firebase/Firebase";
 import { useNavigate } from "react-router-dom";
 import DataImage from "../assets/Images/Database-Icon-Big.png";
@@ -10,60 +10,17 @@ import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 
 import { motion } from "framer-motion";
 
-import { useQuery } from "@tanstack/react-query";
+import useLevelsData from "../components/Custom Hooks/useLevelsData";
 
 function DataLessons() {
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
 
-  const fetchData = async () => {
-    const DatabaseRef = collection(db, "Database");
-    const DatabaseSnapshot = await getDocs(DatabaseRef);
+     // Level Fetch (Custom Hooks)
+      const { data, isLoading } = useLevelsData("Database");
 
-    const lessonData = await Promise.all(
-      DatabaseSnapshot.docs.map(async (lessonDoc) => {
-        const levelsRef = collection(db, "Database", lessonDoc.id, "Levels");
-        const levelsSnapshot = await getDocs(levelsRef);
 
-        const levels = await Promise.all(
-          levelsSnapshot.docs.map(async (levelDoc) => {
-            const topicsRef = collection(
-              db,
-              "Database",
-              lessonDoc.id,
-              "Levels",
-              levelDoc.id,
-              "Topics"
-            );
-            const topicsSnapshot = await getDocs(topicsRef);
-            const topics = topicsSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
 
-            return {
-              id: levelDoc.id,
-              ...levelDoc.data(),
-              topics,
-            };
-          })
-        );
-
-        return {
-          id: lessonDoc.id,
-          ...lessonDoc.data(),
-          levels,
-        };
-      })
-    );
-
-    return lessonData;
-  };
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["Data_Levels"],
-    queryFn: () => fetchData(),
-  });
   return (
     <>
       <div className="h-[100%]">
