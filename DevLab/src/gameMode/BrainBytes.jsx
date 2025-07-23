@@ -268,8 +268,7 @@ function BrainBytes() {
       [&::-webkit-scrollbar-track]:bg-gray-100  
         [&::-webkit-scrollbar-thumb]:rounded-full
       dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
-          >
+      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             {levelData && lessonGamemode ? (
               <>
                 <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">
@@ -297,16 +296,14 @@ function BrainBytes() {
                               selectedOption === key
                                 ? "bg-gray-500"
                                 : "bg-gray-700"
-                            }`}
-                          >
+                            }`}>
                             <input
                               type="radio"
                               name="option"
                               value={key}
                               checked={selectedOption === key}
                               onChange={() => setSelectedOption(key)}
-                              className="accent-purple-600 mt-1 "
-                            />
+                              className="accent-purple-600 mt-1 "/>
                             <span className="font-mono text-sm break-all">
                               {key}: {value}
                             </span>
@@ -315,8 +312,7 @@ function BrainBytes() {
                   </div>
                   <button
                     onClick={answerCheck}
-                    className="w-[30%] h-[8%] self-end rounded-[10px] font-exo font-bold bg-[#7F5AF0] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]"
-                  >
+                    className="w-[30%] h-[8%] self-end rounded-[10px] font-exo font-bold bg-[#7F5AF0] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]">
                     Submit
                   </button>
                 </div>
@@ -338,8 +334,7 @@ function BrainBytes() {
             <div className="flex justify-around w-full">
               <button
                 onClick={runCode}
-                className="bg-[#7F5AF0] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)] "
-              >
+                className="bg-[#7F5AF0] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)] ">
                 RUN
               </button>
               <button className="bg-[#7F5AF0] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]">
@@ -354,15 +349,13 @@ function BrainBytes() {
                 ref={iFrame}
                 title="output"
                 className="w-full h-full rounded-xl"
-                sandbox="allow-scripts allow-same-origin"
-              />
+                sandbox="allow-scripts allow-same-origin"/>
             ) : (
               <div className="w-full h-full flex items-center flex-col">
                 <Lottie
                   animationData={Animation}
                   loop={true}
-                  className="w-[70%] h-[70%]"
-                />
+                  className="w-[70%] h-[70%]"/>
                 <p className="text-[0.8rem]">
                   YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
                 </p>
@@ -398,8 +391,7 @@ function BrainBytes() {
                   onComplete: () => setLevelComplete(true),
                 })
               }
-              className="bg-[#7F5AF0] text-white font-bold rounded-xl w-full py-2 hover: cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]"
-            >
+              className="bg-[#7F5AF0] text-white font-bold rounded-xl w-full py-2 hover: cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]">
               Next
             </button>
           </div>
@@ -452,8 +444,7 @@ function BrainBytes() {
 💻 Write your code  
 🚀 Run it before the timer hits zero!`}
           onClose={() => setShowPopup(false)}
-          buttonText="Start Challenge"
-        />
+          buttonText="Start Challenge"/>
       )}
       <div className="h-screen bg-[#0D1117] flex flex-col">
         {/*Header*/}
@@ -515,8 +506,7 @@ function BrainBytes() {
                               value={key}
                               checked={selectedOption === key}
                               onChange={() => setSelectedOption(key)}
-                              className="accent-purple-600 mt-1 "
-                            />
+                              className="accent-purple-600 mt-1 "/>
                             <span className="font-mono text-sm break-all">
                               {key}: {value}
                             </span>
@@ -575,8 +565,7 @@ function BrainBytes() {
                   <Lottie
                     animationData={Animation}
                     loop={true}
-                    className="w-[70%] h-[70%]"
-                  />
+                    className="w-[70%] h-[70%]"/>
                   <p className="text-[0.8rem]">
                     YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
                   </p>

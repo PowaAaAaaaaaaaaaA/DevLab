@@ -8,7 +8,7 @@ import initSqlJs from "sql.js";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 import { db, auth } from "../Firebase/Firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate} from "react-router-dom";
 import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/OutputLottie.json";
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
@@ -17,16 +17,18 @@ import GameMode_Instruction_PopUp from "./GameMode_Instruction_PopUp";
 import { autocompletion } from "@codemirror/autocomplete";
 import { LanguageSupport } from "@codemirror/language";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  html as beautifyHTML,
-  css as beautifyCSS,
-  js as beautifyJS,
-} from "js-beautify";
-function BugBust() {
+import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
+function BugBust({
+    heart,
+    gameOver,
+    submitAttempt
+  }) {
   const navigate = useNavigate();
   const { subject, lessonId, levelId, gamemodeId, topicId } = useParams();
 
   // Data
+ const news = heart+1;
+  console.log(news)
   const [userDetails, setUserDetails] = useState("");
   const [levelData, setLevelData] = useState(null);
   const [lessonGamemode, setLessonGamemode] = useState(null);
@@ -171,24 +173,21 @@ function BugBust() {
             <tbody>
             ${values
               .map(
-                (row) => `
-                <tr>${row
-                  .map((cell) => `<td class="border px-4 py-1">${cell}</td>`)
-                  .join("")}</tr>
-            `
-              )
-              .join("")}
+                (row) => `<tr>${row.map((cell) => `<td class="border px-4 py-1">${cell}</td>`).join("")}</tr>`).join("")}
             </tbody>
         </table>
         </div>`;
         setOutputHtml(table);
         renderAllTables();
+
+        submitAttempt(true)
       } catch (err) {
         setOutputHtml(
           `<span class="text-red-500 font-medium">${err.message}</span>`
         );
       }
     } else {
+          submitAttempt(false);
       setRunCode(true);
       const fullCode = `
         <!DOCTYPE html>
@@ -219,7 +218,7 @@ function BugBust() {
       }
     });
   }, []);
-
+  // Code Format
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
     if (!lessonGamemode || !subject) return;
@@ -239,7 +238,19 @@ function BugBust() {
     }
   }, [lessonGamemode, subject]);
 
-  console.log(gamemodeId);
+
+
+  const handleSubmit = (answer) => {
+    const correctAnswer = "expected";
+    const isCorrect = answer === correctAnswer;
+    submitAttempt(isCorrect);
+
+    if (isCorrect) {
+      alert("Correct! Moving to next mode...");
+      // trigger next game mode here
+    }
+  };
+
   return subject !== "DataBase" ? (
     <>
       <AnimatePresence>
@@ -252,8 +263,7 @@ function BugBust() {
 💻 Write your code  
 🚀 Run it before the timer hits zero!`}
             onClose={() => setShowPopup(false)}
-            buttonText="Start Challenge"
-          />
+            buttonText="Start Challenge"/>
         ) : null}
       </AnimatePresence>
       <div className="h-screen bg-[#0D1117] flex flex-col">
@@ -269,7 +279,15 @@ function BugBust() {
           </div>
           <div>IMG</div>
         </div>
-
+      {/* Hearts UI handled locally */}
+      <div className="flex gap-2 mb-4">
+        {[...Array(3)].map((_, i) => (
+          <span key={i} className={i < heart ? 'text-yellow-500' : 'text-gray-500'}>
+            bleh
+          </span>
+        ))}
+      </div>
+    
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/* Instruction */}
@@ -280,8 +298,7 @@ function BugBust() {
       [&::-webkit-scrollbar-track]:bg-gray-100  
         [&::-webkit-scrollbar-thumb]:rounded-full
       dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
-          >
+      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             {levelData && lessonGamemode ? (
               <>
                 <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">
@@ -322,16 +339,14 @@ function BugBust() {
                 whileHover={{ scale: 1.05, background: "#7e22ce" }}
                 transition={{ bounceDamping: 100 }}
                 onClick={runCode}
-                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-              >
+                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
                 RUN
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.05, background: "#7e22ce" }}
                 transition={{ bounceDamping: 100 }}
-                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-              >
+                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
                 EVALUATE
               </motion.button>
             </div>
@@ -380,19 +395,12 @@ function BugBust() {
               whileHover={{ scale: 1.05, background: "#7e22ce" }}
               transition={{ bounceDamping: 100 }}
               onClick={() =>
-                goToNextGamemode({
-                  subject,
-                  lessonId,
-                  levelId,
-                  topicId,
-                  gamemodeId,
-                  navigate,
+                goToNextGamemode({subject,lessonId,levelId,topicId,gamemodeId,navigate,
                   // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
                   onComplete: () => setLevelComplete(true),
                 })
               }
-              className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"
-            >
+              className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
               Next
             </motion.button>
           </div>

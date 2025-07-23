@@ -16,8 +16,14 @@ import { goToNextGamemode } from "../gameMode/Util_Navigation";
 import GameMode_Instruction_PopUp from "./GameMode_Instruction_PopUp";
 import { AnimatePresence, motion } from "framer-motion";
 import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
+import useAttemptCounter from "./AttemptCounter";
 
-function CodeRush() {
+function CodeRush({
+    heart,
+    roundKey,
+    gameOver,
+    submitAttempt
+  }) {
   const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
   const navigate = useNavigate();
 
@@ -237,10 +243,21 @@ function CodeRush() {
       return () => clearInterval(countdown);
     }
   }, [showPopup, timer]);
-  
+
+  const handleSubmit = (answer) => {
+    const correctAnswer = "expected";
+    const isCorrect = answer === correctAnswer;
+    submitAttempt(isCorrect);
+
+    if (isCorrect) {
+      alert("Correct! Moving to next mode...");
+      // trigger next game mode here
+    }
+  };
 
   return subject !== "DataBase" ? (
     <>
+    <div key={roundKey}>
     <AnimatePresence>
       {showPopup && (
         <GameMode_Instruction_PopUp
@@ -268,7 +285,23 @@ function CodeRush() {
           </div>
           <div>IMG</div>
         </div>
+      {/* Hearts UI handled locally */}
+      <div className="flex gap-2 mb-4">
+        {[...Array(3)].map((_, i) => (
+          <span key={i} className={i < heart ? 'text-yellow-500' : 'text-gray-500'}>
+            bleh
+          </span>
+        ))}
+      </div>
 
+      {gameOver ? (
+        <div className="text-xl text-red-500 text-center">Game Over!</div>
+      ) : (
+        <div>
+          <button onClick={() => handleSubmit("wrong")}>Submit Wrong</button>
+          <button onClick={() => handleSubmit("expected")}>Submit Correct</button>
+        </div>
+      )}
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/* Instruction */}
@@ -279,8 +312,7 @@ function CodeRush() {
       [&::-webkit-scrollbar-track]:bg-gray-100  
         [&::-webkit-scrollbar-thumb]:rounded-full
       dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
-          >
+      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             {levelData && lessonGamemode ? (
               <>
                 <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">
@@ -423,6 +455,7 @@ function CodeRush() {
         </div>
         )}
       </AnimatePresence>
+      </div>
     </>
   ) : (
     <>

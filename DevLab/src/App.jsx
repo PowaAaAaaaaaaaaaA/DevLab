@@ -113,8 +113,7 @@ function App() {
 
           <Route
             path="/Main/Lessons/:subject/:lessonId/:levelId/:topicId/:gamemodeId"
-            element={<GameModeRouter />}
-          />
+            element={<GameModeRouter />} />
 
           <Route
             path="/codingPlay"

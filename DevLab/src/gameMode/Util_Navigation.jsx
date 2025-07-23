@@ -11,13 +11,12 @@ export const goToNextGamemode = async({subject,lessonId,levelId,topicId,gamemode
         .filter((id) => id !== 'Lesson');
 
     const currentIndex = modeIds.indexOf(gamemodeId);
-    console.log(gamemodeId);
-    console.log(currentIndex);
-    console.log(modeIds.length);
+
 
     if (currentIndex < modeIds.length - 1) {
         const nextGamemode = modeIds[currentIndex + 1];
-        navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${topicId}/${nextGamemode}`);
+navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${topicId}/${nextGamemode}`, {
+});
     } else if (currentIndex === modeIds.length - 1) {
         //  Check if there is a next topic
         const topicsRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics');
@@ -27,7 +26,8 @@ export const goToNextGamemode = async({subject,lessonId,levelId,topicId,gamemode
 
         if (currentTopicIndex < topicIds.length - 1) {
             const nextTopicId = topicIds[currentTopicIndex + 1];
-            navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${nextTopicId}/Lesson`);
+            navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${nextTopicId}/Lesson`, {
+});
         } else {
             //  No more topics —trigger completion popup
             onComplete();

@@ -8,7 +8,7 @@ import initSqlJs from 'sql.js';
 import { tokyoNight } from '@uiw/codemirror-theme-tokyo-night';
 import { db, auth } from '../Firebase/Firebase';
 import { doc, getDoc,} from 'firebase/firestore';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, } from 'react-router-dom';
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/OutputLottie.json';
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
@@ -271,7 +271,7 @@ return subject !== "DataBase" ? (
             whileTap={{scale:0.95}}
             whileHover={{scale:1.05, background:"#7e22ce"}}
             transition={{bounceDamping:100}}
-            onClick={() => goToNextGamemode({ subject, lessonId, levelId, topicId,gamemodeId, navigate })}
+            onClick={() => goToNextGamemode({ subject, lessonId, levelId, topicId,gamemodeId, navigate,})}
             className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
             Next
         </motion.button>
