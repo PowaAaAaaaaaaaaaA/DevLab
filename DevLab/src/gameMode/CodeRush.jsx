@@ -7,23 +7,27 @@ import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 import { db, auth } from "../Firebase/Firebase";
-import { doc, getDoc, getDocs, collection } from "firebase/firestore";
+import { doc, getDoc} from "firebase/firestore";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Lottie from "lottie-react";
+import { LuHeart } from "react-icons/lu";
 import Animation from "../assets/Lottie/OutputLottie.json";
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
-import { goToNextGamemode } from "../gameMode/Util_Navigation";
-import GameMode_Instruction_PopUp from "./GameMode_Instruction_PopUp";
+import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
+import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
+import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
 import { AnimatePresence, motion } from "framer-motion";
+import useLevelBar from "../components/Custom Hooks/useLevelBar";
+import useUserDetails from "../components/Custom Hooks/useUserDetails";
 import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
-import useAttemptCounter from "./AttemptCounter";
 
 function CodeRush({
     heart,
     roundKey,
     gameOver,
     submitAttempt
-  }) {
+  }) {  const {animatedExp} = useLevelBar();
+    const {Userdata, isLoading } = useUserDetails();
   const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
   const navigate = useNavigate();
 
@@ -257,25 +261,11 @@ function CodeRush({
 
   return subject !== "DataBase" ? (
     <>
-    <div key={roundKey}>
-    <AnimatePresence>
-      {showPopup && (
-        <GameMode_Instruction_PopUp
-          title="Hey Dev!!"
-          message={`Welcome to **CodeRush** — a fast-paced challenge where you’ll write and run code before time runs out! . 
-    Your mission:  
-🧩 Read the task  
-💻 Write your code  
-🚀 Run it before the timer hits zero!`}
-          onClose={() => setShowPopup(false)}
-          buttonText="Start Challenge"
-        />
-      )}
-    </AnimatePresence>
-      <div className="h-screen bg-[#0D1117] flex flex-col">
+
+      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between h-[10%] p-3">
-          <div className="flex items-center p-3">
+        <div className="flex justify-between h-[10%] items-center p-3">
+          <div className="flex items-center p-3 w-[12%]">
             <Link to="/Main" className="text-[3rem] text-white">
               <MdArrowBackIos />
             </Link>
@@ -283,25 +273,27 @@ function CodeRush({
               DEVLAB
             </h1>
           </div>
-          <div>IMG</div>
-        </div>
-      {/* Hearts UI handled locally */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-4 w-[12%]">
         {[...Array(3)].map((_, i) => (
-          <span key={i} className={i < heart ? 'text-yellow-500' : 'text-gray-500'}>
-            bleh
+          <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
+            <LuHeart />
           </span>
         ))}
       </div>
-
-      {gameOver ? (
-        <div className="text-xl text-red-500 text-center">Game Over!</div>
-      ) : (
-        <div>
-          <button onClick={() => handleSubmit("wrong")}>Submit Wrong</button>
-          <button onClick={() => handleSubmit("expected")}>Submit Correct</button>
+          <div className="w-[12%] h-[90%] flex items-center gap-2">
+            <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
+            <div className=" w-[100%] self-end h-[70%]">
+              {/*Progress Bar*/}
+              <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
+                <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
+              </div>
+              <div className=" flex justify-between"> 
+                <p className="text-white font-inter font-bold">Lvl {Userdata?.userLevel}</p>
+                <p className='text-white font-inter font-bold'>{Userdata?.exp} / 100xp</p>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/* Instruction */}
@@ -425,40 +417,8 @@ function CodeRush({
           </div>
         </div>
       </div>
-      {/*Level Complete PopUp*/}
-      <AnimatePresence>
-      {levelComplete && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-          <motion.div 
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
-            <h2 className="text-3xl font-bold text-[#9333EA] mb-4">
-              🎉 Congratulations!
-            </h2>
-            <p className="text-lg text-gray-800 mb-6">
-              You have completed all game modes for this level.
-            </p>
-            <motion.button
-                whileTap={{scale:0.95}}
-                whileHover={{scale:1.05}}
-                transition={{bounceDamping:100}}
-              onClick={() => {
-                setLevelComplete(false);
-                navigate("/Main"); // or navigate to next level, summary, or dashboard
-              }}
-              className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
-              Back to Main
-            </motion.button>
-          </motion.div>
-        </div>
-        )}
-      </AnimatePresence>
-      </div>
-    </>
-  ) : (
-    <>
+{/*Instruction Pop Up (1st Pop Up)*/}
+    <AnimatePresence>
       {showPopup && (
         <GameMode_Instruction_PopUp
           title="Hey Dev!!"
@@ -471,6 +431,24 @@ function CodeRush({
           buttonText="Start Challenge"
         />
       )}
+    </AnimatePresence>
+    {/*Level Complete PopUp*/}
+      <AnimatePresence>
+        {levelComplete && (
+          <LevelCompleted_PopUp
+          title="Congrulation"
+          message={`Congrats`}
+          setLevelComplete={setLevelComplete}/>)}  
+      </AnimatePresence>
+    </>
+  ) : 
+    /*DATABASE TAB*/
+      /*DATABASE TAB*/
+        /*DATABASE TAB*/
+          /*DATABASE TAB*/
+            /*DATABASE TAB*/  
+  (
+    <>
       <div className="h-screen bg-[#0D1117] flex flex-col">
         {/*Header*/}
         <div className=" border-white flex justify-between h-[10%] p-3">
@@ -577,35 +555,28 @@ function CodeRush({
           </div>
         </div>
       </div>
-            {/*Level Complete PopUp*/}
+{/*Instruction Pop Up (1st Pop Up)*/}
+    <AnimatePresence>
+      {showPopup && (
+        <GameMode_Instruction_PopUp
+          title="Hey Dev!!"
+          message={`Welcome to **CodeRush** — a fast-paced challenge where you’ll write and run code before time runs out! . 
+    Your mission:  
+🧩 Read the task  
+💻 Write your code  
+🚀 Run it before the timer hits zero!`}
+          onClose={() => setShowPopup(false)}
+          buttonText="Start Challenge"
+        />
+      )}
+    </AnimatePresence>
+    {/*Level Complete PopUp*/}
       <AnimatePresence>
-      {levelComplete && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-          <motion.div 
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
-            <h2 className="text-3xl font-bold text-[#9333EA] mb-4">
-              🎉 Congratulations!
-            </h2>
-            <p className="text-lg text-gray-800 mb-6">
-              You have completed all game modes for this level.
-            </p>
-            <motion.button
-                whileTap={{scale:0.95}}
-                whileHover={{scale:1.05}}
-                transition={{bounceDamping:100}}
-              onClick={() => {
-                setLevelComplete(false);
-                navigate("/Main"); // or navigate to next level, summary, or dashboard
-              }}
-              className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
-              Back to Main
-            </motion.button>
-          </motion.div>
-        </div>
-        )}
+        {levelComplete && (
+          <LevelCompleted_PopUp
+          title="Congrulation"
+          message={`Congrats`}
+          setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
     </>
   );

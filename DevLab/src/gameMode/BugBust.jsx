@@ -1,38 +1,48 @@
+// Utils / Custom Hooks
 import { useEffect, useState, useRef } from "react";
+import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
+
+import useLevelBar from "../components/Custom Hooks/useLevelBar";
+import useUserDetails from "../components/Custom Hooks/useUserDetails";
+// Navigation (React Router)
+import { useParams, Link, useNavigate} from "react-router-dom";
+import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
+// PopUps
+import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
+import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
+// for Animation / Icons
+import Lottie from "lottie-react";
+import Animation from "../assets/Lottie/OutputLottie.json";
+import { AnimatePresence, motion } from "framer-motion";
+import { LuHeart } from "react-icons/lu";
+import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
+// Firebase (Database)
+import { db} from "../Firebase/Firebase";
+import { doc, getDoc } from "firebase/firestore";
+// For the Text Editor
 import CodeMirror from "@uiw/react-codemirror";
 import { htmlLanguage } from "@codemirror/lang-html";
 import { cssLanguage } from "@codemirror/lang-css";
 import { javascriptLanguage } from "@codemirror/lang-javascript";
 import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
-import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
-import { db, auth } from "../Firebase/Firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { useParams, Link, useNavigate} from "react-router-dom";
-import Lottie from "lottie-react";
-import Animation from "../assets/Lottie/OutputLottie.json";
-import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
-import { goToNextGamemode } from "../gameMode/Util_Navigation";
-import GameMode_Instruction_PopUp from "./GameMode_Instruction_PopUp";
 import { autocompletion } from "@codemirror/autocomplete";
 import { LanguageSupport } from "@codemirror/language";
-import { AnimatePresence, motion } from "framer-motion";
-import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
-function BugBust({
-    heart,
-    gameOver,
-    submitAttempt
-  }) {
+import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+
+
+function BugBust({heart,gameOver,submitAttempt,roundKey}) {
+  const type = "Bug Bust";
+  // Navigate
   const navigate = useNavigate();
   const { subject, lessonId, levelId, gamemodeId, topicId } = useParams();
-
-  // Data
- const news = heart+1;
-  console.log(news)
-  const [userDetails, setUserDetails] = useState("");
+  // Custom Hooks
+  const {animatedExp} = useLevelBar();
+  const {Userdata, isLoading } = useUserDetails();
+  // BugBust Mode Data
   const [levelData, setLevelData] = useState(null);
   const [lessonGamemode, setLessonGamemode] = useState(null);
-
+  // Code Mirror input/output
   const [code, setCode] = useState("");
   const iFrame = useRef(null);
   const dbRef = useRef(null);
@@ -41,12 +51,9 @@ function BugBust({
   //Pop up
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
-  // Lottie show
+  // Output Panel (Lottie)
   const [hasRunQuery, setHasRunQuery] = useState(false);
   const [hasRunCode, setRunCode] = useState(false);
-
-  const type = "Bug Bust";
-
   // Language each Subj (I remove the Auto Complete and Suggestion ng Code Mirror for this game mode)
   const languageMap = {
     Html: new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })]),
@@ -63,17 +70,7 @@ function BugBust({
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) setLevelData(docSnap.data());
 
-      const gamemodeRef = doc(
-        db,
-        subject,
-        lessonId,
-        "Levels",
-        levelId,
-        "Topics",
-        topicId,
-        "Gamemodes",
-        gamemodeId
-      );
+      const gamemodeRef = doc(db,subject,lessonId,"Levels",levelId,"Topics",topicId,"Gamemodes",gamemodeId);
       const gamemodeSnap = await getDoc(gamemodeRef);
       if (gamemodeSnap.exists()) {
         setLessonGamemode(gamemodeSnap.data());
@@ -179,7 +176,6 @@ function BugBust({
         </div>`;
         setOutputHtml(table);
         renderAllTables();
-
         submitAttempt(true)
       } catch (err) {
         setOutputHtml(
@@ -187,8 +183,10 @@ function BugBust({
         );
       }
     } else {
-          submitAttempt(false);
+      // Naka Auto Bawas lang (Wala pa kasi pang check)
+      submitAttempt(false);
       setRunCode(true);
+      setTimeout(() => {
       const fullCode = `
         <!DOCTYPE html>
         <html lang="en">
@@ -196,8 +194,7 @@ function BugBust({
         <style>${subject === "Css" ? code : ""}</style>
         </head>
         <body>${
-          subject === "Html" || subject === "JavaScript-FrontEnd" ? code : ""
-        }
+          subject === "Html" || subject === "JavaScript-FrontEnd" ? code : "" }
         <script>${subject === "JavaScript-FrontEnd" ? code : ""}</script>
         </body>
         </html>`;
@@ -206,18 +203,10 @@ function BugBust({
       doc.open();
       doc.write(fullCode);
       doc.close();
+      }, 0);
+
     }
   };
-  // Getting the User Info
-  useEffect(() => {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const getUser = doc(db, "Users", user.uid);
-        const userSnap = await getDoc(getUser);
-        if (userSnap.exists()) setUserDetails(userSnap.data());
-      }
-    });
-  }, []);
   // Code Format
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
@@ -239,37 +228,13 @@ function BugBust({
   }, [lessonGamemode, subject]);
 
 
-
-  const handleSubmit = (answer) => {
-    const correctAnswer = "expected";
-    const isCorrect = answer === correctAnswer;
-    submitAttempt(isCorrect);
-
-    if (isCorrect) {
-      alert("Correct! Moving to next mode...");
-      // trigger next game mode here
-    }
-  };
-
   return subject !== "DataBase" ? (
     <>
-      <AnimatePresence>
-        {showPopup ? (
-          <GameMode_Instruction_PopUp
-            title="Hey Dev!!"
-            message={`Welcome to ${type} — a fast-paced challenge where you’ll write and run code before time runs out! . 
-    Your mission:  
-🧩 Read the task  
-💻 Write your code  
-🚀 Run it before the timer hits zero!`}
-            onClose={() => setShowPopup(false)}
-            buttonText="Start Challenge"/>
-        ) : null}
-      </AnimatePresence>
+    <div key={roundKey}>
       <div className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between h-[10%] p-3">
-          <div className="flex items-center p-3">
+        <div className="flex justify-between h-[10%] items-center p-3">
+          <div className="flex items-center p-3 w-[12%]">
             <Link to="/Main" className="text-[3rem] text-white">
               <MdArrowBackIos />
             </Link>
@@ -277,16 +242,27 @@ function BugBust({
               DEVLAB
             </h1>
           </div>
-          <div>IMG</div>
-        </div>
-      {/* Hearts UI handled locally */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-4 w-[12%]">
         {[...Array(3)].map((_, i) => (
-          <span key={i} className={i < heart ? 'text-yellow-500' : 'text-gray-500'}>
-            bleh
+          <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
+            <LuHeart />
           </span>
         ))}
       </div>
+          <div className="w-[12%] h-[90%] flex items-center gap-2">
+            <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
+            <div className=" w-[100%] self-end h-[70%]">
+              {/*Progress Bar*/}
+              <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
+                <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
+              </div>
+              <div className=" flex justify-between"> 
+                <p className="text-white font-inter font-bold">Lvl {Userdata?.userLevel}</p>
+                <p className='text-white font-inter font-bold'>{Userdata?.exp} / 100xp</p>
+              </div>
+            </div>
+          </div>
+        </div>
     
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
@@ -331,8 +307,7 @@ function BugBust({
               height="640px"
               width="600px"
               extensions={[languageMap[subject] || html()]}
-              theme={tokyoNight}
-            />
+              theme={tokyoNight}/>
             <div className="flex justify-around w-full">
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -358,15 +333,13 @@ function BugBust({
                 ref={iFrame}
                 title="output"
                 className="w-full h-full rounded-xl"
-                sandbox="allow-scripts allow-same-origin"
-              />
+                sandbox="allow-scripts allow-same-origin"/>
             ) : (
               <div className="w-full h-full flex items-center flex-col">
                 <Lottie
                   animationData={Animation}
                   loop={true}
-                  className="w-[70%] h-[70%]"
-                />
+                  className="w-[70%] h-[70%]"/>
                 <p className="text-[0.8rem]">
                   YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
                 </p>
@@ -406,56 +379,51 @@ function BugBust({
           </div>
           <div>
             <p className="text-xl">
-              {userDetails ? `${userDetails.coins} Coins` : "Loading..."}
+              {Userdata ? `${Userdata.coins} Coins` : "Loading..."}
             </p>
           </div>
         </div>
       </div>
-      {/*Level Complete PopUp*/}
+{/*Instruction Pop Up (1st Pop Up)*/}
+      <AnimatePresence>
+        {showPopup ? (
+          <GameMode_Instruction_PopUp
+            title="Hey Dev!!"
+            message={`Welcome to ${type} — a fast-paced challenge where you’ll write and run code before time runs out! . 
+                      Your mission:  
+                      🧩 Read the task  
+                      💻 Write your code  
+                      🚀 Run it before the timer hits zero!`}
+            onClose={() => setShowPopup(false)}
+            buttonText="Start Challenge"/>) : null}
+      </AnimatePresence>
+{/*Level Complete PopUp*/}
       <AnimatePresence>
         {levelComplete && (
-          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
-              <h2 className="text-3xl font-bold text-[#9333EA] mb-4">
-                🎉 Congratulations!
-              </h2>
-              <p className="text-lg text-gray-800 mb-6">
-                You have completed all game modes for this level.
-              </p>
-            <motion.button
-                whileTap={{scale:0.95}}
-                whileHover={{scale:1.05}}
-                transition={{bounceDamping:100}}
-              onClick={() => {
-                setLevelComplete(false);
-                navigate("/Main"); // or navigate to next level, summary, or dashboard
-              }}
-              className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
-              Back to Main
-            </motion.button>
-            </motion.div>
-          </div>
-        )}
+          <LevelCompleted_PopUp
+          title="Congrulation"
+          message="Congrats"
+          setLevelComplete={setLevelComplete}
+          />
+)}  
       </AnimatePresence>
+      {/*GameOver PopUp (this popup when Life = 0)*/}
+      <AnimatePresence>
+
+      </AnimatePresence>
+
+
+      </div>
     </>
-  ) : (
+    
+) : 
+    /*DATABASE TAB*/
+      /*DATABASE TAB*/
+        /*DATABASE TAB*/
+          /*DATABASE TAB*/
+            /*DATABASE TAB*/
+(
     <>
-      {showPopup && (
-        <GameMode_Instruction_PopUp
-          title="Hey Dev!!"
-          message={`Welcome to **CodeRush** — a fast-paced challenge where you’ll write and run code before time runs out! . 
-    Your mission:  
-🧩 Read the task  
-💻 Write your code  
-🚀 Run it before the timer hits zero!`}
-          onClose={() => setShowPopup(false)}
-          buttonText="Start Challenge"
-        />
-      )}
       <div className="h-screen bg-[#0D1117] flex flex-col">
         {/*Header*/}
         <div className=" border-white flex justify-between h-[10%] p-3">
@@ -583,35 +551,28 @@ function BugBust({
           </div>
         </div>
       </div>
-      {/*Level Complete PopUp*/}
+{/*Instruction Pop Up (1st Pop Up)*/}
+    <AnimatePresence>
+      {showPopup && (
+        <GameMode_Instruction_PopUp
+          title="Hey Dev!!"
+          message={`Welcome to ${type} — a fast-paced challenge where you’ll write and run code before time runs out! . 
+    Your mission:  
+🧩 Read the task  
+💻 Write your code  
+🚀 Run it before the timer hits zero!`}
+          onClose={() => setShowPopup(false)}
+          buttonText="Start Challenge"
+        />
+      )}
+    </AnimatePresence>
+{/*Level Complete PopUp*/}
       <AnimatePresence>
         {levelComplete && (
-          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              className="bg-white rounded-2xl shadow-lg p-8 w-[90%] max-w-md text-center">
-              <h2 className="text-3xl font-bold text-[#9333EA] mb-4">
-                🎉 Congratulations!
-              </h2>
-              <p className="text-lg text-gray-800 mb-6">
-                You have completed all game modes for this level.
-              </p>
-            <motion.button
-                whileTap={{scale:0.95}}
-                whileHover={{scale:1.05}}
-                transition={{bounceDamping:100}}
-              onClick={() => {
-                setLevelComplete(false);
-                navigate("/Main"); // or navigate to next level, summary, or dashboard
-              }}
-              className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
-              Back to Main
-            </motion.button>
-            </motion.div>
-          </div>
-        )}
+          <LevelCompleted_PopUp
+          title="Congrulation"
+          message={`Congrats`}
+          setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
     </>
   ); 

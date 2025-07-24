@@ -2,13 +2,14 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../Firebase/Firebase";
 import { useQuery } from "@tanstack/react-query";
 
+// Use Hook for UserDetails
+
 export default function useUserDetails() {
 
-  // ✅ Move this above useQuery and return a Promise with resolve
   const fetchUserData = () => {
     return new Promise((resolve) => {
       const unsubscribe = auth.onAuthStateChanged(async (user) => {
-        unsubscribe(); // ✅ stop listening after getting the user
+        unsubscribe(); 
 
         if (user) {
           const getUser = doc(db, "Users", user.uid);
@@ -30,3 +31,4 @@ export default function useUserDetails() {
 
   return { Userdata, isLoading };
 }
+

@@ -34,7 +34,7 @@ import LessonPage from "./Lessons/LessonPage";
 
 import { getDoc } from "firebase/firestore";
 // GAME MODES
-import GameModeRouter from "./gameMode/GameModeRouter";
+import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 //
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

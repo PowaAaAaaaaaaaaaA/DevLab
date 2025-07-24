@@ -8,12 +8,14 @@ import {doc, getDoc } from 'firebase/firestore';
 import { Link } from 'react-router-dom'
 
 import useUserDetails from './Custom Hooks/useUserDetails'
+import useLevelBar from './Custom Hooks/useLevelBar'
 
 
 function Dashboard() {
 
   // User Details (Custom Hook)
   const {Userdata, isLoading } = useUserDetails();
+  const {animatedExp} = useLevelBar();
 
 
 
@@ -38,24 +40,6 @@ useEffect(() => {
 
   fetchLevelInfo();
 }, [Userdata]);
-// PROGRESS BAR ANINATION
-const [animatedExp, setAnimatedExp] = useState(0);
-useEffect(() => {
-  if (Userdata?.exp >= 0) {
-    let start = animatedExp;
-    const target = Userdata.exp;
-    const step = () => {
-      if (start < target) {
-        start += 0.4; // increase this for faster fill
-        setAnimatedExp(start);
-        requestAnimationFrame(step);
-      } else {
-        setAnimatedExp(target); // lands exactly
-      }
-    };
-    requestAnimationFrame(step);
-  }
-}, [Userdata?.exp]);
 
   return (
 // Dashboard Wrapper

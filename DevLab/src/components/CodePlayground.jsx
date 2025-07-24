@@ -49,7 +49,6 @@ const getLanguageExtension = () => {
 // This will run the code when the Button is pressed hehe
 const runCode = () => {
   setRun(true); // trigger iframe to appear
-
   // Slight delay to allow iframe to mount first ( kase kelangan double click yung "run" btn kapag wlaang delay TT)
 setTimeout(() => {
     const fullCode = 

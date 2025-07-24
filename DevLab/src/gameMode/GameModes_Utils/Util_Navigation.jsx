@@ -1,8 +1,8 @@
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../Firebase/Firebase';
+import { collection,getDocs } from 'firebase/firestore';
+import { db } from '../../Firebase/Firebase';
 
 export const goToNextGamemode = async({subject,lessonId,levelId,topicId,gamemodeId,navigate,onComplete}) => {
-    const gamemodeRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics', topicId, 'Gamemodes',);
+    const gamemodeRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics', topicId, 'Gamemodes');
     const gamemodeSnap = await getDocs(gamemodeRef);
 
     // Get only gamemodes excluding "Lesson"

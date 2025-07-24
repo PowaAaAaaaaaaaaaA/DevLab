@@ -1,11 +1,11 @@
 import { useParams ,useNavigate} from "react-router-dom";
-import CodeRush from "../gameMode/CodeRush";
-import BrainBytes from "../gameMode/BrainBytes";
-import LessonPage from "../Lessons/LessonPage";
-import BugBust from "../gameMode/BugBust";
-import CodeCrafter from "./CodeCrafter";
+import CodeRush from "../CodeRush";
+import BrainBytes from "../BrainBytes";
+import LessonPage from "../../Lessons/LessonPage";
+import BugBust from "../BugBust";
+import CodeCrafter from "../CodeCrafter";
 import { useEffect } from "react";
-import useAttemptCounter from "../gameMode/AttemptCounter";
+import useAttemptCounter from "./AttemptCounter";
 
 const GameModeRouter = () => {
 
@@ -30,11 +30,11 @@ useEffect(() => {
 
 
   const components = {
-    CodeRush: <CodeRush key={roundKey} {...props} />,
-    BrainBytes: <BrainBytes key={roundKey} {...props} />,
-    BugBust: <BugBust key={roundKey} {...props} />,
+    CodeRush: <CodeRush  {...props} />,
+    BrainBytes: <BrainBytes {...props} />,
+    BugBust: <BugBust  {...props} />,
     Lesson: <LessonPage />,
-    CodeCrafter: <CodeCrafter key={roundKey} {...props} />,
+    CodeCrafter: <CodeCrafter  {...props} />,
   };
 
   return components[gamemodeId] || <div>Game Mode Not Found</div>;
