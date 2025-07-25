@@ -1,4 +1,22 @@
+// Utils / Custom Hooks
 import { useEffect, useState, useRef } from "react";
+import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
+
+import useLevelBar from "../components/Custom Hooks/useLevelBar";
+import useUserDetails from "../components/Custom Hooks/useUserDetails";
+// Navigation
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
+// PopUps
+import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
+import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
+// for Animation / Icons
+import Lottie from "lottie-react";
+import Animation from "../assets/Lottie/OutputLottie.json";
+import { AnimatePresence, motion } from "framer-motion";
+import { LuHeart } from "react-icons/lu";
+import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
+// For the Text Editor
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
@@ -6,37 +24,35 @@ import { javascript } from "@codemirror/lang-javascript";
 import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+// Firebase (Database)
 import { db, auth } from "../Firebase/Firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import Lottie from "lottie-react";
-import Animation from "../assets/Lottie/OutputLottie.json";
-import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
-import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
-import { motion,AnimatePresence } from "framer-motion";
-import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
-import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
-import {
-  html as beautifyHTML,
-  css as beautifyCSS,
-  js as beautifyJS,
-} from "js-beautify";
+import { doc, getDoc} from "firebase/firestore";
 
-function CodeCrafter() {
-  const navigate = useNavigate();
+function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
+
+  const type = "Code Crafter"
+  // Navigate
   const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
+  const navigate = useNavigate();
+  // Custom Hooks  const {animatedExp} = useLevelBar();
+  const {Userdata, isLoading } = useUserDetails();  
+  const {animatedExp} = useLevelBar();
+  // CodeCrafter Data
   const [levelData, setLevelData] = useState(null);
   const [lessonGamemode, setLessonGamemode] = useState(null);
+  // Code Mirror input/output
   const [code, setCode] = useState("");
-  const [userDetails, setUserDetails] = useState("");
   const iFrame = useRef(null);
   const dbRef = useRef(null);
   const [outputHtml, setOutputHtml] = useState("");
-  const [hasRunQuery, setHasRunQuery] = useState(false);
-  const [hasRunCode, setRunCode] = useState(false);
   const [tablesHtml, setTablesHtml] = useState("");
+  //Pop Ups
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
+  // Output Panel (Lottie)
+  const [hasRunQuery, setHasRunQuery] = useState(false);
+  const [hasRunCode, setRunCode] = useState(false);
+
   const languageMap = {
     Html: html(),
     Css: css(),
@@ -44,26 +60,15 @@ function CodeCrafter() {
     DataBase: sql(),
   };
 
-    const type = "Code Crafter"
 
-  // Getting data Lesson Data
+  // Getting data CodeCrafter Data
   useEffect(() => {
     const fetchLevel = async () => {
       const docRef = doc(db, subject, lessonId, "Levels", levelId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) setLevelData(docSnap.data());
 
-      const gamemodeRef = doc(
-        db,
-        subject,
-        lessonId,
-        "Levels",
-        levelId,
-        "Topics",
-        topicId,
-        "Gamemodes",
-        gamemodeId
-      );
+      const gamemodeRef = doc(db,subject,lessonId,"Levels",levelId,"Topics",topicId,"Gamemodes",gamemodeId);
       const gamemodeSnap = await getDoc(gamemodeRef);
       if (gamemodeSnap.exists()) setLessonGamemode(gamemodeSnap.data());
     };
@@ -137,7 +142,6 @@ function CodeCrafter() {
       console.error("Error displaying tables:", err);
     }
   };
-  // Data Base (Subject(END))
   // Run Code (Dynammic)
   const runCode = () => {
     if (subject === "DataBase") {
@@ -181,8 +185,11 @@ function CodeCrafter() {
         );
       }
     } else {
+      // Naka Auto Bawas lang (Wala pa kasi pang check)
+      submitAttempt(false);
       setRunCode(true);
-      const fullCode = `
+        setTimeout(() => {
+        const fullCode = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -199,19 +206,9 @@ function CodeCrafter() {
       doc.open();
       doc.write(fullCode);
       doc.close();
+        }, 0);
     }
   };
-
-  // Getting the User Info
-  useEffect(() => {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const getUser = doc(db, "Users", user.uid);
-        const userSnap = await getDoc(getUser);
-        if (userSnap.exists()) setUserDetails(userSnap.data());
-      }
-    });
-  }, []);
   // Format the Code to Display
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
@@ -234,19 +231,38 @@ function CodeCrafter() {
 
   return subject !== "DataBase" ? (
 <>
-    <div className="h-screen bg-[#0D1117] flex flex-col">
-      {/* Header */}
-      <div className="flex justify-between h-[10%] p-3">
-        <div className="flex items-center p-3">
-          <Link to="/Main" className="text-[3rem] text-white">
-            <MdArrowBackIos />
-          </Link>
-          <h1 className="text-[2.5rem] font-exo font-bold text-white">
-            DEVLAB
-          </h1>
-        </div>
-        <div>IMG</div>
+    <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
+        {/* Header */}
+        <div className="flex justify-between h-[10%] items-center p-3">
+          <div className="flex items-center p-3 w-[12%]">
+            <Link to="/Main" className="text-[3rem] text-white">
+              <MdArrowBackIos />
+            </Link>
+            <h1 className="text-[2.5rem] font-exo font-bold text-white">
+              DEVLAB
+            </h1>
+          </div>
+      <div className="flex gap-2 mb-4 w-[12%]">
+        {[...Array(3)].map((_, i) => (
+          <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
+            <LuHeart />
+          </span>
+        ))}
       </div>
+          <div className="w-[12%] h-[90%] flex items-center gap-2">
+            <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
+            <div className=" w-[100%] self-end h-[70%]">
+              {/*Progress Bar*/}
+              <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
+                <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
+              </div>
+              <div className=" flex justify-between"> 
+                <p className="text-white font-inter font-bold">Lvl {Userdata?.userLevel}</p>
+                <p className='text-white font-inter font-bold'>{Userdata?.exp} / 100xp</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
       {/* Content */}
       <div className="h-[83%] flex justify-around items-center p-4">
@@ -374,22 +390,16 @@ function CodeCrafter() {
             whileHover={{ scale: 1.05, background: "#7e22ce" }}
             transition={{ bounceDamping: 100 }}
             onClick={() =>
-              goToNextGamemode({
-                subject,
-                lessonId,
-                levelId,
-                topicId,
-                gamemodeId,
-                navigate,
-              })
-            }
+              goToNextGamemode({subject,lessonId,levelId,topicId,gamemodeId,navigate,
+              // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
+            onComplete: () => setLevelComplete(true), })}
             className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
             Next
           </motion.button>
         </div>
         <div>
           <p className="text-xl">
-            {userDetails ? `${userDetails.coins} Coins` : "Loading..."}
+            {Userdata ? `${Userdata.coins} Coins` : "Loading..."}
           </p>
         </div>
       </div>
@@ -411,8 +421,10 @@ function CodeCrafter() {
       <AnimatePresence>
         {levelComplete && (
           <LevelCompleted_PopUp
-          title="Congrulation"
-          message={`Congrats`}
+          subj = {subject}
+          lessonId = {lessonId}
+          LevelId= {levelId}
+          heartsRemaining={heart}
           setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
 </>
@@ -559,8 +571,7 @@ function CodeCrafter() {
       <AnimatePresence>
         {levelComplete && (
           <LevelCompleted_PopUp
-          title="Congrulation"
-          message={`Congrats`}
+          heartsRemaining={heart}
           setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
 </>

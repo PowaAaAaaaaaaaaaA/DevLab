@@ -1,4 +1,22 @@
+// Utils / Custom Hooks
 import { useEffect, useState, useRef } from "react";
+import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
+
+import useLevelBar from "../components/Custom Hooks/useLevelBar";
+import useUserDetails from "../components/Custom Hooks/useUserDetails";
+// Navigation
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
+// PopUps
+import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
+import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
+// for Animation / Icons
+import Lottie from "lottie-react";
+import Animation from "../assets/Lottie/OutputLottie.json";
+import { AnimatePresence, motion } from "framer-motion";
+import { LuHeart } from "react-icons/lu";
+import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
+// For the Text Editor
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
@@ -6,49 +24,35 @@ import { javascript } from "@codemirror/lang-javascript";
 import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+// Firebase (Database)
 import { db, auth } from "../Firebase/Firebase";
 import { doc, getDoc} from "firebase/firestore";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import Lottie from "lottie-react";
-import { LuHeart } from "react-icons/lu";
-import Animation from "../assets/Lottie/OutputLottie.json";
-import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
-import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
-import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
-import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
-import { AnimatePresence, motion } from "framer-motion";
-import useLevelBar from "../components/Custom Hooks/useLevelBar";
-import useUserDetails from "../components/Custom Hooks/useUserDetails";
-import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
 
-function CodeRush({
-    heart,
-    roundKey,
-    gameOver,
-    submitAttempt
-  }) {  const {animatedExp} = useLevelBar();
-    const {Userdata, isLoading } = useUserDetails();
+
+function CodeRush({heart,roundKey,gameOver,submitAttempt}) {  
+  const type = "Code Rush"
+
+  // Navigate
   const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
   const navigate = useNavigate();
-
-
-  // Data
+  // Custom Hooks  const {animatedExp} = useLevelBar();
+  const {Userdata, isLoading } = useUserDetails();  
+  const {animatedExp} = useLevelBar();
+  // CodeRush Data
   const [levelData, setLevelData] = useState(null);
   const [lessonGamemode, setLessonGamemode] = useState(null);
-  const [userDetails, setUserDetails] = useState("");
-
+  // Code Mirror input/output
   const [code, setCode] = useState("");
   const iFrame = useRef(null);
   const dbRef = useRef(null);
   const [outputHtml, setOutputHtml] = useState("");
   const [tablesHtml, setTablesHtml] = useState("");
-
   //Pop up
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   // Code Rush Timer
   const [timer, setTimer] = useState(null);
-  // Lottie show 
+ // Output Panel (Lottie)
   const [hasRunCode, setRunCode] = useState(false);
   const [hasRunQuery, setHasRunQuery] = useState(false);
 
@@ -182,8 +186,11 @@ function CodeRush({
         );
       }
     } else {
+      // Naka Auto Bawas lang (Wala pa kasi pang check)
+      submitAttempt(false);
       setRunCode(true);
-      const fullCode = `
+        setTimeout(() => {
+        const fullCode = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -200,18 +207,9 @@ function CodeRush({
       doc.open();
       doc.write(fullCode);
       doc.close();
+        }, 0);
     }
   };
-  // Getting the User Info
-  useEffect(() => {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const getUser = doc(db, "Users", user.uid);
-        const userSnap = await getDoc(getUser);
-        if (userSnap.exists()) setUserDetails(userSnap.data());
-      }
-    });
-  }, []);
   // Format the Code to Display
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
@@ -238,6 +236,7 @@ function CodeRush({
           if (prev <= 1) {
             clearInterval(countdown);
             // Here when Time ran outt
+            submitAttempt(false)
             console.log("Time's up!");
             return 0;
           }
@@ -248,20 +247,9 @@ function CodeRush({
     }
   }, [showPopup, timer]);
 
-  const handleSubmit = (answer) => {
-    const correctAnswer = "expected";
-    const isCorrect = answer === correctAnswer;
-    submitAttempt(isCorrect);
-
-    if (isCorrect) {
-      alert("Correct! Moving to next mode...");
-      // trigger next game mode here
-    }
-  };
 
   return subject !== "DataBase" ? (
     <>
-
       <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
         <div className="flex justify-between h-[10%] items-center p-3">
@@ -412,7 +400,7 @@ function CodeRush({
           </div>
           <div>
             <p className="text-xl">
-              {userDetails ? `${userDetails.coins} Coins` : "Loading..."}
+              {Userdata ? `${Userdata.coins} Coins` : "Loading..."}
             </p>
           </div>
         </div>
@@ -422,7 +410,7 @@ function CodeRush({
       {showPopup && (
         <GameMode_Instruction_PopUp
           title="Hey Dev!!"
-          message={`Welcome to **CodeRush** — a fast-paced challenge where you’ll write and run code before time runs out! . 
+          message={`Welcome to ${type} — a fast-paced challenge where you’ll write and run code before time runs out! . 
     Your mission:  
 🧩 Read the task  
 💻 Write your code  
@@ -436,8 +424,7 @@ function CodeRush({
       <AnimatePresence>
         {levelComplete && (
           <LevelCompleted_PopUp
-          title="Congrulation"
-          message={`Congrats`}
+          heartsRemaining={heart}
           setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
     </>
@@ -574,8 +561,7 @@ function CodeRush({
       <AnimatePresence>
         {levelComplete && (
           <LevelCompleted_PopUp
-          title="Congrulation"
-          message={`Congrats`}
+          heartsRemaining={heart}
           setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
     </>

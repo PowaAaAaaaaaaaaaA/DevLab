@@ -30,7 +30,7 @@ navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${topicId}/${nextGamem
 });
         } else {
             //  No more topics —trigger completion popup
-            onComplete();
+            onComplete(true);
         }
     } else {
         console.warn("Gamemode not found or Lesson was the only one.");

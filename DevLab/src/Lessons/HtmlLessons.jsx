@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import { useState,useEffect } from "react";
+import { doc, updateDoc,collection,getDocs } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
 import { useNavigate} from "react-router-dom"; 
 import HtmlImage from "../assets/Images/html-Icon-Big.png"
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 import LockAnimation from '../assets/Lottie/LockItem.json'
-import {motion} from "framer-motion"
+import {motion, progress} from "framer-motion"
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
 
@@ -16,14 +16,35 @@ import useLevelsData from "../components/Custom Hooks/useLevelsData";
 function HtmlLessons() {
 
 
-    // Level Fetch (Custom Hooks)
-    const { data, isLoading } = useLevelsData("Html");
+  // Level Fetch (Custom Hooks)
+  const { data, isLoading } = useLevelsData("Html");
   
-    const navigate = useNavigate();
-    const [showLockedModal, setShowLockedModal] = useState(false);
+  const navigate = useNavigate();
+  const [showLockedModal, setShowLockedModal] = useState(false);
 
+const [userProgress, setUserProgress] = useState({}); // user's progress per level
+    
 
-console.log(data)
+  const fetchProgress = async (lessonIds) => {
+    const userId = auth.currentUser.uid;
+    const allProgress = {};
+    for (const lessonId of lessonIds) {
+      const progressRef = collection(db,"Users",userId,"Progress","Html","Lessons",lessonId,"Levels");
+      const progressSnap = await getDocs(progressRef);
+      progressSnap.forEach((doc) => {
+        allProgress[`${lessonId}-${doc.id}`] = doc.data().status;
+      });
+    }
+    setUserProgress(allProgress);
+  };
+
+  useEffect(() => {
+    if (data) {
+      const lessonIds = data.map((lesson) => lesson.id);
+      console.log("Lesson IDs chck:", lessonIds);
+      fetchProgress(lessonIds);
+    }
+  }, [data]);
 
   return (
     <>
@@ -70,20 +91,23 @@ console.log(data)
               initial = "hidden"
               animate="show"
           className="flex flex-col gap-4">
-            {lesson.levels.map((level) => (
+            {lesson.levels.map((level) => {
+const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+              //console.log(isUnlocked)
+              return(             
               <motion.div key={level.id}
-              variants={{hidden:{opacity:0, y:100}, show:{opacity: level.status ? 1 : 0.3, y:0 }}}
+              variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.3, y:0 }}}
               whileHover={{scale:1.02}}
               className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
-                    ${level.status === false
+                    ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
               onClick={async() => {
-                if (!level.status) {
+                if (!isUnlocked) {
                   setShowLockedModal(true);// show the modal
                   return;}
               // This button will navigate to "LevelPage" and Update the "Jump Back in" sa Dashboard
-              if (level.status) {
+              if (isUnlocked) {
                 const user = auth.currentUser;
                 if(user) {
                   const userRef = doc(db, "Users", user.uid);
@@ -95,8 +119,7 @@ console.log(data)
                     }
                     })
                 }
-                
-    const firstTopic = level.topics?.[0]; //  get the first topic if it exists
+              const firstTopic = level.topics?.[0]; //  get the first topic if it exists
               navigate(`/Main/Lessons/Html/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`);
             }
           }}>
@@ -106,7 +129,8 @@ console.log(data)
                     <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                   </div>
               </motion.div> 
-            ))}
+              )
+})}
             </motion.div>
         </div>))}
       </div>)

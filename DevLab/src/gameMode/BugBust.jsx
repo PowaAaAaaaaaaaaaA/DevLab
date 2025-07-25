@@ -401,8 +401,7 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
       <AnimatePresence>
         {levelComplete && (
           <LevelCompleted_PopUp
-          title="Congrulation"
-          message="Congrats"
+          heartsRemaining={heart}
           setLevelComplete={setLevelComplete}
           />
 )}  
@@ -570,8 +569,7 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
       <AnimatePresence>
         {levelComplete && (
           <LevelCompleted_PopUp
-          title="Congrulation"
-          message={`Congrats`}
+          heartsRemaining={heart}
           setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
     </>

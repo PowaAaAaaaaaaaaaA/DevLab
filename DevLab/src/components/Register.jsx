@@ -20,24 +20,46 @@ function Register() {
             await createUserWithEmailAndPassword(auth, email,password);
             const user = auth.currentUser;
             console.log(user);
-            if(user){
-                await setDoc(doc(db, "Users", user.uid),{
-                    email: user.email,  
-                    username: username,
-                    age: age,
-                    exp: 0,
-                    level: 1,
-                    coins:0,
-                    bio: "",
-                    isAdmin: false,
-                    lastOpenedLevel: {
-                        lessonId: "Html",          // Firestore collection
-                        lessonDocId: "Lesson1",    // Firestore document inside collection
-                        levelId: "Level1"          // Firestore document inside Levels subcollection
-                    }
-                    
-                });
-            }
+if (user) {
+  // Save main profile data
+  await setDoc(doc(db, "Users", user.uid), {
+    email: user.email,
+    username: username,
+    age: age,
+    exp: 0,
+    level: 1,
+    coins: 0,
+    bio: "",
+    isAdmin: false,
+    lastOpenedLevel: {
+      lessonId: "Html",
+      lessonDocId: "Lesson1",
+      levelId: "Level1",
+    },
+  });
+
+  // Initialize Level1 unlocked for each subject
+  const subjects = ["Html", "Css", "JavaScript", "Database"];
+
+  for (const subject of subjects) {
+    await setDoc(
+      doc(
+        db,
+        "Users",
+        user.uid,
+        "Progress",
+        subject,
+        "Lessons",
+        "Lesson1",
+        "Levels",
+        "Level1"
+      ),
+      {
+        status: true,
+      }
+    );
+  }
+}
             toast.success("Registered Successfully",{
                 position:"top-center",
                 theme: "colored"
