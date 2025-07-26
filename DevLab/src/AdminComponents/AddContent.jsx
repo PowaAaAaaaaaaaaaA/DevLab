@@ -32,6 +32,7 @@ const fetchLessonsData = async(subject)=>{
 const [title, setTitle] = useState()
 const [desc, setDesc] = useState()
 const [coins, setCoins] = useState();
+const [exp, setExp] = useState();
 
 
 const handleAdd = async () => {
@@ -100,8 +101,8 @@ const handleAdd = async () => {
         title,
         desc,
         coinReward: parseInt(coins),
+        expReward: parseInt(exp),
         symbol: defaultS,
-        status: false,
         order: nextLevelNum,};
 
 if (subject === "JavaScript") {
@@ -116,6 +117,7 @@ await setDoc(levelDocRef, levelData);
     setTitle("");
     setDesc("");
     setCoins("");
+    setExp("")
 } catch (error) {
     console.error("Error adding level:", error);
 }
@@ -184,7 +186,11 @@ return (
                     setCoins(e.target.value);
                 }}
                 type="number" placeholder='Coin Reward' className='border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400'/>
-                
+                <input 
+                onChange={(e)=>{
+                    setExp(e.target.value);
+                }}
+                type="number" placeholder='Exp Reward' className='border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400'/>
                 <div className='flex mt-5 p-5 justify-around w-[60%] m-auto gap-10'>
                     <button 
                     type='button'

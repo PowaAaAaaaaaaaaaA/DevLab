@@ -98,8 +98,7 @@ function App() {
           {/* Protected Routes */}
           <Route
             path="/Main"
-            element={isLoggedIn ? <Layout /> : <Navigate to="/Login" replace />}
-          >
+            element={isLoggedIn ? <Layout /> : <Navigate to="/Login" replace />}>
             <Route index element={<Dashboard />} />
             <Route path="Lessons/Html" element={<HtmlLessons />} />
             <Route path="Lessons/Css" element={<CssLessons />} />

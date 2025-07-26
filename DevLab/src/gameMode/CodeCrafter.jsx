@@ -304,7 +304,7 @@ function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
                 <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
                   Instruction
                 </h3>
-                <p className="mb-2">{lessonGamemode.instruction}</p>
+                <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.instruction}</p>
                 <pre className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
                   {formattedCode}
                 </pre>
@@ -331,8 +331,7 @@ function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
               whileHover={{ scale: 1.05, background: "#7e22ce" }}
               transition={{ bounceDamping: 100 }}
               onClick={runCode}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            >
+              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
               RUN
             </motion.button>
             <motion.button
@@ -360,8 +359,7 @@ function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
               <Lottie
                 animationData={Animation}
                 loop={true}
-                className="w-[70%] h-[70%]"
-              />
+                className="w-[70%] h-[70%]"/>
               <p className="text-[0.8rem]">
                 YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
               </p>

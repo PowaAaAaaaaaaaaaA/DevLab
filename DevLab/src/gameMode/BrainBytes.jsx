@@ -27,6 +27,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
 import { LuHeart } from "react-icons/lu";
+// Components
+import GameHeader from "./GameModes_Components/GameHeader";
+import InstructionPanel from "./GameModes_Components/InstructionPanel";
+import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE";
 
 function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
   const type = "Brain Bytes";
@@ -75,7 +79,7 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
       if (gamemodeSnap.exists()) {
         setLessonGamemode(gamemodeSnap.data());
         const gamemodeData = gamemodeSnap.data();
-        setOptions(gamemodeData.options || {});
+        //setOptions(gamemodeData.options || {});
         setCorrectAnswer(gamemodeData.correctAnswer);
       }
     };
@@ -211,168 +215,19 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
       doc.close();
     }
   };
-  // Checking the Selected Ans (Not Final)
-  const answerCheck = () => {
-    if (!selectedOption) {
-      toast.error("Select Answer", {
-        position: "top-right",
-        theme: "colored",
-      });
-      return;
-    }
-    if (selectedOption === lessonGamemode.correctAnswer) {
-      console.log("Correct Answer");
-    } else {
-      console.log("Wrong");
-    }
-  };
+
 
   return subject !== "DataBase" ? (
     <>
       <div key={roundKey}className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between h-[10%] items-center p-3">
-          <div className="flex items-center p-3 w-[12%]">
-            <Link to="/Main" className="text-[3rem] text-white">
-              <MdArrowBackIos />
-            </Link>
-            <h1 className="text-[2.5rem] font-exo font-bold text-white">
-              DEVLAB
-            </h1>
-          </div>
-      <div className="flex gap-2 mb-4 w-[12%]">
-        {[...Array(3)].map((_, i) => (
-          <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
-            <LuHeart />
-          </span>
-        ))}
-      </div>
-          <div className="w-[12%] h-[90%] flex items-center gap-2">
-            <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
-            <div className=" w-[100%] self-end h-[70%]">
-              {/*Progress Bar*/}
-              <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
-                <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
-              </div>
-              <div className=" flex justify-between"> 
-                <p className="text-white font-inter font-bold">Lvl {Userdata?.userLevel}</p>
-                <p className='text-white font-inter font-bold'>{Userdata?.exp} / 100xp</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <GameHeader heart={heart}/>
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
-          {/* Instruction */}
-          <div
-            className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl flex flex-col gap-5 text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]
-        [&::-webkit-scrollbar]:w-2
-        [&::-webkit-scrollbar-track]:rounded-full
-      [&::-webkit-scrollbar-track]:bg-gray-100  
-        [&::-webkit-scrollbar-thumb]:rounded-full
-      dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-            {levelData && lessonGamemode ? (
-              <>
-                <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-                <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">
-                  {lessonGamemode.topic}
-                </p>
-                <div className="mt-4 p-4 bg-[#25293B] rounded-2xl flex flex-col gap-3">
-                  <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">
-                    Instruction
-                  </h3>
-                  <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">
-                    {lessonGamemode.instruction}
-                  </p>
-                  {/*Mapping ng Questions*/}
-                  <div className="bg-[#191C2B] p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
-                    {lessonGamemode?.options &&
-                      Object.entries(lessonGamemode.options)
-                        .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-                        .map(([key, value]) => (
-                          <label
-                            key={key}
-                            className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl  hover:bg-gray-500 transition-all duration-500 ${
-                              selectedOption === key
-                                ? "bg-gray-500"
-                                : "bg-gray-700"
-                            }`}>
-                            <input
-                              type="radio"
-                              name="option"
-                              value={key}
-                              checked={selectedOption === key}
-                              onChange={() => setSelectedOption(key)}
-                              className="accent-purple-600 mt-1 "/>
-                            <span className="font-mono text-sm break-all">
-                              {key}: {value}
-                            </span>
-                          </label>
-                        ))}
-                  </div>
-                  <button
-                    onClick={answerCheck}
-                    className="w-[30%] h-[8%] self-end rounded-[10px] font-exo font-bold bg-[#7F5AF0] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]">
-                    Submit
-                  </button>
-                </div>
-              </>
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
-          {/* Code Editor */}
-          <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-            <CodeMirror
-              value={code}
-              onChange={(val) => setCode(val)}
-              height="640px"
-              width="600px"
-              extensions={[languageMap[subject] || html()]}
-              theme={tokyoNight}
-            />
-            <div className="flex justify-around w-full">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05, background: "#7e22ce" }}
-                transition={{ bounceDamping: 100 }}
-                onClick={runCode}
-                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-                RUN
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05, background: "#7e22ce" }}
-                transition={{ bounceDamping: 100 }}
-                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-                EVALUATE
-              </motion.button>
-            </div>
-          </div>
-          {/* Output */}
-          <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-            {hasRunCode ? (
-              <iframe
-                ref={iFrame}
-                title="output"
-                className="w-full h-full rounded-xl"
-                sandbox="allow-scripts allow-same-origin"/>
-            ) : (
-              <div className="w-full h-full flex items-center flex-col">
-                <Lottie
-                  animationData={Animation}
-                  loop={true}
-                  className="w-[70%] h-[70%]"/>
-                <p className="text-[0.8rem]">
-                  YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-                </p>
-              </div>
-            )}
-          </div>
+        {/* Instruction */}
+        <InstructionPanel/>
+        {/* Code Editor */}
+        <Html_TE submitAttempt={submitAttempt}/>
         </div>
         {/* Footer */}
         <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white">
@@ -442,19 +297,7 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
     <>
       <div className="h-screen bg-[#0D1117] flex flex-col">
         {/*Header*/}
-        <div className=" border-white flex justify-between h-[10%] p-3">
-          <div className=" flex items-center p-3">
-            <Link to={"/Main"} className="text-[3rem] text-white">
-              <MdArrowBackIos />
-            </Link>
-            <h1 className="text-[2.5rem] font-exo font-bold text-white">
-              DEVLAB
-            </h1>
-          </div>
-          <div>
-            <div>IMG</div>
-          </div>
-        </div>
+      <GameHeader />
         {/*Contents*/}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/*Instruction*/}
@@ -492,8 +335,7 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
                             className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl  hover:bg-gray-500 transition-all duration-500 ${
                               selectedOption === key
                                 ? "bg-gray-500"
-                                : "bg-gray-700"
-                            }`}>
+                                : "bg-gray-700"}`}>
                             <input
                               type="radio"
                               name="option"

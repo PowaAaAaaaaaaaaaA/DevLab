@@ -1,0 +1,104 @@
+// for the Text Editor
+import CodeMirror from "@uiw/react-codemirror";
+import { html } from "@codemirror/lang-html";
+import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+// (Disable Auto Complete for Mode "Bugbust")
+import { htmlLanguage } from "@codemirror/lang-html";
+import { LanguageSupport } from "@codemirror/language";
+import { autocompletion } from "@codemirror/autocomplete";
+// Animation
+import Animation from '../../../assets/Lottie/OutputLottie.json'
+import Lottie from "lottie-react";
+import { motion } from "framer-motion";
+// Utils
+import { useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+
+
+function Html_TE({submitAttempt}) {
+
+    const {gamemodeId} = useParams();
+    // For the Code Mirror Input/Output
+    const [code, setCode] = useState("");
+    const iFrame = useRef(null);
+    const [hasRunCode, setRunCode] = useState(false);
+
+    const runCode = () =>{
+      submitAttempt(false);
+      setRunCode(true);
+      setTimeout(() => {
+        const fullCode = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        </head>
+        <body>${ code }
+        </body>
+        </html>`;
+        const doc =
+          iFrame.current.contentDocument ||
+          iFrame.current.contentWindow.document;
+        doc.open();
+        doc.write(fullCode);
+        doc.close();
+      }, 0);
+    }
+
+  return (
+    <>
+      <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <CodeMirror
+          className="text-[1rem]"
+          value={code}
+          onChange={(val) => setCode(val)}
+          height="640px"
+          width="600px"
+          extensions={gamemodeId === "BugBust"
+            ? new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })])
+            : html()
+          }
+          theme={tokyoNight} />
+        <div className="flex justify-around w-full">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05, background: "#7e22ce" }}
+            transition={{ bounceDamping: 100 }}
+            onClick={runCode}
+            className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
+            RUN
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05, background: "#7e22ce" }}
+            transition={{ bounceDamping: 100 }}
+            className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
+            EVALUATE
+          </motion.button>
+        </div>
+      </div>
+      {/* Output */}
+      <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        {hasRunCode ? (
+          <iframe
+            ref={iFrame}
+            title="output"
+            className="w-full h-full rounded-xl"
+            sandbox="allow-scripts allow-same-origin"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center flex-col">
+            <Lottie
+              animationData={Animation}
+              loop={true}
+              className="w-[70%] h-[70%]"/>
+            <p className="text-[0.8rem]">
+              YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
+            </p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default Html_TE;

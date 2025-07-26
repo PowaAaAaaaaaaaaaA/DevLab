@@ -1,14 +1,15 @@
-import { useState,useEffect } from "react";
-import { doc, updateDoc,collection,getDocs } from "firebase/firestore";
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
-import { useNavigate} from "react-router-dom"; 
+import { useNavigate } from "react-router-dom"; 
 import HtmlImage from "../assets/Images/html-Icon-Big.png"
 import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 import LockAnimation from '../assets/Lottie/LockItem.json'
-import {motion, progress} from "framer-motion"
+import { motion } from "framer-motion"
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
+import useUserProgress from "../components/Custom Hooks/useUserProgress";
 
 
 
@@ -22,29 +23,11 @@ function HtmlLessons() {
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
 
-const [userProgress, setUserProgress] = useState({}); // user's progress per level
+  const {userProgress} = useUserProgress("Html");
     
 
-  const fetchProgress = async (lessonIds) => {
-    const userId = auth.currentUser.uid;
-    const allProgress = {};
-    for (const lessonId of lessonIds) {
-      const progressRef = collection(db,"Users",userId,"Progress","Html","Lessons",lessonId,"Levels");
-      const progressSnap = await getDocs(progressRef);
-      progressSnap.forEach((doc) => {
-        allProgress[`${lessonId}-${doc.id}`] = doc.data().status;
-      });
-    }
-    setUserProgress(allProgress);
-  };
 
-  useEffect(() => {
-    if (data) {
-      const lessonIds = data.map((lesson) => lesson.id);
-      console.log("Lesson IDs chck:", lessonIds);
-      fetchProgress(lessonIds);
-    }
-  }, [data]);
+
 
   return (
     <>
@@ -93,7 +76,6 @@ const [userProgress, setUserProgress] = useState({}); // user's progress per lev
           className="flex flex-col gap-4">
             {lesson.levels.map((level) => {
 const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
-              //console.log(isUnlocked)
               return(             
               <motion.div key={level.id}
               variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.3, y:0 }}}

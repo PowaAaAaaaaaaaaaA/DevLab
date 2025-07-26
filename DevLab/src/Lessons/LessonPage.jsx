@@ -1,15 +1,8 @@
 // Utils / CustomHooks
 import { useEffect, useState, useRef } from "react";
-import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
 
-import useLevelBar from "../components/Custom Hooks/useLevelBar";
-import useUserDetails from "../components/Custom Hooks/useUserDetails";
-// Firebase (Database)
-import { db } from "../Firebase/Firebase";
-import { doc, getDoc } from "firebase/firestore";
 //Navigation (React Router)
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { goToNextGamemode } from "../gameMode/GameModes_Utils/Util_Navigation";
+import { useParams, Link } from "react-router-dom";
 // for Animation / Icons
 import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/OutputLottie.json";
@@ -17,66 +10,29 @@ import { motion } from "framer-motion";
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
 // for the Text Editor
 import CodeMirror from "@uiw/react-codemirror";
-import { html } from "@codemirror/lang-html";
-import { css } from "@codemirror/lang-css";
-import { javascript } from "@codemirror/lang-javascript";
 import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+// Components
+import GameHeader from "../gameMode/GameModes_Components/GameHeader";
+import InstructionPanel from "../gameMode/GameModes_Components/InstructionPanel";
+import GameFooter from "../gameMode/GameModes_Components/GameFooter";
+import Html_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Html_TE";
+import Css_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Css_TE";
+
 
 function LessonPage() {
   // Navigate
-  const navigate = useNavigate();
   const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
-  // Level Datas
+  // Level Datas will be remove soon
   const [levelData, setLevelData] = useState(null);
-  const [lessonGamemode, setLessonGamemode] = useState(null);
-  // User Data
-  const { animatedExp } = useLevelBar();
-  const { Userdata, isLoading } = useUserDetails();
   // For the Code Mirror Input/Output
-  const [code, setCode] = useState("");
-  const iFrame = useRef(null);
   const dbRef = useRef(null);
   const [outputHtml, setOutputHtml] = useState("");
   const [hasRunQuery, setHasRunQuery] = useState(false);
-  const [hasRunCode, setRunCode] = useState(false);
   const [tablesHtml, setTablesHtml] = useState("");
 
-  const [userDetails, setUserDetails] = useState("");
 
-  const languageMap = {
-    Html: html(),
-    Css: css(),
-    JavaScript: javascript(),
-    DataBase: sql(),
-  };
-  // Getting data Lesson Data
-  useEffect(() => {
-    const fetchLevel = async () => {
-      const docRef = doc(db, subject, lessonId, "Levels", levelId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setLevelData(docSnap.data());
-      }
-      const gamemodeRef = doc(
-        db,
-        subject,
-        lessonId,
-        "Levels",
-        levelId,
-        "Topics",
-        topicId,
-        "Gamemodes",
-        gamemodeId
-      );
-      const gamemodeSnap = await getDoc(gamemodeRef);
-      if (gamemodeSnap.exists()) {
-        setLessonGamemode(gamemodeSnap.data());
-      }
-    };
-    fetchLevel();
-  }, [subject, lessonId, levelId, topicId]);
 
   // Data Base (Data sa Table)
   useEffect(() => {
@@ -212,199 +168,22 @@ function LessonPage() {
       }, 0);
     }
   };
-  // Format the Code to Display
-  const [formattedCode, setFormattedCode] = useState("");
-  useEffect(() => {
-    if (!lessonGamemode || !subject) return;
-    const rawCode = lessonGamemode?.preCode || "";
-    switch (subject) {
-      case "Html":
-        setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
-        break;
-      case "Css":
-        setFormattedCode(beautifyCSS(rawCode, { indent_size: 2 }));
-        break;
-      case "JavaScript":
-        setFormattedCode(beautifyJS(rawCode, { indent_size: 2 }));
-        break;
-      default:
-        setFormattedCode(rawCode);
-    }
-  }, [lessonGamemode, subject]);
+
 
   return subject !== "DataBase" ? (
     <div className="h-screen bg-[#0D1117] flex flex-col">
       {/* Header */}
-      <div className="flex justify-between h-[10%] p-3">
-        <div className="flex items-center p-3">
-          <Link to="/Main" className="text-[3rem] text-white">
-            <MdArrowBackIos />
-          </Link>
-          <h1 className="text-[2.5rem] font-exo font-bold text-white">
-            DEVLAB
-          </h1>
-        </div>
-        <div className="w-[12%] h-[90%] flex items-center gap-2">
-          <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
-          <div className=" w-[100%] self-end h-[70%]">
-            {/*Progress Bar*/}
-            <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
-              <div
-                className="h-4 rounded-full dark:bg-[#2CB67D]"
-                style={{ width: `${(animatedExp / 100) * 100}%` }}>
-              </div>
-            </div>
-            <div className=" flex justify-between">
-              <p className="text-white font-inter font-bold">
-                Lvl {Userdata?.userLevel}
-              </p>
-              <p className="text-white font-inter font-bold">
-                {Userdata?.exp} / 100xp
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+        <GameHeader/>
       {/* Content */}
       <div className="h-[83%] flex justify-around items-center p-4">
         {/* Instruction */}
-        <div
-          className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5
-        [&::-webkit-scrollbar]:w-2
-        [&::-webkit-scrollbar-track]:rounded-full
-        [&::-webkit-scrollbar-track]:bg-gray-100  
-        [&::-webkit-scrollbar-thumb]:rounded-full
-        dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-          {levelData && lessonGamemode ? (
-            <>
-              {subject === "Html" && (
-                <h2 className="text-[2rem] text-[#FF5733] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              {subject === "Css" && (
-                <h2 className="text-[2rem] text-[#1E90FF] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              {subject === "DataBase" && (
-                <h2 className="text-[2rem] text-[#4CAF50] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              {subject === "JavaScript " && (
-                <h2 className="text-[2rem] text-[#F7DF1E] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem]">
-                {lessonGamemode.topic}
-              </p>
-              <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
-                <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
-                  Instruction
-                </h3>
-                <p className="mb-2">{lessonGamemode.instruction}</p>
-                <pre className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                  {formattedCode}
-                </pre>
-              </div>
-            </>
-          ) : (
-            <p>Loading...</p>
-          )}
-        </div>
-
-        {/* Code Editor */}
-        <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          <CodeMirror
-            value={code}
-            onChange={(val) => setCode(val)}
-            height="640px"
-            width="600px"
-            extensions={[languageMap[subject] || html()]}
-            theme={tokyoNight}/>
-          <div className="flex justify-around w-full">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              onClick={runCode}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-              RUN
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-              EVALUATE
-            </motion.button>
-          </div>
-        </div>
-
-        {/* Output */}
-        <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          {hasRunCode ? (
-            <iframe
-              ref={iFrame}
-              title="output"
-              className="w-full h-full rounded-xl"
-              sandbox="allow-scripts allow-same-origin"/>
-          ) : (
-            <div className="w-full h-full flex items-center flex-col">
-              <Lottie
-                animationData={Animation}
-                loop={true}
-                className="w-[70%] h-[70%]"/>
-              <p className="text-[0.8rem]">
-                YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-              </p>
-            </div>
-          )}
-        </div>
+          <InstructionPanel/>
+        {/* Code Editor and Output Panel */}
+          {subject === "Html" && ( <Html_TE/>)}
+          {subject === "Css" && ( <Css_TE/>)}       
       </div>
       {/* Footer */}
-      <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white">
-        <div className="flex items-center gap-3">
-          <MdDensityMedium className="text-2xl" />
-          <div>
-            <p>
-              {levelData
-                ? `${levelData.order}. ${levelData.title}`
-                : "Loading..."}
-            </p>
-            <p className="text-[#58D28F]">
-              {levelData ? `${levelData.expReward}xp` : ""}
-            </p>
-          </div>
-        </div>
-        <div className="w-[10%]">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05, background: "#7e22ce" }}
-            transition={{ bounceDamping: 100 }}
-            onClick={() =>
-              goToNextGamemode({
-                subject,
-                lessonId,
-                levelId,
-                topicId,
-                gamemodeId,
-                navigate,
-              })
-            }
-            className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
-            Next
-          </motion.button>
-        </div>
-        <div>
-          <p className="text-xl">
-            {Userdata ? `${Userdata.coins} Coins` : "Loading..."}
-          </p>
-        </div>
-      </div>
+        <GameFooter/>
     </div>
   ) : 
     /*DATABASE TAB*/

@@ -17,14 +17,7 @@ export default function useLevelsData(subject) {
 
         const levels = await Promise.all(
           levelsSnapshot.docs.map(async (levelDoc) => {
-            const topicsRef = collection(
-              db,
-              subject,
-              lessonDoc.id,
-              "Levels",
-              levelDoc.id,
-              "Topics"
-            );
+            const topicsRef = collection(db,subject,lessonDoc.id,"Levels",levelDoc.id,"Topics");
             const topicsSnapshot = await getDocs(topicsRef);
             const topics = topicsSnapshot.docs.map((doc) => ({
               id: doc.id,

@@ -9,6 +9,7 @@ import LockAnimation from "../assets/Lottie/LockItem.json";
 import { motion } from "framer-motion";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
+import useUserProgress from "../components/Custom Hooks/useUserProgress";
 
 
 
@@ -17,6 +18,7 @@ function JavaScriptLessons() {
 
      // Level Fetch (Custom Hooks)
       const { data, isLoading } = useLevelsData("JavaScript");
+      const {userProgress} = useUserProgress("JavaScript");
 
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
@@ -75,8 +77,7 @@ function JavaScriptLessons() {
             [&::-webkit-scrollbar-thumb]:rounded-full
             [&::-webkit-scrollbar-thumb]:bg-gray-300
             dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
-              >
+            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
                 {data.map((lesson) => (
                   <div key={lesson.id} className="flex flex-col gap-4">
                     <h2 className="font-exo text-[3rem] font-bold text-white">
@@ -91,23 +92,25 @@ function JavaScriptLessons() {
                       initial="hidden"
                       animate="show"
                       className="flex flex-col gap-4">
-                      {lesson.levels.map((level) => (
+                      {lesson.levels.map((level) => {
+const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+                        return(
                         <motion.div
                           key={level.id}
                           variants={{
                             hidden: { opacity: 0, y: 100 },
-                            show: { opacity: level.status ? 1 : 0.3, y: 0 },
+                            show: { opacity: isUnlocked ? 1 : 0.3, y: 0 },
                           }}
                             whileHover={{scale:1.02}}
                             className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
-                    ${level.status === false
+                    ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
                           onClick={async () => {
-                            if (!level.status) {
+                            if (!isUnlocked) {
                               setShowLockedModal(true); // show the modal
                               return;}
-                            if (level.status) {
+                            if (isUnlocked) {
                               const user = auth.currentUser;
                               if (user) {
                                 const userRef = doc(db, "Users", user.uid);
@@ -136,8 +139,8 @@ function JavaScriptLessons() {
                               {level?.desc }
                             </p>
                           </div>
-                        </motion.div>
-                      ))}
+                        </motion.div>)
+                          })}
                     </motion.div>
                   </div>
                 ))}

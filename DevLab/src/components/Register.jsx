@@ -43,17 +43,7 @@ if (user) {
 
   for (const subject of subjects) {
     await setDoc(
-      doc(
-        db,
-        "Users",
-        user.uid,
-        "Progress",
-        subject,
-        "Lessons",
-        "Lesson1",
-        "Levels",
-        "Level1"
-      ),
+      doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1"),
       {
         status: true,
       }

@@ -1,49 +1,37 @@
 // Utils / Custom Hooks
 import { useEffect, useState, useRef } from "react";
-import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
 
-import useLevelBar from "../components/Custom Hooks/useLevelBar";
-import useUserDetails from "../components/Custom Hooks/useUserDetails";
 // Navigation (React Router)
-import { useParams, Link, useNavigate} from "react-router-dom";
-import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
+import { useParams, Link } from "react-router-dom";
 // PopUps
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
 // for Animation / Icons
 import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/OutputLottie.json";
-import { AnimatePresence, motion } from "framer-motion";
-import { LuHeart } from "react-icons/lu";
+import { AnimatePresence } from "framer-motion";
 import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
-// Firebase (Database)
-import { db} from "../Firebase/Firebase";
-import { doc, getDoc } from "firebase/firestore";
 // For the Text Editor
 import CodeMirror from "@uiw/react-codemirror";
-import { htmlLanguage } from "@codemirror/lang-html";
-import { cssLanguage } from "@codemirror/lang-css";
-import { javascriptLanguage } from "@codemirror/lang-javascript";
 import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
-import { autocompletion } from "@codemirror/autocomplete";
-import { LanguageSupport } from "@codemirror/language";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+// Components
+import GameHeader from "./GameModes_Components/GameHeader";
+import InstructionPanel from "./GameModes_Components/InstructionPanel";
+import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE";
+import GameFooter from "./GameModes_Components/GameFooter";
 
 
 function BugBust({heart,gameOver,submitAttempt,roundKey}) {
   const type = "Bug Bust";
   // Navigate
-  const navigate = useNavigate();
   const { subject, lessonId, levelId, gamemodeId, topicId } = useParams();
-  // Custom Hooks
-  const {animatedExp} = useLevelBar();
-  const {Userdata, isLoading } = useUserDetails();
+
   // BugBust Mode Data
   const [levelData, setLevelData] = useState(null);
   const [lessonGamemode, setLessonGamemode] = useState(null);
   // Code Mirror input/output
-  const [code, setCode] = useState("");
   const iFrame = useRef(null);
   const dbRef = useRef(null);
   const [outputHtml, setOutputHtml] = useState("");
@@ -53,31 +41,9 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
   const [showPopup, setShowPopup] = useState(true);
   // Output Panel (Lottie)
   const [hasRunQuery, setHasRunQuery] = useState(false);
-  const [hasRunCode, setRunCode] = useState(false);
-  // Language each Subj (I remove the Auto Complete and Suggestion ng Code Mirror for this game mode)
-  const languageMap = {
-    Html: new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })]),
-    Css: new LanguageSupport(cssLanguage, [autocompletion({ override: [] })]),
-    JavaScript: new LanguageSupport(javascriptLanguage, [
-      autocompletion({ override: [] }),
-    ]),
-    DataBase: sql(),
-  };
-  // Getting the Level Data (Bug Bust)
-  useEffect(() => {
-    const fetchLevel = async () => {
-      const docRef = doc(db, subject, lessonId, "Levels", levelId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) setLevelData(docSnap.data());
 
-      const gamemodeRef = doc(db,subject,lessonId,"Levels",levelId,"Topics",topicId,"Gamemodes",gamemodeId);
-      const gamemodeSnap = await getDoc(gamemodeRef);
-      if (gamemodeSnap.exists()) {
-        setLessonGamemode(gamemodeSnap.data());
-      }
-    };
-    fetchLevel();
-  }, [subject, lessonId, levelId]);
+
+
   // Table for Database Subject
   useEffect(() => {
     if (subject === "DataBase") {
@@ -207,193 +173,36 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
 
     }
   };
-  // Code Format
-  const [formattedCode, setFormattedCode] = useState("");
-  useEffect(() => {
-    if (!lessonGamemode || !subject) return;
-    const rawCode = lessonGamemode?.preCode || "";
-    switch (subject) {
-      case "Html":
-        setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
-        break;
-      case "Css":
-        setFormattedCode(beautifyCSS(rawCode, { indent_size: 2 }));
-        break;
-      case "JavaScript":
-        setFormattedCode(beautifyJS(rawCode, { indent_size: 2 }));
-        break;
-      default:
-        setFormattedCode(rawCode);
-    }
-  }, [lessonGamemode, subject]);
+
 
 
   return subject !== "DataBase" ? (
-    <>
-    <div key={roundKey}>
-      <div className="h-screen bg-[#0D1117] flex flex-col">
+  <>
+    <div 
+      key={roundKey}
+      className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between h-[10%] items-center p-3">
-          <div className="flex items-center p-3 w-[12%]">
-            <Link to="/Main" className="text-[3rem] text-white">
-              <MdArrowBackIos />
-            </Link>
-            <h1 className="text-[2.5rem] font-exo font-bold text-white">
-              DEVLAB
-            </h1>
-          </div>
-      <div className="flex gap-2 mb-4 w-[12%]">
-        {[...Array(3)].map((_, i) => (
-          <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
-            <LuHeart />
-          </span>
-        ))}
-      </div>
-          <div className="w-[12%] h-[90%] flex items-center gap-2">
-            <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
-            <div className=" w-[100%] self-end h-[70%]">
-              {/*Progress Bar*/}
-              <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
-                <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
-              </div>
-              <div className=" flex justify-between"> 
-                <p className="text-white font-inter font-bold">Lvl {Userdata?.userLevel}</p>
-                <p className='text-white font-inter font-bold'>{Userdata?.exp} / 100xp</p>
-              </div>
-            </div>
-          </div>
-        </div>
-    
+      <GameHeader heart={heart} /> 
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
-          {/* Instruction */}
-          <div
-            className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl flex flex-col gap-5 text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]
-        [&::-webkit-scrollbar]:w-2
-        [&::-webkit-scrollbar-track]:rounded-full
-      [&::-webkit-scrollbar-track]:bg-gray-100  
-        [&::-webkit-scrollbar-thumb]:rounded-full
-      dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-            {levelData && lessonGamemode ? (
-              <>
-                <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-                <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">
-                  {lessonGamemode.topic}
-                </p>
-                <div className="mt-4 p-4 bg-[#25293B] rounded-2xl flex flex-col gap-3">
-                  <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">
-                    Instruction
-                  </h3>
-                  <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">
-                    {lessonGamemode.instruction}
-                  </p>
-                  <p className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {formattedCode}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
-          {/* Code Editor */}
-          <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-            <CodeMirror
-              value={code}
-              onChange={(val) => setCode(val)}
-              height="640px"
-              width="600px"
-              extensions={[languageMap[subject] || html()]}
-              theme={tokyoNight}/>
-            <div className="flex justify-around w-full">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05, background: "#7e22ce" }}
-                transition={{ bounceDamping: 100 }}
-                onClick={runCode}
-                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-                RUN
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05, background: "#7e22ce" }}
-                transition={{ bounceDamping: 100 }}
-                className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-                EVALUATE
-              </motion.button>
-            </div>
-          </div>
-          {/* Output */}
-          <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-            {hasRunCode ? (
-              <iframe
-                ref={iFrame}
-                title="output"
-                className="w-full h-full rounded-xl"
-                sandbox="allow-scripts allow-same-origin"/>
-            ) : (
-              <div className="w-full h-full flex items-center flex-col">
-                <Lottie
-                  animationData={Animation}
-                  loop={true}
-                  className="w-[70%] h-[70%]"/>
-                <p className="text-[0.8rem]">
-                  YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-                </p>
-              </div>
-            )}
-          </div>
+        {/* Instruction */}
+      <InstructionPanel/>
+        {/* Code Editor */}
+      <Html_TE submitAttempt={submitAttempt}/>
         </div>
         {/* Footer */}
-        <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white">
-          <div className="flex items-center gap-3">
-            <MdDensityMedium className="text-2xl" />
-            <div>
-              <p>
-                {levelData
-                  ? `${levelData.order}. ${levelData.title}`
-                  : "Loading..."}
-              </p>
-              <p className="text-[#58D28F]">
-                {levelData ? `${levelData.expReward}xp` : ""}
-              </p>
-            </div>
-          </div>
-          <div className="w-[10%]">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              onClick={() =>
-                goToNextGamemode({subject,lessonId,levelId,topicId,gamemodeId,navigate,
-                  // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
-                  onComplete: () => setLevelComplete(true),
-                })
-              }
-              className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
-              Next
-            </motion.button>
-          </div>
-          <div>
-            <p className="text-xl">
-              {Userdata ? `${Userdata.coins} Coins` : "Loading..."}
-            </p>
-          </div>
-        </div>
-      </div>
+      <GameFooter/>
+    </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
       <AnimatePresence>
         {showPopup ? (
           <GameMode_Instruction_PopUp
             title="Hey Dev!!"
             message={`Welcome to ${type} — a fast-paced challenge where you’ll write and run code before time runs out! . 
-                      Your mission:  
-                      🧩 Read the task  
-                      💻 Write your code  
-                      🚀 Run it before the timer hits zero!`}
+                Your mission:  
+                🧩 Read the task  
+                💻 Write your code  
+                🚀 Run it before the timer hits zero!`}
             onClose={() => setShowPopup(false)}
             buttonText="Start Challenge"/>) : null}
       </AnimatePresence>
@@ -402,18 +211,13 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
         {levelComplete && (
           <LevelCompleted_PopUp
           heartsRemaining={heart}
-          setLevelComplete={setLevelComplete}
-          />
-)}  
+          setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>
       {/*GameOver PopUp (this popup when Life = 0)*/}
       <AnimatePresence>
 
       </AnimatePresence>
-
-
-      </div>
-    </>
+  </>
     
 ) : 
     /*DATABASE TAB*/
@@ -448,8 +252,7 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
       [&::-webkit-scrollbar-track]:bg-gray-100  
         [&::-webkit-scrollbar-thumb]:rounded-full
       dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
-          >
+      dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             {levelData && lessonGamemode ? (
               <>
                 <h2 className="text-[2rem] font-bold text-[#E35460] font-exo text-shadow-lg text-shadow-black">

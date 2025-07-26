@@ -10,11 +10,14 @@ import LockAnimation from '../assets/Lottie/LockItem.json'
 import {motion} from "framer-motion"
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
+import useUserProgress from "../components/Custom Hooks/useUserProgress";
 
 function CssLessons() {
     // Level Fetch (Custom Hooks)
     const { data, isLoading } = useLevelsData("Css");
-
+    // User Progress
+    const {userProgress} = useUserProgress("Css");
+    
     const navigate = useNavigate();
     const [showLockedModal, setShowLockedModal] = useState(false);
 
@@ -84,20 +87,22 @@ function CssLessons() {
                   initial = "hidden"
                   animate="show"
                   className="flex flex-col gap-4">
-                    {lesson.levels.map((level) => (
+                    {lesson.levels.map((level) => {
+            const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+                      return(
                       <motion.div
-                      variants={{hidden:{opacity:0, y:100}, show:{opacity: level.status ? 1 : 0.3, y:0 }}}
-                      key={level.id||  "sad"} 
+                      variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.3, y:0 }}}
+                      key={level.id} 
                       whileHover={{scale:1.02}}
                       className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
-                    ${level.status === false
+                    ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
                         onClick={async () => {
-                          if (!level.status) {
+                          if (!isUnlocked) {
                             setShowLockedModal(true);// show the modal
                             return;}
-                          if (level.status) {
+                          if (isUnlocked) {
                             const user = auth.currentUser;
                             if (user) {
                               const userRef = doc(db, "Users", user.uid);
@@ -108,18 +113,20 @@ function CssLessons() {
                                   levelId: level.id,
                                 },
                               });
-                            }const firstTopic = level.topics?.[0]; //  get the first topic if it exists
-                            navigate(
-                              `/Main/Lessons/Css/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`);
+                            }const firstTopic = level.topics?.[0];
+                             //  get the first topic if it exists
+                            navigate(`/Main/Lessons/Css/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`);
                           }
-                        }}>
+                        }}> 
                         <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center"><span className="pb-4">{level.symbol}</span></div>
                         <div className="p-4 text-white font-exo">
                           <p className="text-[1.4rem]">{level.title}</p>
                           <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                         </div>
                       </motion.div>
-                    ))}
+                      )
+}
+)}
                   </motion.div >
                 </div>
               ))}
