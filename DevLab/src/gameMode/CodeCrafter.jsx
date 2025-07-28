@@ -1,406 +1,51 @@
 // Utils / Custom Hooks
-import { useEffect, useState, useRef } from "react";
-import { html as beautifyHTML, css as beautifyCSS, js as beautifyJS} from 'js-beautify';
-
-import useLevelBar from "../components/Custom Hooks/useLevelBar";
-import useUserDetails from "../components/Custom Hooks/useUserDetails";
+import { useState } from "react";
 // Navigation
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { goToNextGamemode } from "./GameModes_Utils/Util_Navigation";
+import { useParams} from "react-router-dom";
 // PopUps
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
 // for Animation / Icons
-import Lottie from "lottie-react";
-import Animation from "../assets/Lottie/OutputLottie.json";
-import { AnimatePresence, motion } from "framer-motion";
-import { LuHeart } from "react-icons/lu";
-import { MdArrowBackIos, MdDensityMedium } from "react-icons/md";
-// For the Text Editor
-import CodeMirror from "@uiw/react-codemirror";
-import { html } from "@codemirror/lang-html";
-import { css } from "@codemirror/lang-css";
-import { javascript } from "@codemirror/lang-javascript";
-import { sql } from "@codemirror/lang-sql";
-import initSqlJs from "sql.js";
-import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
-// Firebase (Database)
-import { db, auth } from "../Firebase/Firebase";
-import { doc, getDoc} from "firebase/firestore";
+import {AnimatePresence} from "framer-motion";
+// Components
+import GameHeader from "./GameModes_Components/GameHeader";
+import GameFooter from "./GameModes_Components/GameFooter";
+import InstructionPanel from "./GameModes_Components/InstructionPanel";
+import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE";
+import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
+import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
+
 
 function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
 
   const type = "Code Crafter"
   // Navigate
   const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
-  const navigate = useNavigate();
-  // Custom Hooks  const {animatedExp} = useLevelBar();
-  const {Userdata, isLoading } = useUserDetails();  
-  const {animatedExp} = useLevelBar();
-  // CodeCrafter Data
-  const [levelData, setLevelData] = useState(null);
-  const [lessonGamemode, setLessonGamemode] = useState(null);
-  // Code Mirror input/output
-  const [code, setCode] = useState("");
-  const iFrame = useRef(null);
-  const dbRef = useRef(null);
-  const [outputHtml, setOutputHtml] = useState("");
-  const [tablesHtml, setTablesHtml] = useState("");
   //Pop Ups
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
-  // Output Panel (Lottie)
-  const [hasRunQuery, setHasRunQuery] = useState(false);
-  const [hasRunCode, setRunCode] = useState(false);
-
-  const languageMap = {
-    Html: html(),
-    Css: css(),
-    JavaScript: javascript(),
-    DataBase: sql(),
-  };
 
 
-  // Getting data CodeCrafter Data
-  useEffect(() => {
-    const fetchLevel = async () => {
-      const docRef = doc(db, subject, lessonId, "Levels", levelId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) setLevelData(docSnap.data());
 
-      const gamemodeRef = doc(db,subject,lessonId,"Levels",levelId,"Topics",topicId,"Gamemodes",gamemodeId);
-      const gamemodeSnap = await getDoc(gamemodeRef);
-      if (gamemodeSnap.exists()) setLessonGamemode(gamemodeSnap.data());
-    };
-    fetchLevel();
-  }, [subject, lessonId, levelId, topicId]);
-  //
-  // Data Base (Subject)
-  useEffect(() => {
-    if (subject === "DataBase") {
-      initSqlJs({
-        locateFile: (file) =>
-          `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/${file}`,
-      }).then((SQL) => {
-        const db = new SQL.Database();
-        db.run(`
-        CREATE TABLE users (id INTEGER, name TEXT);
-        CREATE TABLE orders (id INTEGER, user_id INTEGER, item TEXT);
 
-        INSERT INTO users VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie')
-                                ,(4, 'Jhon'), (5, 'Sahur'), (6, 'Dongskie')
-                                ,(7, 'Barlo'), (8, 'Mirana'), (9, 'Meeps');
-        INSERT INTO orders VALUES (1, 1, 'Laptop'), (2, 2, 'Phone'), (3, 1, 'Tablet')
-                                , (4, 1, 'Shabu'), (5, 2, 'Dildo'), (6, 1, 'Mouse')
-                                , (7, 1, 'Laptop'), (8, 2, 'Phone'), (9, 1, 'Tablet');`);
-        dbRef.current = db;
-        renderAllTables();
-      });
-    }
-  }, [subject]);
-  // Display Table for Database Subj
-  const renderAllTables = () => {
-    if (!dbRef.current) return;
-    try {
-      const tables = dbRef.current.exec(
-        "SELECT name FROM sqlite_master WHERE type='table';"
-      );
-      if (!tables.length) return;
-      let html = "";
-      for (const table of tables[0].values) {
-        const tableName = table[0];
-        const result = dbRef.current.exec(`SELECT * FROM ${tableName}`);
-        if (result.length) {
-          const { columns, values } = result[0];
-          html += `<div class='mb-6 '><h3 class='text-lg font-semibold mb-2 '>${tableName}</h3>`;
-          html += `<div class="overflow-auto ">
-            <table class="table-auto border-collapse border border-gray-400 bg-[#F8F3FF] w-full text-sm">
-            <thead>
-                <tr class="bg-[#F8F3FF]">
-                ${columns
-                  .map((col) => `<th class="border px-4 py-2">${col}</th>`)
-                  .join("")}
-                </tr>
-            </thead>
-            <tbody>
-                ${values
-                  .map(
-                    (row) => `
-                <tr>${row
-                  .map((cell) => `<td class="border px-4 py-1">${cell}</td>`)
-                  .join("")}</tr>
-                `
-                  )
-                  .join("")}
-            </tbody>
-            </table>
-        </div></div>`;
-        }
-      }
-      setTablesHtml(html);
-    } catch (err) {
-      console.error("Error displaying tables:", err);
-    }
-  };
-  // Run Code (Dynammic)
-  const runCode = () => {
-    if (subject === "DataBase") {
-      try {
-        setHasRunQuery(true);
-        const res = dbRef.current.exec(query);
-        if (res.length === 0) {
-          setOutputHtml("Query executed successfully. No results.");
-          renderAllTables();
-          return;
-        }
-        const { columns, values } = res[0];
-        const table = `
-        <div class="overflow-auto ">
-        <table class="table-auto border-collapse border border-gray-400 w-full text-sm ">
-            <thead>
-            <tr class="bg-[#F8F3FF] p-3">   
-                ${columns
-                  .map((col) => `<th class="border px-4 py-2">${col}</th>`)
-                  .join("")}
-            </tr>
-            </thead>
-            <tbody>
-            ${values
-              .map(
-                (row) => `
-                <tr>${row
-                  .map((cell) => `<td class="border px-4 py-1">${cell}</td>`)
-                  .join("")}</tr>
-            `
-              )
-              .join("")}
-            </tbody>
-        </table>
-        </div>`;
-        setOutputHtml(table);
-        renderAllTables();
-      } catch (err) {
-        setOutputHtml(
-          `<span class="text-red-500 font-medium">${err.message}</span>`
-        );
-      }
-    } else {
-      // Naka Auto Bawas lang (Wala pa kasi pang check)
-      submitAttempt(false);
-      setRunCode(true);
-        setTimeout(() => {
-        const fullCode = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-        <style>${subject === "Css" ? code : ""}</style>
-        </head>
-        <body>${
-          subject === "Html" || subject === "JavaScript-FrontEnd" ? code : ""
-        }
-        <script>${subject === "JavaScript-FrontEnd" ? code : ""}</script>
-        </body>
-        </html>`;
-      const doc =
-        iFrame.current.contentDocument || iFrame.current.contentWindow.document;
-      doc.open();
-      doc.write(fullCode);
-      doc.close();
-        }, 0);
-    }
-  };
-  // Format the Code to Display
-  const [formattedCode, setFormattedCode] = useState("");
-  useEffect(() => {
-    if (!lessonGamemode || !subject) return;
-    const rawCode = lessonGamemode?.preCode || "";
-    switch (subject) {
-      case "Html":
-        setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
-        break;
-      case "Css":
-        setFormattedCode(beautifyCSS(rawCode, { indent_size: 2 }));
-        break;
-      case "JavaScript":
-        setFormattedCode(beautifyJS(rawCode, { indent_size: 2 }));
-        break;
-      default:
-        setFormattedCode(rawCode);
-    }
-  }, [lessonGamemode, subject]);
 
-  return subject !== "DataBase" ? (
+  return subject !== "Database" ? (
 <>
     <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between h-[10%] items-center p-3">
-          <div className="flex items-center p-3 w-[12%]">
-            <Link to="/Main" className="text-[3rem] text-white">
-              <MdArrowBackIos />
-            </Link>
-            <h1 className="text-[2.5rem] font-exo font-bold text-white">
-              DEVLAB
-            </h1>
-          </div>
-      <div className="flex gap-2 mb-4 w-[12%]">
-        {[...Array(3)].map((_, i) => (
-          <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
-            <LuHeart />
-          </span>
-        ))}
-      </div>
-          <div className="w-[12%] h-[90%] flex items-center gap-2">
-            <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
-            <div className=" w-[100%] self-end h-[70%]">
-              {/*Progress Bar*/}
-              <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
-                <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
-              </div>
-              <div className=" flex justify-between"> 
-                <p className="text-white font-inter font-bold">Lvl {Userdata?.userLevel}</p>
-                <p className='text-white font-inter font-bold'>{Userdata?.exp} / 100xp</p>
-              </div>
-            </div>
-          </div>
-        </div>
+          <GameHeader heart={heart}/>
 
       {/* Content */}
       <div className="h-[83%] flex justify-around items-center p-4">
         {/* Instruction */}
-        <div
-          className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5
-        [&::-webkit-scrollbar]:w-2
-        [&::-webkit-scrollbar-track]:rounded-full
-        [&::-webkit-scrollbar-track]:bg-gray-100  
-        [&::-webkit-scrollbar-thumb]:rounded-full
-        dark:[&::-webkit-scrollbar-track]:bg-[#393F59]    
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-          {levelData && lessonGamemode ? (
-            <>
-              {subject === "Html" && (
-                <h2 className="text-[2rem] text-[#FF5733] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              {subject === "Css" && (
-                <h2 className="text-[2rem] text-[#1E90FF] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              {subject === "DataBase" && (
-                <h2 className="text-[2rem] text-[#4CAF50] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              {subject === "JavaScript " && (
-                <h2 className="text-[2rem] text-[#F7DF1E] font-bold text-shadow-lg text-shadow-black">
-                  {levelData.order}. {lessonGamemode.title}
-                </h2>
-              )}
-              <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem]">
-                {lessonGamemode.topic}
-              </p>
-              <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
-                <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
-                  Instruction
-                </h3>
-                <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">{lessonGamemode.instruction}</p>
-                <pre className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                  {formattedCode}
-                </pre>
-              </div>
-            </>
-          ) : (
-            <p>Loading...</p>
-          )}
-        </div>
+          <InstructionPanel/>
 
         {/* Code Editor */}
-        <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          <CodeMirror
-            value={code}
-            onChange={(val) => setCode(val)}
-            height="640px"
-            width="600px"
-            extensions={[languageMap[subject] || html()]}
-            theme={tokyoNight}
-          />
-          <div className="flex justify-around w-full">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              onClick={runCode}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-              RUN
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            >
-              EVALUATE
-            </motion.button>
-          </div>
+          {subject === "Html" && ( <Html_TE submitAttempt={submitAttempt}/>)}
+          {subject === "Css" && ( <Css_TE/>)}
         </div>
-
-        {/* Output */}
-        <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          {hasRunCode ? (
-            <iframe
-              ref={iFrame}
-              title="output"
-              className="w-full h-full rounded-xl"
-              sandbox="allow-scripts allow-same-origin"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center flex-col">
-              <Lottie
-                animationData={Animation}
-                loop={true}
-                className="w-[70%] h-[70%]"/>
-              <p className="text-[0.8rem]">
-                YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
       {/* Footer */}
-      <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white">
-        <div className="flex items-center gap-3">
-          <MdDensityMedium className="text-2xl" />
-          <div>
-            <p>
-              {levelData
-                ? `${levelData.order}. ${levelData.title}`
-                : "Loading..."}
-            </p>
-            <p className="text-[#58D28F]">
-              {levelData ? `${levelData.expReward}xp` : ""}
-            </p>
-          </div>
-        </div>
-        <div className="w-[10%]">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05, background: "#7e22ce" }}
-            transition={{ bounceDamping: 100 }}
-            onClick={() =>
-              goToNextGamemode({subject,lessonId,levelId,topicId,gamemodeId,navigate,
-              // THis OnComplete is for when it clicked and no more game modes it will pop up Congratualate (Wala pang validationg kung tama mga pinag cocode nung user)
-            onComplete: () => setLevelComplete(true), })}
-            className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
-            Next
-          </motion.button>
-        </div>
-        <div>
-          <p className="text-xl">
-            {Userdata ? `${Userdata.coins} Coins` : "Loading..."}
-          </p>
-        </div>
-      </div>
+        <GameFooter  setLevelComplete={setLevelComplete} />
     </div>
     {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>
@@ -432,125 +77,20 @@ function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
         /*DATABASE TAB*/
           /*DATABASE TAB*/
             /*DATABASE TAB*/  
-  
-  
   (
     <>
     <div className="h-screen bg-[#0D1117] flex flex-col">
       {/*Header*/}
-      <div className=" border-white flex justify-between h-[10%] p-3">
-        <div className=" flex items-center p-3">
-          <Link to={"/Main"} className="text-[3rem] text-white">
-            <MdArrowBackIos />
-          </Link>
-          <h1 className="text-[2.5rem] font-exo font-bold text-white">
-            DEVLAB
-          </h1>
-        </div>
-        <div>
-          <div>IMG</div>
-        </div>
-      </div>
+        <GameHeader heart={heart}/>
       {/*Contents*/}
       <div className="h-[83%] flex justify-around items-center p-4">
         {/*Instruction*/}
-        <div className="h-[95%] w-[32%] rounded-2xl bg-[#393F59]  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          {levelData ? (
-            <div className="p-8 text-white">
-              <h2 className="text-2xl font-bold mb-2 font-exo text-[2.5rem] text-shadow-lg text-shadow-black ">
-                {levelData.order}. {levelData.title}
-              </h2>
-              <p className="w-[90%]">{levelData.instruction}</p>
-            </div>
-          ) : (
-            <p>Loading...</p>
-          )}
-        </div>
+          <InstructionPanel/>
         {/*Coding Panel*/}
-        <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex items-center justify-center flex-col p- shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          <CodeMirror
-            className="text-xl "
-            value={code}
-            height="650px"
-            width="604px"
-            extensions={[sql()]}
-            theme={tokyoNight}
-            onChange={(value) => setQuery(value)}
-          />
-          <div className="w-[100%] flex justify-around">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ bounceDamping: 100 }}
-              onClick={runCode}
-              className="bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[30%] font-exo font-bold p-4 "
-            >
-              RUN
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ bounceDamping: 100 }}
-              className=" bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[30%] font-exo font-bold p-4 "
-            >
-              EVALUATE
-            </motion.button>
-          </div>
-        </div>
-        <div className="h-[100%] w-[30%] p-4 flex flex-col justify-center gap-7">
-          {/*Table*/}
-          <div className="border-amber-50 w-[100%] h-[45%] border overflow-scroll overflow-x-hidden rounded-3xl p-3 bg-[#F8F3FF]">
-            <div
-              dangerouslySetInnerHTML={{ __html: tablesHtml }}
-              className="text-black font-exo"
-            ></div>
-          </div>
-          {/*OUTPUT TABLEE!!!*/}
-          <div className="w-[100%] h-[45%]">
-            {hasRunQuery ? (
-              <div
-                className="text-2xl font-exo w-full h-full overflow-auto text-black  bg-[#F8F3FF] rounded-3xl p-3 "
-                dangerouslySetInnerHTML={{ __html: outputHtml }}
-              ></div>
-            ) : (
-              <div className="w-full h-full flex items-center flex-col justify-center bg-[#F8F3FF] rounded-3xl">
-                <Lottie
-                  animationData={Animation}
-                  loop={true}
-                  className="w-[70%] h-[70%]"
-                />
-                <p className="text-[0.8rem]">
-                  YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+          <Database_TE/>
       </div>
-
       {/*Footer*/}
-      <div className=" border-2 border-t-white h-[7%] w-[100%] flex justify-between p-4 items-center">
-        <div className="flex items-center gap-4">
-          <MdDensityMedium className="text-[2.3rem] text-white" />
-          <div className="font-exo font-bold">
-            <p className="text-white ">
-              {" "}
-              {levelData
-                ? `${levelData.order}. ${levelData.title}`
-                : "Loading..."}
-            </p>
-            <p className="text-[#58D28F]">100xp</p>
-          </div>
-        </div>
-        <div className="w-[10%]">
-          <button className=" bg-[#9333EA] rounded-xl text-white hover:bg-purple-700 hover:cursor-pointer w-[100%] font-exo font-bold p-2 ">
-            Next
-          </button>
-        </div>
-        <div>
-          <p className="text-white font-exo text-[1.5rem]">$999</p>
-        </div>
-      </div>
+        <GameFooter/>
     </div>
     {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>

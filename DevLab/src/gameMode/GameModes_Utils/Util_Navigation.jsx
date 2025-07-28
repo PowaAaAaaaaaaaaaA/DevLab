@@ -1,7 +1,7 @@
 import { collection,getDocs } from 'firebase/firestore';
 import { db } from '../../Firebase/Firebase';
 
-export const goToNextGamemode = async({subject,lessonId,levelId,topicId,gamemodeId,navigate,onComplete}) => {
+export const goToNextGamemode = async({subject,lessonId,levelId,topicId,gamemodeId,navigate,setLevelComplete}) => {
     const gamemodeRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics', topicId, 'Gamemodes');
     const gamemodeSnap = await getDocs(gamemodeRef);
 
@@ -30,7 +30,7 @@ navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${topicId}/${nextGamem
 });
         } else {
             //  No more topics —trigger completion popup
-            onComplete(true);
+            setLevelComplete(true);
         }
     } else {
         console.warn("Gamemode not found or Lesson was the only one.");

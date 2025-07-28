@@ -9,7 +9,7 @@ import { MdDensityMedium } from "react-icons/md";
 import { motion } from "framer-motion";
 
 
-function GameFooter() {
+function GameFooter({setLevelComplete}) {
 
   const navigate = useNavigate();
 
@@ -40,7 +40,7 @@ function GameFooter() {
             whileHover={{ scale: 1.05, background: "#7e22ce" }}
             transition={{ bounceDamping: 100 }}
             onClick={() =>
-              goToNextGamemode({subject,lessonId,levelId,topicId,gamemodeId,navigate,onComplete: () => setLevelComplete(true)})
+              goToNextGamemode({subject,lessonId,levelId,topicId,gamemodeId,navigate,setLevelComplete})
             }
             className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
             Next

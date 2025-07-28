@@ -103,7 +103,7 @@ function App() {
             <Route path="Lessons/Html" element={<HtmlLessons />} />
             <Route path="Lessons/Css" element={<CssLessons />} />
             <Route path="Lessons/JavaScript" element={<JavaScriptLessons />} />
-            <Route path="Lessons/DataBase" element={<DataLessons />} />
+            <Route path="Lessons/Database" element={<DataLessons />} />
 
             <Route path="Achievements" element={<Achievements />} />
             <Route path="Shop" element={<Shop />} />

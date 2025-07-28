@@ -19,11 +19,12 @@ function HtmlLessons() {
 
   // Level Fetch (Custom Hooks)
   const { data, isLoading } = useLevelsData("Html");
+  const {userProgress} = useUserProgress("Html");
   
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
 
-  const {userProgress} = useUserProgress("Html");
+
     
 
 

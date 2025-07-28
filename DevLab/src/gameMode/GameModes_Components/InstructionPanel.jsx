@@ -1,5 +1,6 @@
 // Utils
-import { useEffect, useState } from "react";
+import { useEffect, useState,  } from "react";
+import { useParams } from "react-router-dom";
 import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
 // Hooks
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
@@ -7,11 +8,12 @@ import useGameModeData from "../../components/Custom Hooks/useGameModeData";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 
-function InstructionPanel() {
+function InstructionPanel({submitAttempt, showPopup, heart}) {
 
+  const {gamemodeId} = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
-    const [selectedOption, setSelectedOption] = useState(null);
-  // Format the Code to Display
+
+    // Format the Code to Display
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
     if (!gameModeData || !subject) return;
@@ -31,6 +33,22 @@ function InstructionPanel() {
     }
   }, [gameModeData, subject]);
 
+
+console.log(subject)
+
+
+
+  // BrainBytes Options
+  const [selectedOption, setSelectedOption] = useState(null);
+  // Code Rush Timer
+  const [timer, setTimer] = useState(null);
+useEffect(() => {
+  if (gamemodeId === "CodeRush" && gameModeData?.timer) {
+    setTimer(gameModeData.timer);
+  }
+}, [gameModeData]);
+
+
     // !! For BrainBytes (Checking Selected Answer)
   const answerCheck = () => {
       if (!selectedOption) {
@@ -43,9 +61,29 @@ function InstructionPanel() {
       if (selectedOption === gameModeData.correctAnswer) {
         console.log("Correct Answer");
       } else {
+        submitAttempt(false)
         console.log("Wrong");
       }
     };
+useEffect(() => {
+  if (gamemodeId === "CodeRush" && !showPopup) {
+    const countdown = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 100); // 
+
+    return () => clearInterval(countdown);
+  }
+}, [gamemodeId, showPopup]);
+
+// 
+useEffect(() => {
+  if (timer === 0 && gamemodeId === "CodeRush") {
+    submitAttempt(false);
+    console.log("Time's up!");
+  }
+}, [timer, gamemodeId]);
+
+
 
   return (
     <div
@@ -82,7 +120,7 @@ function InstructionPanel() {
               </h2>
             </>
           )}
-          {subject === "DataBase" && (
+          {subject === "Database" && (
             <>
               <h2
                 className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${
@@ -106,7 +144,7 @@ function InstructionPanel() {
               </h2>
             </>
           )}
-          <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem]">
+          <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] font-exo">
             {gameModeData.topic}
           </p>
           {gameModeData?.type === "BrainBytes" ? (
@@ -114,7 +152,7 @@ function InstructionPanel() {
               <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">
                 Instruction
               </h3>
-              <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] ">
+              <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] font-exo ">
                 {gameModeData.instruction}
               </p>
               {/*Mapping ng Questions*/}
@@ -155,12 +193,21 @@ function InstructionPanel() {
               <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
                 Instruction
               </h3>
-              <p className="mb-2">{gameModeData.instruction}</p>
+              <p className="mb-2 font-exo">{gameModeData.instruction}</p>
               <p className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
                 {formattedCode}
               </p>
             </div>
           )}
+          {gameModeData?.type === "CodeRush"?(
+            <div className="font-bold text-[3.2rem] w-[40%] m-auto p-3 flex flex-col justify-center items-center ">
+              <p className="font-exo text-shadow-lg text-shadow-black text-[1.5rem]">Time:</p>
+                <p className="text-[#E35460] ">
+                  {String(Math.floor(timer / 60)).padStart(2, "0")}:
+                  {String(timer % 60).padStart(2, "0")}
+                </p>
+            </div>
+          ):null}
         </>
       ) : (
         <p>Loading...</p>

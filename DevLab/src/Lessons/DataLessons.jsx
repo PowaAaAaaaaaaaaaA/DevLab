@@ -11,6 +11,7 @@ import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import { motion } from "framer-motion";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
+import useUserProgress from "../components/Custom Hooks/useUserProgress";
 
 function DataLessons() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function DataLessons() {
 
      // Level Fetch (Custom Hooks)
       const { data, isLoading } = useLevelsData("Database");
+      const {userProgress} = useUserProgress("Database");
 
 
 
@@ -63,8 +65,7 @@ function DataLessons() {
             <Lottie
               animationData={Animation}
               loop={true}
-              className="w-[60%] h-[70%] mt-[30px]"
-            />
+              className="w-[60%] h-[70%] mt-[30px]"/>
           ) : (
             <div
               className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
@@ -74,8 +75,7 @@ function DataLessons() {
         [&::-webkit-scrollbar-thumb]:rounded-full
         [&::-webkit-scrollbar-thumb]:bg-gray-300
         dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
-            >
+        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
               {data.map((lesson) => (
                 <div key={lesson.id} className="flex flex-col gap-4">
                   <h2 className="font-exo text-[3rem] font-bold text-white">
@@ -125,12 +125,12 @@ function DataLessons() {
                             }
                             const firstTopic = level.topics?.[0];
                             navigate(
-                              `/Main/Lessons/Html/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`
+                              `/Main/Lessons/Database/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`
                             );
                           }
                         }}>
-                        <div className=" text-white bg-black w-[15%] flex justify-center  text-[4rem] font-bold rounded-4xl">
-                          {level.symbol}
+                        <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center">
+                          <span className="pb-4">{level.symbol}</span>
                         </div>
                         <div className="p-4 text-white font-exo">
                           <p className="text-[1.4rem]">{level.title}</p>

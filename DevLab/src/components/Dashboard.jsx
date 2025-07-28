@@ -92,10 +92,9 @@ useEffect(() => {
         <div className='h-[40%] p-3 flex flex-col gap-5'>
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
-
           {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.lessonDocId}/${Userdata.lastOpenedLevel.levelId}`} className='h-full'>
           <div className='w-[100%] bg-[#111827] min-h-[90%] flex rounded-3xl border-black border-2 gap-4  hover:scale-102 cursor-pointer duration-500'>
-            <div className='bg-black w-[15%] h-[100%] text-white rounded-3xl flex items-center justify-center  text-[4rem] p-1'> {levelInfo.symbol}</div>
+            <div className='bg-black min-w-[14%] h-[100%] text-white rounded-3xl flex items-center justify-center  text-[4rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
             <div className='p-2'>
               <p className='font-exo text-[1.4rem] text-white font-bold'> {levelInfo.title}</p>
               <p className='font-exo text-gray-500 text-[0.8rem]'> {levelInfo.desc}</p>

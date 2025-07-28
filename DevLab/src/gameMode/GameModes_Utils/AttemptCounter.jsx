@@ -16,9 +16,10 @@ const useAttemptCounter = (initialHearts) => {
       setRoundKey(prev => prev + 1); // restart current game mode
     }
     // if remaining === 0, game over triggers automatically
-  };  const resetHearts = () => {
+  };  
+  const resetHearts = () => {
     setHearts(initialHearts);
-    setRoundKey(prev => prev + 1); // Optional rerender trigger
+    setRoundKey(prev => prev + 1); // rerender trigger
   };
 
   return {heart,roundKey,gameOver,submitAttempt,resetHearts};

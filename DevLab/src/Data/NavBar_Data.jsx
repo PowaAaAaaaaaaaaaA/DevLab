@@ -24,7 +24,7 @@ export const Navbar_Data=[
     { key: 'html', label: 'HTML', path: '/Main/Lessons/Html', icon:<IoLibraryOutline /> },
     { key: 'css', label: 'CSS', path: '/Main/Lessons/Css' , icon:<IoLibraryOutline />},
     { key: 'js', label: 'JavaScript', path: '/Main/Lessons/JavaScript', icon:<IoLibraryOutline /> },
-    { key: 'db', label: 'Database', path: '/Main/Lessons/DataBase', icon:<IoLibraryOutline /> }
+    { key: 'db', label: 'Database', path: '/Main/Lessons/Database', icon:<IoLibraryOutline /> }
     ]
     },{
         key:'achievements',

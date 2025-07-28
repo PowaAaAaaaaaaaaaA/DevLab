@@ -12,7 +12,7 @@ const GameModeRouter = () => {
 
 
   const { subject,lessonId,levelId,topicId,gamemodeId } = useParams();
-    const navigate = useNavigate(); 
+  const navigate = useNavigate(); 
 
   const { heart, roundKey, gameOver, submitAttempt,resetHearts} = useAttemptCounter(3);
   // If no Life na balik sa Lesson ng TOpic:Id
