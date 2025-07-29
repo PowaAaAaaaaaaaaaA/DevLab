@@ -18,10 +18,12 @@ function JavaScriptLessons() {
 
      // Level Fetch (Custom Hooks)
       const { data, isLoading } = useLevelsData("JavaScript");
-      const {userProgress} = useUserProgress("JavaScript");
+      const {userProgress, completedCount} = useUserProgress("JavaScript");
 
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
+  
+console.log(completedCount)
   
 
   return (

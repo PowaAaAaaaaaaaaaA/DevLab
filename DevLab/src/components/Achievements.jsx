@@ -16,7 +16,7 @@ function Achievements() {
 
       <div className='h-[65%] flex flex-col items-center gap-3'>
         <div className='bg-amber-300 w-[10%] h-[80%] rounded-[100%]'></div>
-        <p className='font-exo font-bold text-white text-shadow-lg/30'>{Userdata.username}</p>
+        <p className='font-exo font-bold text-white text-shadow-lg/30'>{Userdata?.username}</p>
         <p className='font-exo font-bold text-white tracking-wider text-shadow-lg/30 text-2xl'>HALL OF ACHIEVEMENTS</p>
       </div>
       <div className='h-[35%] w-[95%] m-auto flex items-end'>

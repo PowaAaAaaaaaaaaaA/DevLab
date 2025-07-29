@@ -10,6 +10,7 @@ import { motion } from "framer-motion"
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
+import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
 
 
@@ -19,16 +20,18 @@ function HtmlLessons() {
 
   // Level Fetch (Custom Hooks)
   const { data, isLoading } = useLevelsData("Html");
-  const {userProgress} = useUserProgress("Html");
+  const {userProgress, completedCount} = useUserProgress("Html");
   
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
+
+  const {animatedBar} = useSubjProgressBar("Html")
 
 
     
 
 
-
+console.log(completedCount)
 
   return (
     <>
@@ -42,7 +45,7 @@ function HtmlLessons() {
               </div>
               <div>
                 <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-                  <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}>
+                  <div className="h-4 rounded-full dark:bg-[#2CB67D]"  style={{ width: `${animatedBar}%` }}>
                   </div>
                 </div>
               </div>
@@ -75,8 +78,9 @@ function HtmlLessons() {
               initial = "hidden"
               animate="show"
           className="flex flex-col gap-4">
-            {lesson.levels.map((level) => {
+            {lesson.levels.map((level,index) => {
 const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+console.log (isUnlocked)
               return(             
               <motion.div key={level.id}
               variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.3, y:0 }}}
@@ -89,7 +93,7 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                 if (!isUnlocked) {
                   setShowLockedModal(true);// show the modal
                   return;}
-              // This button will navigate to "LevelPage" and Update the "Jump Back in" sa Dashboard
+              // This button will navigate to "LevelPage" and Update the "Jump Back in"  sa Dashboard
               if (isUnlocked) {
                 const user = auth.currentUser;
                 if(user) {

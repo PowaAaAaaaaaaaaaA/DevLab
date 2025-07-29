@@ -16,11 +16,12 @@ function CssLessons() {
     // Level Fetch (Custom Hooks)
     const { data, isLoading } = useLevelsData("Css");
     // User Progress
-    const {userProgress} = useUserProgress("Css");
+    const {userProgress, completedCount} = useUserProgress("Css");
     
     const navigate = useNavigate();
     const [showLockedModal, setShowLockedModal] = useState(false);
 
+console.log(completedCount)
 
   return (
     <>
