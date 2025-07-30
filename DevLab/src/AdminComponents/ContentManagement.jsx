@@ -187,7 +187,7 @@ const fetchLessons = async (subject) => {
         onClick={closePopup}>
             <div 
             onClick={(e)=> e.stopPropagation()}
-            className={`w-[40%] h-[55%] transition-all  duration-300 ${popupVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`}>
+            className={`w-[40%] h-[60%] transition-all  duration-300 ${popupVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`}>
               <AddContent subject={activeTab} closePopup={() => setShowPopup(false)}/>
             </div>
         </div>

@@ -1,9 +1,7 @@
+// Hook for FetchingLevels
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../Firebase/Firebase";
 import { useQuery } from "@tanstack/react-query";
-
-
-// Hook for FetchingLevels
 
 export default function useLevelsData(subject) {
   const fetchData = async () => {

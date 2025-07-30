@@ -20,18 +20,13 @@ function HtmlLessons() {
 
   // Level Fetch (Custom Hooks)
   const { data, isLoading } = useLevelsData("Html");
-  const {userProgress, completedCount} = useUserProgress("Html");
-  
+  // Unlocked and Locked Levels
+  const {userProgress} = useUserProgress("Html");
+  // Subject Levels Progress Bar
+  const {animatedBar} = useSubjProgressBar("Html")
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
 
-  const {animatedBar} = useSubjProgressBar("Html")
-
-
-    
-
-
-console.log(completedCount)
 
   return (
     <>
@@ -78,9 +73,8 @@ console.log(completedCount)
               initial = "hidden"
               animate="show"
           className="flex flex-col gap-4">
-            {lesson.levels.map((level,index) => {
+            {lesson.levels.map((level) => {
 const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
-console.log (isUnlocked)
               return(             
               <motion.div key={level.id}
               variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.3, y:0 }}}

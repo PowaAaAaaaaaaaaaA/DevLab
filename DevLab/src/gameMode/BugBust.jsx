@@ -45,7 +45,7 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
           {subject === "Css" && ( <Css_TE/>)} 
         </div>
         {/* Footer */}
-      <GameFooter/>
+      <GameFooter setLevelComplete={setLevelComplete}/>
     </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
       <AnimatePresence>
@@ -92,7 +92,7 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
             <Database_TE/>
         </div>
         {/*Footer*/}
-          <GameFooter/>
+          <GameFooter setLevelComplete={setLevelComplete}/>
       </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>

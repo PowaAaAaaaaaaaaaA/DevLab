@@ -12,14 +12,17 @@ import { motion } from "framer-motion";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
+import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
 function DataLessons() {
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
 
-     // Level Fetch (Custom Hooks)
-      const { data, isLoading } = useLevelsData("Database");
-      const {userProgress} = useUserProgress("Database");
+  // Level Fetch (Custom Hooks)
+  const { data, isLoading } = useLevelsData("Database");
+  const {userProgress} = useUserProgress("Database");
+  // Subject Levels Progress Bar
+  const {animatedBar} = useSubjProgressBar("Database")
 
 
 
@@ -48,7 +51,7 @@ function DataLessons() {
               <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
                 <div
                   className="h-4 rounded-full dark:bg-[#2CB67D]"
-                  style={{ width: "56%" }}
+                  style={{ width: `${animatedBar}%` }}
                 ></div>
               </div>
             </div>
@@ -96,22 +99,24 @@ function DataLessons() {
                     initial="hidden"
                     animate="show"
                     className="flex flex-col gap-4">
-                    {lesson.levels.map((level) => (
-                      <motion.div
+                    {lesson.levels.map((level) => {
+                  const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+                    return(
+                    <motion.div
                         variants={{
                           hidden: { opacity: 0, y: 100 },
-                          show: { opacity: level.status ? 1 : 0.3, y: 0 },}}
+                          show: { opacity: isUnlocked ? 1 : 0.3, y: 0 },}}
                           key={level.id}
                           whileHover={{scale:1.02}}
-              className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
-                    ${level.status === false
+                          className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
+                    ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
                         onClick={async () => {
-                          if (!level.status) {
+                          if (isUnlocked) {
                             setShowLockedModal(true);// show the modal
                             return;}
-                          if (level.status) {
+                          if (isUnlocked) {
                             const user = auth.currentUser;
                             if (user) {
                               const userRef = doc(db, "Users", user.uid);
@@ -137,7 +142,7 @@ function DataLessons() {
                           <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                         </div>
                       </motion.div>
-                    ))}
+                      )})}
                   </motion.div>
                 </div>
               ))}

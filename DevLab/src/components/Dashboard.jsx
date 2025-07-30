@@ -53,7 +53,7 @@ useEffect(() => {
       <div className='h-[80%] w-[100%] flex flex-col p-2'>
         <p className='text-white font-inter font-bold'>Good to see you!</p>
         <h1 className='text-[5.6rem] text-white font-inter font-bold'>{Userdata.username}</h1>
-        <p className='text-white font-inter font-bold mb-0.5'>Level {Userdata.level}</p>
+        <p className='text-white font-inter font-bold mb-0.5'>Level {Userdata.userLevel}</p>
             {/*Progress Bar*/}
         <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700 ">
           <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
@@ -100,7 +100,7 @@ useEffect(() => {
               <p className='font-exo text-gray-500 text-[0.8rem]'> {levelInfo.desc}</p>
             </div>
           </div>
-          </Link>):(   <div className='w-[100%] bg-[#111827] min-h-[60%] rounded-3xl border-black border-2 p-5'>
+          </Link>):(<div className='w-[100%] bg-[#111827] min-h-[60%] rounded-3xl border-black border-2 p-5'>
             
 <div role="status" className="max-w-sm animate-pulse  min-h-[60%]">
     <div className ="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>

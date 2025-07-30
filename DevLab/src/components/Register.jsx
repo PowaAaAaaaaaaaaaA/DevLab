@@ -46,6 +46,7 @@ if (user) {
       doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1"),
       {
         status: true,
+        rewardClaimed: false
       }
     );
   }

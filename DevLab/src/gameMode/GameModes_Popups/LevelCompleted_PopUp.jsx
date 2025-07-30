@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db,auth} from "../../Firebase/Firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+
+import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete}) {
@@ -11,6 +13,7 @@ function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelCom
   const navigate = useNavigate();
   const [LevelData , setLevelData] = useState("");
 
+  const { refetch } = useUserDetails();
 useEffect(()=>{
   const fetchLevelData = async ()=>{
     const fetchLevelData = doc (db,subj,lessonId,"Levels",LevelId);
@@ -22,35 +25,87 @@ useEffect(()=>{
   fetchLevelData();
 },[subj,lessonId,LevelId])
 
+// Exp and Coins
+  const addExp = async (userId,  Exp, coinsAmmount) => {
+  const userRef = doc(db, 'Users', userId);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    const userData = userSnap.data();
+    let newExp = (userData.exp || 0) + (Exp || 0);
+    let newLevel = userData.level || 1;
+    let newCoins = (userData.coins || 0) + (coinsAmmount || 0);
+
+
+    if (newExp >= 100) {
+      const levelsGained = Math.floor(newExp / 100);
+      newLevel += levelsGained;
+      newExp = newExp % 100;
+    }
+    // Update the Firebase (Coins and EXP)
+    await updateDoc(userRef, {
+      exp: newExp || userData.exp,
+      userLevel: newLevel ||userData.userLevel ,
+      coins: newCoins || userData.coins
+    });
+  }
+};
+const RewardAdd = async () => {
+  const user = auth.currentUser;
+
+
+  const userLevelRef = doc(db, "Users", user.uid, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
+  const levelSnap = await getDoc(userLevelRef);
+
+  if (levelSnap.exists()) {
+    const levelData = levelSnap.data();
+
+    if (levelData.rewardClaimed) {
+      console.log("Reward already claimed.");
+      return;
+    }
+    console.log(levelData.rewardClaimed)
+
+    const expReward = LevelData.expReward;
+    const coinsReward = LevelData.coinsReward;
+
+    await addExp(user.uid, expReward, coinsReward);
+
+    // Mark reward as claimed
+    await updateDoc(userLevelRef, {
+      rewardClaimed: true,
+    });
+
+    console.log("Reward given and marked as claimed.");
+  }
+};
 
 
 
-
-const unlockNextLevel = async () => {
+const unlockNextLevel = async (goContinue) => {
       const userId = auth.currentUser.uid;
   try {
     const currentLevelNum = parseInt(LevelId.replace("Level", ""));
     const nextLevelId = `Level${currentLevelNum + 1}`;
 
     const userLevelRef = doc(db,"Users",userId,"Progress",subj,"Lessons",lessonId,"Levels",LevelId);
-
-    // Mark current level as completed
-    await setDoc(userLevelRef, { status: true }, { merge: true });
-
+    // Mark current level as completed with rewardClaimed = false
+    await setDoc(userLevelRef, { 
+      status: true, 
+    }, { merge: true });
     // Unlock the next level
     const nextLevelRef = doc(db,"Users",userId,"Progress",subj,"Lessons",lessonId,"Levels",nextLevelId);
 
-    await setDoc(nextLevelRef, { status: true }, { merge: true });
+    await setDoc(nextLevelRef, { status: true,rewardClaimed: false }, { merge: true });
     console.log("Level completed and next level unlocked.");
 
-
-
-    navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Topic1/Lesson`);
+    if (goContinue){
+      navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Topic1/Lesson`);
+    }
   } catch (error) {
     console.error("Error unlocking next level:", error);
   }
 };
-
 
 
 
@@ -87,8 +142,11 @@ const unlockNextLevel = async () => {
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
           onClick={() => {
+            unlockNextLevel(false);
             setLevelComplete(false);
-            navigate("/Main"); // or navigate to next level, summary, or dashboard
+            RewardAdd();
+            refetch();
+            navigate("/Main",{ replace: true });
           }}
           className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-70s0 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
           Back to Main
@@ -98,7 +156,9 @@ const unlockNextLevel = async () => {
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
           onClick={() => {
-            unlockNextLevel();
+          unlockNextLevel(true);
+          RewardAdd();
+          refetch();
           }}
           className="bg-[#36DB4F] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0 0 10px rgba(126, 34, 206, 0.5)] cursor-pointer "> Continue
         </motion.button>

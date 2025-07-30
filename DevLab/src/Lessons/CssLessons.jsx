@@ -11,17 +11,20 @@ import {motion} from "framer-motion"
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
+import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
+
 
 function CssLessons() {
     // Level Fetch (Custom Hooks)
     const { data, isLoading } = useLevelsData("Css");
     // User Progress
     const {userProgress, completedCount} = useUserProgress("Css");
+    // Subject Levels Progress Bar
+    const {animatedBar} = useSubjProgressBar("Css")
     
     const navigate = useNavigate();
     const [showLockedModal, setShowLockedModal] = useState(false);
 
-console.log(completedCount)
 
   return (
     <>
@@ -48,7 +51,7 @@ console.log(completedCount)
               <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
                 <div
                   className="h-4 rounded-full dark:bg-[#2CB67D]"
-                  style={{ width: "56%" }}
+                  style={{ width: `${animatedBar}%` }}
                 ></div>
               </div>
             </div>

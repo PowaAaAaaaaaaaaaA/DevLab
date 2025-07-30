@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import useUserDetails from "./useUserDetails";
 
 export default function useLevelBar() {
+  const [animatedExp, setAnimatedExp] = useState(0);
   const { Userdata, isLoading } = useUserDetails();
 
   useEffect(() => {
