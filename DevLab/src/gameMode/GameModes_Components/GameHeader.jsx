@@ -31,7 +31,7 @@ function GameHeader({heart}) {
           </div>
       )}
 
-      <div className="w-[12%] h-[90%] flex items-center gap-2">
+      <div className="w-[12%] h-[90%] flex items-center gap-2 mr-[10px]">
         <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
         <div className=" w-[100%] self-end h-[70%]">
           {/*Progress Bar*/}

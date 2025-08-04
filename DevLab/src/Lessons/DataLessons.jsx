@@ -63,7 +63,7 @@ function DataLessons() {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
-          {isLoading ? (
+          {isLoading || Object.keys(userProgress).length === 0 ? (
             /*Loading*/
             <Lottie
               animationData={Animation}
@@ -122,8 +122,8 @@ function DataLessons() {
                               const userRef = doc(db, "Users", user.uid);
                               await updateDoc(userRef, {
                                 lastOpenedLevel: {
-                                  lessonId: "Database", // since nasa Database lesson Page, Hardcoded nalang
-                                  lessonDocId: lesson.id,
+                                  subject: "Database", // since nasa Database lesson Page, Hardcoded nalang
+                                  lessonId: lesson.id,
                                   levelId: level.id,
                                 },
                               });

@@ -20,10 +20,10 @@ function GameFooter({setLevelComplete}) {
 
 
   return (
-    <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white">
-        <div className="flex items-center gap-3">
+    <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white ">
+        <div className="flex items-center gap-3 min-w-[20%]">
           <MdDensityMedium className="text-2xl" />
-          <div>
+          <div className="min-w-[100%] font-exo">
             <p>
               {levelData
                 ? `${levelData.order}. ${levelData.title}`

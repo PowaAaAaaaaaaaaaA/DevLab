@@ -141,12 +141,12 @@ const unlockNextLevel = async (goContinue) => {
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
-          onClick={() => {
-            unlockNextLevel(false);
-            setLevelComplete(false);
-            RewardAdd();
-            refetch();
-            navigate("/Main",{ replace: true });
+          onClick={async() => {
+            await refetch();
+            await unlockNextLevel(false);
+            await setLevelComplete(false);
+            await RewardAdd();
+            await navigate("/Main",{ replace: true });
           }}
           className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-70s0 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
           Back to Main

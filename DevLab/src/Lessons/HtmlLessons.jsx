@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
 import { useNavigate } from "react-router-dom"; 
@@ -7,6 +7,7 @@ import Lottie from "lottie-react";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 import LockAnimation from '../assets/Lottie/LockItem.json'
 import { motion } from "framer-motion"
+import { FaLock } from "react-icons/fa";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
@@ -26,6 +27,12 @@ function HtmlLessons() {
   const {animatedBar} = useSubjProgressBar("Html")
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
+
+  // const {status, setStatus} = useState()
+
+  
+
+
 
 
   return (
@@ -52,7 +59,7 @@ function HtmlLessons() {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
         {/*Left Panel*/}
-        {isLoading?
+        {isLoading|| Object.keys(userProgress).length === 0 ?
         /*Loading*/
       (<Lottie animationData={Animation} loop={true} className="w-[60%] h-[70%] mt-[30px]" />):
       (<div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
@@ -77,9 +84,9 @@ function HtmlLessons() {
 const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
               return(             
               <motion.div key={level.id}
-              variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.3, y:0 }}}
+              variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.4, y:0 }}}
               whileHover={{scale:1.02}}
-              className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
+              className= {`relative group w-full border flex gap-5 rounded-4xl h-[120px] 
                     ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
@@ -94,8 +101,8 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                   const userRef = doc(db, "Users", user.uid);
                     await updateDoc(userRef,{
                       lastOpenedLevel: {
-                        lessonId: "Html",    // since nasa HTML lesson Page, Hardcoded nalang   
-                        lessonDocId: lesson.id,    
+                        subject: "Html",    // since nasa HTML lesson Page, Hardcoded nalang   
+                        lessonId: lesson.id,    
                         levelId: level.id          
                     }
                     })
@@ -107,6 +114,11 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                 <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center"><span className="pb-4">{level.symbol}</span></div>
                   <div className="p-4 text-white font-exo"> 
                     <p className="text-[1.4rem]">{level.title}</p>
+    {!isUnlocked && (
+  <div className="absolute top-13 right-0 left-105 text-white">
+    <FaLock className="text-xl text-red-400" />
+  </div>
+)}
                     <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                   </div>
               </motion.div> 

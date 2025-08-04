@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs,setDoc, doc } from "firebase/firestore";
+import { collection, getDocs,setDoc, doc,deleteDoc } from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
-
+import { AnimatePresence, motion } from "framer-motion";
 import { HiArrowDownTray } from "react-icons/hi2";
-import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { GoPlus } from "react-icons/go";
+import { GoTrash } from "react-icons/go";
 import Animation from '../assets/Lottie/LoadingLessonsLottie.json'
 import Lottie from "lottie-react";
 
@@ -34,7 +35,6 @@ const closePopup = () => {
   setTimeout(() => setShowPopup(false), 100); 
 };
 // For PopUP(Adding Level/Lesson) Transition (End)
-
 const fetchLessons = async (subject) => {
   try {
     setLoading(true);
@@ -81,15 +81,13 @@ const fetchLessons = async (subject) => {
     console.error("Error fetching lessons:", error);
   }
 };
-
-
   useEffect(() => {
     if (activeTab) {
       fetchLessons(activeTab);
     }
   }, [activeTab]);
 
-
+// Adding new Topic on a Level
   const addNewTopic = async (subject, lessonId, levelId) => {
   try {
     const topicsRef = collection(db, subject, lessonId, "Levels", levelId, "Topics");
@@ -114,7 +112,36 @@ const fetchLessons = async (subject) => {
     console.error("Error adding topic:", error);
   }
 };
+// Deleting a Level
+const deleteLevel = async (subject, lessonId, levelId) => {
+  try {
+    const topicsRef = collection(db, subject, lessonId, "Levels", levelId, "Topics");
+    const topicDocs = await getDocs(topicsRef);
 
+    // Delete all topics inside this level
+    const deletePromises = topicDocs.docs.map((docSnap) =>
+      deleteDoc(doc(db, subject, lessonId, "Levels", levelId, "Topics", docSnap.id))
+    );
+    await Promise.all(deletePromises);
+
+    // Delete the level itself
+    await deleteDoc(doc(db, subject, lessonId, "Levels", levelId));
+
+    // Check if the lesson has remaining levels
+    const levelsRef = collection(db, subject, lessonId, "Levels");
+    const remainingLevels = await getDocs(levelsRef);
+
+    if (remainingLevels.empty) {
+      // No more levels, delete the lesson itself
+      await deleteDoc(doc(db, subject, lessonId));
+      console.log(`Lesson '${lessonId}' deleted because it had no more levels.`);
+    }
+    // Refresh UI
+    fetchLessons(subject);
+  } catch (error) {
+    console.error("Error deleting level:", error);
+  }
+};
 
 
   return (
@@ -172,7 +199,8 @@ const fetchLessons = async (subject) => {
                 </div>
               ))}
               </div>
-              <div className="absolute text-white bottom-5 right-5 text-2xl"><button className="hover:cursor-pointer hover:bg-gray-600 rounded p-2" onClick={() => addNewTopic(activeTab, lesson.id, level.id)}>plUS</button></div>
+              <div className="absolute text-white bottom-5 right-5 text-2xl"><button className="hover:cursor-pointer hover:bg-gray-600 rounded p-2 border-gray-500 border" onClick={() => addNewTopic(activeTab, lesson.id, level.id)}><GoPlus /></button></div>
+              <div className="absolute text-white bottom-5 right-18 text-2xl"><button className="hover:cursor-pointer hover:bg-gray-600 rounded p-2 border-gray-500 border" onClick={() =>  deleteLevel(activeTab, lesson.id, level.id)}><GoTrash /></button></div>
             </div>
           /*Lesson Card*/
             ))}

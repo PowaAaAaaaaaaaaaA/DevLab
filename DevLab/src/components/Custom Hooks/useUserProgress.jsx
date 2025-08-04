@@ -32,7 +32,6 @@ export default function useUserProgress(subject) {
     useEffect(() => {
       if (data) {
         const lessonIds = data.map((lesson) => lesson.id);
-        console.log("Lesson IDs chck:", lessonIds);
         fetchProgress(lessonIds);
       }
     }, [data]);

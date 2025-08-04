@@ -22,9 +22,9 @@ function Layout() {
   } 
 
     return (
-    <div className='flex flex-row bg-[#0D1117] w-screen h-screen overflow-hidden gap-15 items-center p-5'>
+    <div className='flex flex-row bg-[#0D1117] w-screen h-screen overflow-hidden gap-5 items-center p-4 '>
         <Navbar />
-        <div className='h-[90vh] w-[80%] bg-[#25293B] p-2 rounded-4xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
+        <div className='h-[97vh] w-[90%] bg-[#25293B] p-2 rounded-4xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
             <Outlet />
         </div>
     </div>

@@ -121,8 +121,8 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                                 const userRef = doc(db, "Users", user.uid);
                                 await updateDoc(userRef, {
                                   lastOpenedLevel: {
-                                    lessonId: "JavaScript", // since nasa JavaScript lesson Page, Hardcoded nalang
-                                    lessonDocId: lesson.id,
+                                    subject: "JavaScript", // since nasa JavaScript lesson Page, Hardcoded nalang
+                                    lessonId: lesson.id,
                                     levelId: level.id,
                                   },
                                 });

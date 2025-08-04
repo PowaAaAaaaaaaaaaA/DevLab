@@ -63,7 +63,7 @@ function CssLessons() {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
-          {isLoading ? (
+          {isLoading || Object.keys(userProgress).length === 0 ? (
             <Lottie
               animationData={Animation}
               loop={true}
@@ -112,8 +112,8 @@ function CssLessons() {
                               const userRef = doc(db, "Users", user.uid);
                               await updateDoc(userRef, {
                                 lastOpenedLevel: {
-                                  lessonId: "Css", // since nasa CSS lesson Page, Hardcoded nalang
-                                  lessonDocId: lesson.id,
+                                  subject: "Css", // since nasa CSS lesson Page, Hardcoded nalang
+                                  lessonId: lesson.id,
                                   levelId: level.id,
                                 },
                               });

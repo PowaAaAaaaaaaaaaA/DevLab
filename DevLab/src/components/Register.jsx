@@ -27,13 +27,13 @@ if (user) {
     username: username,
     age: age,
     exp: 0,
-    level: 1,
+    userLevel: 1,
     coins: 0,
     bio: "",
     isAdmin: false,
     lastOpenedLevel: {
-      lessonId: "Html",
-      lessonDocId: "Lesson1",
+      subject: "Html",
+      lessonId: "Lesson1",
       levelId: "Level1",
     },
   });

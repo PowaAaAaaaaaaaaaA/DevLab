@@ -13,7 +13,7 @@ export default function useLevelBar() {
       const target = Userdata.exp;
       const step = () => {
         if (start < target) {
-          start = Math.min(start + 0.4, target);
+          start = Math.min(start + 2, target);
           setAnimatedExp(start);
           requestAnimationFrame(step);
         } else {
