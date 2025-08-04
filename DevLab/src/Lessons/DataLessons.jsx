@@ -20,12 +20,10 @@ function DataLessons() {
 
   // Level Fetch (Custom Hooks)
   const { data, isLoading } = useLevelsData("Database");
-  const {userProgress} = useUserProgress("Database");
+
+  const {userProgress,isLoading: progressLoading } = useUserProgress("Database");
   // Subject Levels Progress Bar
   const {animatedBar} = useSubjProgressBar("Database")
-
-
-
   return (
     <>
       <div className="h-[100%]">
@@ -63,7 +61,7 @@ function DataLessons() {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
-          {isLoading || Object.keys(userProgress).length === 0 ? (
+          {isLoading || progressLoading ? (
             /*Loading*/
             <Lottie
               animationData={Animation}
@@ -101,6 +99,7 @@ function DataLessons() {
                     className="flex flex-col gap-4">
                     {lesson.levels.map((level) => {
                   const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+                  console.log("SAD")
                     return(
                     <motion.div
                         variants={{

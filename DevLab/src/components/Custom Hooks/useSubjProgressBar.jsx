@@ -48,9 +48,6 @@ export default function useSubjProgressBar(subject) {
 
     requestAnimationFrame(step);
   }, [progress]);
-
-console.log(total)
-
 return {animatedBar, rawProgress: progress };
 
 } 

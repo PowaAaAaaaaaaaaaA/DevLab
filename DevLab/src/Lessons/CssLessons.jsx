@@ -3,7 +3,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../Firebase/Firebase";
 import { useNavigate} from "react-router-dom";
 import CssImage from "../assets/Images/css-Icon-Big.png";
-import { MdOutlineLock } from "react-icons/md";
+import { FaLock } from "react-icons/fa";
 import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import LockAnimation from '../assets/Lottie/LockItem.json'
@@ -18,7 +18,7 @@ function CssLessons() {
     // Level Fetch (Custom Hooks)
     const { data, isLoading } = useLevelsData("Css");
     // User Progress
-    const {userProgress, completedCount} = useUserProgress("Css");
+    const {userProgress, isLoading: progressLoading} = useUserProgress("Css");
     // Subject Levels Progress Bar
     const {animatedBar} = useSubjProgressBar("Css")
     
@@ -63,7 +63,7 @@ function CssLessons() {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
-          {isLoading || Object.keys(userProgress).length === 0 ? (
+          {isLoading ||progressLoading ? (
             <Lottie
               animationData={Animation}
               loop={true}
@@ -125,6 +125,11 @@ function CssLessons() {
                         <div className=" text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center"><span className="pb-4">{level.symbol}</span></div>
                         <div className="p-4 text-white font-exo">
                           <p className="text-[1.4rem]">{level.title}</p>
+                              {!isUnlocked && (
+                            <div className="absolute top-9 right-0 left-105 text-white">
+                              <FaLock className="text-[3rem] text-white" />
+                            </div>
+                          )}
                           <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                         </div>
                       </motion.div>

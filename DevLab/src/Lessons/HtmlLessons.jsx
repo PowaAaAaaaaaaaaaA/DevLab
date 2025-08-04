@@ -21,8 +21,9 @@ function HtmlLessons() {
 
   // Level Fetch (Custom Hooks)
   const { data, isLoading } = useLevelsData("Html");
+  console.log(isLoading)
   // Unlocked and Locked Levels
-  const {userProgress} = useUserProgress("Html");
+  const {userProgress,isLoading: progressLoading} = useUserProgress("Html");
   // Subject Levels Progress Bar
   const {animatedBar} = useSubjProgressBar("Html")
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ function HtmlLessons() {
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
         {/*Left Panel*/}
-        {isLoading|| Object.keys(userProgress).length === 0 ?
+        {isLoading || progressLoading ?
         /*Loading*/
       (<Lottie animationData={Animation} loop={true} className="w-[60%] h-[70%] mt-[30px]" />):
       (<div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden
@@ -115,8 +116,8 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                   <div className="p-4 text-white font-exo"> 
                     <p className="text-[1.4rem]">{level.title}</p>
     {!isUnlocked && (
-  <div className="absolute top-13 right-0 left-105 text-white">
-    <FaLock className="text-xl text-red-400" />
+  <div className="absolute top-10 right-0 left-105 text-white">
+    <FaLock className="text-[3rem] text-white" />
   </div>
 )}
                     <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>

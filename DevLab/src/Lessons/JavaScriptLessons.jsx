@@ -7,6 +7,7 @@ import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import LockAnimation from "../assets/Lottie/LockItem.json";
 import { motion } from "framer-motion";
+import { FaLock } from "react-icons/fa";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
@@ -19,14 +20,13 @@ function JavaScriptLessons() {
 
      // Level Fetch (Custom Hooks)
       const { data, isLoading } = useLevelsData("JavaScript");
-      const {userProgress, completedCount} = useUserProgress("JavaScript");
+      const {userProgress ,isLoading: progressLoading} = useUserProgress("JavaScript");
   // Subject Levels Progress Bar
   const {animatedBar} = useSubjProgressBar("JavaScript");
 
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
-  
-console.log(completedCount)
+
   
 
   return (
@@ -66,7 +66,7 @@ console.log(completedCount)
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
-          {isLoading ? (
+          {isLoading || progressLoading? (
             <Lottie
               animationData={Animation}
               loop={true}
@@ -107,7 +107,7 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                             show: { opacity: isUnlocked ? 1 : 0.3, y: 0 },
                           }}
                             whileHover={{scale:1.02}}
-                            className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
+                            className= {`relative group w-full border flex gap-5 rounded-4xl h-[120px]
                     ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
@@ -140,6 +140,11 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                             <p className="text-[1.4rem]">
                               {level?.title}
                             </p>
+                              {!isUnlocked && (
+  <div className="absolute top-9 right-0 left-105 text-white">
+    <FaLock className="text-[3rem] text-white" />
+  </div>
+)}
                             <p className="text-[0.7rem] line-clamp-3 text-gray-500">
                               {level?.desc }
                             </p>
