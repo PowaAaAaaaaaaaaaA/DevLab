@@ -1,15 +1,89 @@
-import {useState, useEffect}from 'react'
+import {useEffect, useState}from 'react'
+import { doc, updateDoc, setDoc } from "firebase/firestore";
+import { db, auth } from '../Firebase/Firebase';
+
 import ShopIcon from '../assets/Images/Shop_Icon.png'
 import MoneyIcon from '../assets/Images/Money_Icon.png'
 import ItemIcon from '../assets/Images/Item_Icon.png'
+import Loading from '../assets/Lottie/LoadingDots.json'
+import Lottie from 'lottie-react';
+
 import useUserDetails from './Custom Hooks/useUserDetails'
+import useShopItems from './Custom Hooks/useShopItems'
 
 
 
 function Shop() {
 
   // User Details (Custom Hook)
-  const {Userdata, isLoading } = useUserDetails();
+  const {Userdata, refetch } = useUserDetails();
+  // Shop Items (Custom Hook)
+  const {items, loading} = useShopItems();
+// Buy Button
+  const [isBuying, setIsBuying] = useState(false);
+
+  const buyItem = async (item) => {
+    const user = auth.currentUser;
+
+    if (Userdata.coins < item.cost) {
+      alert("Not enough coins!");
+      return;
+    }
+
+    try {
+      setIsBuying(true);
+
+      // 1. Deduct Coins
+      const userRef = doc(db, "Users", user.uid);
+      await updateDoc(userRef, {
+        coins: Userdata.coins - item.cost,
+      });
+
+      // 2. Add to Inventory
+      const inventoryRef = doc(db, "Users", user.uid, "Inventory", item.id);
+      await setDoc(inventoryRef, {
+        ...item,
+        acquiredAt: new Date(),
+      });
+      refetch(); // Refresh user details (coins)
+    } catch (error) {
+      console.error("Purchase failed:", error);
+    } finally {
+      setIsBuying(false);
+    }
+  };
+const [animatedCoins, setAnimatedCoins] = useState(0);
+
+useEffect(() => {
+  if (Userdata?.coins == null) return;
+
+  const target = Userdata.coins;
+  const start = animatedCoins;
+  const duration = 500; // in ms
+  const frameRate = 30; // in ms
+  const steps = Math.ceil(duration / frameRate);
+  const stepAmount = (target - start) / steps;
+
+  let currentStep = 0;
+
+  const interval = setInterval(() => {
+    currentStep++;
+    const newValue = Math.round(start + stepAmount * currentStep);
+
+    setAnimatedCoins(() =>
+      stepAmount > 0 ? Math.min(newValue, target) : Math.max(newValue, target)
+    );
+
+    if (currentStep >= steps) {
+      clearInterval(interval);
+    }
+  }, frameRate);
+
+  return () => clearInterval(interval);
+}, [Userdata?.coins]);
+
+
+if(loading) return <p>Loading</p>
 
   return (
     <>
@@ -24,7 +98,7 @@ function Shop() {
         </div>
         <div className='flex h-[100%] w-[20%] justify-center items-center gap-3.5'>
           <img src={MoneyIcon} alt="" className='h-[20%]' />
-          <p className='font-exo font-bold text-[#2CB67D] text-4xl'>{Userdata?.coins}</p>
+          <p className='font-exo font-bold text-[#2CB67D] text-4xl'>{animatedCoins}</p>
         </div>
       </div>
 
@@ -40,201 +114,42 @@ function Shop() {
     dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500'>
       
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-20 w-full h-[100%] p-4'>
-
-
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
+        {items.map(item=>(
+          <div 
+          key={item.id}
+          className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
           <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
             {/* Icon */}
             <img src={ItemIcon} alt="" />
             {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
+            <h2 className="text-xl font-bold text-center text-white">{item.title}</h2>
             {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
+            <p className="text-sm text-center text-gray-300"> {item.desc}
             </p>
-            {/* Subtext */}
+            {/* Subtext
             <p className="text-sm text-center text-green-400 font-semibold">
           Multiply or Lose rewards by 2x
-            </p>
+            </p> */}
             {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
+            <button 
+            onClick={
+              ()=>{
+                buyItem(item)
+              }
+            }
+            className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer"> $ {item.cost}
             </button>
           </div>
         </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        {/*ITEM*/}
-        <div className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
-            {/* Icon */}
-            <img src={ItemIcon} alt="" />
-            {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">DOUBLE DOWN</h2>
-            {/* Description */}
-            <p className="text-sm text-center text-gray-300">
-            Multiply your rewards at a risk! Earn double or lose the bonus depending on your answer
-            </p>
-            {/* Subtext */}
-            <p className="text-sm text-center text-green-400 font-semibold">
-          Multiply or Lose rewards by 2x
-            </p>
-            {/* Button */}
-            <button className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer">
-          $400
-            </button>
-          </div>
-        </div>
-        
-    
+        ))}
     </div>
-      </div>   
+  </div>
+  {isBuying && (
+  <div className='fixed inset-0 z-50 flex items-center justify-center  bg-black/80'>
+    <Lottie animationData={Loading} loop={true} className="w-[60%] h-[70%] mt-[30px]" />
+  </div>
+  )}
+  
     </>
   )
 }

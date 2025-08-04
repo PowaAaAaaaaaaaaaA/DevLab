@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { auth, db } from '../Firebase/Firebase'
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
 
@@ -37,7 +37,10 @@ if (user) {
       levelId: "Level1",
     },
   });
-
+  // Optional: Add empty Inventory doc
+  await setDoc(doc(db, "Users", user.uid, "Inventory", "placeholder"), {
+    empty: true
+  });
   // Initialize Level1 unlocked for each subject
   const subjects = ["Html", "Css", "JavaScript", "Database"];
 

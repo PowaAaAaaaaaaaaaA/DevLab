@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom'
 import useUserDetails from './Custom Hooks/useUserDetails'
 import useLevelBar from './Custom Hooks/useLevelBar'
 import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
+import useShopItems from './Custom Hooks/useShopItems'
 
 
 function Dashboard() {
@@ -22,6 +23,9 @@ function Dashboard() {
   const {animatedBar: CssProgress} = useSubjProgressBar("Css")
   const {animatedBar: JsProgress} = useSubjProgressBar("JavaScript")
   const {animatedBar: DbProgress} = useSubjProgressBar("Database")
+
+    // // Shop Items (Custom Hook)
+    // const {items, loading} = useShopItems();
 
 
 
