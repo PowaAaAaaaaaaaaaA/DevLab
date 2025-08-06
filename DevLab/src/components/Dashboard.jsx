@@ -199,7 +199,7 @@ useEffect(() => {
       </div>
         <div className=' bg-[#111827] border-2  w-[30%] h-[100%] rounded-3xl p-4'>
           <h1 className='text-white font-exo text-4xl font-bold m-5'>Inventory</h1>
-      {inventory.map(Items=>(
+      {inventory?.map(Items=>(
         <div className="border rounded-2xl border-gray-400 h-[15%] bg-[#25293B] flex items-center p-1 justify-arround gap-10">
           <div className="rounded-2xl bg-gray-700 w-[20%] h-[95%]"></div>
           <h2 className="text-2xl font-exo text-gray-300">{Items.title}</h2>

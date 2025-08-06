@@ -3,9 +3,12 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db,auth} from "../../Firebase/Firebase";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc,arrayRemove } from "firebase/firestore";
 
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
+import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
+// Items
+import CoinSurge from "../../ItemsLogics/CoinSurge";
 
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete}) {
@@ -13,7 +16,9 @@ function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelCom
   const navigate = useNavigate();
   const [LevelData , setLevelData] = useState("");
 
-  const { refetch } = useUserDetails();
+
+  const { Userdata,refetch } = useUserDetails();
+  // Level Data
 useEffect(()=>{
   const fetchLevelData = async ()=>{
     const fetchLevelData = doc (db,subj,lessonId,"Levels",LevelId);
@@ -52,34 +57,43 @@ useEffect(()=>{
 };
 const RewardAdd = async () => {
   const user = auth.currentUser;
-
-
   const userLevelRef = doc(db, "Users", user.uid, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
   const levelSnap = await getDoc(userLevelRef);
+  const userRef = doc(db, "Users", user.uid)  
 
-  if (levelSnap.exists()) {
+  if (levelSnap.exists()) { 
     const levelData = levelSnap.data();
-
     if (levelData.rewardClaimed) {
       console.log("Reward already claimed.");
       return;
     }
-    console.log(levelData.rewardClaimed)
-
+      // Coin Surge 
+    if (Userdata.activeBuffs?.includes("doubleCoins")) {
+    const { DoubleCoins } = CoinSurge(LevelData.coinsReward);
+    const doubled = DoubleCoins();
+        const expReward = LevelData.expReward;
+        await addExp(user.uid, expReward, doubled);
+          // Mark reward as claimed
+          await updateDoc(userLevelRef, {
+      rewardClaimed: true,  
+    });
+    await updateDoc(userRef, {
+      activeBuffs: arrayRemove("doubleCoins")
+    });
+  }else{
     const expReward = LevelData.expReward;
     const coinsReward = LevelData.coinsReward;
-
     await addExp(user.uid, expReward, coinsReward);
+  }
 
-    // Mark reward as claimed
-    await updateDoc(userLevelRef, {
-      rewardClaimed: true,
-    });
 
-    console.log("Reward given and marked as claimed.");
+
   }
 };
 
+
+  const {animatedValue: Coins} = useAnimatedNumber(LevelData?.coinsReward || 0);
+  const {animatedValue: Exp} = useAnimatedNumber(LevelData?.expReward || 0);
 
 
 const unlockNextLevel = async (goContinue) => {
@@ -107,6 +121,7 @@ const unlockNextLevel = async (goContinue) => {
   }
 };
 
+// Items Check
 
 
 
@@ -132,8 +147,8 @@ const unlockNextLevel = async (goContinue) => {
             <h2 className="font-exo text-white text-[2rem]">PERFORMANCE SUMMARY</h2>
             <div className="flex flex-col gap-3 mt-5">
               <p className="text-white">Lives Remaining: {heartsRemaining}x</p>
-              <p className="text-white">DevCoins: +{LevelData?.coinsReward || "wait"}</p>
-              <p className="text-white">Xp Gained: +{LevelData?.expReward || "wait"}XP</p>
+              <p className="text-white">DevCoins: +{Coins}</p>
+              <p className="text-white">Xp Gained: +{Exp}XP</p>
             </div>
           </div>
           <div className=" w-[80%] flex items-center justify-around p-4 ">

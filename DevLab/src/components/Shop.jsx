@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 
 import useUserDetails from './Custom Hooks/useUserDetails'
 import useShopItems from './Custom Hooks/useShopItems'
+import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
 
 
 
@@ -20,6 +21,8 @@ function Shop() {
   const {Userdata, refetch } = useUserDetails();
   // Shop Items (Custom Hook)
   const {items, loading} = useShopItems();
+  //
+  const {animatedValue} = useAnimatedNumber(Userdata?.coins);
 // Buy Button
   const [isBuying, setIsBuying] = useState(false);
 
@@ -59,33 +62,6 @@ function Shop() {
       setIsBuying(false);
     }
   };
-// Coins Counting
-const [animatedCoins, setAnimatedCoins] = useState(0);
-useEffect(() => {
-  if (Userdata?.coins == null) return;
-
-  const target = Userdata.coins;
-  const start = animatedCoins;
-  const duration = 500; // in ms
-  const frameRate = 30; // in ms
-  const steps = Math.ceil(duration / frameRate);
-  const stepAmount = (target - start) / steps;
-
-  let currentStep = 0;
-
-  const interval = setInterval(() => {
-    currentStep++;
-    const newValue = Math.round(start + stepAmount * currentStep);
-
-    setAnimatedCoins(() =>
-      stepAmount > 0 ? Math.min(newValue, target) : Math.max(newValue, target)
-    );
-    if (currentStep >= steps) {
-      clearInterval(interval);
-    }
-  }, frameRate);
-  return () => clearInterval(interval);
-}, [Userdata?.coins]);
 
 if(loading) return <p>Loading</p>
 
@@ -102,7 +78,7 @@ if(loading) return <p>Loading</p>
         </div>
         <div className='flex h-[100%] w-[20%] justify-center items-center gap-3.5'>
           <img src={MoneyIcon} alt="" className='h-[20%]' />
-          <p className='font-exo font-bold text-[#2CB67D] text-4xl'>{animatedCoins}</p>
+          <p className='font-exo font-bold text-[#2CB67D] text-4xl'>{animatedValue}</p>
         </div>
       </div>
 

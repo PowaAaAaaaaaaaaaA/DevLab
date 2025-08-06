@@ -1,28 +1,29 @@
+import { useState, useEffect } from "react";
 import { db, auth } from "../../Firebase/Firebase";
-import { collection, getDocs } from "firebase/firestore";
-import { useQuery } from "@tanstack/react-query";
+import { collection, onSnapshot } from "firebase/firestore";
 
 export default function useUserInventory() {
-  const fetchInventory = async () => {
-    try {
-      const userId = auth.currentUser.uid;
-      const inventoryRef = collection(db, "Users", userId, "Inventory");
-      const snapshot = await getDocs(inventoryRef);
+  const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-      return snapshot.docs.map(doc => ({
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const inventoryRef = collection(db, "Users", user.uid, "Inventory");
+
+    // Listen for changes in real time
+    const unsubscribe = onSnapshot(inventoryRef, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-    } catch (error) {
-      console.log(error);
-      return [];
-    }
-  };
+      setInventory(items);
+      setLoading(false);
+    });
 
-  const { data: inventory, isLoading: loading } = useQuery({
-    queryKey: ["User_Inventory"],
-    queryFn: fetchInventory,
-  });
+    return () => unsubscribe(); // Cleanup when component unmounts
+  }, []);
 
   return { inventory, loading };
 }
