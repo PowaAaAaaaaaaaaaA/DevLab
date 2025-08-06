@@ -1,5 +1,5 @@
 import {useEffect, useState}from 'react'
-import { doc, updateDoc, setDoc } from "firebase/firestore";
+import { doc, updateDoc, setDoc , getDoc, increment} from "firebase/firestore";
 import { db, auth } from '../Firebase/Firebase';
 
 import ShopIcon from '../assets/Images/Shop_Icon.png'
@@ -7,6 +7,7 @@ import MoneyIcon from '../assets/Images/Money_Icon.png'
 import ItemIcon from '../assets/Images/Item_Icon.png'
 import Loading from '../assets/Lottie/LoadingDots.json'
 import Lottie from 'lottie-react';
+import { motion } from "framer-motion";
 
 import useUserDetails from './Custom Hooks/useUserDetails'
 import useShopItems from './Custom Hooks/useShopItems'
@@ -24,36 +25,42 @@ function Shop() {
 
   const buyItem = async (item) => {
     const user = auth.currentUser;
-
     if (Userdata.coins < item.cost) {
       alert("Not enough coins!");
       return;
     }
-
     try {
       setIsBuying(true);
-
-      // 1. Deduct Coins
+      // Deduct Coins
       const userRef = doc(db, "Users", user.uid);
       await updateDoc(userRef, {
         coins: Userdata.coins - item.cost,
       });
-
-      // 2. Add to Inventory
+      refetch(); // Refresh user details (coins)
+      // Add to Inventory
       const inventoryRef = doc(db, "Users", user.uid, "Inventory", item.id);
+      const inventorySnap = await getDoc(inventoryRef);
+
+    if (inventorySnap.exists()) {
+      // If item already exists, increment quantity
+      await updateDoc(inventoryRef, {
+        quantity: increment(1)
+      });
+    } else {
+      // If item is new, create with quantity = 1
       await setDoc(inventoryRef, {
         ...item,
-        acquiredAt: new Date(),
+        quantity: 1
       });
-      refetch(); // Refresh user details (coins)
+    }
     } catch (error) {
       console.error("Purchase failed:", error);
     } finally {
       setIsBuying(false);
     }
   };
+// Coins Counting
 const [animatedCoins, setAnimatedCoins] = useState(0);
-
 useEffect(() => {
   if (Userdata?.coins == null) return;
 
@@ -73,15 +80,12 @@ useEffect(() => {
     setAnimatedCoins(() =>
       stepAmount > 0 ? Math.min(newValue, target) : Math.max(newValue, target)
     );
-
     if (currentStep >= steps) {
       clearInterval(interval);
     }
   }, frameRate);
-
   return () => clearInterval(interval);
 }, [Userdata?.coins]);
-
 
 if(loading) return <p>Loading</p>
 
@@ -118,35 +122,35 @@ if(loading) return <p>Loading</p>
           <div 
           key={item.id}
           className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4">
+          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4 ">
             {/* Icon */}
             <img src={ItemIcon} alt="" />
             {/* Title */}
-            <h2 className="text-xl font-bold text-center text-white">{item.title}</h2>
+            <h2 className="text-xl font-bold text-center text-white font-exo">{item.title}</h2>
             {/* Description */}
-            <p className="text-sm text-center text-gray-300"> {item.desc}
-            </p>
+            <p className="text-sm text-center text-gray-300">{item.desc}</p>
             {/* Subtext
             <p className="text-sm text-center text-green-400 font-semibold">
           Multiply or Lose rewards by 2x
             </p> */}
             {/* Button */}
-            <button 
-            onClick={
-              ()=>{
-                buyItem(item)
-              }
-            }
-            className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:bg-green-300 transition hover:cursor-pointer"> $ {item.cost}
-            </button>
+            <motion.button 
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ bounceDamping: 100 }}
+          onClick={() => {
+            setTimeout(() => buyItem(item), 300);
+            }}
+            className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:cursor-pointer"> $ {item.cost}
+            </motion.button>
           </div>
         </div>
         ))}
     </div>
   </div>
   {isBuying && (
-  <div className='fixed inset-0 z-50 flex items-center justify-center  bg-black/80'>
-    <Lottie animationData={Loading} loop={true} className="w-[60%] h-[70%] mt-[30px]" />
+  <div className='fixed inset-0 z-50 flex items-center justify-center  bg-black/95'>
+    <Lottie animationData={Loading} loop={true} className="w-[50%] h-[50%]" />
   </div>
   )}
   

@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom'
 import useUserDetails from './Custom Hooks/useUserDetails'
 import useLevelBar from './Custom Hooks/useLevelBar'
 import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
+import useUserInventory from './Custom Hooks/useUserInventory'
+
 import useShopItems from './Custom Hooks/useShopItems'
 
 
@@ -18,6 +20,7 @@ function Dashboard() {
   // User Details (Custom Hook)
   const {Userdata, isLoading } = useUserDetails();
   const {animatedExp} = useLevelBar();
+  const {inventory, loading} = useUserInventory();
   // Subject ProgressbAr
   const {animatedBar: htmlProgress} = useSubjProgressBar("Html")
   const {animatedBar: CssProgress} = useSubjProgressBar("Css")
@@ -194,8 +197,15 @@ useEffect(() => {
           </div>
         </div>
       </div>
-        <div className=' bg-[#111827] border-2  w-[30%] h-[100%] rounded-3xl'>
-
+        <div className=' bg-[#111827] border-2  w-[30%] h-[100%] rounded-3xl p-4'>
+          <h1 className='text-white font-exo text-4xl font-bold m-5'>Inventory</h1>
+      {inventory.map(Items=>(
+        <div className="border rounded-2xl border-gray-400 h-[15%] bg-[#25293B] flex items-center p-1 justify-arround gap-10">
+          <div className="rounded-2xl bg-gray-700 w-[20%] h-[95%]"></div>
+          <h2 className="text-2xl font-exo text-gray-300">{Items.title}</h2>
+          <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">{Items.quantity}</p>
+        </div>
+      ))}  
         </div>
     </div>
 {/*END DASHBOARD*/}

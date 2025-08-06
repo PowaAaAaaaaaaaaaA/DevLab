@@ -188,7 +188,7 @@ hover:cursor-pointer">
     <AnimatePresence initial={false}>
       {showAdminPopup ? (
         <div 
-        className="fixed  inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50">
+        className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50">
           <motion.div 
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}

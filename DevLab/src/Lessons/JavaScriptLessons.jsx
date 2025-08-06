@@ -91,9 +91,7 @@ function JavaScriptLessons() {
                     <motion.div
                       variants={{
                         hidden: { opacity: 0 },
-                        show: {opacity: 1,transition: {staggerChildren: 0.3,duration: 1,ease: "easeOut",},
-                        },
-                      }}
+                        show: {opacity: 1,transition: {staggerChildren: 0.3,duration: 1,ease: "easeOut",}},}}
                       initial="hidden"
                       animate="show"
                       className="flex flex-col gap-4">
@@ -104,7 +102,7 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                           key={level.id}
                           variants={{
                             hidden: { opacity: 0, y: 100 },
-                            show: { opacity: isUnlocked ? 1 : 0.3, y: 0 },
+                            show: { opacity: isUnlocked ? 1 : 0.4, y: 0 },
                           }}
                             whileHover={{scale:1.02}}
                             className= {`relative group w-full border flex gap-5 rounded-4xl h-[120px]
