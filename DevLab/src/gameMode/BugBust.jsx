@@ -16,6 +16,7 @@ import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Data
 import GameFooter from "./GameModes_Components/GameFooter";
 
 
+
 function BugBust({heart,gameOver,submitAttempt,roundKey}) {
   const type = "Bug Bust";
   // Navigate
@@ -24,8 +25,7 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
   //Pop up
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
-
-
+  const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
 
 
@@ -39,13 +39,13 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
         {/* Instruction */}
-      <InstructionPanel/>
+      <InstructionPanel showCodeWhisper={showCodeWhisper} setShowCodeWhisper={setShowCodeWhisper} />
         {/* Code Editor */}
           {subject === "Html" && ( <Html_TE submitAttempt={submitAttempt}/>)}
           {subject === "Css" && ( <Css_TE/>)} 
         </div>
         {/* Footer */}
-      <GameFooter setLevelComplete={setLevelComplete}/>
+      <GameFooter setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper}/>
     </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
       <AnimatePresence>

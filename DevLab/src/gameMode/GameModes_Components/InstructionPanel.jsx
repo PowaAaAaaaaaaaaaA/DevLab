@@ -2,13 +2,17 @@
 import { useEffect, useState,  } from "react";
 import { useParams } from "react-router-dom";
 import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
+import { doc, updateDoc, arrayRemove } from "firebase/firestore";
+import { auth, db } from "../../Firebase/Firebase";
 // Hooks
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
 // Animation
-import { motion } from "framer-motion";
+import { motion,AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
+// 
+import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 
-function InstructionPanel({submitAttempt, showPopup, heart}) {
+function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCodeWhisper}) {
 
   const {gamemodeId} = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
@@ -75,7 +79,7 @@ useEffect(() => {
   }
 }, [gamemodeId, showPopup]);
 
-// 
+// when timer gets 0 bawas heart 
 useEffect(() => {
   if (timer === 0 && gamemodeId === "CodeRush") {
     submitAttempt(false);
@@ -208,10 +212,19 @@ useEffect(() => {
                 </p>
             </div>
           ):null}
+  {showCodeWhisper && (
+    <CodeWhisper
+    hint={gameModeData?.hint}
+    onClose= {async() => {
+          setShowCodeWhisper(false);
+        }}
+    />
+  )}
         </>
       ) : (
         <p>Loading...</p>
-      )}
+      )
+      }
     </div>
   );
 }
