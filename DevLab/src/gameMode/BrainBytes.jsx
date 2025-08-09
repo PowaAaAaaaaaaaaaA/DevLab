@@ -23,6 +23,7 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
   //Pop up
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
+  const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
 
 
@@ -37,13 +38,13 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
         {/* Instruction */}
-        <InstructionPanel submitAttempt={submitAttempt}/>
+        <InstructionPanel submitAttempt={submitAttempt} showCodeWhisper={showCodeWhisper} setShowCodeWhisper={setShowCodeWhisper} />
         {/* Code Editor */}
           {subject === "Html" && ( <Html_TE />)}
           {subject === "Css" && ( <Css_TE/>)}    
         </div>
         {/* Footer */}
-        <GameFooter/>
+        <GameFooter setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper}/>
       </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>
@@ -80,12 +81,12 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
         {/*Contents*/}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/*Instruction*/}
-            <InstructionPanel submitAttempt={submitAttempt} />
+            <InstructionPanel submitAttempt={submitAttempt} showCodeWhisper={showCodeWhisper} setShowCodeWhisper={setShowCodeWhisper}  />
           {/*Coding Panel*/}
             <Database_TE/>
         </div>
         {/*Footer*/}
-          <GameFooter/>
+          <GameFooter setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper}/>
       </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>

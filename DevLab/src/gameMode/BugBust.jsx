@@ -87,12 +87,12 @@ function BugBust({heart,gameOver,submitAttempt,roundKey}) {
         {/*Contents*/}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/*Instruction*/}
-            <InstructionPanel/>
+            <InstructionPanel showCodeWhisper={showCodeWhisper} setShowCodeWhisper={setShowCodeWhisper} />
           {/*Coding Panel*/}
             <Database_TE/>
         </div>
         {/*Footer*/}
-          <GameFooter setLevelComplete={setLevelComplete}/>
+          <GameFooter setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper}/>
       </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>

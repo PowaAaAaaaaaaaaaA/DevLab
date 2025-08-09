@@ -42,7 +42,7 @@ function ItemsUse({ setShowCodeWhisper }) {
         await useItem(item.id, "revealHint");
         setShowCodeWhisper(true); // Trigger the popup after applying the buff
       },
-      extraTime: (item) => useItem(item.id, "extraTime"),
+      "Code Patch++": (item) => useItem(item.id, "extraTime"),
       skipLevel: (item) => useItem(item.id, "skipLevel"),
     };
 

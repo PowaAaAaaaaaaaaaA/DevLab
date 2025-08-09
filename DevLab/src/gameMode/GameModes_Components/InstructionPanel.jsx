@@ -6,6 +6,10 @@ import { doc, updateDoc, arrayRemove } from "firebase/firestore";
 import { auth, db } from "../../Firebase/Firebase";
 // Hooks
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
+import useCodeRushTimer from "./useCodeRushTimer";
+import useUserDetails from "../../components/Custom Hooks/useUserDetails";
+import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
+
 // Animation
 import { motion,AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
@@ -16,7 +20,10 @@ function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCod
 
   const {gamemodeId} = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
+  const {Userdata,refetch} = useUserDetails();
 
+  const [timer,buffApplied] = useCodeRushTimer(gameModeData?.timer, gamemodeId,gameModeData,showPopup,Userdata?.activeBuffs,refetch)
+  const {animatedValue} = useAnimatedNumber(buffApplied ? 30 : 0);
     // Format the Code to Display
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
@@ -38,19 +45,12 @@ function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCod
   }, [gameModeData, subject]);
 
 
-console.log(subject)
+console.log(buffApplied)
 
 
 
   // BrainBytes Options
   const [selectedOption, setSelectedOption] = useState(null);
-  // Code Rush Timer
-  const [timer, setTimer] = useState(null);
-useEffect(() => {
-  if (gamemodeId === "CodeRush" && gameModeData?.timer) {
-    setTimer(gameModeData.timer);
-  }
-}, [gameModeData]);
 
 
     // !! For BrainBytes (Checking Selected Answer)
@@ -69,15 +69,6 @@ useEffect(() => {
         console.log("Wrong");
       }
     };
-useEffect(() => {
-  if (gamemodeId === "CodeRush" && !showPopup) {
-    const countdown = setInterval(() => {
-      setTimer((prev) => prev - 1);
-    }, 100); // 
-
-    return () => clearInterval(countdown);
-  }
-}, [gamemodeId, showPopup]);
 
 // when timer gets 0 bawas heart 
 useEffect(() => {
@@ -86,8 +77,11 @@ useEffect(() => {
     console.log("Time's up!");
   }
 }, [timer, gamemodeId]);
-
-
+const FormatTimer = (seconds) =>{
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
 
   return (
     <div
@@ -206,20 +200,25 @@ useEffect(() => {
           {gameModeData?.type === "CodeRush"?(
             <div className="font-bold text-[3.2rem] w-[40%] m-auto p-3 flex flex-col justify-center items-center ">
               <p className="font-exo text-shadow-lg text-shadow-black text-[1.5rem]">Time:</p>
-                <p className="text-[#E35460] ">
-                  {String(Math.floor(timer / 60)).padStart(2, "0")}:
-                  {String(timer % 60).padStart(2, "0")}
+                <p className="text-[#E35460]">
+                  {FormatTimer(timer)}
                 </p>
+                {buffApplied && (<div>
+                  <h1>{animatedValue}</h1>
+                  </div>
+                  )
+                }
             </div>
           ):null}
+  <AnimatePresence>
   {showCodeWhisper && (
     <CodeWhisper
     hint={gameModeData?.hint}
     onClose= {async() => {
           setShowCodeWhisper(false);
-        }}
-    />
+        }}/>
   )}
+  </AnimatePresence>
         </>
       ) : (
         <p>Loading...</p>

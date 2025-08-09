@@ -28,6 +28,7 @@ function CodeRush({heart,roundKey,gameOver,submitAttempt}) {
   //Pop up
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
+  const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
 
 
@@ -39,13 +40,13 @@ function CodeRush({heart,roundKey,gameOver,submitAttempt}) {
         {/* Content */}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/* Instruction */}
-          <InstructionPanel submitAttempt={submitAttempt} showPopup={showPopup} heart={heart} />
+          <InstructionPanel submitAttempt={submitAttempt} showPopup={showPopup} showCodeWhisper={showCodeWhisper} setShowCodeWhisper={setShowCodeWhisper}/>
           {/* Code Editor */}
           {subject === "Html" && ( <Html_TE submitAttempt={submitAttempt}/>)}
           {subject === "Css" && ( <Css_TE/>)}
         </div>
         {/* Footer */}
-          <GameFooter/>
+          <GameFooter setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper}/>
       </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>
@@ -83,12 +84,12 @@ function CodeRush({heart,roundKey,gameOver,submitAttempt}) {
         {/*Contents*/}
         <div className="h-[83%] flex justify-around items-center p-4">
           {/*Instruction*/}
-            <InstructionPanel submitAttempt={submitAttempt} showPopup={showPopup} heart={heart} />
+            <InstructionPanel submitAttempt={submitAttempt} showPopup={showPopup} showCodeWhisper={showCodeWhisper} setShowCodeWhisper={setShowCodeWhisper} />
           {/*Coding Panel*/}
             <Database_TE/>
         </div>
         {/*Footer*/}
-          <GameFooter/>
+          <GameFooter setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper}/>
       </div>
 {/*Instruction Pop Up (1st Pop Up)*/}
     <AnimatePresence>

@@ -1,7 +1,7 @@
 // hooks/useAnimatedNumber.js
 import { useState, useEffect } from "react";
 
-export default function useAnimatedNumber(targetValue,duration = 500,frameRate = 30) {
+export default function useAnimatedNumber(targetValue, duration = 500, frameRate = 30) {
   const [animatedValue, setAnimatedValue] = useState(0);
 
   useEffect(() => {
