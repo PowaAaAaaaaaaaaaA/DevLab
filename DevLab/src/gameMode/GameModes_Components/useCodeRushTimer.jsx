@@ -39,7 +39,7 @@ export default function useCodeRushTimer(initialTime,gamemodeId,gameModeData,sho
           activeBuffs: arrayRemove("extraTime"),
         });
               // Reset animation flag after 500ms
-      setTimeout(() => setBuffApplied(false), 5000);
+      setTimeout(() => setBuffApplied(false), 1000);
       }
       
     });

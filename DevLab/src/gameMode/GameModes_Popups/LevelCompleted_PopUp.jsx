@@ -1,6 +1,9 @@
 
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import Lottie from "lottie-react";
+import confetti from "../../assets/Lottie/Confetti.json"
+
 import { useEffect, useState } from "react";
 import { db,auth} from "../../Firebase/Firebase";
 import { doc, getDoc, setDoc, updateDoc,arrayRemove } from "firebase/firestore";
@@ -90,9 +93,11 @@ const RewardAdd = async () => {
 
   }
 };
+  const finalCoinReward = Userdata.activeBuffs?.includes("doubleCoins")
+  ? LevelData?.coinsReward * 2
+  : LevelData?.coinsReward;
 
-
-  const {animatedValue: Coins} = useAnimatedNumber(LevelData?.coinsReward || 0);
+  const {animatedValue: Coins} = useAnimatedNumber(finalCoinReward || 0);
   const {animatedValue: Exp} = useAnimatedNumber(LevelData?.expReward || 0);
 
 
@@ -128,12 +133,16 @@ const unlockNextLevel = async (goContinue) => {
 
 
   return (
-    <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/95 z-0 flex items-center justify-center">
+      <Lottie
+      animationData={confetti}
+      loop={false}
+      className="w-[100%] h-[100%] fixed z-1"/>
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0 }}
-        className="bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[1px] w-[40%] text-center h-[65%] ">
+        className="bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[1px] w-[40%] text-center h-[65%] z-2">
         <div className="bg-[#111827] h-[100%] w-[100%] rounded-2xl p-5 flex flex-col gap-5 items-center">
           <h1 className="font-exo font-bold text-[3rem] text-[#F2FF43]">LEVEL COMPLETED</h1>
           <div className="bg-[#080C14] rounded-2xl border border-gray-700 p-8 font-exo w-[90%]"> 
@@ -146,9 +155,9 @@ const unlockNextLevel = async (goContinue) => {
           <div>
             <h2 className="font-exo text-white text-[2rem]">PERFORMANCE SUMMARY</h2>
             <div className="flex flex-col gap-3 mt-5">
-              <p className="text-white">Lives Remaining: {heartsRemaining}x</p>
-              <p className="text-white">DevCoins: +{Coins}</p>
-              <p className="text-white">Xp Gained: +{Exp}XP</p>
+              <p className="text-white tex-[1.5rem] font-exo font-semibold">Lives Remaining: <span className="font-bold text-red-400">{heartsRemaining}x</span></p>
+              <p className="text-white tex-[1.5rem] font-exo font-semibold">DevCoins: +<span className="font-bold text-yellow-400">{Coins}</span></p>
+              <p className="text-white tex-[1.5rem] font-exo font-semibold">Xp Gained: +<span className="font-bold text-cyan-400">{Exp}XP</span></p>
             </div>
           </div>
           <div className=" w-[80%] flex items-center justify-around p-4 ">

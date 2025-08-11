@@ -1,5 +1,6 @@
 import { LuAlignJustify } from "react-icons/lu";
 import { motion, AnimatePresence} from "framer-motion";
+import { toast } from "react-toastify";
 
 import { useState } from "react";
 import useUserInventory from "../components/Custom Hooks/useUserInventory";
@@ -7,10 +8,13 @@ import useUserInventory from "../components/Custom Hooks/useUserInventory";
 import { db, auth } from "../Firebase/Firebase";
 import { doc, updateDoc, increment, arrayUnion, deleteDoc, getDoc} from "firebase/firestore";
 
-function ItemsUse({ setShowCodeWhisper }) {
+function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
+
+  const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
     const [showInventory, setShowInventory] = useState(false);
     const { inventory, loading} = useUserInventory();
 
+    console.log(gamemodeId)
   
       const useItem = async(itemId, buffName)=>{
       const userId = auth.currentUser.uid;
@@ -42,7 +46,16 @@ function ItemsUse({ setShowCodeWhisper }) {
         await useItem(item.id, "revealHint");
         setShowCodeWhisper(true); // Trigger the popup after applying the buff
       },
-      "Code Patch++": (item) => useItem(item.id, "extraTime"),
+      "Code Patch++": (item) => {
+    if (gamemodeId !== "CodeRush") { 
+      toast.error("Cannot use Item in this Game mode", {
+      position: "top-right",
+      theme: "colored",
+    });
+      return;
+    }
+    useItem(item.id, "extraTime");
+  },
       skipLevel: (item) => useItem(item.id, "skipLevel"),
     };
 
@@ -66,9 +79,9 @@ function ItemsUse({ setShowCodeWhisper }) {
         <button
         key={Items.id}
         onClick={() => itemActions[Items.title]?.(Items)}
-        className="cursor-pointer border rounded-2xl border-gray-400 h-[15%] bg-[#25293B] flex items-center p-1 gap-10">
-          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%]"></div>
-          <h2 className="text-2xl font-exo text-gray-300">{Items.title}</h2>
+        className="cursor-pointer border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 gap-10">
+          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2"><img src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default} alt="" className='w-full h-full'/></div>
+          <h2 className="text-2xl font-exo text-gray-300 min-w-[50%]">{Items.title}</h2>
           <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">{Items.quantity}</p>
         </button>
       ))}  

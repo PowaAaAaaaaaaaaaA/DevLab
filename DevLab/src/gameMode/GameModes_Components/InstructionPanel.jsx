@@ -198,17 +198,25 @@ const FormatTimer = (seconds) =>{
             </div>
           )}
           {gameModeData?.type === "CodeRush"?(
-            <div className="font-bold text-[3.2rem] w-[40%] m-auto p-3 flex flex-col justify-center items-center ">
-              <p className="font-exo text-shadow-lg text-shadow-black text-[1.5rem]">Time:</p>
-                <p className="text-[#E35460]">
-                  {FormatTimer(timer)}
-                </p>
-                {buffApplied && (<div>
-                  <h1>{animatedValue}</h1>
-                  </div>
-                  )
-                }
-            </div>
+  <div className="font-bold text-[3.2rem] w-[60%] m-auto p-3 flex flex-col justify-center items-center bg-[#25293B] rounded-2xl relative overflow-hidden">
+    <p className="font-exo text-shadow-lg text-shadow-black text-[1.5rem]">Time:</p>
+    <p className="text-[#E35460]">{FormatTimer(timer)}</p>
+    {/* Extra Time Animation */}
+    <AnimatePresence>
+      {buffApplied && (
+        <motion.span
+          key="extra-time"
+          initial={{ opacity: 0, y: 20, scale: 0.8 }}
+          animate={{ opacity: 1, y: -10, scale: 1 }}
+          exit={{ opacity: 0, y: -40, scale: 0.8 }}
+          transition={{ duration: 0.8 }}
+          className="absolute top-2 text-green-400 text-2xl font-bold"
+        >
+          +{animatedValue}s
+        </motion.span>
+      )}
+    </AnimatePresence>
+  </div>
           ):null}
   <AnimatePresence>
   {showCodeWhisper && (

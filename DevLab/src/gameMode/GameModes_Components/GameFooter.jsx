@@ -18,17 +18,11 @@ function GameFooter({setLevelComplete,setShowCodeWhisper}) {
   const {Userdata, isLoading} = useUserDetails();
   const {gameModeData,levelData, subject, lessonId, levelId, topicId, gamemodeId} = useGameModeData();
 
-
-  
-
-
-
-
   return (
 <>
     <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white ">
         <div className="flex items-center gap-3 min-w-[20%]">
-            < ItemsUse setShowCodeWhisper={setShowCodeWhisper}/>
+            < ItemsUse setShowCodeWhisper={setShowCodeWhisper} gamemodeId={gamemodeId}/>
           <div className="min-w-[80%] font-exo">
             <p>
               {levelData

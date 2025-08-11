@@ -16,7 +16,7 @@ import useShopItems from './Custom Hooks/useShopItems'
 
 
 function Dashboard() {
-
+  const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
   // User Details (Custom Hook)
   const {Userdata, isLoading } = useUserDetails();
   const {animatedExp} = useLevelBar();
@@ -202,8 +202,8 @@ useEffect(() => {
       {inventory?.map(Items=>(
         <div 
         key={Items.id}
-        className="border rounded-2xl border-gray-400 h-[15%] bg-[#25293B] flex items-center p-1 justify-arround gap-10">
-          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%]"></div>
+        className="border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 justify-arround gap-10">
+          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2"><img src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default} alt="" className='w-full h-full'/></div>
           <h2 className="text-2xl font-exo text-gray-300 min-w-[50%]">{Items.title}</h2>
           <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">{Items.quantity}</p>
         </div>

@@ -15,7 +15,10 @@ import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
 
 
 
+
 function Shop() {
+
+  const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
 
   // User Details (Custom Hook)
   const {Userdata, refetch } = useUserDetails();
@@ -100,7 +103,7 @@ if(loading) return <p>Loading</p>
           className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
           <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4 ">
             {/* Icon */}
-            <img src={ItemIcon} alt="" />
+            <img src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} alt="" className='w-30'/>
             {/* Title */}
             <h2 className="text-xl font-bold text-center text-white font-exo">{item.title}</h2>
             {/* Description */}

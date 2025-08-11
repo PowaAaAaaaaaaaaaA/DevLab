@@ -3,7 +3,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../Firebase/Firebase";
 import { useNavigate } from "react-router-dom";
 import DataImage from "../assets/Images/Database-Icon-Big.png";
-import { MdOutlineLock } from "react-icons/md";
+import { FaLock } from "react-icons/fa";
 import Lottie from "lottie-react";
 import LockAnimation from '../assets/Lottie/LockItem.json'
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
@@ -107,7 +107,7 @@ function DataLessons() {
                           show: { opacity: isUnlocked ? 1 : 0.3, y: 0 },}}
                           key={level.id}
                           whileHover={{scale:1.02}}
-                          className= {`group w-full border flex gap-5 rounded-4xl h-[120px]
+                          className= {` relative group w-full border flex gap-5 rounded-4xl h-[120px]
                     ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
@@ -138,6 +138,11 @@ function DataLessons() {
                         </div>
                         <div className="p-4 text-white font-exo">
                           <p className="text-[1.4rem]">{level.title}</p>
+                            {!isUnlocked && (
+  <div className="absolute top-10 right-0 left-105 text-white">
+    <FaLock className="text-[3rem] text-white" />
+  </div>
+)}
                           <p className="text-[0.7rem] line-clamp-3 text-gray-500">{level.desc}</p>
                         </div>
                       </motion.div>
