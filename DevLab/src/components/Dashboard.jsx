@@ -13,6 +13,7 @@ import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
 
 import useShopItems from './Custom Hooks/useShopItems'
+import '../index.css'
 
 
 function Dashboard() {
@@ -58,14 +59,14 @@ useEffect(() => {
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
     { !isLoading ? 
-    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-10'>
-      <div className='w-[30%] h-[90%] flex items-center flex-col gap-5 p-2'>
-        <div className='bg-amber-300 w-[65%] h-[90%] rounded-[100%]'></div>
-        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className=' text-center'>{Userdata.bio}</p></div>
+    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-5'>
+      <div className='w-[40%] h-[90%] flex items-center flex-col gap-5 p-2'>
+        <div className='bg-amber-300 w-[55%] h-[80%] rounded-full'></div>
+        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className='text-center'>{Userdata.bio}</p></div>
       </div>
-      <div className='h-[80%] w-[100%] flex flex-col p-2'>
+      <div className='h-auto w-[100%] flex flex-col p-2 gap-2'>
         <p className='text-white font-inter font-bold'>Good to see you!</p>
-        <h1 className='text-[5.6rem] text-white font-inter font-bold'>{Userdata.username}</h1>
+        <h1 className='sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight '>{Userdata.username}</h1>
         <p className='text-white font-inter font-bold mb-0.5'>Level {Userdata.userLevel}</p>
             {/*Progress Bar*/}
         <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700 ">
@@ -99,15 +100,15 @@ useEffect(() => {
     
 
     {/*Bottom Part*/}
-    <div className='h-[100%] flex gap-2'>
+    <div className='flex gap-2 h-[60%]'>
 
       <div className='w-[70%] h-[100%] flex flex-col'>
-        <div className='h-[40%] p-3 flex flex-col gap-5'>
+        <div className='h-[35%] p-1 flex flex-col gap-4 '>
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
-          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Topic1/Lesson`} className='h-full'>
-          <div className='w-[100%] bg-[#111827] max-h-[90%] flex rounded-3xl border-black border-2 gap-4  hover:scale-102 cursor-pointer duration-300'>
-            <div className='bg-black min-w-[14%] text-white rounded-3xl flex items-center justify-center  text-[4rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
+          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Topic1/Lesson`} className='min-h-[100%]'>
+          <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300'>
+            <div className='bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
             <div className='p-2 flex-col flex gap-2'>
               <p className='font-exo text-[1.4rem] text-white font-bold'> {levelInfo.title}</p>
               <p className='font-exo text-gray-500 text-[0.8rem] line-clamp-2'> {levelInfo.desc}</p>
@@ -115,20 +116,16 @@ useEffect(() => {
           </div>
           </Link>):(<div className='w-[100%] bg-[#111827] min-h-[60%] rounded-3xl border-black border-2 p-5'>
             
-<div role="status" className="max-w-sm animate-pulse  min-h-[60%]">
+<div role="status" className="max-w-sm animate-pulse min-h-[100%]">
     <div className ="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
     <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
     <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
     <span className ="sr-only">Loading...</span>
 </div>
-
-
-          </div>)}
-          
+          </div>)}      
         </div>
 
-        <div className='h-[70%] flex flex-col p-3 gap-5'>
+        <div className='flex flex-col p-3 gap-5 flex-grow mt-3'>
           <h2 className='text-white font-exo font-bold text-[2rem]'>View Your Progress</h2>
           <div className='w-[100%] h-[80%] flex items-center justify-around'>
             
@@ -137,7 +134,7 @@ useEffect(() => {
                 <img src={HtmlIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white'>HTML Development</p>
+                <p className='font-exo text-white textSmall-laptop'>HTML Development</p>
                 <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -153,7 +150,7 @@ useEffect(() => {
                 <img src={CssIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem] '>Css Development</p>
+                <p className='font-exo text-white text-[1rem] textSmall-laptop'>Css Development</p>
                 <div className="relative w-12 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -169,7 +166,7 @@ useEffect(() => {
                 <img src={JsIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem]'>JavaScript Development</p>
+                <p className='font-exo text-white text-[1rem] textSmall-laptop  '>JavaScript Development</p>
                 <div className="relative w-15 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -184,7 +181,7 @@ useEffect(() => {
                 <img src={DataIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white'>Database Querying</p>
+                <p className='font-exo text-white textSmall-laptop'>Database Querying</p>
                 <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -197,8 +194,8 @@ useEffect(() => {
           </div>
         </div>
       </div>
-        <div className=' bg-[#111827] border-2  w-[30%] h-[100%] rounded-3xl p-4 flex flex-col gap-3'>
-          <h1 className='text-white font-exo text-4xl font-bold m-5'>Inventory</h1>
+        <div className=' bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3'>
+          <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
       {inventory?.map(Items=>(
         <div 
         key={Items.id}

@@ -18,3 +18,23 @@
 
 @import "tailwindcss";
 
+/*Laptop View*/
+@media (max-height: 750px) {
+
+  
+
+  .large-heading {
+    font-size: 2rem !important;  /* shrink big fonts */
+  }
+
+  /* Adjust padding/margins to fit */
+  .padding-heavy {
+    padding: 0.5rem !important;
+  }
+  .textSmall-laptop {
+    font-size: 0.8rem;
+  }
+  .bigText-laptop{
+    font-size: ;
+  }
+}
