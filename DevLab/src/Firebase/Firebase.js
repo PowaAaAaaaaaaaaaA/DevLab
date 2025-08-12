@@ -12,7 +12,7 @@ const firebaseConfig = {
   projectId: "devlab-b8a1e",
   storageBucket: "devlab-b8a1e.firebasestorage.app",
   messagingSenderId: "871275485475",
-  appId: "1:871275485475:web:47b922283bf3e9d5a41496"
+  appId: "1:871275485475:web:47b922283bf3e9d5a41496" 
 };
 
 // Initialize Firebase
