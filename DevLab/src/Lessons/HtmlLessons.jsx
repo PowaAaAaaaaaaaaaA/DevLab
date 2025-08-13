@@ -14,14 +14,13 @@ import useUserProgress from "../components/Custom Hooks/useUserProgress";
 import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
 
-
+import '../index.css'
 
 function HtmlLessons() {
 
 
   // Level Fetch (Custom Hooks)
   const { data, isLoading } = useLevelsData("Html");
-  console.log(isLoading)
   // Unlocked and Locked Levels
   const {userProgress,isLoading: progressLoading} = useUserProgress("Html");
   // Subject Levels Progress Bar
@@ -43,11 +42,11 @@ function HtmlLessons() {
           <div className=" h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#FF5733] to-[#FFC300]">
             <div className="w-[80%] flex flex-col gap-7">
               <div className="p-3 flex flex-col gap-4">
-                  <h1 className="font-exo text-white text-[3.5rem] font-bold text-shadow-lg text-shadow-black"> HTML: The Gateway to Web Adventure</h1>
-                  <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black">Step into the world of Front-End Development with HTML and CSS as your weapons of creation. Your adventure begins with mastering the fundamentals—building structure and style to craft stunning, responsive websites. As you level up, you'll unlock the secrets of layout design, styling, and structure, gaining the skills to transform raw code into beautiful web pages. Conquer each challenge to earn badges of mastery and become a true HTML and CSS hero!</p>
+                  <h1 className="font-exo text-white text-[3.5rem] font-bold text-shadow-lg text-shadow-black bigText-laptop"> HTML: The Gateway to Web Adventure</h1>
+                  <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop">Step into the world of Front-End Development with HTML and CSS as your weapons of creation. Your adventure begins with mastering the fundamentals—building structure and style to craft stunning, responsive websites. As you level up, you'll unlock the secrets of layout design, styling, and structure, gaining the skills to transform raw code into beautiful web pages. Conquer each challenge to earn badges of mastery and become a true HTML and CSS hero!</p>
               </div>
               <div>
-                <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
+                <div className="w-[70%] min-h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
                   <div className="h-4 rounded-full dark:bg-[#2CB67D]"  style={{ width: `${animatedBar}%` }}>
                   </div>
                 </div>
@@ -83,6 +82,7 @@ function HtmlLessons() {
           className="flex flex-col gap-4">
             {lesson.levels.map((level) => {
 const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+              console.log(level.type)
               return(             
               <motion.div key={level.id}
               variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.4, y:0 }}}

@@ -2,11 +2,8 @@
 import { useEffect, useState,  } from "react";
 import { useParams } from "react-router-dom";
 import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
-import { doc, updateDoc, arrayRemove } from "firebase/firestore";
-import { auth, db } from "../../Firebase/Firebase";
 // Hooks
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
-import useCodeRushTimer from "./useCodeRushTimer";
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 
@@ -14,6 +11,7 @@ import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 import { motion,AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 // 
+import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 
 function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCodeWhisper}) {
@@ -70,13 +68,6 @@ console.log(buffApplied)
       }
     };
 
-// when timer gets 0 bawas heart 
-useEffect(() => {
-  if (timer === 0 && gamemodeId === "CodeRush") {
-    submitAttempt(false);
-    console.log("Time's up!");
-  }
-}, [timer, gamemodeId]);
 const FormatTimer = (seconds) =>{
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

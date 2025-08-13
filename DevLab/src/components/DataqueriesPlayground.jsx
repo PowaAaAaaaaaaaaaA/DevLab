@@ -117,13 +117,15 @@ return (
             <h2 className="text-[1.5rem] font-semibold mb-2 text-white font-exo">Database Tables</h2>
             <div dangerouslySetInnerHTML={{ __html: tablesHtml }} className="text-white" />
         </div>
-        <div className="w-[100%] h-[100%] bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl flex flex-col p-4 justify-between">
+        <div className="px-4 w-full flex flex-col flex-1 min-h-0 gap-3 rounded-3xl p-3 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="flex-1 min-h-0 overflow-auto">
             <CodeMirror
                 value={query}
-                height="450px"
+                height="100%"
                 theme={tokyoNight}
                 extensions={[sql()]}
                 onChange={(value) => setQuery(value)}/>
+        </div>
             <motion.button 
             whileTap={{scale:0.95}}
             whileHover={{scale:1.05, background:"#7e22ce"}}

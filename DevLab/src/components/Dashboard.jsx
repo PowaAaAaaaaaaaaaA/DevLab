@@ -151,7 +151,7 @@ useEffect(() => {
               </div>
               <div className='flex items-center p-2 gap-2'>
                 <p className='font-exo text-white text-[1rem] textSmall-laptop'>Css Development</p>
-                <div className="relative w-12 h-12">
+                <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
                     <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (CssProgress / 100) * 282.6}`} strokeLinecap="round"/>
@@ -201,7 +201,7 @@ useEffect(() => {
         key={Items.id}
         className="border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 justify-arround gap-10">
           <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2"><img src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default} alt="" className='w-full h-full'/></div>
-          <h2 className="text-2xl font-exo text-gray-300 min-w-[50%]">{Items.title}</h2>
+          <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">{Items.title}</h2>
           <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">{Items.quantity}</p>
         </div>
       ))}  

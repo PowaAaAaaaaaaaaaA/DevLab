@@ -13,6 +13,8 @@ import { motion } from "framer-motion";
 // Utils
 import { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+//
+import { useErrorShield } from "../../../ItemsLogics/ErrorShield";
 
 
 function Html_TE({submitAttempt}) {
@@ -24,7 +26,12 @@ function Html_TE({submitAttempt}) {
     const [hasRunCode, setRunCode] = useState(false);
 
     const runCode = () =>{
-      submitAttempt(false);
+      if (gamemodeId === "Lesson"){
+        
+      }else{
+        submitAttempt(false);
+      }
+
       setRunCode(true);
       setTimeout(() => {
         const fullCode = `
@@ -47,17 +54,19 @@ function Html_TE({submitAttempt}) {
   return (
     <>
       <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="flex-1 min-h-0 overflow-auto w-full">
         <CodeMirror
-          className="text-[1rem]"
+          className="text-[1rem] h-full"
           value={code}
           onChange={(val) => setCode(val)}
-          height="640px"
-          width="600px"
+          height="100%"
+          width="100%"
           extensions={gamemodeId === "BugBust"
             ? new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })])
             : html()
           }
           theme={tokyoNight} />
+        </div>
         <div className="flex justify-around w-full">
           <motion.button
             whileTap={{ scale: 0.95 }}

@@ -74,7 +74,7 @@ const onChange = useCallback((val) => {
     <>
        {/* Tabs */}
       <div className="w-[32%] h-[100%]">
-        <div className="flex p-4 text-2xl gap-10 h-[8%] w-full">
+        <div className="flex p-4 text-2xl gap-10 h-[10%] w-full">
             {tabs.map((tab) => (
                 <motion.button
                   whileTap={{ scale: 0.95 }}
@@ -88,15 +88,17 @@ const onChange = useCallback((val) => {
                   {tab}
                 </motion.button>))}
         </div>
-      <div className=" bg-[#191a26] h-[90%] w-[100%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+      <div className=" bg-[#191a26] h-[88%] w-[100%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="flex-1 min-h-0 overflow-auto w-full">     
         <CodeMirror
           className="text-[1rem]"
           value={code[activeTab]}
           onChange={onChange}
-          height="570px"
-          width="600px"
+          height="100%"
+          width="100%"
           extensions={[getLanguageExtension()]}
           theme={tokyoNight}/>
+        </div>   
         <div className="flex justify-around w-full">
           <motion.button
             whileTap={{ scale: 0.95 }}

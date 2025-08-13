@@ -8,14 +8,13 @@ import useUserInventory from "../components/Custom Hooks/useUserInventory";
 import { db, auth } from "../Firebase/Firebase";
 import { doc, updateDoc, increment, arrayUnion, deleteDoc, getDoc} from "firebase/firestore";
 
-function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
+import { useErrorShield } from "./ErrorShield";
 
+function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
     const [showInventory, setShowInventory] = useState(false);
     const { inventory, loading} = useUserInventory();
-
-    console.log(gamemodeId)
-  
+    
       const useItem = async(itemId, buffName)=>{
       const userId = auth.currentUser.uid;
         // Reduce quantity in Inventory
@@ -56,7 +55,9 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
     }
     useItem(item.id, "extraTime");
   },
-      skipLevel: (item) => useItem(item.id, "skipLevel"),
+    "Error Shield": async(item)=>{
+      await useItem(item.id, "errorShield");
+    }
     };
 
   return (

@@ -13,7 +13,7 @@ import useUserDetails from './Custom Hooks/useUserDetails'
 import useShopItems from './Custom Hooks/useShopItems'
 import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
 
-
+import '../index.css'
 
 
 function Shop() {
@@ -87,7 +87,7 @@ if(loading) return <p>Loading</p>
 
 
       {/*Shop*/}
-      <div className='max-h-[500px] border border-[#36334B] w-[80%] rounded-4xl overflow-y-scroll overflow-x-hidden m-auto mt-[3rem] p-4
+      <div className='max-h-[500px] border border-[#36334B] w-[80%] rounded-4xl overflow-y-scroll overflow-x-hidden m-auto mt-[3rem] p-4 Shop-container
       [&::-webkit-scrollbar]:w-2
       [&::-webkit-scrollbar-track]:rounded-full
     [&::-webkit-scrollbar-track]:bg-gray-100
@@ -100,14 +100,14 @@ if(loading) return <p>Loading</p>
         {items.map(item=>(
           <div 
           key={item.id}
-          className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 w-72 shadow-md">
-          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4 ">
+          className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 shadow-md">
+          <div className="bg-[#0D1117] rounded-xl p-6 flex flex-col items-center space-y-4 h-full">
             {/* Icon */}
             <img src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} alt="" className='w-30'/>
             {/* Title */}
             <h2 className="text-xl font-bold text-center text-white font-exo">{item.title}</h2>
             {/* Description */}
-            <p className="text-sm text-center text-gray-300">{item.desc}</p>
+            <p className="text-sm text-center text-gray-300 min-h-[25%] max-h-[25%]">{item.desc}</p>
             {/* Subtext
             <p className="text-sm text-center text-green-400 font-semibold">
           Multiply or Lose rewards by 2x

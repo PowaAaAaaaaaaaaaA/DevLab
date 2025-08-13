@@ -1,5 +1,3 @@
-import { doc, updateDoc, increment } from "firebase/firestore";
-import { db,auth } from "../Firebase/Firebase";
 
 export default function CoinSurge(originalCoins) {
     const DoubleCoins = () => {

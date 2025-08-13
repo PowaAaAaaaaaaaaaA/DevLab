@@ -14,6 +14,8 @@ import useLevelsData from "../components/Custom Hooks/useLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
 import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
+import '../index.css'
+
 function DataLessons() {
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
@@ -31,10 +33,10 @@ function DataLessons() {
         <div className=" h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#4CAF50] to-[#124B15]">
           <div className="w-[80%] flex flex-col gap-7">
             <div className="p-3 flex flex-col gap-4">
-              <h1 className="font-exo text-white text-[3rem] font-bold text-shadow-lg text-shadow-black">
+              <h1 className="font-exo text-white text-[3rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
                 |||| Database: The Vault of Digital Knowledge
               </h1>
-              <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black">
+              <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop">
                 Enter the fortress of data, where every piece of information is
                 carefully guarded and stored! As a Database Guardian, you'll
                 learn to unlock the vault of digital knowledge, mastering the

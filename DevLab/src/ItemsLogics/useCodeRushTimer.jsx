@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db, auth } from "../../Firebase/Firebase";
+import { db, auth } from "../Firebase/Firebase";
 import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 
 export default function useCodeRushTimer(initialTime,gamemodeId,gameModeData,showPopup) {
