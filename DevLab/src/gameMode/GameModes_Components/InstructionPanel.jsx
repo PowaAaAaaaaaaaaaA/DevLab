@@ -6,6 +6,7 @@ import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beau
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
+import useActiveBuffs from "../../components/Custom Hooks/useActiveBuffs";
 
 // Animation
 import { motion,AnimatePresence } from "framer-motion";
@@ -13,15 +14,18 @@ import { toast } from "react-toastify";
 // 
 import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
+import {BrainFilter} from "../../ItemsLogics/BrainFilter"
 
 function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCodeWhisper}) {
 
   const {gamemodeId} = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
   const {Userdata,refetch} = useUserDetails();
+  const { activeBuffs, loading } = useActiveBuffs();
 
   const [timer,buffApplied] = useCodeRushTimer(gameModeData?.timer, gamemodeId,gameModeData,showPopup,Userdata?.activeBuffs,refetch)
   const {animatedValue} = useAnimatedNumber(buffApplied ? 30 : 0);
+  
     // Format the Code to Display
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
@@ -43,14 +47,8 @@ function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCod
   }, [gameModeData, subject]);
 
 
-console.log(buffApplied)
-
-
-
   // BrainBytes Options
   const [selectedOption, setSelectedOption] = useState(null);
-
-
     // !! For BrainBytes (Checking Selected Answer)
   const answerCheck = () => {
       if (!selectedOption) {
@@ -73,6 +71,26 @@ const FormatTimer = (seconds) =>{
     const secs = seconds % 60;
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
+
+const [filtteredOpttions, setFilteredOptions] = useState([])
+const [used, setUsed] = useState(false)
+useEffect(() => {
+  if (!gameModeData?.options || loading) return; // wait for buffs to load
+
+  let optionsArray = Object.entries(gameModeData.options)
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
+console.log(activeBuffs)
+  if (activeBuffs.includes("brainFilter")) {
+    setUsed(true)
+    BrainFilter(filtteredOpttions, gameModeData.correctAnswer)
+      .then((filtered) => setFilteredOptions(filtered))
+      .catch(console.error);
+  } else if(!used) {
+    setFilteredOptions(optionsArray);
+    console.log("else");
+  }
+}, [gameModeData, activeBuffs, loading]);
+
 
   return (
     <div
@@ -144,36 +162,33 @@ const FormatTimer = (seconds) =>{
               <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] font-exo ">
                 {gameModeData.instruction}
               </p>
-              {/*Mapping ng Questions*/}
+              {/*Mapping ng options*/}
               <div className="bg-[#191C2B] p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
-                {gameModeData?.options &&
-                  Object.entries(gameModeData.options)
-                    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-                    .map(([key, value]) => (
-                      <label
-                        key={key}
-                        className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl  hover:bg-gray-500 transition-all duration-500 ${
-                          selectedOption === key ? "bg-gray-500" : "bg-gray-700"
-                        }`}>
-                        <input
-                          type="radio"
-                          name="option"
-                          value={key}
-                          checked={selectedOption === key}
-                          onChange={() => setSelectedOption(key)}
-                          className="accent-purple-600 mt-1 "/>
-                        <span className="font-mono text-sm break-all">
-                          {key}: {value}
-                        </span>
-                      </label>
-                    ))}
+{filtteredOpttions.map(([key, value]) => (
+  <label
+    key={key}
+    className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl hover:bg-gray-500 transition-all duration-500 ${
+      selectedOption === key ? "bg-gray-500" : "bg-gray-700"
+    }`}
+  >
+    <input
+      type="radio"
+      name="option"
+      value={key}
+      checked={selectedOption === key}
+      onChange={() => setSelectedOption(key)}
+      className="accent-purple-600 mt-1"
+    />
+    <span className="font-mono text-sm break-all">{key}: {value}</span>
+  </label>
+))}
               </div>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.05, background: "#7e22ce" }}
                 transition={{ bounceDamping: 100 }}
                 onClick={answerCheck}
-                className="w-[30%] h-[8%] self-end rounded-[10px] font-exo font-bold bg-[#7F5AF0] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]">
+                className="w-[30%] min-h-[8%] self-end rounded-[10px] font-exo font-bold bg-[#7F5AF0] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]">
                 Submit
               </motion.button>
             </div>
@@ -209,6 +224,7 @@ const FormatTimer = (seconds) =>{
     </AnimatePresence>
   </div>
           ):null}
+  {/*Code Whisper*/}
   <AnimatePresence>
   {showCodeWhisper && (
     <CodeWhisper

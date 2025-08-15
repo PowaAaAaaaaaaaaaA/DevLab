@@ -57,6 +57,9 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   },
     "Error Shield": async(item)=>{
       await useItem(item.id, "errorShield");
+    },
+    "Brain Filter": (item)=>{
+      useItem(item.id, "brainFilter");
     }
     };
 

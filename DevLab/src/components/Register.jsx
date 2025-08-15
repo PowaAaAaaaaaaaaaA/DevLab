@@ -39,7 +39,6 @@ if (user) {
   });
   // Optional: Add empty Inventory doc
   await setDoc(doc(db, "Users", user.uid, "Inventory", "placeholder"), {
-    empty: true
   });
   // Initialize Level1 unlocked for each subject
   const subjects = ["Html", "Css", "JavaScript", "Database"];

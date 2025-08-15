@@ -194,18 +194,33 @@ useEffect(() => {
           </div>
         </div>
       </div>
-        <div className=' bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3'>
-          <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
-      {inventory?.map(Items=>(
+      {/*Inventory*/}
+<div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3'>
+  <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
+  {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
+    inventory.filter(item => item.id !== "placeholder").map(item => (
         <div 
-        key={Items.id}
-        className="border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 justify-arround gap-10">
-          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2"><img src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default} alt="" className='w-full h-full'/></div>
-          <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">{Items.title}</h2>
-          <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">{Items.quantity}</p>
+          key={item.id}
+          className="border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 justify-around gap-10">
+          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
+            <img 
+              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 
+              alt="" 
+              className='w-full h-full'/>
+          </div>
+          <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">
+            {item.title}
+          </h2>
+          <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">
+            {item.quantity}
+          </p>
         </div>
-      ))}  
-        </div>
+      ))
+  ) : (
+    <p className="text-gray-400 text-lg font-exo p-3">No Items</p>
+  )}
+</div>
+
     </div>
 {/*END DASHBOARD*/}
   </div>
