@@ -12,6 +12,7 @@ import GameHeader from "./GameModes_Components/GameHeader";
 import InstructionPanel from "./GameModes_Components/InstructionPanel";
 import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE";
 import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE"
+import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter"
 
@@ -41,7 +42,8 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
         <InstructionPanel submitAttempt={submitAttempt} showCodeWhisper={showCodeWhisper} setShowCodeWhisper={setShowCodeWhisper} />
         {/* Code Editor */}
           {subject === "Html" && ( <Html_TE />)}
-          {subject === "Css" && ( <Css_TE/>)}    
+          {subject === "Css" && ( <Css_TE/>)}
+          {subject === "JavaScript" && ( <JavaScript_TE/>)}     
         </div>
         {/* Footer */}
         <GameFooter setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper}/>
@@ -63,6 +65,9 @@ function BrainBytes({heart,gameOver,submitAttempt,roundKey}) {
       <AnimatePresence>
         {levelComplete && (
           <LevelCompleted_PopUp
+          subj = {subject}
+          lessonId = {lessonId}
+          LevelId= {levelId}
           heartsRemaining={heart}
           setLevelComplete={setLevelComplete}/>)}  
       </AnimatePresence>

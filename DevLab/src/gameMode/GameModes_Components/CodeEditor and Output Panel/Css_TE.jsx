@@ -45,10 +45,6 @@ const onChange = useCallback((val) => {
 }, [activeTab]);
 
 
-
-
-
-
   const runCode = () => {
     setRunCode(true);
     setTimeout(() => {

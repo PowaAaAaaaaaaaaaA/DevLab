@@ -82,7 +82,6 @@ function HtmlLessons() {
           className="flex flex-col gap-4">
             {lesson.levels.map((level) => {
 const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
-              console.log(level.type)
               return(             
               <motion.div key={level.id}
               variants={{hidden:{opacity:0, y:100}, show:{opacity: isUnlocked ? 1 : 0.4, y:0 }}}

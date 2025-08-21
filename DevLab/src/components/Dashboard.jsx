@@ -114,7 +114,7 @@ useEffect(() => {
               <p className='font-exo text-gray-500 text-[0.8rem] line-clamp-2'> {levelInfo.desc}</p>
             </div>
           </div>
-          </Link>):(<div className='w-[100%] bg-[#111827] min-h-[60%] rounded-3xl border-black border-2 p-5'>
+          </Link>):(<div className='w-[100%] bg-[#111827] rounded-3xl border-black border-2 p-5 '>
             
 <div role="status" className="max-w-sm animate-pulse min-h-[100%]">
     <div className ="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
@@ -134,7 +134,7 @@ useEffect(() => {
                 <img src={HtmlIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white textSmall-laptop'>HTML Development</p>
+                <p className='font-exo text-white textSmall-laptop max-w-[65%]'>HTML Development</p>
                 <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -150,7 +150,7 @@ useEffect(() => {
                 <img src={CssIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem] textSmall-laptop'>Css Development</p>
+                <p className='font-exo text-white text-[1rem] textSmall-laptop max-w-[65%]'>Css Development</p>
                 <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -166,8 +166,8 @@ useEffect(() => {
                 <img src={JsIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem] textSmall-laptop  '>JavaScript Development</p>
-                <div className="relative w-15 h-12">
+                <p className='font-exo text-white text-[1rem] textSmall-laptop max-w-[65%]  '>JavaScript Development</p>
+                <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
                     <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (JsProgress / 100) * 282.6}`} strokeLinecap="round"/>
@@ -181,7 +181,7 @@ useEffect(() => {
                 <img src={DataIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white textSmall-laptop'>Database Querying</p>
+                <p className='font-exo text-white textSmall-laptop max-w-[65%]'>Database Querying</p>
                 <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -195,13 +195,14 @@ useEffect(() => {
         </div>
       </div>
       {/*Inventory*/}
-<div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3'>
+<div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3 '>
   <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
+  <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-6'>
   {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
     inventory.filter(item => item.id !== "placeholder").map(item => (
         <div 
           key={item.id}
-          className="border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 justify-around gap-10">
+          className="border rounded-2xl border-gray-600 min-h-[20%] max-h-[20%] bg-[#0D1117] flex items-center p-1 justify-around gap-10">
           <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
             <img 
               src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 
@@ -211,7 +212,7 @@ useEffect(() => {
           <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">
             {item.title}
           </h2>
-          <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">
+          <p className="rounded-lg bg-gray-700 p-2 text-[0.9rem] font-exo text-white">
             {item.quantity}
           </p>
         </div>
@@ -219,6 +220,8 @@ useEffect(() => {
   ) : (
     <p className="text-gray-400 text-lg font-exo p-3">No Items</p>
   )}
+  </div>
+
 </div>
 
     </div>

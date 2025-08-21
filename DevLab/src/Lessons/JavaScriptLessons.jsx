@@ -127,7 +127,7 @@ const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
                               }
                               const firstTopic = level.topics?.[0];
                               navigate(
-                                `/Main/Lessons/Html/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`
+                                `/Main/Lessons/JavaScript/${lesson.id}/${level.id}/${firstTopic.id}/Lesson`
                               );
                             }
                           }}>

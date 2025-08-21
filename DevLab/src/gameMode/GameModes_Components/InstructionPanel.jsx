@@ -23,7 +23,7 @@ function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCod
   const {Userdata,refetch} = useUserDetails();
   const { activeBuffs, loading } = useActiveBuffs();
 
-  const [timer,buffApplied] = useCodeRushTimer(gameModeData?.timer, gamemodeId,gameModeData,showPopup,Userdata?.activeBuffs,refetch)
+  const [timer,buffApplied,buffType] = useCodeRushTimer(gameModeData?.timer, gamemodeId,gameModeData,showPopup,Userdata?.activeBuffs,refetch)
   const {animatedValue} = useAnimatedNumber(buffApplied ? 30 : 0);
   
     // Format the Code to Display
@@ -163,26 +163,32 @@ console.log(activeBuffs)
                 {gameModeData.instruction}
               </p>
               {/*Mapping ng options*/}
-              <div className="bg-[#191C2B] p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
-{filtteredOpttions.map(([key, value]) => (
-  <label
-    key={key}
-    className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl hover:bg-gray-500 transition-all duration-500 ${
-      selectedOption === key ? "bg-gray-500" : "bg-gray-700"
-    }`}
-  >
-    <input
-      type="radio"
-      name="option"
-      value={key}
-      checked={selectedOption === key}
-      onChange={() => setSelectedOption(key)}
-      className="accent-purple-600 mt-1"
-    />
-    <span className="font-mono text-sm break-all">{key}: {value}</span>
-  </label>
-))}
-              </div>
+                <div className="bg-[#191C2B] p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
+  <AnimatePresence>
+    {filtteredOpttions.map(([key, value]) => (
+      <motion.label
+        key={key}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.5, opacity: 0 }}
+        transition={{ duration: 0.3, type: "pop", stiffness: 300 }}
+        className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl hover:bg-gray-500 transition-all duration-500 ${
+          selectedOption === key ? "bg-gray-500" : "bg-gray-700"
+        }`}>
+        <input
+          type="radio"
+          name="option"
+          value={key}
+          checked={selectedOption === key}
+          onChange={() => setSelectedOption(key)}
+          className="accent-purple-600 mt-1"/>
+        <span className="font-mono text-sm break-all">
+          {key}: {value}
+        </span>
+      </motion.label>
+    ))}
+  </AnimatePresence>
+</div>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.05, background: "#7e22ce" }}
@@ -209,18 +215,34 @@ console.log(activeBuffs)
     <p className="text-[#E35460]">{FormatTimer(timer)}</p>
     {/* Extra Time Animation */}
     <AnimatePresence>
-      {buffApplied && (
-        <motion.span
-          key="extra-time"
-          initial={{ opacity: 0, y: 20, scale: 0.8 }}
-          animate={{ opacity: 1, y: -10, scale: 1 }}
-          exit={{ opacity: 0, y: -40, scale: 0.8 }}
-          transition={{ duration: 0.8 }}
-          className="absolute top-2 text-green-400 text-2xl font-bold"
-        >
-          +{animatedValue}s
-        </motion.span>
-      )}
+{buffApplied && (
+  <>
+    {buffType === "extraTime" && (
+      <motion.span
+        key="extra-time"
+        initial={{ opacity: 0, y: 20, scale: 0.8 }}
+        animate={{ opacity: 1, y: -10, scale: 1 }}
+        exit={{ opacity: 0, y: -40, scale: 0.8 }}
+        transition={{ duration: 0.8 }}
+        className="absolute top-2 text-green-400 text-2xl font-bold">
+        +{animatedValue}s
+      </motion.span>
+    )}
+
+    {buffType === "timeFreeze" && (
+      <motion.span
+        key="time-freeze"
+        initial={{ opacity: 0, y: 20, scale: 0.8 }}
+        animate={{ opacity: 1, y: -10, scale: 1 }}
+        exit={{ opacity: 0, y: -40, scale: 0.8 }}
+        transition={{ duration: 0.8 }}
+        className="absolute top-2 text-blue-400 text-2xl font-bold">
+        Time Frozen!
+      </motion.span>
+    )}
+  </>
+)}
+
     </AnimatePresence>
   </div>
           ):null}

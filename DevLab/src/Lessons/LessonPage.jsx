@@ -6,6 +6,7 @@ import InstructionPanel from "../gameMode/GameModes_Components/InstructionPanel"
 import GameFooter from "../gameMode/GameModes_Components/GameFooter";
 import Html_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Html_TE";
 import Css_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Css_TE";
+import JavaScript_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Database_TE";
 
 
@@ -25,7 +26,8 @@ function LessonPage() {
         <InstructionPanel/>
         {/* Code Editor and Output Panel */}
           {subject === "Html" && ( <Html_TE />)}
-          {subject === "Css" && ( <Css_TE/>)}       
+          {subject === "Css" && ( <Css_TE/>)}   
+          {subject === "JavaScript" && ( <JavaScript_TE/>)}     
       </div>
       {/* Footer */}
         <GameFooter/>

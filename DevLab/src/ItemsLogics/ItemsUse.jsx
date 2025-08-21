@@ -55,12 +55,29 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
     }
     useItem(item.id, "extraTime");
   },
+  "Time Freeze": (item) => {
+    if (gamemodeId !== "CodeRush") { 
+      toast.error("Cannot use Item in this Game mode", {
+      position: "top-right",
+      theme: "colored",
+    });
+      return;
+    }
+    useItem(item.id, "timeFreeze");
+  },
     "Error Shield": async(item)=>{
       await useItem(item.id, "errorShield");
     },
     "Brain Filter": (item)=>{
-      useItem(item.id, "brainFilter");
+    if (gamemodeId !== "BrainBytes"){
+      toast.error("Cannot use Item in this Game mode", {
+      position: "top-right",
+      theme: "colored",
+    });
+    return
     }
+      useItem(item.id, "brainFilter");
+    },
     };
 
   return (
@@ -77,16 +94,16 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0 }}
     className="w-[20%] h-[50%] fixed bottom-20 left-5">
-      <div className="h-[100%] w-[100%] border border-gray-500 rounded-2xl bg-[#111827] p-4 flex flex-col gap-4">
+      <div className="h-[100%] w-[100%] border border-gray-500 rounded-2xl bg-[#111827] p-4 flex flex-col gap-4 overflow-scroll overflow-x-hidden">
       <h1 className="text-white font-exo text-4xl">Inventory</h1>
       {inventory.map(Items=>(
         <button
         key={Items.id}
         onClick={() => itemActions[Items.title]?.(Items)}
-        className="cursor-pointer border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 gap-10">
+        className="cursor-pointer border rounded-2xl border-gray-600 min-h-[15%] bg-[#0D1117] flex items-center p-1 gap-10">
           <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2"><img src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default} alt="" className='w-full h-full'/></div>
-          <h2 className="text-2xl font-exo text-gray-300 min-w-[50%]">{Items.title}</h2>
-          <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">{Items.quantity}</p>
+          <h2 className="text-2xl font-exo text-gray-300 min-w-[45%]">{Items.title}</h2>
+          <p className="rounded-lg bg-gray-700 p-3 text-[0.8rem]">{Items.quantity}</p>
         </button>
       ))}  
       </div>

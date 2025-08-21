@@ -101,20 +101,19 @@ function DataLessons() {
                     className="flex flex-col gap-4">
                     {lesson.levels.map((level) => {
                   const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
-                  console.log("SAD")
+                  console.log(isUnlocked)
                     return(
-                    <motion.div
+                    <motion.div key={level.id}
                         variants={{
                           hidden: { opacity: 0, y: 100 },
                           show: { opacity: isUnlocked ? 1 : 0.3, y: 0 },}}
-                          key={level.id}
                           whileHover={{scale:1.02}}
                           className= {` relative group w-full border flex gap-5 rounded-4xl h-[120px]
                     ${isUnlocked === false
                     ? "bg-[#060505]  cursor-pointer"
                     : "bg-[#111827]  cursor-pointer "}`}
                         onClick={async () => {
-                          if (isUnlocked) {
+                          if (!isUnlocked) {
                             setShowLockedModal(true);// show the modal
                             return;}
                           if (isUnlocked) {
