@@ -5,27 +5,28 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function useLevelsData(subject) {
   const fetchData = async () => {
-    const SubjectRef = collection(db, subject);
-    const SubjectSnapshot = await getDocs(SubjectRef);
+    const lessonsRef = collection(db, subject);
+    const lessonSnapshot = await getDocs(lessonsRef);
 
-    const lessonData = await Promise.all(
-      SubjectSnapshot.docs.map(async (lessonDoc) => {
+    const lessons = await Promise.all(
+      lessonSnapshot.docs.map(async (lessonDoc) => {
         const levelsRef = collection(db, subject, lessonDoc.id, "Levels");
         const levelsSnapshot = await getDocs(levelsRef);
 
         const levels = await Promise.all(
           levelsSnapshot.docs.map(async (levelDoc) => {
-            const topicsRef = collection(db,subject,lessonDoc.id,"Levels",levelDoc.id,"Topics");
-            const topicsSnapshot = await getDocs(topicsRef);
-            const topics = topicsSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
+            const stagesRef = collection(db,subject,lessonDoc.id,"Levels",levelDoc.id,"Stages");
+            const stagesSnapshot = await getDocs(stagesRef);
+
+            const stages = stagesSnapshot.docs.map((stageDoc) => ({
+              id: stageDoc.id,
+              ...stageDoc.data(),
             }));
 
             return {
               id: levelDoc.id,
               ...levelDoc.data(),
-              topics,
+              stages,
             };
           })
         );
@@ -38,7 +39,7 @@ export default function useLevelsData(subject) {
       })
     );
 
-    return lessonData;
+    return lessons;
   };
 
   const { data, isLoading } = useQuery({

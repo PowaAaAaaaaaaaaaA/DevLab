@@ -31,7 +31,6 @@ export default function useSubjProgressBar(subject) {
   }, [subject]);
 
   const progress = total > 0 ? (completedCount / total) * 100 : 0;
-
   useEffect(() => {
     let current = animatedBar;
     const target = progress;

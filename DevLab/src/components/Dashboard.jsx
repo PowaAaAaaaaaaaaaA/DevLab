@@ -39,7 +39,7 @@ useEffect(() => {
   const fetchLevelInfo = async () => {
     if (Userdata?.lastOpenedLevel) {
       const { subject, lessonId, levelId } = Userdata.lastOpenedLevel;
-
+console.log(subject)
       // Full dynamic path
       const getUser = doc(db, subject, lessonId, "Levels", levelId);
       const userDocs = await getDoc(getUser);
@@ -54,6 +54,7 @@ useEffect(() => {
 
   fetchLevelInfo();
 }, [Userdata]);
+
 
   return (
 // Dashboard Wrapper
@@ -106,12 +107,12 @@ useEffect(() => {
         <div className='h-[35%] p-1 flex flex-col gap-4 '>
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
-          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Topic1/Lesson`} className='min-h-[100%]'>
-          <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300'>
+          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Topic1/Lesson`} className='h-[100%]'>
+          <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[90%] '>
             <div className='bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
             <div className='p-2 flex-col flex gap-2'>
-              <p className='font-exo text-[1.4rem] text-white font-bold'> {levelInfo.title}</p>
-              <p className='font-exo text-gray-500 text-[0.8rem] line-clamp-2'> {levelInfo.desc}</p>
+              <p className='font-exo text-[1.4rem] text-white font-bold'>{levelInfo.title}</p>
+              <p className='font-exo text-gray-500 text-[0.8rem] line-clamp-2'> {levelInfo.description}</p>
             </div>
           </div>
           </Link>):(<div className='w-[100%] bg-[#111827] rounded-3xl border-black border-2 p-5 '>
