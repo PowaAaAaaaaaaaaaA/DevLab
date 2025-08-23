@@ -21,7 +21,7 @@ function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
 
   const type = "Code Crafter"
   // Navigate
-  const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
+  const { subject, lessonId, levelId,} = useParams();
   //Pop Ups
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);

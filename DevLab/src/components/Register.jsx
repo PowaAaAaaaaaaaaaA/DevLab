@@ -40,18 +40,27 @@ if (user) {
   // Optional: Add empty Inventory doc
   await setDoc(doc(db, "Users", user.uid, "Inventory", "placeholder"), {
   });
-  // Initialize Level1 unlocked for each subject
-  const subjects = ["Html", "Css", "JavaScript", "Database"];
+// Initialize Level1 unlocked for each subject, including Stage1
+const subjects = ["Html", "Css", "JavaScript", "Database"];
 
-  for (const subject of subjects) {
-    await setDoc(
-      doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1"),
-      {
-        status: true,
-        rewardClaimed: false
-      }
-    );
-  }
+for (const subject of subjects) {
+  // Create Level1 document
+  await setDoc(
+    doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
+    {
+    status: true,
+    rewardClaimed: false,
+    }
+  );
+
+  // Create Stage1 document inside Stages subcollection of Level1
+  await setDoc(
+    doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1","Stages","Stage1"),
+    {
+    status: true,
+    });
+}
+
 }
             toast.success("Registered Successfully",{
                 position:"top-center",

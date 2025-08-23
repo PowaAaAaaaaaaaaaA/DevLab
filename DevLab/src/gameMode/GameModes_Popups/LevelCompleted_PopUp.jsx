@@ -119,12 +119,19 @@ const unlockNextLevel = async (goContinue) => {
 
     if (currentLevelNum < totalLevels) {
       // Unlock next level in the SAME lesson
-      const nextLevelId = `Level${currentLevelNum + 1}`;
-      const currentLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
+      const nextLevelId = `Level${currentLevelNum + 1}`;            // Change this with "subj"
+      const currentLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", lessonId, "Levels", LevelId);
       await setDoc(currentLevelRef, { status: true }, { merge: true });
 
-      const nextLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", nextLevelId);
+      const nextLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", lessonId, "Levels", nextLevelId);
       await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
+          // Unlock the next stage in user's progress
+    const nextStageRef = doc(db,"Users",userId,"Progress","Html","Lessons",lessonId,"Levels",nextLevelId,"Stages","Stage1");
+    await setDoc(
+      nextStageRef,
+      {status: true,},
+      {merge: true }
+    );
 
       if (goContinue) {
         navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Topic1/Lesson`);
@@ -136,11 +143,17 @@ const unlockNextLevel = async (goContinue) => {
       const nextLevelId = "Level1";
 
       // Unlock Level1 of the next lesson
-      const nextLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", nextLessonId, "Levels", nextLevelId);
+      const nextLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", nextLessonId, "Levels", nextLevelId);
       await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
+    const nextStageRef = doc(db,"Users",userId,"Progress","Html","Lessons",nextLessonId,"Levels",nextLevelId,"Stages","Stage1");
+    await setDoc(
+      nextStageRef,
+      {status: true,},
+      {merge: true }
+    );
 
       if (goContinue) {
-        navigate(`/Main/Lessons/${subj}/${nextLessonId}/${nextLevelId}/Topic1/Lesson`);
+        navigate(`/Main/Lessons/${subj}/${nextLessonId}/${nextLevelId}/Stage1/Lesson`);
       }
     }
 
@@ -153,7 +166,7 @@ const unlockNextLevel = async (goContinue) => {
 
 // Items Check
 
-
+console.log(subj)
 
 
 

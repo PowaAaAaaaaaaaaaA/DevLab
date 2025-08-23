@@ -7,7 +7,7 @@ import useUserProgress from "./useUserProgress";
 export default function useSubjProgressBar(subject) {
 
 
-    const {userProgress,completedCount} = useUserProgress(subject);
+    const {userProgress,completedLevels} = useUserProgress(subject);
     const [animatedBar, setAnimatedBar] = useState(0);
     const [total, setTotal]  = useState(0)
 
@@ -29,8 +29,7 @@ export default function useSubjProgressBar(subject) {
   useEffect(() => {
     getTotalLevels();
   }, [subject]);
-
-  const progress = total > 0 ? (completedCount / total) * 100 : 0;
+  const progress = total > 0 ? (completedLevels / total) * 100 : 0;
   useEffect(() => {
     let current = animatedBar;
     const target = progress;

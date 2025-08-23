@@ -49,11 +49,9 @@ function App() {
     //
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
-
       try {
         const userRef = doc(db, "Users", user.uid);
         const userSnap = await getDoc(userRef);
-
         if (userSnap.data().isAdmin) {
           setAdmin(true);
         } else {
@@ -81,19 +79,13 @@ function App() {
           <Route
             path="/"
             element={
-              !isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />
-            }
-          />
+              !isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />}/>
           <Route
             path="/Login"
-            element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />}
-          />
+            element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />}/>
           <Route
             path="/Register"
-            element={
-              !isLoggedIn ? <Register /> : <Navigate to="/Main" replace />
-            }
-          />
+            element={!isLoggedIn ? <Register /> : <Navigate to="/Main" replace />}/>
 
           {/* Protected Routes */}
           <Route
@@ -111,15 +103,14 @@ function App() {
           </Route>
 
           <Route
-            path="/Main/Lessons/:subject/:lessonId/:levelId/:topicId/:gamemodeId"
+            path="/Main/Lessons/:subject/:lessonId/:levelId/:stageId/:gamemodeId"
             element={<GameModeRouter />} />
 
           <Route
             path="/codingPlay"
             element={
               isLoggedIn ? <CodePlayground /> : <Navigate to="/Login" replace />
-            }
-          />
+            }/>
           <Route
             path="/dataPlayground"
             element={
@@ -128,8 +119,7 @@ function App() {
               ) : (
                 <Navigate to="/Login" replace />
               )
-            }
-          />
+            }/>
 
           {/*ADmin*/}
           <Route path="/AdminLogin" element={<AdminLogin />} />
@@ -143,8 +133,7 @@ function App() {
               ) : (
                 <Navigate to="/Login" replace />
               )
-            }
-          >
+            }>
             <Route index element={<Navigate to="ContentManagement" />} />
             <Route path="ContentManagement" element={<ContentManagement />} />
             <Route path="UserManagement" element={<UserManagement />} />

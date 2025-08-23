@@ -1,22 +1,36 @@
-import { arrayRemove } from "firebase/firestore";
+// this is the Util_Nvigation before 
+import { collection,getDocs } from 'firebase/firestore';
+import { db } from '../../Firebase/Firebase';
 
-async function awardCoins(baseCoins) {
-  const userId = auth.currentUser.uid;
-  const userRef = doc(db, "Users", userId);
-  const userSnap = await getDoc(userRef);
-  const userData = userSnap.data();
+export const goToNextGamemode = async({subject,lessonId,levelId,topicId,gamemodeId,navigate,setLevelComplete}) => {
+    const gamemodeRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics', topicId, 'Gamemodes');
+    const gamemodeSnap = await getDocs(gamemodeRef);
 
-  let reward = baseCoins;
+    // Get only gamemodes excluding "Lesson"
+    const modeIds = gamemodeSnap.docs
+        .map((doc) => doc.id)
+        .filter((id) => id !== 'Lesson');
+    const currentIndex = modeIds.indexOf(gamemodeId);
+    if (currentIndex < modeIds.length - 1) {
+        const nextGamemode = modeIds[currentIndex + 1];
+navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${topicId}/${nextGamemode}`, {
+});
+    } else if (currentIndex === modeIds.length - 1) {
+        //  Check if there is a next topic
+        const topicsRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics');
+        const topicsSnap = await getDocs(topicsRef);
+        const topicIds = topicsSnap.docs.map((doc) => doc.id);
+        const currentTopicIndex = topicIds.indexOf(topicId);
 
-  if (userData.activeBuffs?.includes("doubleCoins")) {
-    reward *= 2;
-    await updateDoc(userRef, {
-      activeBuffs: arrayRemove("doubleCoins") // Remove buff after use
-    });
-  }
-  await updateDoc(userRef, {
-    coins: userData.coins + reward
-  });
-}
-
-
+        if (currentTopicIndex < topicIds.length - 1) {
+            const nextTopicId = topicIds[currentTopicIndex + 1];
+            navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${nextTopicId}/Lesson`, {
+});
+        } else {
+            //  No more topics —trigger completion popup
+            setLevelComplete(true);
+        }
+    } else {
+        console.warn("Gamemode not found or Lesson was the only one.");
+    }
+};

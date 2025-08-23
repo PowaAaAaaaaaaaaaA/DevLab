@@ -91,7 +91,6 @@ console.log(activeBuffs)
   }
 }, [gameModeData, activeBuffs, loading]);
 
-
   return (
     <div
       className="h-[95%] w-[32%] bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5
