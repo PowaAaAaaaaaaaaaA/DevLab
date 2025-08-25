@@ -124,10 +124,22 @@ function HtmlLessons() {
                             ${
                               isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
                             } cursor-pointer`}
-                            onClick={() => {
+                            onClick={async() => {
                               if (!isUnlocked) {
                                 setShowLockedModal(true);
                                 return;}
+                                if (isUnlocked) {
+                                const user = auth.currentUser;
+                                if (user) {
+                                  const userRef = doc(db, "Users", user.uid);
+                                  await updateDoc(userRef, {
+                                    lastOpenedLevel: {
+                                      subject: "Html", // since nasa Htmlk lesson Panalang
+                                      lessonId: lesson.id,
+                                      levelId: level.id,
+                                    },
+                                  });
+                                }}
                               toggleLevel(lesson.id, level.id);
                             }}>
                             <div className="text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center">
