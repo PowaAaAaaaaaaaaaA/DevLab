@@ -4,7 +4,7 @@ import useLevelsData from "./useLevelsData";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useUserProgress(subject) {
-  const { data: levelsData, isLoading: levelsLoading } = useLevelsData(subject);
+  const { levelsData, isLoading: levelsLoading } = useLevelsData(subject);
 
   const fetchProgress = async () => {
     const userId = auth.currentUser.uid;

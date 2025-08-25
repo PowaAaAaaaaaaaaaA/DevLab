@@ -17,16 +17,16 @@ import "../index.css";
 
 function HtmlLessons() {
   // Level Fetch (Custom Hooks)
-  const { data, isLoading } = useLevelsData("sampleHTML2");
+  const { levelsData, isLoading } = useLevelsData("Html");
   // Unlocked and Locked Levels
   const {userProgress,isLoading: progressLoading,userStageProgress} = useUserProgress("Html");
   // Subject Levels Progress Bar
-  const { animatedBar } = useSubjProgressBar("Html");
+  const { animatedBar,total} = useSubjProgressBar("Html");
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
 
   const [expandedLevel, setExpandedLevel] = useState(null);
-
+console.log(total);
   return (
     <>
       <div className="h-[100%]">
@@ -81,7 +81,7 @@ function HtmlLessons() {
         [&::-webkit-scrollbar-thumb]:bg-gray-300
         dark:[&::-webkit-scrollbar-track]:bg-neutral-700
         dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-              {data.map((lesson) => (
+              {levelsData.map((lesson) => (
                 <div key={lesson.id} className="flex flex-col gap-4">
                   <h2 className="font-exo text-[3rem] font-bold text-white">
                     Lesson {lesson.Lesson}
@@ -104,6 +104,8 @@ function HtmlLessons() {
                     {lesson.levels.map((level) => {
                       // Level Locked or Unlocked
                       const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+                      console.log (lesson.id,level.id);
+                      console.log(isUnlocked);
                       // unique identifier
                       const isExpanded = expandedLevel === `${lesson.id}-${level.id}`;
                       const toggleLevel = (lessonId, levelId) => {
@@ -117,7 +119,7 @@ function HtmlLessons() {
                           <motion.div
                             variants={{
                               hidden: { opacity: 0, y: 100 },
-                              show: { opacity: isUnlocked ? 1 : 0.4, y: 0 },
+                              show: { opacity: isUnlocked ?  1 : 0.4, y: 0 },
                             }}
                             whileHover={{ scale: 1.02 }}
                             className={`relative group w-full border flex gap-5 rounded-4xl h-[120px] 
@@ -196,7 +198,7 @@ function HtmlLessons() {
                                           onClick={() => {
                                             if (isStageUnlocked) {
                                               navigate(
-                                                `/Main/Lessons/sampleHTML2/${lesson.id}/${level.id}/${stage.id}/${stage.type}`
+                                                `/Main/Lessons/Html/${lesson.id}/${level.id}/${stage.id}/${stage.type}`
                                               );
                                             }
                                           }}>

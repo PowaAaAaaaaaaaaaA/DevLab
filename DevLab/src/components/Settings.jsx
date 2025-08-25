@@ -193,7 +193,7 @@ hover:cursor-pointer">
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0 }}
-          className="bg-[#1E212F] w-[25%] h-[40%] text-white rounded-2xl text-center p-4 flex flex-col items-center">
+          className="bg-[#1E212F] w-[25%] h-auto text-white rounded-2xl text-center p-4 flex flex-col items-center">
             <h2 className="font-exo text-3xl">Admin Login</h2>
             <Lottie
               animationData={AdminLogin}

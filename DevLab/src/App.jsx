@@ -31,7 +31,8 @@ import JavaScriptLessons from "./Lessons/JavaScriptLessons";
 import DataLessons from "./Lessons/DataLessons";
 // LESSON PAGES
 import LessonPage from "./Lessons/LessonPage";
-
+// LOADING
+import Loading from "./components/Loading";
 import { getDoc } from "firebase/firestore";
 // GAME MODES
 import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";

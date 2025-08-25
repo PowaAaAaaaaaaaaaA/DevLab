@@ -25,7 +25,7 @@ function LessonPage() {
         {/* Instruction */}
         <InstructionPanel/>
         {/* Code Editor and Output Panel */}
-          {subject === "sampleHTML2" && ( <Html_TE />)}
+          {subject === "Html" && ( <Html_TE />)}
           {subject === "Css" && ( <Css_TE/>)}   
           {subject === "JavaScript" && ( <JavaScript_TE/>)}     
       </div>

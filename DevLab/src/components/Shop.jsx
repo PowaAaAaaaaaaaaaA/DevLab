@@ -14,8 +14,6 @@ import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
 
 import '../index.css'
 
-import '../index.css'
-
 
 function Shop() {
 
@@ -97,11 +95,11 @@ if(loading) return <p>Loading</p>
     dark:[&::-webkit-scrollbar-track]:bg-neutral-700
     dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500'>
       
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-20 w-full h-[100%] p-4'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-20 w-full h-[100%] p-4 '>
         {items.map(item=>(
           <div 
           key={item.id}
-          className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 shadow-md">
+          className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 shadow-md h-[100%]">
           <div className="bg-[#0D1117] rounded-xl p-7 flex flex-col items-center space-y-4 h-full">
             {/* Icon */}
             <img src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} alt="" className='w-30'/>

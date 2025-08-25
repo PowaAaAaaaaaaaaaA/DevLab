@@ -46,6 +46,16 @@ const subjects = ["Html", "Css", "JavaScript", "Database"];
 for (const subject of subjects) {
   // Create Level1 document
   await setDoc(
+    doc(db, "Users", user.uid, "Progress", subject),
+    {
+        status: true, 
+    });
+      await setDoc(
+    doc(db, "Users", user.uid, "Progress", subject,"Lessons","Lesson1"),
+    {
+        status: true, 
+    });
+  await setDoc(
     doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
     {
     status: true,
@@ -60,7 +70,6 @@ for (const subject of subjects) {
     status: true,
     });
 }
-
 }
             toast.success("Registered Successfully",{
                 position:"top-center",

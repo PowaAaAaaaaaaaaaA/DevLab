@@ -42,10 +42,10 @@ export default function useLevelsData(subject) {
     return lessons;
   };
 
-  const { data, isLoading } = useQuery({
+  const { data: levelsData, isLoading } = useQuery({
     queryKey: ["lesson_data", subject],
     queryFn: fetchData,
   });
 
-  return { data, isLoading };
+  return {levelsData, isLoading };
 }

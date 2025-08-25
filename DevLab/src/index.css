@@ -49,3 +49,22 @@
     max-height: 450px;
   }
 }
+
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #44526c;
+  border-radius: 9999px;
+}
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #29323f;
+  border-radius: 9999px;
+}
+.dark .scrollbar-custom::-webkit-scrollbar-track {
+  background: #374151;
+}
+.dark .scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}

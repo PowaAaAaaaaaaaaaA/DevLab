@@ -89,26 +89,41 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
           {/*Inventory Show*/}
   <AnimatePresence >
 {showInventory && (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0 }}
-    className="w-[20%] h-[50%] fixed bottom-20 left-5">
-      <div className="h-[100%] w-[100%] border border-gray-500 rounded-2xl bg-[#111827] p-4 flex flex-col gap-4 overflow-scroll overflow-x-hidden">
+  <motion.div 
+    initial={{ opacity: 0, scale: 0 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 0 }}
+    className="w-[20%] h-[50%] fixed bottom-20 left-5"
+  >
+    <div className="h-[100%] w-[100%] border border-gray-500 rounded-2xl bg-[#111827] p-4 flex flex-col gap-4 overflow-scroll overflow-x-hidden">
       <h1 className="text-white font-exo text-4xl">Inventory</h1>
-      {inventory.map(Items=>(
-        <button
-        key={Items.id}
-        onClick={() => itemActions[Items.title]?.(Items)}
-        className="cursor-pointer border rounded-2xl border-gray-600 min-h-[15%] bg-[#0D1117] flex items-center p-1 gap-10">
-          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2"><img src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default} alt="" className='w-full h-full'/></div>
-          <h2 className="text-2xl font-exo text-gray-300 min-w-[45%]">{Items.title}</h2>
-          <p className="rounded-lg bg-gray-700 p-3 text-[0.8rem]">{Items.quantity}</p>
-        </button>
-      ))}  
-      </div>
-    </motion.div>
-)}</AnimatePresence>
+      {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
+        inventory
+          .filter(item => item.id !== "placeholder")
+          .map(Items => (
+            <button
+              key={Items.id}
+              onClick={() => itemActions[Items.title]?.(Items)}
+              className="cursor-pointer border rounded-2xl border-gray-600 min-h-[15%] bg-[#0D1117] flex items-center p-1 gap-10"
+            >
+              <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
+                <img
+                  src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default}
+                  alt=""
+                  className="w-full h-full"
+                />
+              </div>
+              <h2 className="text-2xl font-exo text-gray-300 min-w-[45%]">{Items.title}</h2>
+              <p className="rounded-lg bg-gray-700 p-3 text-[0.8rem]">{Items.quantity}</p>
+            </button>
+          ))
+      ) : (
+        <p className="text-gray-400 text-center mt-4">No items in inventory</p>
+      )}
+    </div>
+  </motion.div>
+)}
+</AnimatePresence>
     </>
   );
 }

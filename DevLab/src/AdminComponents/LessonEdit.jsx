@@ -1,60 +1,30 @@
-  import React from 'react'
-  import { Link } from 'react-router-dom'
-  import { getDoc, doc,updateDoc, setDoc } from "firebase/firestore";
-  import { db } from "../Firebase/Firebase";
 
-  import { HiChevronLeft } from "react-icons/hi2";
-  import { useParams } from "react-router-dom";
-  import { useEffect,useState } from 'react';
+import { getDoc, doc, setDoc, deleteDoc} from "firebase/firestore";
+import { db } from "../Firebase/Firebase";
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
-  import { toast } from 'react-toastify';
-
-
-
-  function LessonEdit() {
+function LessonEdit({ subject, lessonId, levelId, stageId }) {
 
   const gameModes = ["Lesson", "BugBust", "CodeRush", "CodeCrafter", "BrainBytes"];
 
-  const { subject,lessonId, levelId ,topicId} = useParams()
-  const [levelData, setLevelData] = useState(null);
   const [activeTab, setActiveTab] = useState("Lesson");
-  const [gamemodeData, setGameModeData] = useState();
+  const [stageData, setStageData] = useState();
 
-  // get The Level Data
-  const fetchLessons = async ()=>{
-    try{
-      const subjectDb = doc (db, subject, lessonId, "Levels", levelId);
-      const subjDocs = await getDoc(subjectDb)
-      if(subjDocs.exists()){
-        setLevelData(subjDocs.data())
-      }
-    }catch(Error){
-      console.log(Error)
+  const fetchStage = async () => {
+    const stageRef = doc(db, subject, lessonId, "Levels", levelId, "Stages", stageId);
+    const stageSnap = await getDoc(stageRef);
+    if (stageSnap.exists()) {
+      setStageData(stageSnap.data());
+      setActiveTab(stageSnap.data().type || "Lesson");
+    } else {
+      setStageData(null);
     }
-  }
-  const fetchGameModes = async (activeTab)=>{
-    const gmDb = doc(db,subject, lessonId, "Levels", levelId,"Topics", topicId, "Gamemodes", activeTab);
-    const gmData = await getDoc(gmDb);
-    if (gmData.exists()){
-      setGameModeData(gmData.data())
-    }else{
-      setGameModeData(null);
-    }
-  }
-  useEffect (()=>{
-    fetchLessons();
-    if (activeTab){
-      fetchGameModes(activeTab);
-    }
-
-  }, [activeTab])
-
-  const [editedTitle, setEditedTitle] = useState(null);
-  const [editedDesc, setEditedDesc] = useState(null);
+  };
 
   const [instruction, setInstruction] = useState('');
-  const [gameModeTitle, setTitle] = useState('')
-  const [topic, setTopic] = useState('');
+  const [description, setDescription] = useState('');
+  const [gameModeTitle, setTitle] = useState('');
   const [preCode, setPreCode] = useState('');
   const [hint, setHint] = useState('');
   const [timer, setTimer] = useState('');
@@ -66,254 +36,268 @@
     correct: ''
   });
 
-
-  // This is for saving and adding game mode (if hindi na eexist)
-  const handleSave = async(e)=>{
+  const handleSave = async (e) => {
     e.preventDefault();
-    try{
-      // Save Level Data
-      const levelDb = doc(db, subject,lessonId, "Levels",levelId);
-      await updateDoc(levelDb,{
-        title: editedTitle || levelData.title,
-        desc: editedDesc || levelData.desc
-      })
-
-      const gamemodeDb = doc(db,subject, lessonId, "Levels", levelId,"Topics", topicId, "Gamemodes", activeTab);
-
-      let gamemodePayload = {
+    try {
+      const stageRef = doc(db, subject, lessonId, "Levels", levelId, "Stages", stageId);
+      let stagePayload = {
         type: activeTab,
-        title: gameModeTitle || gamemodeData?.title || null,
-        instruction: instruction || gamemodeData?.instruction || null,
-        topic: topic || gamemodeData?.topic || null,
-        preCode: preCode || gamemodeData?.preCode || null 
+        title: gameModeTitle || stageData?.title || null,
+        description: description || stageData?.description || null,
+        instruction: instruction || stageData?.instruction || null,
+        preCode: preCode || stageData?.preCode || null,
       };
-      if ( activeTab === "BugBust" || activeTab === "CodeCrafter") {
-        gamemodePayload = {
-          ...gamemodePayload,
-          hint: hint || gamemodeData?.hint || null,
+
+      if (activeTab === "BugBust" || activeTab === "CodeCrafter") {
+        stagePayload = {
+          ...stagePayload,
+          hint: hint || stageData?.hint || null,
         };
-      }if(activeTab === "Lesson"){
-        gamemodePayload = {
-          ...gamemodePayload,
+      }
+      if (activeTab === "CodeRush") {
+        stagePayload = {
+          ...stagePayload,
+          hint: hint || stageData?.hint || null,
+          timer: timer || stageData?.timer || null,
         };
-      }if (activeTab === "CodeRush") {
-        gamemodePayload = {
-          ...gamemodePayload,
-          hint: hint || gamemodeData?.hint || null,
-          timer: timer || gamemodeData?.timer || null,
+      }
+      if (activeTab === "BrainBytes") {
+        stagePayload = {
+          ...stagePayload,
+          options: {
+            A: answers.A || stageData?.options?.A,
+            B: answers.B || stageData?.options?.B,
+            C: answers.C || stageData?.options?.C,
+            D: answers.D || stageData?.options?.D,
+          },
+          correctAnswer: answers.correct || stageData?.correctAnswer,
         };
-      }if (activeTab === "BrainBytes") {
-    gamemodePayload = {
-      ...gamemodePayload,
-      options: {
-        A: answers.A || gamemodeData?.options.A,
-        B: answers.B || gamemodeData?.options.B,
-        C: answers.C || gamemodeData?.options.C,
-        D: answers.D || gamemodeData?.options.D,
-      },
-      correctAnswer: answers.correct || gamemodeData?.correctAnswer,
-    };
-      }await setDoc(gamemodeDb, gamemodePayload, { merge: true });
+      }
 
+      await setDoc(stageRef, stagePayload, { merge: true });
 
+      toast.success("Stage updated successfully!", {
+        position: "top-center",
+        theme: "colored"
+      });
 
-
-
-        toast.success("Save Changes",{
-            position:"top-center",
-            theme: "colored"})
-          await fetchLessons();
-          await fetchGameModes(activeTab)
-    }catch(error){
-      console.log(error)
+      await fetchStage();
+    } catch (error) {
+      console.error(error);
     }
-  }
+  };
 
-  console.log(activeTab)
-    return (
-      <div className='bg-[#25293B] h-fit p-2 overflow-hidden'>
-      {/*Header*/}
-        <div className='h-[35vh] flex flex-col p-4 justify-between gap-4 border-b-white border-b-2'>
-          <div className='flex items-center gap-3.5'>
-            <Link className='text-white text-[2rem]' to={'/Admin/ContentManagement'}><HiChevronLeft /></Link>
-            <h1 className='text-white text-[3rem] font-exo font-bold'>DevLab</h1>
-          </div>
-          <div className='h-[100%] flex gap-5'> 
-            <div className='w-[65%] border border-cyan-400 rounded-2xl bg-[#111827] p-5 flex flex-col gap-5'>
-              <h1 className='text-white font-exo text-6xl'>Editing: </h1>
-              <h2 className='text-white font-exo text-4xl' >{levelData?.title || 'wait'}</h2>
-            </div>
-            <div className='w-[35%] border border-cyan-400 rounded-2xl bg-[#111827] p-5 text-white font-exo'>
-              <p className='text-white font-exo'>{levelData?.desc || 'wait'}</p>
-            </div>
-          </div>
-        </div>
-      {/*Contents*/}
-        <div className='h-[200vh] p-5 flex flex-col gap-5'>
-          {/*Buttons*/}
-          <div className='flex justify-around h-[3%]'>
-            {gameModes.map((gm)=>(
-              <button key={gm} className={`font-exo text-white text-[1.2rem] font-bold p-2 w-[15%] rounded-3xl bg-[#7F5AF0] hover:cursor-pointer transition duration-500 ${activeTab === gm
-                ? "bg-[#563f99]"
-                : "hover:scale-110"}`}
-              onClick={()=> setActiveTab(gm)}
-              >{gm}</button>
+  useEffect(() => {
+    fetchStage();
+  }, []);
+
+    // Delete stage
+  const handleDelete = async () => {
+    try {
+      const stageRef = doc(db,subject,lessonId,"Levels",levelId,"Stages",stageId);
+      await deleteDoc(stageRef);
+      toast.success('Stage deleted successfully!');
+    } catch (error) {
+      console.log(error);
+      toast.error('Failed to delete stage.');
+    }
+  };
+  console.log(subject)
+
+  return (
+    <div className='bg-[#25293B]'>
+      <div className='h-auto p-5 flex flex-col gap-s'>
+        {/* Buttons */}
+        <div className=''>
+          <h1 className='font-exo text-white text-[1.5rem]'>Select Stage Type</h1>
+          <div className='flex justify-around mt-5 mb-5'>
+            {gameModes.map((gm) => (
+              <button
+                key={gm}
+                className={`font-exo text-white text-[0.8rem] font-bold p-2 w-[17%] rounded-3xl bg-[#7F5AF0] hover:cursor-pointer transition duration-500 ${activeTab === gm
+                  ? "bg-[#563f99]"
+                  : "hover:scale-110"}`}
+                onClick={() => setActiveTab(gm)}>
+                {gm}
+              </button>
             ))}
           </div>
-          {/*Buttons (END)*/}
-          {/*Form*/}
-            <form action="" className='h-[100%] flex flex-wrap p-4 gap-5 justify-center ' onSubmit={handleSave} type="submit">
-
-
-              <div className='border-cyan-400 border rounded-2xl w-[55%] h-[15%] p-4 bg-[#111827]'>
-                <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Level Title: </h1>
-                <textarea 
-                onChange={(e) => setEditedTitle(e.target.value)}
-                name="" id="" className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none' placeholder={levelData?.title || 'Loading'}></textarea>
-              </div>
-
-              {/*Level Description*/}
-              <div className='border-cyan-400 border rounded-2xl w-[35%] h-[15%] p-4 bg-[#111827]'>
-                <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Level Description:</h1>
-                <textarea 
-                onChange={(e) => setEditedDesc(e.target.value)}
-                name="" id="" className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={levelData?.desc || 'Loading'}></textarea>
-              </div> 
-
-              {/*Gamemode Title*/}
-              <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>GameMode Title:</h1>
-                  <textarea 
-                  onChange={(e)=> setTitle(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.title || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-              </div>
-
-                {/*Instruction*/}
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Instruction:</h1>
-                  <textarea 
-                  onChange={(e)=> setInstruction(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.instruction || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                </div>
-
-                {/*Topic*/}
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Topic:</h1>
-                  <textarea 
-                  onChange={(e)=> setTopic(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.topic || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                </div>
-                {activeTab === "Lesson" ?(
-                <>
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
-                  <textarea 
-                  onChange={(e)=> setPreCode(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.preCode || 'This mode doesn`t exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                </div>
-
-                </>
-                ):activeTab === "BugBust" ?(
-                /*Hint For BugBust*/
-                <>
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
-                  <textarea 
-                  onChange={(e)=> setPreCode(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.preCode || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                </div>
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Hint:</h1>
-                  <textarea 
-                  onChange={(e)=> setHint(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.hint || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                </div>
-                </>
-                ):activeTab === "CodeRush" ?(
-                  <>
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
-                  <textarea 
-                  onChange={(e)=> setPreCode(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.preCode || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                </div>
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827] flex flex-col gap-5'>
-                  <div className='h-[40%]'>
-                    <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Hint:</h1>
-                    <textarea 
-                    onChange={(e)=> setHint(e.target.value)}
-                    name="" id="" className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.hint || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                  </div>
-                  <div className='h-[50%]'>
-                    <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Timer: </h1>
-                    <input 
-                    onChange={(e) => setTimer(Number(e.target.value))}
-                    type="number" className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none text-5xl' placeholder={gamemodeData?.timer  || 'Enter Seconds'}/>
-                  </div>
-                </div>
-                </>
-                ):activeTab === "CodeCrafter"?(
-                  <>
-                <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827]'>
-                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
-                  <textarea 
-                  onChange={(e)=> setPreCode(e.target.value)}
-                  name="" id="" className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.preCode || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                </div>
-                <div  className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827] flex flex-col gap-5'> 
-                  <div className='h-[40%]'>
-                    <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Hint: </h1>
-                    <textarea 
-                    onChange={(e)=> setHint(e.target.value)}
-                    name="" id="" className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none' placeholder={gamemodeData?.hint || 'This mode doesnt exist yet. Fill in the fields and click Save to create it.'}></textarea>
-                  </div>
-                  <div className='h-[50%]'>
-                    <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Replicate (Optional): </h1>
-                    <div className='border h-[70%] rounded-2xl bg-[#0d13207c] border-gray-700'></div>
-                  </div>
-                </div>
-                  </>
-                ):activeTab === "BrainBytes"?(
-                  <>
-                    <div className='border-cyan-400 border rounded-2xl w-[45%] h-[20%] p-4 bg-[#111827] flex flex-col justify-around'>
-                      <input 
-                      onChange={(e) => setAnswers(prev => ({...prev, A: e.target.value}))}
-                      type="text" placeholder={`A:  ${gamemodeData?.options?.A}`}className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
-                      <input 
-                      onChange={(e) => setAnswers(prev => ({...prev, B: e.target.value}))}
-                      type="text" placeholder={`B:  ${gamemodeData?.options?.B}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
-                      <input 
-                      onChange={(e) => setAnswers(prev => ({...prev, C: e.target.value}))}
-                      type="text" placeholder={`C:  ${gamemodeData?.options?.C}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
-                      <input 
-                      onChange={(e) => setAnswers(prev => ({...prev, D: e.target.value}))}
-                      type="text" placeholder={`D:  ${gamemodeData?.options?.D}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
-                      <input 
-                      onChange={(e) => setAnswers(prev => ({...prev, correct: e.target.value}))}
-                      type="text" placeholder={`Correct Answer:  ${gamemodeData?.correctAnswer}`} className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'/>
-                    </div>
-                  </>
-                ):null}
-        
-                {/*Delete Button*/}
-                <div className=' w-[95%] flex justify-between p-5 items-center'>
-                  <p className='text-white font-exo text-5xl underline'>{activeTab}</p>
-                  <button className='font-exo font-bold text-1xl text-white w-[13%] p-2 rounded-4xl bg-[#E35460] hover:cursor-pointer  hover:scale-105 transition duration-300 ease-in-out  hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]'>Delete</button>
-                </div>
-                  
-                {/*Save Button*/}
-                <button  className='w-[13%] h-[3%] p-1 rounded-2xl bg-[#5FDC70] text-white font-exo font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]' >Save Changes</button>
-
-            </form>
         </div>
 
+        {/* Form */}
+        <form
+          action=""
+          className='h-[100%] flex flex-col  p-4 gap-5 justify-center'>
+          {/* Stage Title */}
+          <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+            <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Stage Title:</h1>
+            <textarea
+              onChange={(e) => setTitle(e.target.value)}
+              className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+              placeholder={stageData?.title || 'Enter stage title here.'}
+            ></textarea>
+          </div>
+          {/* Stage Description */}
+          <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+            <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Stage Description:</h1>
+            <textarea
+              onChange={(e) => setDescription(e.target.value)}
+              className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+              placeholder={stageData?.title || 'Enter stage title here.'}
+            ></textarea>
+          </div>
+          {/* Instruction */}
+          <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+            <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Instruction:</h1>
+            <textarea
+              onChange={(e) => setInstruction(e.target.value)}
+              className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+              placeholder={stageData?.description || 'Enter instructions for this stage.'}
+            ></textarea>
+          </div>
 
+          {/* PreCode, Hint, Timer, Answers stay the same */}
+          {activeTab === "Lesson" ? (
+            <>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+                <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
+                <textarea
+                  onChange={(e) => setPreCode(e.target.value)}
+                  className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                ></textarea>
+              </div>
+            </>
+          ) : activeTab === "BugBust" ? (
+            <>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+                <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
+                <textarea
+                  onChange={(e) => setPreCode(e.target.value)}
+                  className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                ></textarea>
+              </div>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+                <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Hint:</h1>
+                <textarea
+                  onChange={(e) => setHint(e.target.value)}
+                  className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+                  placeholder={stageData?.hint || 'Provide a hint for debugging here.'}
+                ></textarea>
+              </div>
+            </>
+          ) : activeTab === "CodeRush" ? (
+            <>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+                <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
+                <textarea
+                  onChange={(e) => setPreCode(e.target.value)}
+                  className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                ></textarea>
+              </div>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827] flex flex-col gap-5'>
+                <div className='h-[40%]'>
+                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Hint:</h1>
+                  <textarea
+                    onChange={(e) => setHint(e.target.value)}
+                    className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+                    placeholder={stageData?.hint || 'Provide a hint for this challenge.'}
+                  ></textarea>
+                </div>
+                <div className='h-[50%]'>
+                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Timer: </h1>
+                  <input
+                    onChange={(e) => setTimer(Number(e.target.value))}
+                    type="number"
+                    className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none text-5xl'
+                    placeholder={stageData?.timer || 'Enter Seconds'}
+                  />
+                </div>
+              </div>
+            </>
+          ) : activeTab === "CodeCrafter" ? (
+            <>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
+                <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Coding Interface:</h1>
+                <textarea
+                  onChange={(e) => setPreCode(e.target.value)}
+                  className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                ></textarea>
+              </div>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827] flex flex-col gap-5'>
+                <div className='h-[40%]'>
+                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Hint: </h1>
+                  <textarea
+                    onChange={(e) => setHint(e.target.value)}
+                    className='w-[100%] h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
+                    placeholder={stageData?.hint || 'Provide a hint for this challenge.'}
+                  ></textarea>
+                </div>
+                <div className='h-[50%]'>
+                  <h1 className='font-exo text-white text-[2rem] mb-[10px]'>Replicate (Optional): </h1>
+                  <div className='border h-[70%] rounded-2xl bg-[#0d13207c] border-gray-700'></div>
+                </div>
+              </div>
+            </>
+          ) : activeTab === "BrainBytes" ? (
+            <>
+              <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827] flex flex-col justify-around gap-4'>
+                <input
+                  onChange={(e) => setAnswers(prev => ({ ...prev, A: e.target.value }))}
+                  type="text"
+                  placeholder={`A: ${stageData?.options?.A}`}
+                  className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'
+                />
+                <input
+                  onChange={(e) => setAnswers(prev => ({ ...prev, B: e.target.value }))}
+                  type="text"
+                  placeholder={`B: ${stageData?.options?.B}`}
+                  className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'
+                />
+                <input
+                  onChange={(e) => setAnswers(prev => ({ ...prev, C: e.target.value }))}
+                  type="text"
+                  placeholder={`C: ${stageData?.options?.C}`}
+                  className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'
+                />
+                <input
+                  onChange={(e) => setAnswers(prev => ({ ...prev, D: e.target.value }))}
+                  type="text"
+                  placeholder={`D: ${stageData?.options?.D}`}
+                  className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'
+                />
+                <input
+                  onChange={(e) => setAnswers(prev => ({ ...prev, correct: e.target.value }))}
+                  type="text"
+                  placeholder={`Correct Answer: ${stageData?.correctAnswer}`}
+                  className='border h-[15%] rounded-2xl border-gray-700 bg-[#0d13207c] p-2 text-white font-exo focus:border-cyan-500 focus:outline-none'
+                />
+              </div>
+            </>
+          ) : null}
 
+          {/* Delete and Save Buttons */}
+          <div className='w-[95%] flex justify-between p-5 items-center'>
+            <button
+            type="button"
+              onClick={handleDelete}
+              className='font-exo font-bold text-1xl text-white w-[30%] p-2 rounded-4xl bg-[#E35460] hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]'>
+              Delete
+            </button>
+          </div>
 
-
-
+          <button
+            onClick={handleSave}
+            className='w-[30%] h-[3%] p-1 self-center rounded-2xl bg-[#5FDC70] text-white font-exo font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]'>
+            Save Changes
+          </button>
+        </form>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
-  export default LessonEdit
+export default LessonEdit;

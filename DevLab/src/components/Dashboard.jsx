@@ -13,6 +13,8 @@ import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
 
 import useShopItems from './Custom Hooks/useShopItems'
+
+import Loading from './Loading'
 import '../index.css'
 
 
@@ -28,10 +30,20 @@ function Dashboard() {
   const {animatedBar: JsProgress} = useSubjProgressBar("JavaScript")
   const {animatedBar: DbProgress} = useSubjProgressBar("Database")
 
+  const [loadingDashboard , setLoading] = useState(true);
+  const [hasloaded, setHasLoaded] = useState("no");
+
     // // Shop Items (Custom Hook)
     // const {items, loading} = useShopItems();
 
-
+  // Timer for loading screen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+      setHasLoaded("yes");
+    }, 7000);
+    return () => clearTimeout(timer);
+  }, []);
 
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
@@ -55,8 +67,17 @@ console.log(subject)
   fetchLevelInfo();
 }, [Userdata]);
 
+  // Show Loading Screen first
+  console.log(loadingDashboard, hasloaded)
+  if (loadingDashboard && hasloaded === "no") {
+    return(
+    <div className="fixed top-0 left-0 w-screen h-screen z-50">
+        <Loading />
+    </div>);
+  }
 
   return (
+    
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
     { !isLoading ? 
@@ -108,7 +129,7 @@ console.log(subject)
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
           {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Topic1/Lesson`} className='h-[100%]'>
-          <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[90%] '>
+          <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[100px]'>
             <div className='bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
             <div className='p-2 flex-col flex gap-2'>
               <p className='font-exo text-[1.4rem] text-white font-bold'>{levelInfo.title}</p>
