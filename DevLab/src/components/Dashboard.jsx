@@ -31,18 +31,23 @@ function Dashboard() {
   const {animatedBar: DbProgress} = useSubjProgressBar("Database")
 
   const [loadingDashboard , setLoading] = useState(true);
-  const [hasloaded, setHasLoaded] = useState("no");
 
     // // Shop Items (Custom Hook)
     // const {items, loading} = useShopItems();
 
   // Timer for loading screen
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const hasLoadedBefore = localStorage.getItem('dashboardLoaded');
+
+    if (!hasLoadedBefore) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+        localStorage.setItem('dashboardLoaded', 'true');
+      }, 7000);
+      return () => clearTimeout(timer);
+    } else {
       setLoading(false);
-      setHasLoaded("yes");
-    }, 7000);
-    return () => clearTimeout(timer);
+    }
   }, []);
 
 // THis will get the last open lesson 
@@ -68,14 +73,14 @@ console.log(subject)
 }, [Userdata]);
 
   // Show Loading Screen first
-  console.log(loadingDashboard, hasloaded)
-  if (loadingDashboard && hasloaded === "no") {
-    return(
-    <div className="fixed top-0 left-0 w-screen h-screen z-50">
+  // Show Loading Screen
+  if (loadingDashboard && loadingDashboard ) {
+    return (
+      <div className="fixed top-0 left-0 w-screen h-screen z-50">
         <Loading />
-    </div>);
+      </div>
+    );
   }
-
   return (
     
 // Dashboard Wrapper
@@ -217,9 +222,9 @@ console.log(subject)
         </div>
       </div>
       {/*Inventory*/}
-<div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3 '>
+<div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3  '>
   <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
-  <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-6'>
+  <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-6 scrollbar-custom'>
   {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
     inventory.filter(item => item.id !== "placeholder").map(item => (
         <div 

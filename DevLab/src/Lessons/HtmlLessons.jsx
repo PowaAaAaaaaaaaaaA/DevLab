@@ -73,14 +73,7 @@ console.log(total);
               className="w-[60%] h-[70%] mt-[30px]"/>
           ) : (
             <div
-              className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden 
-          [&::-webkit-scrollbar]:w-2
-          [&::-webkit-scrollbar-track]:rounded-full
-        [&::-webkit-scrollbar-track]:bg-gray-100
-          [&::-webkit-scrollbar-thumb]:rounded-full
-        [&::-webkit-scrollbar-thumb]:bg-gray-300
-        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+              className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden scrollbar-custom">
               {levelsData.map((lesson) => (
                 <div key={lesson.id} className="flex flex-col gap-4">
                   <h2 className="font-exo text-[3rem] font-bold text-white">
@@ -126,10 +119,21 @@ console.log(total);
                             ${
                               isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
                             } cursor-pointer`}
-                            onClick={() => {
+                            onClick={async() => {
                               if (!isUnlocked) {
                                 setShowLockedModal(true);
-                                return;}
+                                return;} if (isUnlocked) {
+                                const user = auth.currentUser;
+                                if (user) {
+                                  const userRef = doc(db, "Users", user.uid);
+                                  await updateDoc(userRef, {
+                                    lastOpenedLevel: {
+                                      subject: "Html", // since nasa Html lesson Panalang
+                                      lessonId: lesson.id,
+                                      levelId: level.id,
+                                    },
+                                  });
+                                }}
                               toggleLevel(lesson.id, level.id);
                             }}>
                             <div className="text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center">
