@@ -14,6 +14,23 @@ import AddContent from "./AddContent";
 import LessonEdit from "./LessonEdit";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import SortableStage from "./SortableStage"
+
+import {
+  DndContext,
+  closestCorners
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+
+
 function ContentManagement() {
 
 const queryClient = useQueryClient()
@@ -28,6 +45,42 @@ const queryClient = useQueryClient()
   // For PopUP(Adding Level/Lesson)Transition
   const [popupVisible, setPopupVisible] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+
+  const [levelStages, setLevelStages] = useState({});
+
+useEffect(() => {
+  if (levelsData && Array.isArray(levelsData)) {
+    const formatted = {};
+    levelsData.forEach(lesson => {
+      if (lesson.levels && Array.isArray(lesson.levels)) {
+        lesson.levels.forEach(level => {
+          formatted[level.id] = Array.isArray(level.stages) ? level.stages : [];
+        });
+      }
+    });
+    setLevelStages(formatted);
+  } else {
+    setLevelStages({});
+  }
+}, [levelsData]);
+
+const handleDragEnd = (event, levelId) => {
+  const { active, over } = event;
+  if (!over || active.id === over.id) return;
+
+  setLevelStages((prev) => {
+    const updatedStages = [...prev[levelId]];
+    const oldIndex = updatedStages.findIndex(stage => stage.id === active.id);
+    const newIndex = updatedStages.findIndex(stage => stage.id === over.id);
+    return {
+      ...prev,
+      [levelId]: arrayMove(updatedStages, oldIndex, newIndex)
+    };
+  });
+};
+
+
+
 
 const openPopup = () => {
   setShowPopup(true);
@@ -96,6 +149,7 @@ const deleteLevel = async (subject, lessonId, levelId) => {
   }
 };
 
+console.log(showForm)
   return (
 <div className='h-full overflow-hidden'>
     {/*Header*/}
@@ -141,20 +195,21 @@ const deleteLevel = async (subject, lessonId, levelId) => {
               <p className="text-white font-exo text-[0.8rem]">{level.desc}</p>
               <div className="flex gap-5">
                 <div className="border mt-3 flex flex-wrap p-2 rounded-lg border-gray-500 gap-3 w-[100%]">
-                  {level.stages && level.stages.map((stages) => (
-                    <div key={stages.id} className="rounded bg-[#1F2937] p-3">
-                      <button 
-                        onClick={() => {
-                        setShowForm(true);
-                        setStageId(stages.id);
-                        setLevelId(level.id);
-                        setLessonId(lesson.Lesson);
-                        }}
-                        className="font-exo text-white cursor-pointer">
-                        {stages.id}
-                      </button>
-                    </div>
-                  ))}
+                  <DndContext collisionDetection={closestCorners} onDragEnd={(event) => handleDragEnd(event, level.id)}>
+                    <SortableContext
+                    items={levelStages[level.id]?.map(stage => stage.id) || []}
+                    strategy={horizontalListSortingStrategy}>
+                      {levelStages[level.id]?.map(stage => (
+                        <SortableStage 
+                          key={stage.id} 
+                          stage={stage}  
+                          onClick={() => {
+                            setShowForm(true);
+                            setStageId(stage.id);
+                            setLevelId(level.id);
+                            setLessonId(lesson.Lesson);}}/>))}
+                    </SortableContext>
+                  </DndContext>
                 </div>
               </div>
               <div className="flex justify-end gap-3 absolute top-3 right-5">
