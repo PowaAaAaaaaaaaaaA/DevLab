@@ -18,6 +18,7 @@ function Settings() {
   // Logout
   const logout = async () => {
     try {
+      sessionStorage.removeItem('dashboardLoaded');
       await auth.signOut();
       navigate("/Login"); // Use navigate
     } catch (error) {
@@ -100,7 +101,7 @@ function Settings() {
               type="text"
               placeholder={userDetails ? userDetails.username : "Loading..."}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl pl-10"/>
+              className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl  p-2 pl-10"/>
             <IoPerson className="absolute top-2 left-2 text-white text-2xl" />
           </div>
           <label htmlFor="" className="text-white font-exo font-light">

@@ -105,7 +105,7 @@ const handleAdd = async () => {
     const levelData = {
         title,
         description:desc,
-        coinReward: parseInt(coins),
+        coinsReward: parseInt(coins),
         expReward: parseInt(exp),
         symbol: defaultS,
         order: nextLevelNum,};

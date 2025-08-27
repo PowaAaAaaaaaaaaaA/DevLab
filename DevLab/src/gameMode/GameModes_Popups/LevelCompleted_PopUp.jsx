@@ -134,7 +134,7 @@ const unlockNextLevel = async (goContinue) => {
     );
 
       if (goContinue) {
-        navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Topic1/Lesson`);
+        navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Stage1/Lesson`);
       }
     } else {
       // Go to NEXT lesson's Level1

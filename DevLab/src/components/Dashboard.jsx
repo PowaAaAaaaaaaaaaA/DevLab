@@ -33,22 +33,31 @@ function Dashboard() {
   const [loadingDashboard , setLoading] = useState(true);
 
     // // Shop Items (Custom Hook)
-    // const {items, loading} = useShopItems();
+    const {items} = useShopItems();
 
   // Timer for loading screen
-  useEffect(() => {
-    const hasLoadedBefore = localStorage.getItem('dashboardLoaded');
+const [hasLoadedBefore, setHasLoadedBefore] = useState(false);
 
-    if (!hasLoadedBefore) {
-      const timer = setTimeout(() => {
-        setLoading(false);
-        localStorage.setItem('dashboardLoaded', 'true');
-      }, 7000);
-      return () => clearTimeout(timer);
-    } else {
+
+useEffect(() => {
+  const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
+
+  if (!hasLoadedBefore) {
+    // First time in this session → show loader
+    const timer = setTimeout(() => {
       setLoading(false);
-    }
-  }, []);
+      sessionStorage.setItem('dashboardLoaded', 'true');
+    }, 7000);
+
+    return () => clearTimeout(timer);
+  } else {
+    // Already loaded before → skip loader
+    setLoading(false);
+  }
+}, []);
+
+
+
 
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
@@ -74,13 +83,14 @@ console.log(subject)
 
   // Show Loading Screen first
   // Show Loading Screen
-  if (loadingDashboard && loadingDashboard ) {
-    return (
-      <div className="fixed top-0 left-0 w-screen h-screen z-50">
-        <Loading />
-      </div>
-    );
-  }
+ if (loadingDashboard) {
+  return (
+    <div className="fixed top-0 left-0 w-screen h-screen z-50">
+      <Loading />
+    </div>
+  );
+}
+
   return (
     
 // Dashboard Wrapper
@@ -133,7 +143,7 @@ console.log(subject)
         <div className='h-[35%] p-1 flex flex-col gap-4 '>
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
-          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Topic1/Lesson`} className='h-[100%]'>
+          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Stage1/Lesson`} className='h-[100%]'>
           <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[100px]'>
             <div className='bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
             <div className='p-2 flex-col flex gap-2'>
@@ -224,12 +234,12 @@ console.log(subject)
       {/*Inventory*/}
 <div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3  '>
   <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
-  <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-6 scrollbar-custom'>
+  <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-4 scrollbar-custom'>
   {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
     inventory.filter(item => item.id !== "placeholder").map(item => (
         <div 
           key={item.id}
-          className="border rounded-2xl border-gray-600 min-h-[20%] max-h-[20%] bg-[#0D1117] flex items-center p-1 justify-around gap-10">
+          className="border rounded-2xl border-gray-600 min-h-[25%] max-h-[25%] bg-[#0D1117] flex items-center p-1 justify-around gap-10">
           <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
             <img 
               src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 

@@ -196,7 +196,7 @@ console.log(total);
                                           className={`p-3 rounded-xl min-h-[100px] text-white transition cursor-pointer relative
                                           ${
                                             isStageUnlocked
-                                              ? "bg-[#1E1E2E] hover:bg-[#FF5733]/90"
+                                              ? "bg-[#1E1E2E] hover:bg-[#FF5733]/80"
                                               : "bg-gray-800 pacity-50"
                                           }`}
                                           onClick={() => {

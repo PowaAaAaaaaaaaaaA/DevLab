@@ -45,7 +45,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
         title: gameModeTitle || stageData?.title || null,
         description: description || stageData?.description || null,
         instruction: instruction || stageData?.instruction || null,
-        preCode: preCode || stageData?.preCode || null,
+        codingInterface: preCode || stageData?.preCode || null,
       };
 
       if (activeTab === "BugBust" || activeTab === "CodeCrafter") {
@@ -164,7 +164,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
                 <textarea
                   onChange={(e) => setPreCode(e.target.value)}
                   className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
-                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                  placeholder={stageData?.codingInterface || 'Enter initial code setup here.'}
                 ></textarea>
               </div>
             </>
@@ -175,7 +175,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
                 <textarea
                   onChange={(e) => setPreCode(e.target.value)}
                   className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
-                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                  placeholder={stageData?.codingInterface || 'Enter initial code setup here.'}
                 ></textarea>
               </div>
               <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]'>
@@ -194,7 +194,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
                 <textarea
                   onChange={(e) => setPreCode(e.target.value)}
                   className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
-                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                  placeholder={stageData?.codingInterface || 'Enter initial code setup here.'}
                 ></textarea>
               </div>
               <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827] flex flex-col gap-5'>
@@ -224,7 +224,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
                 <textarea
                   onChange={(e) => setPreCode(e.target.value)}
                   className='w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700  focus:outline-none resize-none'
-                  placeholder={stageData?.preCode || 'Enter initial code setup here.'}
+                  placeholder={stageData?.codingInterface || 'Enter initial code setup here.'}
                 ></textarea>
               </div>
               <div className='border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827] flex flex-col gap-5'>

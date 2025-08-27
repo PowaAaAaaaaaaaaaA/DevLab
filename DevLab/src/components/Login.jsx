@@ -30,7 +30,7 @@ function Login() {
         await signInWithEmailAndPassword(auth, email, password);
         navigate('/Main');
     }catch(error){
-        toast.error(error.message,{
+        toast.error("Invalid Credentials",{
                         position:"bottom-center",
                         theme: "colored"
                     })

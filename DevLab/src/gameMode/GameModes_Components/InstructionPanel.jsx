@@ -30,7 +30,7 @@ function InstructionPanel({submitAttempt, showPopup, showCodeWhisper, setShowCod
   const [formattedCode, setFormattedCode] = useState("");
   useEffect(() => {
     if (!gameModeData || !subject) return;
-    const rawCode = gameModeData?.preCode || "";
+    const rawCode = gameModeData?.codingInterface || "";
     switch (subject) {
       case "Html":
         setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
@@ -151,7 +151,7 @@ console.log(activeBuffs)
             </>
           )}
           <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] font-exo">
-            {gameModeData.topic}
+            {gameModeData.description}
           </p>
           {gameModeData?.type === "BrainBytes" ? (
             <div className="mt-4 p-4 bg-[#25293B] rounded-2xl flex flex-col gap-3">
@@ -202,14 +202,14 @@ console.log(activeBuffs)
               <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
                 Instruction
               </h3>
-              <p className="mb-2 font-exo">{gameModeData.instruction}</p>
+              <p className="mb-2 font-exo whitespace-pre-line leading-relaxed">{gameModeData.instruction}</p>
               <p className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
                 {formattedCode}
               </p>
             </div>
           )}
           {gameModeData?.type === "CodeRush"?(
-  <div className="font-bold text-[3.2rem] w-[60%] m-auto p-3 flex flex-col justify-center items-center bg-[#25293B] rounded-2xl relative overflow-hidden">
+  <div className="font-bold text-[3.2rem] w-[60%] m-auto p-2 flex flex-col justify-center items-center bg-[#25293B] rounded-2xl relative ">
     <p className="font-exo text-shadow-lg text-shadow-black text-[1.5rem]">Time:</p>
     <p className="text-[#E35460]">{FormatTimer(timer)}</p>
     {/* Extra Time Animation */}

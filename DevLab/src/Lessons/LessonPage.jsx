@@ -12,8 +12,7 @@ import Database_TE from "../gameMode/GameModes_Components/CodeEditor and Output 
 
 function LessonPage() {
   // Navigate
-  const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
-
+  const { subject,  } = useParams();
 
 
   return subject !== "Database" ? (
@@ -27,7 +26,8 @@ function LessonPage() {
         {/* Code Editor and Output Panel */}
           {subject === "Html" && ( <Html_TE />)}
           {subject === "Css" && ( <Css_TE/>)}   
-          {subject === "JavaScript" && ( <JavaScript_TE/>)}     
+          {subject === "JavaScript" && ( <JavaScript_TE/>)}    
+          {subject === "Database" && ( <Database_TE/>)}   
       </div>
       {/* Footer */}
         <GameFooter/>

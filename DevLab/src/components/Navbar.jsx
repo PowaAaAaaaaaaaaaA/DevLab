@@ -12,7 +12,7 @@ const toggleDropdown = (key) => {
     setOpen(open === key ? null : key);};
 
 return (
-    <div className='flex flex-col p-4 w-70 text-white h-screen overflow-auto'>
+    <div className='flex flex-col p-4 w-70 text-white h-screen overflow-auto scrollbar-custom'>
         <div className='p-5'>
             <h1 className='p-5 font-exo font-bold text-5xl'>DevLab</h1>
         </div>

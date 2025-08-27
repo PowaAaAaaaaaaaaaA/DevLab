@@ -8,13 +8,13 @@ export default function SortableStage({ stage, onClick }) {
   const style = {
     transform: transform ? CSS.Transform.toString(transform) : "none",
     transition: transition || "transform 200ms ease",
-    padding: "8px",
+    padding: "10px",
     margin: "0%", // for horizontal spacing
     background: "#1F2937",
     color: "white",
     borderRadius: "8px",
     display: "inline-block",
-    minWidth: "100px",
+    minWidth: "130px",
     textAlign: "center",
     height: "auto"
   };
@@ -29,7 +29,7 @@ export default function SortableStage({ stage, onClick }) {
         }}>
         {stage.id}
       </button>
-      <div  {...listeners} className="border hover:bg-amber-400 h-[6px] cursor-grab"></div>
+      <div  {...listeners} className="hover:bg-purple-600 h-[6px] cursor-grab rounded-3xl transition-colors duration-300"></div>
     </div>
   );
 }

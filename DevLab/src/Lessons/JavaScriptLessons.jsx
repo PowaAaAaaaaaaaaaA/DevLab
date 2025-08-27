@@ -208,7 +208,7 @@ console.log(total);
                                           <p className="font-exo">
                                             {stage.title}
                                           </p>
-                                          <p className="text-gray-400 text-sm line-clamp-3">
+                                          <p className="text-gray-600 text-sm line-clamp-3">
                                             {stage.description}
                                           </p>
                                           {!isStageUnlocked && (
