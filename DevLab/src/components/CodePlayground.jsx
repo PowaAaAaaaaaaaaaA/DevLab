@@ -8,6 +8,7 @@ import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/OutputLottie.json";
 import { motion } from "framer-motion";
 
+import '../index.css'
 function CodePlayground() {
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("HTML");
@@ -65,6 +66,7 @@ function CodePlayground() {
     </body>
     </html>`;
 
+    console.log(fullCode); // For debugging purposes
       const iframe = iFrame.current;
       if (iframe) {
         const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -101,9 +103,9 @@ function CodePlayground() {
           {/* Code Editor wrapper */}
           <div className="px-4 w-full flex flex-col flex-1 min-h-0 gap-3 rounded-3xl p-3 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
             {/* CodeMirror container */}
-            <div className="flex-1 min-h-0 overflow-auto">
+            <div className="flex-1 min-h-0 overflow-auto ">
               <CodeMirror
-                className="text-xl h-full"
+                className="text-xl h-full scrollbar-custom"
                 height="100%"
                 value={code[activeTab]}
                 extensions={[getLanguageExtension()]}
@@ -125,7 +127,7 @@ function CodePlayground() {
         </div>
 
         {/* Output Panel */}
-        <div className="bg-[#F8F3FF] w-[39%] h-full rounded-2xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="bg-[#F8F3FF] w-[39%] h-full rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
           {run ? (
             <iframe
               title="output"
@@ -134,7 +136,7 @@ function CodePlayground() {
               sandbox="allow-scripts allow-same-origin allow-modals"
             />
           ) : (
-            <div className="w-full h-full flex flex-col justify-center items-center rounded-3xl bg-[#F8F3FF]">
+            <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl bg-[#F8F3FF]">
               <Lottie animationData={Animation} className="w-[50%] h-[50%]" />
               <p className="text-gray-700 font-bold">
                 YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
