@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { db, auth } from "../../Firebase/Firebase";
+import { db, auth } from "../Firebase/Firebase";
 import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 
-export default function useCodeRushTimer(initialTime,gamemodeId,gameModeData,showPopup) {
+export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, showPopup) {
   const [timer, setTimer] = useState(null);
   const [buffApplied, setBuffApplied] = useState(false);
+  const [isFrozen, setIsFrozen] = useState(false);
+  const [buffType, setBuffType] = useState("")
 
   // Initialize the timer
   useEffect(() => {
@@ -15,13 +17,13 @@ export default function useCodeRushTimer(initialTime,gamemodeId,gameModeData,sho
 
   // Countdown logic
   useEffect(() => {
-    if (gamemodeId === "CodeRush" && !showPopup) {
+    if (gamemodeId === "CodeRush" && !showPopup && !isFrozen) {
       const countdown = setInterval(() => {
         setTimer((prev) => Math.max(prev - 1, 0));
       }, 1000);
       return () => clearInterval(countdown);
     }
-  }, [gamemodeId, showPopup]);
+  }, [gamemodeId, showPopup, isFrozen]);
 
   // Listen for buffs in realtime from Firestore
   useEffect(() => {
@@ -30,22 +32,34 @@ export default function useCodeRushTimer(initialTime,gamemodeId,gameModeData,sho
     const userDb = doc(db, "Users", auth.currentUser.uid);
     const unsubscribe = onSnapshot(userDb, (snap) => {
       const data = snap.data();
+
+      // Extra Time Buff (+30s)
       if (data?.activeBuffs?.includes("extraTime")) {
         setTimer((prev) => prev + 30);
         setBuffApplied(true);
+        setBuffType("extraTime");
 
-        // Remove buff so it’s only used once
-        updateDoc(userDb, {
-          activeBuffs: arrayRemove("extraTime"),
-        });
-              // Reset animation flag after 500ms
-      setTimeout(() => setBuffApplied(false), 1000);
+        updateDoc(userDb, { activeBuffs: arrayRemove("extraTime") });
+        setTimeout(() => setBuffApplied(false), 1000);
       }
-      
+
+      // Time Freeze Buff (pauses countdown for 5s)
+      if (data?.activeBuffs?.includes("timeFreeze")) {
+        setIsFrozen(true);
+        setBuffApplied(true);
+        setBuffType("timeFreeze");
+
+        updateDoc(userDb, { activeBuffs: arrayRemove("timeFreeze") });
+
+        setTimeout(() => {
+          setIsFrozen(false);
+          setBuffApplied(false);
+        }, 5000); // freeze lasts 5s
+      }
     });
 
     return () => unsubscribe();
   }, [gamemodeId]);
 
-  return [timer,buffApplied];
+  return [timer, buffApplied,buffType];
 }

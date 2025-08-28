@@ -4,28 +4,42 @@ import useLevelsData from "./useLevelsData";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useUserProgress(subject) {
-  const { data: levelsData, isLoading: levelsLoading } = useLevelsData(subject);
+  const { levelsData, isLoading: levelsLoading } = useLevelsData(subject);
 
   const fetchProgress = async () => {
     const userId = auth.currentUser.uid;
-    const allProgress = {};
-    let count = 0;
+    const allProgress = {}; // stores level completion
+    const allStages = {};   // stores stage completion
+    let completedLevels = 0;
+    let completedStages = 0;
 
-    if (!levelsData) return { allProgress, count };
+    if (!levelsData) return { allProgress, allStages, completedLevels, completedStages };
 
     for (const lesson of levelsData) {
       const lessonId = lesson.id;
-      const progressRef = collection(db,"Users",userId,"Progress",subject,"Lessons",lessonId,"Levels");
-      const progressSnap = await getDocs(progressRef);
+      const levelsRef = collection(db, "Users", userId, "Progress", subject, "Lessons", lessonId, "Levels");
+      const levelsSnap = await getDocs(levelsRef);
 
-      progressSnap.forEach((doc) => {
-        const status = doc.data().status;
-        allProgress[`${lessonId}-${doc.id}`] = status;
-        if (status === true) count += 1;
-      });
+      for (const levelDoc of levelsSnap.docs) {
+        const levelId = levelDoc.id;
+        const status = levelDoc.data().status;
+        allProgress[`${lessonId}-${levelId}`] = status;
+
+        if (status === true) completedLevels += 1;
+
+        // Fetch Stages inside this Level
+        const stagesRef = collection(db, "Users", userId, "Progress", subject, "Lessons", lessonId, "Levels", levelId, "Stages");
+        const stagesSnap = await getDocs(stagesRef);
+
+        stagesSnap.forEach((stageDoc) => {
+          const stageStatus = stageDoc.data().status;
+          allStages[`${lessonId}-${levelId}-${stageDoc.id}`] = stageStatus;
+          if (stageStatus === true) completedStages += 1;
+        });
+      }
     }
 
-    return { allProgress, count };
+    return { allProgress, allStages, completedLevels, completedStages };
   };
 
   const { data, isLoading } = useQuery({
@@ -35,8 +49,10 @@ export default function useUserProgress(subject) {
   });
 
   return {
-    userProgress: data?.allProgress || {},
-    completedCount: data?.count || 0,
+    userProgress: data?.allProgress || {},   
+    userStageProgress: data?.allStages || {},    
+    completedLevels: data?.completedLevels || 0, 
+    completedStages: data?.completedStages || 0, 
     isLoading: isLoading || levelsLoading,
   };
 }

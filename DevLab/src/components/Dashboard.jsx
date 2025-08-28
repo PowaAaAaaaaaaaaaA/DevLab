@@ -14,6 +14,9 @@ import useUserInventory from './Custom Hooks/useUserInventory'
 
 import useShopItems from './Custom Hooks/useShopItems'
 
+import Loading from './Loading'
+import '../index.css'
+
 
 function Dashboard() {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
@@ -27,8 +30,32 @@ function Dashboard() {
   const {animatedBar: JsProgress} = useSubjProgressBar("JavaScript")
   const {animatedBar: DbProgress} = useSubjProgressBar("Database")
 
+  const [loadingDashboard , setLoading] = useState(true);
+
     // // Shop Items (Custom Hook)
-    // const {items, loading} = useShopItems();
+    const {items} = useShopItems();
+
+  // Timer for loading screen
+const [hasLoadedBefore, setHasLoadedBefore] = useState(false);
+
+
+useEffect(() => {
+  const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
+
+  if (!hasLoadedBefore) {
+    // First time in this session → show loader
+    const timer = setTimeout(() => {
+      setLoading(false);
+      sessionStorage.setItem('dashboardLoaded', 'true');
+    }, 7000);
+
+    return () => clearTimeout(timer);
+  } else {
+    // Already loaded before → skip loader
+    setLoading(false);
+  }
+}, []);
+
 
 
 
@@ -38,7 +65,7 @@ useEffect(() => {
   const fetchLevelInfo = async () => {
     if (Userdata?.lastOpenedLevel) {
       const { subject, lessonId, levelId } = Userdata.lastOpenedLevel;
-
+console.log(subject)
       // Full dynamic path
       const getUser = doc(db, subject, lessonId, "Levels", levelId);
       const userDocs = await getDoc(getUser);
@@ -54,18 +81,29 @@ useEffect(() => {
   fetchLevelInfo();
 }, [Userdata]);
 
+  // Show Loading Screen first
+  // Show Loading Screen
+ if (loadingDashboard) {
   return (
+    <div className="fixed top-0 left-0 w-screen h-screen z-50">
+      <Loading />
+    </div>
+  );
+}
+
+  return (
+    
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
     { !isLoading ? 
-    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-10'>
-      <div className='w-[30%] h-[90%] flex items-center flex-col gap-5 p-2'>
-        <div className='bg-amber-300 w-[65%] h-[90%] rounded-[100%]'></div>
-        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className=' text-center'>{Userdata.bio}</p></div>
+    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-5'>
+      <div className='w-[40%] h-[90%] flex items-center flex-col gap-5 p-2'>
+        <div className='bg-amber-300 w-[55%] h-[80%] rounded-full'></div>
+        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className='text-center'>{Userdata.bio}</p></div>
       </div>
-      <div className='h-[80%] w-[100%] flex flex-col p-2'>
+      <div className='h-auto w-[100%] flex flex-col p-2 gap-2'>
         <p className='text-white font-inter font-bold'>Good to see you!</p>
-        <h1 className='text-[5.6rem] text-white font-inter font-bold'>{Userdata.username}</h1>
+        <h1 className='sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight '>{Userdata.username}</h1>
         <p className='text-white font-inter font-bold mb-0.5'>Level {Userdata.userLevel}</p>
             {/*Progress Bar*/}
         <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700 ">
@@ -99,36 +137,32 @@ useEffect(() => {
     
 
     {/*Bottom Part*/}
-    <div className='h-[100%] flex gap-2'>
+    <div className='flex gap-2 h-[60%]'>
 
       <div className='w-[70%] h-[100%] flex flex-col'>
-        <div className='h-[40%] p-3 flex flex-col gap-5'>
+        <div className='h-[35%] p-1 flex flex-col gap-4 '>
           <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
-          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Topic1/Lesson`} className='h-full'>
-          <div className='w-[100%] bg-[#111827] max-h-[90%] flex rounded-3xl border-black border-2 gap-4  hover:scale-102 cursor-pointer duration-300'>
-            <div className='bg-black min-w-[14%] text-white rounded-3xl flex items-center justify-center  text-[4rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
+          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Stage1/Lesson`} className='h-[100%]'>
+          <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[100px]'>
+            <div className='bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
             <div className='p-2 flex-col flex gap-2'>
-              <p className='font-exo text-[1.4rem] text-white font-bold'> {levelInfo.title}</p>
-              <p className='font-exo text-gray-500 text-[0.8rem] line-clamp-2'> {levelInfo.desc}</p>
+              <p className='font-exo text-[1.4rem] text-white font-bold'>{levelInfo.title}</p>
+              <p className='font-exo text-gray-500 text-[0.8rem] line-clamp-2'> {levelInfo.description}</p>
             </div>
           </div>
-          </Link>):(<div className='w-[100%] bg-[#111827] min-h-[60%] rounded-3xl border-black border-2 p-5'>
+          </Link>):(<div className='w-[100%] bg-[#111827] rounded-3xl border-black border-2 p-5 '>
             
-<div role="status" className="max-w-sm animate-pulse  min-h-[60%]">
+<div role="status" className="max-w-sm animate-pulse min-h-[100%]">
     <div className ="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
     <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
     <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
     <span className ="sr-only">Loading...</span>
 </div>
-
-
-          </div>)}
-          
+          </div>)}      
         </div>
 
-        <div className='h-[70%] flex flex-col p-3 gap-5'>
+        <div className='flex flex-col p-3 gap-5 flex-grow mt-3'>
           <h2 className='text-white font-exo font-bold text-[2rem]'>View Your Progress</h2>
           <div className='w-[100%] h-[80%] flex items-center justify-around'>
             
@@ -137,7 +171,7 @@ useEffect(() => {
                 <img src={HtmlIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white'>HTML Development</p>
+                <p className='font-exo text-white textSmall-laptop max-w-[65%]'>HTML Development</p>
                 <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -153,8 +187,8 @@ useEffect(() => {
                 <img src={CssIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem] '>Css Development</p>
-                <div className="relative w-12 h-12">
+                <p className='font-exo text-white text-[1rem] textSmall-laptop max-w-[65%]'>Css Development</p>
+                <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
                     <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (CssProgress / 100) * 282.6}`} strokeLinecap="round"/>
@@ -169,8 +203,8 @@ useEffect(() => {
                 <img src={JsIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem]'>JavaScript Development</p>
-                <div className="relative w-15 h-12">
+                <p className='font-exo text-white text-[1rem] textSmall-laptop max-w-[65%]  '>JavaScript Development</p>
+                <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
                     <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (JsProgress / 100) * 282.6}`} strokeLinecap="round"/>
@@ -184,7 +218,7 @@ useEffect(() => {
                 <img src={DataIcons} alt="" />
               </div>
               <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white'>Database Querying</p>
+                <p className='font-exo text-white textSmall-laptop max-w-[65%]'>Database Querying</p>
                 <div className="relative w-13 h-12">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
@@ -197,18 +231,36 @@ useEffect(() => {
           </div>
         </div>
       </div>
-        <div className=' bg-[#111827] border-2  w-[30%] h-[100%] rounded-3xl p-4 flex flex-col gap-3'>
-          <h1 className='text-white font-exo text-4xl font-bold m-5'>Inventory</h1>
-      {inventory?.map(Items=>(
+      {/*Inventory*/}
+<div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3  '>
+  <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
+  <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-4 scrollbar-custom'>
+  {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
+    inventory.filter(item => item.id !== "placeholder").map(item => (
         <div 
-        key={Items.id}
-        className="border rounded-2xl border-gray-600 h-[15%] bg-[#25293B] flex items-center p-1 justify-arround gap-10">
-          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2"><img src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default} alt="" className='w-full h-full'/></div>
-          <h2 className="text-2xl font-exo text-gray-300 min-w-[50%]">{Items.title}</h2>
-          <p className="rounded-xs bg-gray-700 p-1 text-[0.8rem]">{Items.quantity}</p>
+          key={item.id}
+          className="border rounded-2xl border-gray-600 min-h-[25%] max-h-[25%] bg-[#0D1117] flex items-center p-1 justify-around gap-10">
+          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
+            <img 
+              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 
+              alt="" 
+              className='w-full h-full'/>
+          </div>
+          <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">
+            {item.title}
+          </h2>
+          <p className="rounded-lg bg-gray-700 p-2 text-[0.9rem] font-exo text-white">
+            {item.quantity}
+          </p>
         </div>
-      ))}  
-        </div>
+      ))
+  ) : (
+    <p className="text-gray-400 text-lg font-exo p-3">No Items</p>
+  )}
+  </div>
+
+</div>
+
     </div>
 {/*END DASHBOARD*/}
   </div>

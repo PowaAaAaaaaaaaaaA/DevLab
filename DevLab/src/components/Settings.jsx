@@ -18,6 +18,7 @@ function Settings() {
   // Logout
   const logout = async () => {
     try {
+      sessionStorage.removeItem('dashboardLoaded');
       await auth.signOut();
       navigate("/Login"); // Use navigate
     } catch (error) {
@@ -100,7 +101,7 @@ function Settings() {
               type="text"
               placeholder={userDetails ? userDetails.username : "Loading..."}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl pl-10"/>
+              className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl  p-2 pl-10"/>
             <IoPerson className="absolute top-2 left-2 text-white text-2xl" />
           </div>
           <label htmlFor="" className="text-white font-exo font-light">
@@ -193,7 +194,7 @@ hover:cursor-pointer">
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0 }}
-          className="bg-[#1E212F] w-[25%] h-[40%] text-white rounded-2xl text-center p-4 flex flex-col items-center">
+          className="bg-[#1E212F] w-[25%] h-auto text-white rounded-2xl text-center p-4 flex flex-col items-center">
             <h2 className="font-exo text-3xl">Admin Login</h2>
             <Lottie
               animationData={AdminLogin}

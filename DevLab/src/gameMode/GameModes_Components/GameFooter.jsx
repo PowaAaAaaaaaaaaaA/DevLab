@@ -1,6 +1,6 @@
 // Navigation
 import { useParams, useNavigate } from "react-router-dom"
-import { goToNextGamemode } from "../GameModes_Utils/Util_Navigation";
+import { goToNextStage } from "../GameModes_Utils/Util_Navigation";
 // Hooks
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useGameModeData from "../../components/Custom Hooks/useGameModeData"
@@ -16,8 +16,8 @@ function GameFooter({setLevelComplete,setShowCodeWhisper}) {
   const navigate = useNavigate();
 
   const {Userdata, isLoading} = useUserDetails();
-  const {gameModeData,levelData, subject, lessonId, levelId, topicId, gamemodeId} = useGameModeData();
-
+  const {gameModeData,levelData, subject, lessonId, levelId, stageId, gamemodeId} = useGameModeData();
+  console.log(gamemodeId)
   return (
 <>
     <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white ">
@@ -40,7 +40,7 @@ function GameFooter({setLevelComplete,setShowCodeWhisper}) {
             whileHover={{ scale: 1.05, background: "#7e22ce" }}
             transition={{ bounceDamping: 100 }}
             onClick={() =>
-              goToNextGamemode({subject,lessonId,levelId,topicId,gamemodeId,navigate,setLevelComplete})
+              goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
             }
             className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
             Next

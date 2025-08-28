@@ -1,38 +1,50 @@
-import { collection,getDocs } from 'firebase/firestore';
-import { db } from '../../Firebase/Firebase';
+import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
+import { db, auth } from "../../Firebase/Firebase";
 
-export const goToNextGamemode = async({subject,lessonId,levelId,topicId,gamemodeId,navigate,setLevelComplete}) => {
-    const gamemodeRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics', topicId, 'Gamemodes');
-    const gamemodeSnap = await getDocs(gamemodeRef);
+export const goToNextStage = async ({
+  subject,
+  lessonId,
+  levelId,
+  stageId,
+  navigate,
+  setLevelComplete,
+}) => {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    // Get only gamemodes excluding "Lesson"
-    const modeIds = gamemodeSnap.docs
-        .map((doc) => doc.id)
-        .filter((id) => id !== 'Lesson');
+  const stagesRef = collection(db, subject, lessonId, "Levels", levelId, "Stages");
+  const stagesSnap = await getDocs(stagesRef);
 
-    const currentIndex = modeIds.indexOf(gamemodeId);
+  // Map stages into an array with id and order
+  const stages = stagesSnap.docs.map((docSnap) => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+  }));
 
+  // Sort stages by their order field
+  const sortedStages = stages.sort((a, b) => a.order - b.order);
 
-    if (currentIndex < modeIds.length - 1) {
-        const nextGamemode = modeIds[currentIndex + 1];
-navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${topicId}/${nextGamemode}`, {
-});
-    } else if (currentIndex === modeIds.length - 1) {
-        //  Check if there is a next topic
-        const topicsRef = collection(db, subject, lessonId, 'Levels', levelId, 'Topics');
-        const topicsSnap = await getDocs(topicsRef);
-        const topicIds = topicsSnap.docs.map((doc) => doc.id);
-        const currentTopicIndex = topicIds.indexOf(topicId);
+  // Find the index of the current stage
+  const currentIndex = sortedStages.findIndex((stage) => stage.id === stageId);
 
-        if (currentTopicIndex < topicIds.length - 1) {
-            const nextTopicId = topicIds[currentTopicIndex + 1];
-            navigate(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${nextTopicId}/Lesson`, {
-});
-        } else {
-            //  No more topics —trigger completion popup
-            setLevelComplete(true);
-        }
-    } else {
-        console.warn("Gamemode not found or Lesson was the only one.");
-    }
+  if (currentIndex < sortedStages.length - 1) {
+    // Get the next stage
+    const nextStage = sortedStages[currentIndex + 1];
+
+    // Unlock the next stage in user's progress
+    const nextStageRef = doc(db,"Users",user.uid,"Progress","Html","Lessons",lessonId,"Levels",levelId,"Stages",nextStage.id);
+    await setDoc(
+      nextStageRef,
+      {status: true},
+      {merge: true }
+    );
+
+    // Navigate to the next stage
+    navigate(
+      `/Main/Lessons/${subject}/${lessonId}/${levelId}/${nextStage.id}/${nextStage.type}`
+    );
+  } else {
+    // No more stages, mark level as complete
+    setLevelComplete(true);
+  }
 };

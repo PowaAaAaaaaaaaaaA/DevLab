@@ -6,7 +6,7 @@ import confetti from "../../assets/Lottie/Confetti.json"
 
 import { useEffect, useState } from "react";
 import { db,auth} from "../../Firebase/Firebase";
-import { doc, getDoc, setDoc, updateDoc,arrayRemove } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc,arrayRemove, collection, getDocs } from "firebase/firestore";
 
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
@@ -16,7 +16,9 @@ import CoinSurge from "../../ItemsLogics/CoinSurge";
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete}) {
 
-  const navigate = useNavigate();
+  console.log(LevelId)
+
+  const navigate = useNavigate(); 
   const [LevelData , setLevelData] = useState("");
 
 
@@ -87,6 +89,9 @@ const RewardAdd = async () => {
     const expReward = LevelData.expReward;
     const coinsReward = LevelData.coinsReward;
     await addExp(user.uid, expReward, coinsReward);
+    await updateDoc(userLevelRef, {
+      rewardClaimed: true,  
+    });
   }
 
 
@@ -102,33 +107,66 @@ const RewardAdd = async () => {
 
 
 const unlockNextLevel = async (goContinue) => {
-      const userId = auth.currentUser.uid;
+  const userId = auth.currentUser.uid;
   try {
+    // Get reference to Levels collection of the current lesson
+    const levelsRef = collection(db, subj, lessonId, "Levels");
+    const levelsSnap = await getDocs(levelsRef);
+    const levels = levelsSnap.docs.map(doc => doc.id);
+    const totalLevels = levels.length;
+
     const currentLevelNum = parseInt(LevelId.replace("Level", ""));
-    const nextLevelId = `Level${currentLevelNum + 1}`;
 
-    const userLevelRef = doc(db,"Users",userId,"Progress",subj,"Lessons",lessonId,"Levels",LevelId);
-    // Mark current level as completed with rewardClaimed = false
-    await setDoc(userLevelRef, { 
-      status: true, 
-    }, { merge: true });
-    // Unlock the next level
-    const nextLevelRef = doc(db,"Users",userId,"Progress",subj,"Lessons",lessonId,"Levels",nextLevelId);
+    if (currentLevelNum < totalLevels) {
+      // Unlock next level in the SAME lesson
+      const nextLevelId = `Level${currentLevelNum + 1}`;            // Change this with "subj"
+      const currentLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", lessonId, "Levels", LevelId);
+      await setDoc(currentLevelRef, { status: true }, { merge: true });
 
-    await setDoc(nextLevelRef, { status: true,rewardClaimed: false }, { merge: true });
-    console.log("Level completed and next level unlocked.");
+      const nextLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", lessonId, "Levels", nextLevelId);
+      await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
+          // Unlock the next stage in user's progress
+    const nextStageRef = doc(db,"Users",userId,"Progress","Html","Lessons",lessonId,"Levels",nextLevelId,"Stages","Stage1");
+    await setDoc(
+      nextStageRef,
+      {status: true,},
+      {merge: true }
+    );
 
-    if (goContinue){
-      navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Topic1/Lesson`);
+      if (goContinue) {
+        navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Stage1/Lesson`);
+      }
+    } else {
+      // Go to NEXT lesson's Level1
+      const currentLessonNum = parseInt(lessonId.replace("Lesson", ""));
+      const nextLessonId = `Lesson${currentLessonNum + 1}`;
+      const nextLevelId = "Level1";
+
+      // Unlock Level1 of the next lesson
+      const nextLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", nextLessonId, "Levels", nextLevelId);
+      await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
+    const nextStageRef = doc(db,"Users",userId,"Progress","Html","Lessons",nextLessonId,"Levels",nextLevelId,"Stages","Stage1");
+    await setDoc(
+      nextStageRef,
+      {status: true,},
+      {merge: true }
+    );
+
+      if (goContinue) {
+        navigate(`/Main/Lessons/${subj}/${nextLessonId}/${nextLevelId}/Stage1/Lesson`);
+      }
     }
+
+    console.log("Level completed and next level/lesson unlocked.");
   } catch (error) {
     console.error("Error unlocking next level:", error);
   }
 };
 
+
 // Items Check
 
-
+console.log(subj)
 
 
 
@@ -142,7 +180,7 @@ const unlockNextLevel = async (goContinue) => {
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0 }}
-        className="bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[1px] w-[40%] text-center h-[65%] z-2">
+        className="bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[1px] w-[40%] text-center h-auto z-2">
         <div className="bg-[#111827] h-[100%] w-[100%] rounded-2xl p-5 flex flex-col gap-5 items-center">
           <h1 className="font-exo font-bold text-[3rem] text-[#F2FF43]">LEVEL COMPLETED</h1>
           <div className="bg-[#080C14] rounded-2xl border border-gray-700 p-8 font-exo w-[90%]"> 
@@ -179,10 +217,10 @@ const unlockNextLevel = async (goContinue) => {
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
-          onClick={() => {
-          unlockNextLevel(true);
-          RewardAdd();
-          refetch();
+          onClick={async () => {
+          await unlockNextLevel(true);
+          await RewardAdd();
+          await refetch();
           }}
           className="bg-[#36DB4F] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0 0 10px rgba(126, 34, 206, 0.5)] cursor-pointer "> Continue
         </motion.button>

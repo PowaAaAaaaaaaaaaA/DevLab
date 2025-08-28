@@ -4,6 +4,8 @@ import { HTML_Data,CSS_Data,Js_Data,Query_Data } from '../Data/Achievements_Data
 
 import useUserDetails from './Custom Hooks/useUserDetails'
 
+import '../index.css'
+
 function Achievements() {
 
   const {Userdata, isLoading } = useUserDetails();
@@ -40,7 +42,7 @@ function Achievements() {
 
     {/**/}
     <div className=' mt-[5px]'>
-    <div className='max-h-[470px] overflow-y-scroll overflow-x-hidden
+    <div className='max-h-[470px] overflow-y-scroll overflow-x-hidden Achievements-container
     [&::-webkit-scrollbar]:w-2
     [&::-webkit-scrollbar-track]:rounded-full
   [&::-webkit-scrollbar-track]:bg-gray-100

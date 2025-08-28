@@ -130,15 +130,17 @@ function Database_TE() {
 
   return (
 <>
-  <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex items-center justify-center flex-col p- shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+  <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+    <div className="flex-1 min-h-0 overflow-auto w-full rounded-3xl p-2">
     <CodeMirror
       className="text-[1rem] "
-      height="650px"
-      width="604px"
+      height="100%"
+      width="100%"
       extensions={[sql()]}
       theme={tokyoNight}
       onChange={(value) => setQuery(value)}/>
-    <div className="w-[100%] flex justify-around">
+    </div>
+    <div className="w-full flex justify-around">
       <motion.button
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.05 }}
@@ -158,7 +160,7 @@ function Database_TE() {
   </div>
         <div className="h-[100%] w-[30%] p-4 flex flex-col justify-center gap-7">
           {/*Table*/}
-          <div className="border-amber-50 w-[100%] h-[45%] border overflow-scroll overflow-x-hidden rounded-3xl p-3 bg-[#F8F3FF]">
+          <div className="border-amber-50 w-[100%] h-[45%] border overflow-scroll overflow-x-hidden rounded-l-3xl rounded-bl-3xl rounded-xl p-3 bg-[#F8F3FF] scrollbar-custom">
             <div
               dangerouslySetInnerHTML={{ __html: tablesHtml }}
               className="text-black font-exo"
@@ -172,13 +174,13 @@ function Database_TE() {
                 dangerouslySetInnerHTML={{ __html: outputHtml }}
               ></div>
             ) : (
-              <div className="w-full h-full flex items-center flex-col justify-center bg-[#F8F3FF] rounded-3xl">
+              <div className="w-full h-full flex items-center flex-col justify-center bg-[#F8F3FF] rounded-l-3xl rounded-bl-3xl scrollbar-custom">
                 <Lottie
                   animationData={Animation}
                   loop={true}
                   className="w-[70%] h-[70%]"
                 />
-                <p className="text-[0.8rem]">
+                <p className="text-[0.8rem] text-center ">
                   YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
                 </p>
               </div>

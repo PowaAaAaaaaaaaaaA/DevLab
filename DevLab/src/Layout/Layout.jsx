@@ -1,7 +1,6 @@
-import { Navigate, Outlet, useLocation  } from 'react-router-dom'
+import { Outlet, useLocation  } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import { auth } from '../Firebase/Firebase'
-import { useEffect, useState } from 'react'
+
 
 function Layout() {
     const location = useLocation();
@@ -9,6 +8,7 @@ function Layout() {
   location.pathname.startsWith("/Main/Lessons/Html/") ||
   location.pathname.startsWith("/Main/Lessons/Css/") ||
   location.pathname.startsWith("/Main/Lessons/JavaScript/");
+
      const shouldSkipLayout = isLessonView;
      
      if (shouldSkipLayout) {

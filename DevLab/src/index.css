@@ -18,3 +18,53 @@
 
 @import "tailwindcss";
 
+/*Laptop View*/
+@media (max-height: 750px) {
+
+  
+
+  .large-heading {
+    font-size: 2rem !important;  /* shrink big fonts */
+  }
+
+  /* Adjust padding/margins to fit */
+  .padding-heavy {
+    padding: 0.5rem !important;
+  }
+  .textSmall-laptop {
+    font-size: 0.7rem;
+  }.mediuText-laptop{
+    font-size: 1.1rem;
+  }
+  .bigText-laptop{
+    font-size: 2rem;
+  }.NavBarText-laptop{
+    font-size: 1rem;
+  }
+
+  /*Cotainers*/
+  .Achievements-container{
+    max-height: 400px;
+  }.Shop-container{
+    max-height: 450px;
+  }
+}
+
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #44526c;
+  border-radius: 9999px;
+}
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #29323f;
+  border-radius: 9999px;
+}
+.dark .scrollbar-custom::-webkit-scrollbar-track {
+  background: #374151;
+}
+.dark .scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}

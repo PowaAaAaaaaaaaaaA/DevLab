@@ -13,6 +13,7 @@ import GameFooter from "./GameModes_Components/GameFooter";
 import InstructionPanel from "./GameModes_Components/InstructionPanel";
 import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE";
 import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
+import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 
 
@@ -20,7 +21,7 @@ function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
 
   const type = "Code Crafter"
   // Navigate
-  const { subject, lessonId, levelId, topicId, gamemodeId } = useParams();
+  const { subject, lessonId, levelId,} = useParams();
   //Pop Ups
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
@@ -44,6 +45,7 @@ function CodeCrafter({heart,roundKey,gameOver,submitAttempt}) {
         {/* Code Editor */}
           {subject === "Html" && ( <Html_TE submitAttempt={submitAttempt}/>)}
           {subject === "Css" && ( <Css_TE/>)}
+          {subject === "JavaScript" && ( <JavaScript_TE/>)} 
         </div>
       {/* Footer */}
         <GameFooter  setLevelComplete={setLevelComplete} setShowCodeWhisper={setShowCodeWhisper} />
