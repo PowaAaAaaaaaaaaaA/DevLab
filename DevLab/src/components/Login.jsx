@@ -1,14 +1,19 @@
 
 import Image from '../assets/Images/Login-Image.jpg';
 import { Link } from 'react-router-dom';
-import { signInWithEmailAndPassword, 
+import { signInWithEmailAndPassword,signOut,
         setPersistence,
         browserLocalPersistence,
-        browserSessionPersistence} from 'firebase/auth';
-import { auth } from '../Firebase/Firebase';
+        browserSessionPersistence,} from 'firebase/auth';
+import { doc,getDoc } from 'firebase/firestore';
+
+import { auth,db } from '../Firebase/Firebase';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+
+import Lottie from 'lottie-react';
+import Loading from '../assets/Lottie/LoadingDots.json';
 
 
 function Login() {
@@ -18,27 +23,67 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e)=>{
-    e.preventDefault();
-    try{
-        const persistence = rememberMe
-      ? browserLocalPersistence   // Stay signed in (even after tab close)
-      : browserSessionPersistence; // Sign out when the tab or browser closes
-        await setPersistence(auth, persistence);
-        
-        await signInWithEmailAndPassword(auth, email, password);
-        navigate('/Main');
-    }catch(error){
-        toast.error("Invalid Credentials",{
-                        position:"bottom-center",
-                        theme: "colored"
-                    })
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    // Set persistence based on "Remember Me"
+    const persistence = rememberMe
+      ? browserLocalPersistence
+      : browserSessionPersistence;
+    await setPersistence(auth, persistence);
+
+    // Sign in user
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+    // Check Firestore user status BEFORE navigating
+    const userRef = doc(db, "Users", userCredential.user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+
+      // If account is suspended
+      if (userData.suspend) {
+        toast.error("Your account has been suspended. Please contact support.", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+        await signOut(auth);
+        setLoading(false);
+        return; // Block navigation
+      }
     }
-}
+    console.log("Login successful!");
+    // Navigate only if NOT suspended
+    navigate('/Main');
+  } catch (error) {
+    toast.error("Invalid Credentials", {
+      position: "bottom-center",
+      theme: "colored",
+    });
+  } finally {
+    // Only stop loading when it's safe
+    setLoading(false);
+  }
+};
+
+
+
 
     
     return (
+<>
+{loading && (
+ <div className='fixed inset-0 z-50 flex items-center justify-center  bg-black/95'>
+    <Lottie animationData={Loading} loop={true} className="w-[50%] h-[50%]" />
+  </div>
+)}
+
         <div className="min-h-screen bg-[#0D1117] flex justify-center items-center">
 
             {/* Login Wrapper*/}
@@ -115,6 +160,7 @@ function Login() {
 
 
         </div>  
+</>
     )
 }
 export default Login
