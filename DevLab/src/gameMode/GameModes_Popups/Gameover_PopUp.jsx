@@ -20,7 +20,7 @@ function Gameover_PopUp() {
             navigate("/Main"); // or navigate to next level, summary, or dashboard
           }}
           className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
-          Back to Main
+          Go back to the previous Lesson
         </motion.button>
       </motion.div>
     </div>

@@ -33,11 +33,11 @@ function CodeRush({ heart, gameOver, submitAttempt, roundKey }) {
       case "Html":
         return <Html_TE submitAttempt={submitAttempt} />;
       case "Css":
-        return <Css_TE />;
+        return <Css_TE submitAttempt={submitAttempt}/>;
       case "JavaScript":
-        return <JavaScript_TE />;
+        return <JavaScript_TE submitAttempt={submitAttempt}/>;
       case "Database":
-        return <Database_TE />;
+        return <Database_TE submitAttempt={submitAttempt}/>;
       default:
         return <div className="text-white">Invalid subject</div>;
     }
@@ -50,15 +50,19 @@ function CodeRush({ heart, gameOver, submitAttempt, roundKey }) {
         <GameHeader heart={heart} />
 
         {/* Content */}
-        <div className="h-[83%] flex justify-around items-center p-4">
+        <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5">
           {/* Instruction */}
-          <InstructionPanel
-            showCodeWhisper={showCodeWhisper}
-            setShowCodeWhisper={setShowCodeWhisper}
-          />
+          <div className="h-[40%] md:w-[35%] md:h-full w-full">
+            <InstructionPanel
+              showCodeWhisper={showCodeWhisper}
+              setShowCodeWhisper={setShowCodeWhisper}
+            />
+          </div>
 
           {/* Code Editor */}
-          {renderEditor()}
+          <div className="h-[60%] md:w-[80%] md:h-full w-full flex">
+            {renderEditor()}
+          </div>
         </div>
 
         {/* Footer */}

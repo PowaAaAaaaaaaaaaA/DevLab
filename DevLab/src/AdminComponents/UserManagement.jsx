@@ -175,6 +175,7 @@ function UserManagement() {
                         Completed {percent}% ({Math.round((percent / 100) * total)}
                         /{total} levels)
                       </p>
+                    
                     </div>
                   );
                 })

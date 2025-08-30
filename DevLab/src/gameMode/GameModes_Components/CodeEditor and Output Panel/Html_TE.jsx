@@ -53,7 +53,7 @@ function Html_TE({submitAttempt}) {
 
   return (
     <>
-      <div className={`bg-[#191a26] h-[95%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] ${gamemodeId === "Lesson" ? "w-[47%] ml-auto":"w-[32%] ml-0"}`}>
+      <div className="bg-[#191a26] h-[95%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] w-[47%] ml-auto">
         <div className="flex-1 min-h-0 overflow-auto w-full">
         <CodeMirror
           className="text-[1rem] h-full"
@@ -86,7 +86,7 @@ function Html_TE({submitAttempt}) {
         </div>
       </div>
       {/* Output */}
-      <div className={`h-[95%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] ${gamemodeId === "Lesson" ? "w-[47%] ml-auto":"w-[32%] ml-0"}`}>
+      <div className="h-[95%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] w-[47%] ml-auto ">
         {hasRunCode ? (
           <iframe
             ref={iFrame}

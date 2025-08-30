@@ -39,31 +39,30 @@ function LessonPage() {
       <GameHeader />
 
       {/* Content */}
-      <div className="relative h-[83%] flex p-4 transition-all duration-500 ">
-        {/* Instruction Panel */}
-        <div
-          className={`bg-[#161B22]transition-all duration-500 ${
-            isEditorVisible ? "w-[35%]" : "w-full"}`}>
-          <InstructionPanel />
-        </div>
+<div className="relative h-[83%] flex flex-col gap-5 md:flex-row p-10 transition-all duration-500 overflow-hidden">
+  {/* Instruction Panel */}
+  <div
+    className={`transition-all duration-500
+      ${isEditorVisible ? "h-[40%] md:w-[35%] md:h-full w-full" : "w-full h-full"}`}>
+    <InstructionPanel />
+  </div>
 
-        {/* Code Editor and Output Panel */}
-        <div
-          className={` transition-all flex duration-500 ${
-            isEditorVisible ? "w-[80%]" : "w-0 overflow-hidden"
-          }`}>
-          {isEditorVisible && renderEditor()}
-        </div>
+  {/* Code Editor and Output Panel */}
+  <div
+    className={`transition-all flex duration-500 overflow-hidden
+      ${isEditorVisible ? "h-[60%] md:w-[80%] md:h-full w-full" : "w-0 h-0 md:h-full"}`}>
+    {isEditorVisible && renderEditor()}
+  </div>
 
   {/* Hover-Reveal Toggle Button */}
-  <div className="absolute top-1/2 -translate-y-1/2 right-0">
-    <button
-      onClick={() => setIsEditorVisible((prev) => !prev)}
-      className="relative -right-[80%] hover:right-0 transition-all duration-300 bg-[#238636] text-white rounded-l-lg p-7 shadow-lg text-4xl cursor-pointer" >
-      {isEditorVisible ? <LuChevronLast /> : <LuChevronFirst />}
-    </button>
-  </div>
-      </div>
+<div className="absolute top-1/2 -translate-y-1/2 right-0"> 
+<button onClick={() => setIsEditorVisible((prev) => !prev)} className="relative -right-[80%] hover:right-0 transition-all duration-300 bg-[#238636] text-white rounded-l-lg p-7 shadow-lg text-4xl cursor-pointer" > 
+  {isEditorVisible ? <LuChevronLast /> : <LuChevronFirst />} 
+  </button> 
+</div>
+</div>
+
+
 
       {/* Footer */}
       <GameFooter />

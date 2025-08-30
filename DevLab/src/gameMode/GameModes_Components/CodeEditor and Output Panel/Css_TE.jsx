@@ -9,9 +9,10 @@ import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 // Utils
 import { useState, useRef, useCallback } from "react";
+import { useParams } from "react-router-dom";
 
-function Css_TE() {
-
+function Css_TE({submitAttempt}) {
+    const {gamemodeId} = useParams();
   const tabs = ["HTML", "CSS"];
   const [activeTab, setActiveTab] = useState("CSS");
   // For the Code Mirror Input/Output
@@ -46,6 +47,11 @@ const onChange = useCallback((val) => {
 
 
   const runCode = () => {
+      if (gamemodeId === "Lesson"){
+        
+      }else{
+        submitAttempt(false);
+      }
     setRunCode(true);
     setTimeout(() => {
     const fullCode = 
@@ -69,7 +75,7 @@ const onChange = useCallback((val) => {
   return (
     <>
        {/* Tabs */}
-      <div className="w-[32%] h-[100%]">
+      <div className=" w-[47%] ml-auto h-full">
         <div className="flex p-4 text-2xl gap-10 h-[10%] w-full">
             {tabs.map((tab) => (
                 <motion.button
@@ -118,7 +124,7 @@ const onChange = useCallback((val) => {
 
 
       {/* Output */}
-      <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+      <div className="h-[100%] w-[47%] ml-auto rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
         {hasRunCode ? (
           <iframe
             ref={iFrame}

@@ -31,7 +31,7 @@ function BrainBytes({ heart, gameOver, submitAttempt, roundKey }) {
   const renderEditor = () => {
     switch (subject) {
       case "Html":
-        return <Html_TE />;
+        return <Html_TE submitAttempt={submitAttempt} />;
       case "Css":
         return <Css_TE />;
       case "JavaScript":
@@ -51,16 +51,20 @@ function BrainBytes({ heart, gameOver, submitAttempt, roundKey }) {
         <GameHeader heart={heart} />
 
         {/* Content */}
-        <div className="h-[83%] flex justify-around items-center p-4">
+        <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5">
           {/* Instruction Panel */}
-          <InstructionPanel
-            submitAttempt={submitAttempt}
-            showCodeWhisper={showCodeWhisper}
-            setShowCodeWhisper={setShowCodeWhisper}
-          />
+          <div className="h-[40%] md:w-[35%] md:h-full w-full">
+            <InstructionPanel
+              submitAttempt={submitAttempt}
+              showCodeWhisper={showCodeWhisper}
+              setShowCodeWhisper={setShowCodeWhisper}
+            />
+          </div>
 
           {/* Code Editor */}
-          {renderEditor()}
+          <div className="h-[60%] md:w-[80%] md:h-full w-full flex">
+            {renderEditor()}
+          </div>
         </div>
 
         {/* Footer */}

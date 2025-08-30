@@ -119,14 +119,14 @@ const unlockNextLevel = async (goContinue) => {
 
     if (currentLevelNum < totalLevels) {
       // Unlock next level in the SAME lesson
-      const nextLevelId = `Level${currentLevelNum + 1}`;            // Change this with "subj"
-      const currentLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", lessonId, "Levels", LevelId);
+      const nextLevelId = `Level${currentLevelNum + 1}`;            
+      const currentLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
       await setDoc(currentLevelRef, { status: true }, { merge: true });
 
-      const nextLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", lessonId, "Levels", nextLevelId);
+      const nextLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", nextLevelId);
       await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
           // Unlock the next stage in user's progress
-    const nextStageRef = doc(db,"Users",userId,"Progress","Html","Lessons",lessonId,"Levels",nextLevelId,"Stages","Stage1");
+    const nextStageRef = doc(db,"Users",userId,"Progress",subj,"Lessons",lessonId,"Levels",nextLevelId,"Stages","Stage1");
     await setDoc(
       nextStageRef,
       {status: true,},

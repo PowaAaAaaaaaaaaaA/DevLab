@@ -27,7 +27,6 @@ export default function useGameModeData() {
       fetchLevel();
   }, [subject, lessonId, levelId, stageId]);
 
-  console.log(gamemodeId)
 
   return {gameModeData,levelData,  subject, lessonId, levelId, stageId, gamemodeId }
 }
