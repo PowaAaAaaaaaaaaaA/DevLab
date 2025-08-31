@@ -84,7 +84,7 @@ const onChange = useCallback((val) => {
                   transition={{ bounceDamping: 100 }}
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`font-exo font-bold rounded-2xl w-[30%] h-full text-[1.3rem] bg-[#191a26]  cursor-pointer ${activeTab === tab  
+                  className={`font-exo font-bold rounded-2xl w-[30%] h-auto text-[1rem] bg-[#191a26]  cursor-pointer ${activeTab === tab  
                             ? "text-white "
                             : "text-gray-500 hover:text-white "}`} >
                   {tab}

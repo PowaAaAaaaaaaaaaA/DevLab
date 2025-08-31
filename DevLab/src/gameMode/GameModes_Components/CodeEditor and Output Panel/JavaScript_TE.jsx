@@ -74,7 +74,7 @@ function JavaScript_TE() {
   return (
     <>
       {/* Tabs */}
-      <div className="w-[32%] h-[100%]">
+      <div className=" w-[47%] ml-auto h-full">
         <div className="flex p-4 text-2xl gap-10 h-[10%] w-full">
           {tabs.map((tab) => (
             <motion.button
@@ -83,7 +83,7 @@ function JavaScript_TE() {
               transition={{ bounceDamping: 100 }}
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`font-exo font-bold rounded-2xl w-[30%] h-full text-[1.3rem] bg-[#191a26]  cursor-pointer ${
+              className={`font-exo font-bold rounded-2xl w-[30%] h-auto text-[1rem] bg-[#191a26]  cursor-pointer ${
                 activeTab === tab
                   ? "text-white "
                   : "text-gray-500 hover:text-white "
@@ -111,8 +111,7 @@ function JavaScript_TE() {
               whileHover={{ scale: 1.05, background: "#7e22ce" }}
               transition={{ bounceDamping: 100 }}
               onClick={runCode}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            >
+              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
               RUN
             </motion.button>
             <motion.button
@@ -128,7 +127,7 @@ function JavaScript_TE() {
       </div>
 
       {/* Output */}
-      <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+      <div className="h-[100%] w-[47%] ml-auto rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
         {hasRunCode ? (
           <iframe
             ref={iFrame}

@@ -71,11 +71,6 @@ const handleSubmit = async (e) => {
     setLoading(false);
   }
 };
-
-
-
-
-    
     return (
 <>
 {loading && (

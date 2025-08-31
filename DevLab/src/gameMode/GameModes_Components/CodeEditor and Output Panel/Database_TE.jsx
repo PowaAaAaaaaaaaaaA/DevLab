@@ -130,7 +130,7 @@ function Database_TE() {
 
   return (
 <>
-  <div className="bg-[#191a26] h-[95%] w-[32%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+  <div className="bg-[#191a26] w-[47%] ml-auto h-[95%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
     <div className="flex-1 min-h-0 overflow-auto w-full rounded-3xl p-2">
     <CodeMirror
       className="text-[1rem] "
@@ -158,7 +158,7 @@ function Database_TE() {
       </motion.button>
     </div>
   </div>
-        <div className="h-[100%] w-[30%] p-4 flex flex-col justify-center gap-7">
+        <div className="h-[100%] w-[47%] ml-auto p-4 flex flex-col justify-center gap-7">
           {/*Table*/}
           <div className="border-amber-50 w-[100%] h-[45%] border overflow-scroll overflow-x-hidden rounded-l-3xl rounded-bl-3xl rounded-xl p-3 bg-[#F8F3FF] scrollbar-custom">
             <div
