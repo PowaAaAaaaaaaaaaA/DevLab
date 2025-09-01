@@ -9,10 +9,13 @@ import Animation from "../assets/Lottie/OutputLottie.json";
 import { motion } from "framer-motion";
 
 import '../index.css'
+import { useNavigate } from "react-router-dom";
 function CodePlayground() {
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("HTML");
   const [run, setRun] = useState(false);
+
+  const navigate = useNavigate();
 
   // useRef
   const iFrame = useRef(null);
@@ -78,8 +81,8 @@ function CodePlayground() {
   };
   return (
     <div className="bg-[#16161A] h-screen text-white font-exo flex flex-col p-3">
-      <div className="text-3xl font-bold p-10">DEVLAB</div>
-
+      <div 
+      className="text-5xl font-bold p-10"><span className="cursor-pointer"onClick={()=>navigate("/main")}>DEVLAB</span></div>
       <div className="flex p-1 gap-5 flex-1 min-h-0">
         {/* Left Panel */}
         <div className="flex flex-col w-[60%] min-h-0">
@@ -89,12 +92,20 @@ function CodePlayground() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`font-exo font-bold rounded-2xl w-[17%] h-full bg-[#1E1E2E] transition-all duration-300 ease-in-out transform${
-                  activeTab === tab
-                    ? "text-[#9333EA] scale-105 shadow-[0_0_10px_#9333EA]"
-                    : "text-gray-100 hover:text-[#C084FC] hover:scale-105 hover:shadow-lg hover:border-[#9333EA] cursor-pointer"
-                }`}
-              >
+                  className={`font-exo font-bold rounded-2xl w-[17%] h-full bg-[#1E1E2E]
+                    transition-all duration-300 ease-in-out transform
+                    ${activeTab === tab
+                      ? `scale-105 ${
+                        tab === "HTML"
+                            ? "text-[#FF4500] shadow-[0_0_15px_#FF4500]" // Orange for HTML
+                            : tab === "CSS"
+                            ? "text-[#2965f1] shadow-[0_0_15px_#2965f1]" // Blue for CSS
+                            : tab === "JavaScript"
+                            ? "text-[#f7df1e] shadow-[0_0_15px_#f7df1e]" // Yellow for JS
+                            : "text-[#9333EA]"  // Default purple
+                        }`
+                      : "text-gray-100 hover:scale-105 cursor-pointer"
+                    }`}>
                 {tab}
               </button>
             ))}
@@ -138,7 +149,7 @@ function CodePlayground() {
           ) : (
             <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl bg-[#F8F3FF]">
               <Lottie animationData={Animation} className="w-[50%] h-[50%]" />
-              <p className="text-gray-700 font-bold">
+              <p className="text-gray-700 font-bold text-center">
                 YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
               </p>
             </div>

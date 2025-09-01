@@ -114,11 +114,11 @@ Your mission:
       </AnimatePresence>
 
       {/**/}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {gameOver &&(
           <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </>
   );
 }

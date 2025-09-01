@@ -3,8 +3,11 @@ import { IoHomeOutline,
         IoTrophyOutline,
         IoCartOutline,
         IoCodeSlash,
-        IoLayersOutline 
-
+        IoLayersOutline,
+        IoLogoCss3,
+        IoLogoHtml5,
+        IoLogoJavascript,
+        IoServer
 
  } from "react-icons/io5";
 
@@ -21,10 +24,10 @@ export const Navbar_Data=[
         path:'/Main/Lessons/Html',
         icon:<IoLibraryOutline />,
         children: [
-    { key: 'html', label: 'HTML', path: '/Main/Lessons/Html', icon:<IoLibraryOutline /> },
-    { key: 'css', label: 'CSS', path: '/Main/Lessons/Css' , icon:<IoLibraryOutline />},
-    { key: 'js', label: 'JavaScript', path: '/Main/Lessons/JavaScript', icon:<IoLibraryOutline /> },
-    { key: 'db', label: 'Database', path: '/Main/Lessons/Database', icon:<IoLibraryOutline /> }
+    { key: 'html', label: 'Html', path: '/Main/Lessons/Html', icon:<IoLogoHtml5 /> },
+    { key: 'css', label: 'Css', path: '/Main/Lessons/Css' , icon:<IoLogoCss3 />},
+    { key: 'js', label: 'JavaScript', path: '/Main/Lessons/JavaScript', icon:<IoLogoJavascript /> },
+    { key: 'db', label: 'Database', path: '/Main/Lessons/Database', icon:<IoServer /> }
     ]
     },{
         key:'achievements',

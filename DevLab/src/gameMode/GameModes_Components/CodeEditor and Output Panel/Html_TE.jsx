@@ -24,12 +24,13 @@ function Html_TE({submitAttempt}) {
     const [code, setCode] = useState("");
     const iFrame = useRef(null);
     const [hasRunCode, setRunCode] = useState(false);
+    const [isCorrect, setCorrect] = useState(false)
 
     const runCode = () =>{
       if (gamemodeId === "Lesson"){
         
       }else{
-        submitAttempt(false);
+        submitAttempt(isCorrect);
       }
 
       setRunCode(true);

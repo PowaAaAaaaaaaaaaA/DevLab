@@ -9,6 +9,7 @@ import Html_TE from "../gameMode/GameModes_Components/CodeEditor and Output Pane
 import Css_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Database_TE";
+import Js_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Js_TE";
 // ICons 
 import { LuChevronLast } from "react-icons/lu";
 import { LuChevronFirst } from "react-icons/lu";

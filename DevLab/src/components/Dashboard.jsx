@@ -13,7 +13,7 @@ import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
 
 import useShopItems from './Custom Hooks/useShopItems'
-
+import { auth } from '../Firebase/Firebase'
 import Loading from './Loading'
 import '../index.css'
 
@@ -55,9 +55,34 @@ useEffect(() => {
     setLoading(false);
   }
 }, []);
+useEffect(() => {
+    const fetchData = async () => {
+      const currentUser = auth.currentUser;
 
+      const token = await currentUser?.getIdToken(true);
 
+      try {
+        const res = await fetch("http://localhost:8082/fireBase/Shop", {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        });
 
+        if (!res.ok) {
+          console.log("It is not ok lol");
+          return;
+        }
+
+        const data = await res.json();
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
+    fetchData();
+  }, []);
 
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
@@ -239,7 +264,7 @@ console.log(subject)
     inventory.filter(item => item.id !== "placeholder").map(item => (
         <div 
           key={item.id}
-          className="border rounded-2xl border-gray-600 min-h-[25%] max-h-[25%] bg-[#0D1117] flex items-center p-1 justify-around gap-10">
+          className="border rounded-2xl border-gray-600 min-h-[25%] max-h-[25%] bg-[#0D1117] flex items-center p-1 justify-around gap-8">
           <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
             <img 
               src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 

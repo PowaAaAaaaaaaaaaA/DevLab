@@ -248,12 +248,10 @@ function InstructionPanel({
                         animate={{ opacity: 1, y: -10, scale: 1 }}
                         exit={{ opacity: 0, y: -40, scale: 0.8 }}
                         transition={{ duration: 0.8 }}
-                        className="absolute top-2 text-green-400 text-2xl font-bold"
-                      >
+                        className="absolute top-2 text-green-400 text-2xl font-bold">
                         +{animatedValue}s
                       </motion.span>
                     )}
-
                     {buffType === "timeFreeze" && (
                       <motion.span
                         key="time-freeze"
@@ -261,8 +259,7 @@ function InstructionPanel({
                         animate={{ opacity: 1, y: -10, scale: 1 }}
                         exit={{ opacity: 0, y: -40, scale: 0.8 }}
                         transition={{ duration: 0.8 }}
-                        className="absolute top-2 text-blue-400 text-2xl font-bold"
-                      >
+                        className="absolute top-2 text-blue-400 text-2xl font-bold">
                         Time Frozen!
                       </motion.span>
                     )}
