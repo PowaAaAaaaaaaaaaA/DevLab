@@ -22,8 +22,8 @@ import AdminLogin from "./components/AdminLogin";
 import AdminLayout from "./Layout/AdminLayout";
 import ContentManagement from "./AdminComponents/ContentManagement";
 import UserManagement from "./AdminComponents/UserManagement";
-import LessonEdit from "./AdminComponents/LessonEdit";
-import AddContent from "./AdminComponents/AddContent";
+import LessonEdit from "./AdminComponents/contentManagement Components/LessonEdit";
+import AddContent from "./AdminComponents/contentManagement Components/AddContent";
 // DISPLAY LESSON/LEVELS PAGE
 import HtmlLessons from "./Lessons/HtmlLessons";
 import CssLessons from "./Lessons/CssLessons";
@@ -39,7 +39,9 @@ import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 //
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+
 const queryClient = new QueryClient();
+
 
 function App() {
   const [user, setUser] = useState();

@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
 import { IoPerson } from "react-icons/io5";
-import { auth, db } from "../Firebase/Firebase";
+import { auth, db,storage } from "../Firebase/Firebase";
 import { Link, useNavigate } from "react-router-dom";
-import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { updateDoc,doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Lottie from "lottie-react";
 import AdminLogin from "../assets/Lottie/AdminLogin.json";
 import LogoutAnimation from "../assets/Lottie/SadSignout.json";
 import { AnimatePresence, motion } from "framer-motion";
 
+import useUserDetails from "./Custom Hooks/useUserDetails";
+
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 function Settings() {
+
+
+  const {Userdata, isLoading,refetch } = useUserDetails();
+
   const [showLogoutPopUp, setShowLogoutPopUp] = useState(false);
   const [showAdminPopup, setAdminPopup] = useState(false);
-  const [userDetails, setUserDetails] = useState("");
   const navigate = useNavigate();
 
   // Logout
@@ -35,34 +42,15 @@ function Settings() {
       console.log(error);
     }
   };
-  // Getting the user details
-  const fetchUserData = async () => {
-    const user = auth.currentUser;
-    try {
-      const getUser = doc(db, "Users", user.uid);
-      const userDocs = await getDoc(getUser);
-      if (userDocs.exists()) {
-        setUserDetails(userDocs.data());
-      } else {
-        console.log("No such document!");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
+// Updating Username or Bio
   const [newUserName, setUserName] = useState("");
   const [newBio, setBio] = useState("");
   useEffect(() => {
-    if (userDetails) {
-      setUserName(userDetails.username || "");
-      setBio(userDetails.bio || "");
+    if (Userdata) {
+      setUserName(Userdata.username || "");
+      setBio(Userdata.bio || "");
     }
-  }, [userDetails]);
+  }, [Userdata]);
   // Save Button
   const saveDetails = async (e) => {
     e.preventDefault();
@@ -75,20 +63,80 @@ function Settings() {
     });
     try {
       await updateDoc(getUser, {
-        username: newUserName || userDetails.username,
-        bio: newBio || userDetails.bio,
+        username: newUserName || Userdata.username,
+        bio: newBio || Userdata.bio,
       });
     } catch (error) {
       console.log(error);
     }
   };
+  // Update Imagese (Storage)
+  const uploadImage = async (file, type = "profile") => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No user logged in.");
 
+    const fileRef = ref(storage, `userProfiles/${user.uid}/${type}.jpg`);
+    // Upload file to storage
+    await uploadBytes(fileRef, file);
+    // Get download URL
+    const downloadURL = await getDownloadURL(fileRef);
+    // Update Firestore with the new URL (safe with merge)
+    await setDoc(
+      doc(db, "Users", user.uid),
+      { [`${type}Image`]: downloadURL },
+      { merge: true }
+    );
+
+    return downloadURL;
+  };
   return (
     <>
       <div className="bg-[#111827] flex flex-col items-center gap-5 p-5 h-[95%] w-[40%] m-auto mt-5 rounded-3xl border-2 shadow-2xl shadow-black">
-        <div className="w-[35%] h-[25%] bg-amber-300 rounded-[100px]"></div>
-        <div className="w-[70%] h-[10%] bg-amber-300 rounded-3xl "></div>
-        <p className="text-white font-exo font-light">Update profile picture</p>
+{/* Profile Image */}
+<motion.div
+  className="w-[35%] h-[25%] rounded-full overflow-hidden border border-gray-600 cursor-pointer relative"
+  whileHover={{ opacity: 0.5 }}
+  transition={{ duration: 0.3, ease: "easeInOut" }}>
+  <img
+    src={Userdata?.profileImage || "/defaultAvatar.png"}
+    alt="Profile"
+    className="w-full h-full object-cover"/>
+  <input
+    type="file"
+    accept="image/*"
+    className="absolute inset-0 opacity-0 cursor-pointer"
+    onChange={async (e) => {
+      if (e.target.files[0]) {
+        await uploadImage(e.target.files[0], "profile");
+        await refetch();
+        toast.success("Profile picture updated!");
+      }
+    }}
+  />
+</motion.div>
+
+{/* Background Image */}
+<motion.div 
+  whileHover={{ opacity: 0.5 }}
+  transition={{ duration: 0.3, ease: "easeInOut" }}
+className="w-[70%] h-[10%] rounded-3xl overflow-hidden border border-gray-600 relative">
+  <img
+    src={Userdata?.backgroundImage || "/defaultBackground.png"}
+    alt="Background"
+    className="w-full h-full object-cover"/>
+  <input
+    type="file"
+    accept="image/*"
+    className="absolute inset-0 opacity-0 cursor-pointer"
+    onChange={async (e) => {
+      if (e.target.files[0]) {
+        await uploadImage(e.target.files[0], "background");
+        await refetch();
+        toast.success("Background image updated!");
+      }
+    }}
+  />
+</motion.div>
         <form
           action=""
           className="w-[55%] h-[50%] flex flex-col gap-4 p-1 "
@@ -99,7 +147,7 @@ function Settings() {
           <div className="relative w-[100%] h-[15%]">
             <input
               type="text"
-              placeholder={userDetails ? userDetails.username : "Loading..."}
+              placeholder={Userdata ? Userdata.username : "Loading..."}
               onChange={(e) => setUserName(e.target.value)}
               className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl  p-2 pl-10"/>
             <IoPerson className="absolute top-2 left-2 text-white text-2xl" />
@@ -112,7 +160,7 @@ function Settings() {
               name=""
               id=""
               maxLength="50"
-              placeholder={userDetails ? userDetails.bio : "Loading..."}
+              placeholder={Userdata ? Userdata.bio : "Loading..."}
               onChange={(e) => setBio(e.target.value)}
               className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl p-2 resize-none ">
               </textarea>

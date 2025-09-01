@@ -49,6 +49,5 @@ export const Navbar_Data=[
         label:'Database Playground',
         path:'/dataPlayground',
         icon:<IoLayersOutline />
-
-    },
+    }
 ]

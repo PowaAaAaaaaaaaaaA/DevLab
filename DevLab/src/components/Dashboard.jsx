@@ -55,34 +55,34 @@ useEffect(() => {
     setLoading(false);
   }
 }, []);
-useEffect(() => {
-    const fetchData = async () => {
-      const currentUser = auth.currentUser;
+// useEffect(() => {
+//     const fetchData = async () => {
+//       const currentUser = auth.currentUser;
 
-      const token = await currentUser?.getIdToken(true);
+//       const token = await currentUser?.getIdToken(true);
 
-      try {
-        const res = await fetch("http://localhost:8082/fireBase/Shop", {
-          method: "GET",
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        });
+//       try {
+//         const res = await fetch("http://localhost:8082/fireBase/Shop", {
+//           method: "GET",
+//           headers: {
+//             authorization: `Bearer ${token}`,
+//           },
+//         });
 
-        if (!res.ok) {
-          console.log("It is not ok lol");
-          return;
-        }
+//         if (!res.ok) {
+//           console.log("It is not ok lol");
+//           return;
+//         }
 
-        const data = await res.json();
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-    };
-    fetchData();
-  }, []);
+//         const data = await res.json();
+//         console.log(data);
+//       } catch (error) {
+//         console.log(error);
+//         return;
+//       }
+//     };
+//     fetchData();
+//   }, []);
 
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
@@ -121,26 +121,54 @@ console.log(subject)
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
     { !isLoading ? 
-    (<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-5'>
-      <div className='w-[40%] h-[90%] flex items-center flex-col gap-5 p-2'>
-        <div className='bg-amber-300 w-[55%] h-[80%] rounded-full'></div>
-        <div className='text-white font-inter text-[0.85rem] break-words w-[60%]'><p className='text-center'>{Userdata.bio}</p></div>
+    (<div
+  className="shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-5 bg-cover bg-center"
+  style={{
+    backgroundImage: `url(${Userdata?.backgroundImage})`,
+    backgroundColor: "#111827", // fallback if no image
+  }}>
+  <div className="w-[40%] h-[90%] flex items-center flex-col gap-5 p-2">
+    <div className="w-[55%] h-[80%] rounded-full overflow-hidden">
+      <img
+        src={Userdata?.profileImage || "/defaultAvatar.png"}
+        alt="Profile"
+        className="w-full h-full object-cover"/>
+    </div>
+
+    <div className="text-white font-inter text-[0.85rem] break-words w-[60%]">
+      <p className="text-center">{Userdata.bio}</p>
+    </div>
+  </div>
+
+  <div className="h-auto w-[100%] flex flex-col p-2 gap-2 backdrop-blur-[2px] rounded-3xl">
+    <p className="text-white font-inter font-bold">Good to see you!</p>
+    <h1 className="sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight text-shadow-lg/30">
+      {Userdata.username}
+    </h1>
+    <p className="text-white font-inter font-bold mb-0.5 text-shadow-lg/30">
+      Level {Userdata.userLevel}
+    </p>
+
+    {/* Progress Bar */}
+    <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
+      <div
+        className="h-4 rounded-full dark:bg-[#2CB67D]"
+        style={{ width: `${(animatedExp / 100) * 100}%` }}
+      ></div>
+    </div>
+    {/* Progress Bar */}
+
+    <div className="flex w-[40%] justify-around mt-[10px]">
+      <p className="text-white font-inter font-bold text-shadow-lg/30">
+        User Xp: {Userdata.exp} / 100
+      </p>
+      <div className="text-white font-inter font-bold text-shadow-lg/30">
+        User Money: {Userdata.coins}
       </div>
-      <div className='h-auto w-[100%] flex flex-col p-2 gap-2'>
-        <p className='text-white font-inter font-bold'>Good to see you!</p>
-        <h1 className='sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight '>{Userdata.username}</h1>
-        <p className='text-white font-inter font-bold mb-0.5'>Level {Userdata.userLevel}</p>
-            {/*Progress Bar*/}
-        <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700 ">
-          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{ width: `${(animatedExp / 100) * 100}%` }}></div>
-        </div>
-            {/*Progress Bar*/}
-        <div className='flex w-[40%] justify-around mt-[10px]'>
-          <p className='text-white font-inter font-bold'>User Xp: {Userdata.exp} / 100</p>
-          <div className='text-white font-inter font-bold'>User Money: {Userdata.coins}</div>
-        </div>
-      </div>
-    </div>): 
+    </div>
+  </div>
+</div>
+): 
     /*LOADING*/
 (<div className='bg-[#111827] shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-10'>
   <div role="status" className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center h-[100%]">

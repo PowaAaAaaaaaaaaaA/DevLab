@@ -69,11 +69,14 @@ function UserManagement() {
             {users.map((user) => (
               <div
                 key={user.uid}
-                className="bg-gray-800 text-white p-4 rounded-xl shadow-md hover:shadow-lg transition flex gap-8"
-              >
+                className="bg-gray-800 text-white p-4 rounded-xl shadow-md hover:shadow-lg transition flex gap-8">
                 {/* User Avatar */}
-                <div className="flex-shrink-0 w-[50px] h-[50px] md:w-[60px] md:h-[60px] bg-gray-500 rounded-full border border-white" />
-
+              <div className="flex-shrink-0 w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full overflow-hidden border border-white">
+                <img
+                  src={user.profileImage || "/defaultAvatar.png"}
+                  alt={`${user.username || "User"}'s profile`}
+                  className="w-full h-full object-cover"/>
+              </div>
                 {/* User Info */}
                 <div>
                   <p className="font-bold text-lg">
@@ -101,8 +104,7 @@ function UserManagement() {
                   onClick={() =>
                     setOpenUserId((prev) => (prev === user.uid ? null : user.uid))
                   }
-                  className="ml-auto px-5 py-2 border mt-auto mb-auto cursor-pointer rounded-md text-sm font-semibold"
-                >
+                  className="ml-auto px-5 py-2 border mt-auto mb-auto cursor-pointer rounded-md text-sm font-semibold">
                   Progress
                 </motion.button>
 
@@ -117,8 +119,7 @@ function UserManagement() {
                   }`}
                   onClick={() =>
                     mutation.mutate({ uid: user.uid, isSuspended: user.suspend })
-                  }
-                >
+                  }>
                   {user.suspend ? "Activate" : "Suspend"}
                 </motion.button>
               </div>
@@ -151,7 +152,6 @@ function UserManagement() {
                 ✕
               </button>
             </div>
-
             {/* Progress Content */}
             {currentUser ? (
               userProgress.some((subj) => subj.total === 0) ? (
@@ -175,7 +175,6 @@ function UserManagement() {
                         Completed {percent}% ({Math.round((percent / 100) * total)}
                         /{total} levels)
                       </p>
-                    
                     </div>
                   );
                 })

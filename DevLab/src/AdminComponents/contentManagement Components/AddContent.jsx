@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { HiChevronLeft } from "react-icons/hi2";
+
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { collection,  getDocs,addDoc,setDoc,doc } from "firebase/firestore";
 
-import { db } from "../Firebase/Firebase";
+import { db } from "../../Firebase/Firebase";
 function AddContent({subject,closePopup}) {
 const [Lessons, setLessons] = useState([]);
 const [selectedLesson, setSelectedLesson] = useState("");
