@@ -8,22 +8,28 @@ import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
-// Utils
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 function JavaScript_TE() {
   const tabs = ["HTML", "CSS", "JavaScript"];
-  const [activeTab, setActiveTab] = useState("CSS");
-  // For the Code Mirror Input/Output
+  const [activeTab, setActiveTab] = useState("JavaScript");
+
+  // Code states
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
     JavaScript: "// Hello World"
   });
+
+  // Output states
   const iFrame = useRef(null);
   const [hasRunCode, setRunCode] = useState(false);
 
-  // Determine the CodeMirror extension based on active tab
+  // Console log states
+  const [logs, setLogs] = useState([]);
+  const consoleRef = useRef([]);
+
+  // Get language for CodeMirror
   const getLanguageExtension = () => {
     switch (activeTab) {
       case "HTML":
@@ -37,7 +43,7 @@ function JavaScript_TE() {
     }
   };
 
-  // Handle code change based on active tab
+  // Handle editor changes
   const onChange = useCallback(
     (val) => {
       setCode((prev) => ({
@@ -48,33 +54,60 @@ function JavaScript_TE() {
     [activeTab]
   );
 
+  // Run code in iframe and capture logs
   const runCode = () => {
     setRunCode(true);
+    // Clear logs
+    consoleRef.current = [];
+    setLogs([]);
+
     setTimeout(() => {
-      const fullCode = `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <style>${code.CSS}</style>
-    </head>
-    <body>
-    ${code.HTML}
-    <script>
-    ${code.JavaScript}
-    </script>
-    </body>
-    </html>`;
-      const doc =
-        iFrame.current.contentDocument || iFrame.current.contentWindow.document;
+      const fullCode = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <style>${code.CSS}</style>
+        </head>
+        <body>
+          ${code.HTML}
+          <script>
+            const sendLog = (...args) => {
+              window.parent.postMessage({ type: 'console-log', args }, '*');
+            };
+            console.log = sendLog;
+            try {
+              ${code.JavaScript}
+            } catch (err) {
+              sendLog('Error:', err.message);
+            }
+          </script>
+        </body>
+        </html>
+      `;
+
+      const doc = iFrame.current.contentDocument || iFrame.current.contentWindow.document;
       doc.open();
       doc.write(fullCode);
       doc.close();
     }, 0);
   };
 
+  // Listen for messages from iframe for console logs
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data.type === "console-log") {
+        consoleRef.current.push(event.data.args.join(" "));
+        setLogs([...consoleRef.current]);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
   return (
     <>
-      {/* Tabs */}
-      <div className="w-[32%] h-[100%]">
+      {/* Code Editor */}
+      <div className="w-[47%] ml-auto h-full">
         <div className="flex p-4 text-2xl gap-10 h-[10%] w-full">
           {tabs.map((tab) => (
             <motion.button
@@ -83,18 +116,18 @@ function JavaScript_TE() {
               transition={{ bounceDamping: 100 }}
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`font-exo font-bold rounded-2xl w-[30%] h-full text-[1.3rem] bg-[#191a26]  cursor-pointer ${
+              className={`font-exo font-bold rounded-2xl w-[30%] h-auto text-[1rem] bg-[#191a26] cursor-pointer ${
                 activeTab === tab
-                  ? "text-white "
-                  : "text-gray-500 hover:text-white "
+                  ? "text-white"
+                  : "text-gray-500 hover:text-white"
               }`}
             >
               {tab}
             </motion.button>
           ))}
         </div>
-        <div className=" bg-[#191a26] h-[88%] w-[100%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          <div className="flex-1 min-h-0 overflow-auto w-full ">
+        <div className="bg-[#191a26] h-[88%] w-full rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+          <div className="flex-1 min-h-0 overflow-auto w-full">
             <CodeMirror
               className="text-[1rem]"
               value={code[activeTab]}
@@ -105,7 +138,7 @@ function JavaScript_TE() {
               theme={tokyoNight}
             />
           </div>
-          <div className="flex justify-around w-full ">
+          <div className="flex justify-around w-full">
             <motion.button
               whileTap={{ scale: 0.95 }}
               whileHover={{ scale: 1.05, background: "#7e22ce" }}
@@ -128,26 +161,38 @@ function JavaScript_TE() {
       </div>
 
       {/* Output */}
-      <div className="h-[95%] w-[32%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-        {hasRunCode ? (
-          <iframe
-            ref={iFrame}
-            title="output"
-            className="w-full h-full rounded-xl"
-            sandbox="allow-scripts allow-same-origin"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center flex-col">
-            <Lottie
-              animationData={Animation}
-              loop={true}
-              className="w-[70%] h-[70%]"
+      <div className="h-full w-[47%] ml-auto flex flex-col gap-4">
+        {/* Visual Output */}
+        <div className="flex-1 rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+          {hasRunCode ? (
+            <iframe
+              ref={iFrame}
+              title="output"
+              className="w-full h-full rounded-xl"
+              sandbox="allow-scripts allow-same-origin"
             />
-            <p className="text-[0.8rem]">
-              YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-            </p>
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-full flex items-center flex-col">
+              <Lottie
+                animationData={Animation}
+                loop={true}
+                className="w-[70%] h-[70%]"
+              />
+              <p className="text-[0.8rem]">
+                YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Console Output */}
+        <div className="h-32 p-2 bg-black text-green-400 font-mono overflow-auto rounded-xl shadow-inner border border-white">
+          {logs.length > 0 ? (
+            logs.map((log, i) => <div key={i}>{log}</div>)
+          ) : (
+            <div className="text-gray-500">Console output will appear here...</div>
+          )}
+        </div>
       </div>
     </>
   );

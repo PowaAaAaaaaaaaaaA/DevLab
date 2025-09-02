@@ -26,7 +26,7 @@ function HtmlLessons() {
   const [showLockedModal, setShowLockedModal] = useState(false);
 
   const [expandedLevel, setExpandedLevel] = useState(null);
-console.log(total);
+console.log(levelsData);
   return (
     <>
       <div className="h-[100%]">
@@ -97,8 +97,6 @@ console.log(total);
                     {lesson.levels.map((level) => {
                       // Level Locked or Unlocked
                       const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
-                      console.log (lesson.id,level.id);
-                      console.log(isUnlocked);
                       // unique identifier
                       const isExpanded = expandedLevel === `${lesson.id}-${level.id}`;
                       const toggleLevel = (lessonId, levelId) => {

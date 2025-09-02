@@ -31,6 +31,7 @@ if (user) {
     coins: 0,
     bio: "",
     isAdmin: false,
+    suspend: false,
     lastOpenedLevel: {
       subject: "Html",
       lessonId: "Lesson1",

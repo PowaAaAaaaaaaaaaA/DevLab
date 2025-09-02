@@ -22,8 +22,8 @@ import AdminLogin from "./components/AdminLogin";
 import AdminLayout from "./Layout/AdminLayout";
 import ContentManagement from "./AdminComponents/ContentManagement";
 import UserManagement from "./AdminComponents/UserManagement";
-import LessonEdit from "./AdminComponents/LessonEdit";
-import AddContent from "./AdminComponents/AddContent";
+import LessonEdit from "./AdminComponents/contentManagement Components/LessonEdit";
+import AddContent from "./AdminComponents/contentManagement Components/AddContent";
 // DISPLAY LESSON/LEVELS PAGE
 import HtmlLessons from "./Lessons/HtmlLessons";
 import CssLessons from "./Lessons/CssLessons";
@@ -39,35 +39,52 @@ import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 //
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+
 const queryClient = new QueryClient();
+
 
 function App() {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setAdmin] = useState(null);
 
-  useEffect(() => {
-    //
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUser(user);
-      try {
-        const userRef = doc(db, "Users", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.data().isAdmin) {
-          setAdmin(true);
-        } else {
-          setAdmin(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+useEffect(() => {
+  const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      setUser(null);
       setLoading(false);
-    });
-    return () => unsubscribe(); // cleanup
-  }, []); //
+      return;
+    }
 
-  const isLoggedIn = !!user;
+    try {
+      const userRef = doc(db, "Users", user.uid);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.data();
 
+      if (userData?.suspend) {
+        // Immediately sign out suspended user
+        await signOut(auth);
+        toast.error("Your account is suspended. Please contact support.", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+        setUser(null); // Reset user state
+      } else {
+        setUser(user);
+        setAdmin(!!userData?.isAdmin);
+      }
+    } catch (error) {
+      console.log("Error fetching user data:", error);
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
+
+
+    const isLoggedIn = !!user;
   // Loading (Para Hindi bumalik sa Main Dashboard and mag stay lang sa Admin Dashboard pag nirerefresh yung webapp)
   // !! LAGYAN LOADING ANIMATION !!
   if (loading) return null;
@@ -79,8 +96,7 @@ function App() {
           {/* Public Routes */}
           <Route
             path="/"
-            element={
-              !isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />}/>
+            element={!isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />}/>
           <Route
             path="/Login"
             element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />}/>

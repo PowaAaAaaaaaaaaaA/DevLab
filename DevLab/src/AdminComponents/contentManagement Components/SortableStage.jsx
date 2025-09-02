@@ -14,7 +14,7 @@ export default function SortableStage({ stage, onClick }) {
     color: "white",
     borderRadius: "8px",
     display: "inline-block",
-    minWidth: "130px",
+    minWidth: "110px",
     textAlign: "center",
     height: "auto"
   };

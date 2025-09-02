@@ -32,7 +32,7 @@ export const goToNextStage = async ({
     const nextStage = sortedStages[currentIndex + 1];
 
     // Unlock the next stage in user's progress
-    const nextStageRef = doc(db,"Users",user.uid,"Progress","Html","Lessons",lessonId,"Levels",levelId,"Stages",nextStage.id);
+    const nextStageRef = doc(db,"Users",user.uid,"Progress",subject,"Lessons",lessonId,"Levels",levelId,"Stages",nextStage.id);
     await setDoc(
       nextStageRef,
       {status: true},

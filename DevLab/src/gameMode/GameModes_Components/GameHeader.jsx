@@ -15,14 +15,14 @@ function GameHeader({heart}) {
 
   return (
     <div className="flex justify-between h-[10%] p-3 items-center">
-      <div className="flex items-center p-3">
+      <div className="flex items-center p-3 border ">
         <Link to="/Main" className="text-[3rem] text-white">
           <MdArrowBackIos />
         </Link>
         <h1 className="text-[2.5rem] font-exo font-bold text-white">DEVLAB</h1>
       </div>
       {gamemodeId !== "Lesson" && (
-          <div className="flex gap-2 mb-4 w-[12%]">
+          <div className="flex gap-2 mb-4 w-auto justify-center">
             {[...Array(3)].map((_, i) => (
               <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
                 <LuHeart />
@@ -31,11 +31,17 @@ function GameHeader({heart}) {
           </div>
       )}
 
-      <div className="w-[12%] h-[90%] flex items-center gap-2 mr-[10px]">
-        <div className="border h-[90%] w-[35%] rounded-full bg-gray-600"></div>
-        <div className=" w-[100%] self-end h-[70%]">
+      <div className="w-auto h-[90%] flex items-center gap-2 mr-[10px] border ">
+        <div className="border rounded-full bg-gray-600 overflow-hidden w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16">
+          <img
+            src={Userdata?.profileImage || "/defaultAvatar.png"}
+            alt="Profile"
+            className="w-full h-full object-cover"/>
+        </div>
+
+        <div className=" w-auto self-end h-[70%]">
           {/*Progress Bar*/}
-          <div className="w-[90%] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
+          <div className="w-[150px] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
             <div
               className="h-4 rounded-full dark:bg-[#2CB67D]"
               style={{ width: `${(animatedExp / 100) * 100}%` }}>
