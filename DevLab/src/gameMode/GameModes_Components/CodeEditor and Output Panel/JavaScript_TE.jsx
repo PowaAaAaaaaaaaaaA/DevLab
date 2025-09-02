@@ -12,7 +12,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 
 function JavaScript_TE() {
   const tabs = ["HTML", "CSS", "JavaScript"];
-  const [activeTab, setActiveTab] = useState("CSS");
+  const [activeTab, setActiveTab] = useState("JavaScript");
 
   // Code states
   const [code, setCode] = useState({

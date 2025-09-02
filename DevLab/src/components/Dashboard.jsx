@@ -135,7 +135,7 @@ console.log(subject)
         className="w-full h-full object-cover"/>
     </div>
 
-    <div className="text-white font-inter text-[0.85rem] break-words w-[60%]">
+    <div className="text-white font-inter text-[0.85rem] break-words w-[60%] rounded-2xl backdrop-blur-[10px]">
       <p className="text-center">{Userdata.bio}</p>
     </div>
   </div>
