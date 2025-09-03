@@ -1,32 +1,34 @@
-import { getAuth } from "firebase/auth";
+
+// Use Hook for UserDetails
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../Firebase/Firebase";
+import { useQuery } from "@tanstack/react-query";
+
+export default function useUserDetails() {
+
+  const fetchUserData = () => {
+    return new Promise((resolve) => {
+      const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        unsubscribe(); 
+
+        if (user) {
+          const getUser = doc(db, "Users", user.uid);
+          const userDocs = await getDoc(getUser);
+
+          if (userDocs.exists()) {
+            resolve(userDocs.data()); 
+          } 
+        } 
+      });
+    });
+  };
 
 
-useEffect(() => {
-    const fetchPing = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) {
-        return null;
-    }
-    const token = await user.getIdToken(true);
-    console.log("Token being sent:", token);
-    try {
-            console.log("sadas")
-const response = await fetch("http://127.0.0.1:5174/openAI/evaluate", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  },
-  body: JSON.stringify({ prompt: "Do you know iyot puno saging" }),
-});
- // replace with your server URL
-        const data = await response.json();
-        console.log(data);
-    } catch (error) {
-        console.error("Error fetching ping:", error);
-    }
-    };
+  const { data: Userdata, isLoading, refetch } = useQuery({
+    queryKey: ["User_Details"],
+    queryFn: fetchUserData,
+  });
 
-    fetchPing();
-}, []);
+  return { Userdata, isLoading, refetch };
+}
+

@@ -13,16 +13,15 @@ import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 // Items
 import CoinSurge from "../../ItemsLogics/CoinSurge";
 
+import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete}) {
-
-  console.log(LevelId)
 
   const navigate = useNavigate(); 
   const [LevelData , setLevelData] = useState("");
 
-
   const { Userdata,refetch } = useUserDetails();
+  console.log(Userdata.uid)
   // Level Data
 useEffect(()=>{
   const fetchLevelData = async ()=>{
@@ -208,6 +207,8 @@ console.log(subj)
             await unlockNextLevel(false);
             await setLevelComplete(false);
             await RewardAdd();
+              // Unlock achievements for completing this level
+              await unlockAchievement(Userdata.uid, subj, "levelComplete", LevelId);
             await navigate("/Main",{ replace: true });
           }}
           className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-70s0 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">

@@ -38,7 +38,7 @@ import { getDoc } from "firebase/firestore";
 import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 //
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import useAchievementListener from "./components/Custom Hooks/useAchievementListener";
 
 const queryClient = new QueryClient();
 
@@ -47,7 +47,7 @@ function App() {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setAdmin] = useState(null);
-
+  useAchievementListener(user?.uid);
 useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged(async (user) => {
     if (!user) {
