@@ -1,10 +1,11 @@
 // React
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 // PopUps
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
+import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
 // for Animation / Icons
 import { AnimatePresence } from "framer-motion";
 // Components
@@ -16,17 +17,24 @@ import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/Ja
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
 
-function CodeRush({ heart, gameOver, submitAttempt, roundKey }) {
+function CodeRush({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const type = "Code Rush";
 
   // Route params
-  const { subject, lessonId, levelId, gamemodeId, topicId } = useParams();
+  const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
 
   // Popups
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
+  const [timesUp, setTimesUp] = useState(false);
+  const [stageCon, setStageCon] = useState("");
 
+  useEffect(()=>{
+    if (gamemodeId =="Lesson"){
+      setStageCon(stageId);
+    }
+  },[gamemodeId])
   // Dynamically render editor based on subject
   const renderEditor = () => {
     switch (subject) {
@@ -54,8 +62,11 @@ function CodeRush({ heart, gameOver, submitAttempt, roundKey }) {
           {/* Instruction */}
           <div className="h-[40%] md:w-[35%] md:h-full w-full">
             <InstructionPanel
+              submitAttempt={submitAttempt}
+              showPopup = {showPopup}
               showCodeWhisper={showCodeWhisper}
               setShowCodeWhisper={setShowCodeWhisper}
+              setTimesUp = {setTimesUp}
             />
           </div>
 
@@ -98,6 +109,25 @@ Your mission:
             heartsRemaining={heart}
             setLevelComplete={setLevelComplete}
           />
+        )}
+      </AnimatePresence>
+            {/* Times Up PopUp */}
+      <AnimatePresence>
+        {timesUp && (
+<GameMode_Instruction_PopUp
+  title="Time’s Up!"
+  message="⏳ You ran out of time! Be quicker next round."
+  onClose={() => {
+    setTimesUp(false);      // close popup
+    submitAttempt(false);   // THEN lose HP
+  }}
+  buttonText="Continue"/>
+        )}
+      </AnimatePresence>
+      {/*Game Over PopUp*/}
+            <AnimatePresence>
+        {gameOver &&(
+          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
         )}
       </AnimatePresence>
     </>

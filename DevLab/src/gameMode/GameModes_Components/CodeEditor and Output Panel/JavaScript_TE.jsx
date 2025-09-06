@@ -9,26 +9,25 @@ import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
-function JavaScript_TE() {
+function JavaScript_TE({submitAttempt}) {
+      const {gamemodeId} = useParams();
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("JavaScript");
-
   // Code states
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
     JavaScript: "// Hello World"
   });
-
+  const [isCorrect, setCorrect] = useState(false)
   // Output states
   const iFrame = useRef(null);
   const [hasRunCode, setRunCode] = useState(false);
-
   // Console log states
   const [logs, setLogs] = useState([]);
   const consoleRef = useRef([]);
-
   // Get language for CodeMirror
   const getLanguageExtension = () => {
     switch (activeTab) {
@@ -62,6 +61,11 @@ function JavaScript_TE() {
     setLogs([]);
 
     setTimeout(() => {
+            if (gamemodeId === "Lesson"){
+        
+      }else{
+        submitAttempt(isCorrect);
+      }
       const fullCode = `
         <!DOCTYPE html>
         <html lang="en">

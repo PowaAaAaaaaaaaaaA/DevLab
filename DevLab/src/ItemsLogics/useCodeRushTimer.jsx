@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { db, auth } from "../Firebase/Firebase";
 import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 
-export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, showPopup) {
-  const [timer, setTimer] = useState(null);
+export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, showPopup,) {
+  const [timer, setTimer] = useState(1);
   const [buffApplied, setBuffApplied] = useState(false);
   const [isFrozen, setIsFrozen] = useState(false);
   const [buffType, setBuffType] = useState("")
@@ -14,18 +14,23 @@ export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, 
       setTimer(initialTime);
     }
   }, [gameModeData, gamemodeId, initialTime]);
+//   // Debugging: log timer updates
+// useEffect(() => {
+//   if (gamemodeId === "CodeRush") {
+//     console.log("Timer:", timer);
+//   }
+// }, [timer, gamemodeId]);
 
   // Countdown logic
   useEffect(() => {
-    if (gamemodeId === "CodeRush" && !showPopup && !isFrozen) {
+    if (gamemodeId === "CodeRush" && !showPopup && !isFrozen ) {
       const countdown = setInterval(() => {
         setTimer((prev) => Math.max(prev - 1, 0));
       }, 1000);
       return () => clearInterval(countdown);
     }
-  }, [gamemodeId, showPopup, isFrozen]);
-
-  // Listen for buffs in realtime from Firestore
+  }, [gamemodeId, showPopup, isFrozen,]);
+  // Buffs
   useEffect(() => {
     if (gamemodeId !== "CodeRush") return;
 

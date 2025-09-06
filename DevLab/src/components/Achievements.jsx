@@ -6,12 +6,15 @@ import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
 import useUserDetails from './Custom Hooks/useUserDetails'
 import useUserAchievements from './Custom Hooks/useUserAchievements.jsx'
 
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import '../index.css'
+import Lottie from "lottie-react";
+import Loading from '../assets/Lottie/LoadingDots.json'
+import { useState } from 'react'
 
 function Achievements() {
 
@@ -23,30 +26,50 @@ function Achievements() {
 
  // Use your new hook here
 const { data: userAchievements, } = useUserAchievements(Userdata?.uid);
-
-
+const [LoadingClaim , setLoadingClaim] = useState(false);
 console.log(HtmlData)
 
 const queryClient = useQueryClient();
-
 const claimMutation = useMutation({
-  mutationFn: async (achievement) => {
-    const userAchRef = doc(db, "Users", Userdata.uid, "Achievements", achievement.id);
-    await updateDoc(userAchRef, { claimed: true });
-    return achievement.id;
-  },
+mutationFn: async (achievement) => {
+  const userId = Userdata.uid;
+  const userRef = doc(db, "Users", userId);
+  const userAchRef = doc(db, "Users", userId, "Achievements", achievement.id);
+  //Mark achievement as claimed
+  await updateDoc(userAchRef, { claimed: true });
+  //  Calculate EXP, Level, and Coins
+  let newExp = (Userdata.exp || 0) + (achievement.expReward || 0);
+  let newLevel = Userdata.userLevel || 1;
+  let newCoins = (Userdata.coins || 0) + (achievement.coinsReward || 0);
+  if (newExp >= 100) {
+    const levelsGained = Math.floor(newExp / 100);
+    newLevel += levelsGained;
+    newExp = newExp % 100;
+  }
+  // Update user document
+  await updateDoc(userRef, {
+    exp: newExp,
+    userLevel: newLevel,
+    coins: newCoins,
+  });
+  return achievement.id;
+},
   onSuccess: () => {
-    queryClient.invalidateQueries(['userAchievements', Userdata?.uid]);
+    queryClient.invalidateQueries(["userAchievements", Userdata?.uid]);
+    queryClient.invalidateQueries(["User_Details", Userdata?.uid]); // refetch coins/exp too
   },
   onError: (error) => {
     console.error("Error claiming achievement:", error);
+  },
+  onSettled: ()=>{
+    setLoadingClaim(false);
   }
 });
-
-
-
+  const handleClaim = (item) => {
+    setLoadingClaim(true);
+    claimMutation.mutate(item);
+  };
   return (
-    
 <>
     {/*Profile Top*/}
     <div className='bg-cover bg-no-repeat bg-[#111827] w-[100%] h-[43%] rounded-3xl flex flex-col p-3' /*style={{ backgroundImage: `url(${Example})` }}*/>
@@ -90,7 +113,7 @@ const claimMutation = useMutation({
         <h1 className='text-[#FF5733] font-exo font-bold text-5xl text-shadow-lg/30'>HTML ACHIEVEMENTS</h1>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
 {HtmlData?.map((item) => {
-  const isUnlocked = !!userAchievements[item.id];
+  const isUnlocked = !!userAchievements?.[item.id];
   const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
   console.log(`${item.id} - ${isClaimed}`)
   return (
@@ -98,18 +121,19 @@ const claimMutation = useMutation({
       key={item.id}
       className={`p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500 transition duration-500
         hover:scale-110 hover:shadow-lg hover:shadow-gray-400
-        ${isUnlocked ? "opacity-100 cursor-pointer" : "opacity-50 cursor-not-allowed"}`}
-onClick={() => isUnlocked && !isClaimed && claimMutation.mutate(item)}
->
+        ${isUnlocked ? "opacity-100 " : "opacity-50 cursor-not-allowed"}`}>
       <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
         <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
         <hr className="border-t border-gray-700 w-full" />
         <h3 className="text-white text-lg font-bold">{item.title}</h3>
         <p className="text-gray-400 text-sm">{item.description} </p>
-        <span className={`px-4 py-1 rounded-full font-semibold 
-          ${isClaimed ? "bg-green-500 text-white" : "bg-yellow-500 text-black"}`}>
-          {isClaimed ? "COMPLETED" : "UNCLAIMED"}
-        </span>
+<button 
+onClick={() => isUnlocked && !isClaimed && handleClaim(item)}
+className={`px-4 py-1 rounded-full font-semibold cursor-pointer 
+  ${isClaimed ? "bg-green-500 text-white" : "bg-yellow-500 text-black"}`}> 
+  {isClaimed ? "COMPLETED" : "UNCLAIMED"}
+</button>
+
       </div>
     </div>
   );
@@ -171,6 +195,13 @@ onClick={() => isUnlocked && !isClaimed && claimMutation.mutate(item)}
         
       </div>
     </div>
+    {LoadingClaim &&(
+      <div className='fixed inset-0 z-50 flex items-center justify-center  bg-black/99'>      
+      <Lottie animationData={Loading} loop={true} className="w-[50%] h-[50%]" /> 
+      </div>
+
+      
+      )}
 
 </div>
 

@@ -30,7 +30,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
-const [stageCon, setStageCon] = ("");
+const [stageCon, setStageCon] = useState("");
 
   useEffect(()=>{
     if (gamemodeId =="Lesson"){
@@ -38,18 +38,17 @@ const [stageCon, setStageCon] = ("");
     }
   },[gamemodeId])
 
-console.log(stageCon)
   // Dynamically render editor based on subject
   const renderEditor = () => {
     switch (subject) {
       case "Html":
         return <Html_TE submitAttempt={submitAttempt} />;
       case "Css":
-        return <Css_TE />;
+        return <Css_TE submitAttempt={submitAttempt}/>;
       case "JavaScript":
-        return <JavaScript_TE />;
+        return <JavaScript_TE submitAttempt={submitAttempt}/>;
       case "Database":
-        return <Database_TE />;
+        return <Database_TE submitAttempt={submitAttempt}/>;
       default:
         return <div className="text-white">Invalid or missing subject.</div>;
     }
@@ -114,11 +113,11 @@ Your mission:
       </AnimatePresence>
 
       {/**/}
-      {/* <AnimatePresence>
+      <AnimatePresence>
         {gameOver &&(
           <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
         )}
-      </AnimatePresence> */}
+      </AnimatePresence>
     </>
   );
 }

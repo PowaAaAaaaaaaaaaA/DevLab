@@ -92,15 +92,12 @@ const RewardAdd = async () => {
       rewardClaimed: true,  
     });
   }
-
-
-
   }
 };
+
   const finalCoinReward = Userdata.activeBuffs?.includes("doubleCoins")
   ? LevelData?.coinsReward * 2
   : LevelData?.coinsReward;
-
   const {animatedValue: Coins} = useAnimatedNumber(finalCoinReward || 0);
   const {animatedValue: Exp} = useAnimatedNumber(LevelData?.expReward || 0);
 
@@ -131,7 +128,6 @@ const unlockNextLevel = async (goContinue) => {
       {status: true,},
       {merge: true }
     );
-
       if (goContinue) {
         navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Stage1/Lesson`);
       }
@@ -142,20 +138,18 @@ const unlockNextLevel = async (goContinue) => {
       const nextLevelId = "Level1";
 
       // Unlock Level1 of the next lesson
-      const nextLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", nextLessonId, "Levels", nextLevelId);
+      const nextLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", nextLessonId, "Levels", nextLevelId);
       await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
-    const nextStageRef = doc(db,"Users",userId,"Progress","Html","Lessons",nextLessonId,"Levels",nextLevelId,"Stages","Stage1");
+    const nextStageRef = doc(db,"Users",userId,"Progress",subj,"Lessons",nextLessonId,"Levels",nextLevelId,"Stages","Stage1");
     await setDoc(
       nextStageRef,
       {status: true,},
       {merge: true }
     );
-
       if (goContinue) {
         navigate(`/Main/Lessons/${subj}/${nextLessonId}/${nextLevelId}/Stage1/Lesson`);
       }
     }
-
     console.log("Level completed and next level/lesson unlocked.");
   } catch (error) {
     console.error("Error unlocking next level:", error);
@@ -207,7 +201,9 @@ console.log(subj)
             await unlockNextLevel(false);
             await setLevelComplete(false);
             await RewardAdd();
-              // Unlock achievements for completing this level
+                          // Unlock achievements for completing 1st Lesson
+              await unlockAchievement(Userdata.uid, subj, "lessonComplete", lessonId);
+                          // Unlock achievements for completing 1st Level
               await unlockAchievement(Userdata.uid, subj, "levelComplete", LevelId);
             await navigate("/Main",{ replace: true });
           }}

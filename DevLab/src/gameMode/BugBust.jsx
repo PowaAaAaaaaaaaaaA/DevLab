@@ -1,11 +1,12 @@
 // Utils / Custom Hooks
-import { useState } from "react";
+import { useState,useEffect } from "react";
 
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 // PopUps
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
+import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
 // for Animation / Icons
 import { AnimatePresence } from "framer-motion";
 // Components
@@ -17,17 +18,23 @@ import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/Ja
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
 
-function BugBust({ heart, gameOver, submitAttempt, roundKey }) {
+function BugBust({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const type = "Bug Bust";
 
   // Route params
-  const { subject, lessonId, levelId, gamemodeId, topicId } = useParams();
+  const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
 
   // Popups
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
+const [stageCon, setStageCon] = useState("");
 
+  useEffect(()=>{
+    if (gamemodeId =="Lesson"){
+      setStageCon(stageId);
+    }
+  },[gamemodeId])
   // Dynamically render editor based on subject
   const renderEditor = () => {
     switch (subject) {
@@ -99,6 +106,12 @@ Your mission:
             heartsRemaining={heart}
             setLevelComplete={setLevelComplete}
           />
+        )}
+      </AnimatePresence>
+      {/*Game Over PopUp*/}
+      <AnimatePresence>
+        {gameOver &&(
+          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
         )}
       </AnimatePresence>
     </>

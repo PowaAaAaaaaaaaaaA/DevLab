@@ -16,7 +16,7 @@ export const unlockAchievement = async (userId, subject, actionType, levelId) =>
       // 3. Check if this achievement matches the action
       if (
         achievement.unlockCondition?.type === actionType &&
-        achievement.unlockCondition?.levelId === levelId
+        (achievement.unlockCondition?.levelId === levelId || achievement.unlockCondition?.lessonId === levelId)
       ) {
         // 4. Check if already unlocked
         const userAchRef = doc(db, "Users", userId, "Achievements", achievementId);

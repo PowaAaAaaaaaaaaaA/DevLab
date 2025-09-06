@@ -1,11 +1,7 @@
 // Utils
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  html as beautifyHTML,
-  css as beautifyCSS,
-  js as beautifyJS,
-} from "js-beautify";
+import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
 // Hooks
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
@@ -22,25 +18,13 @@ import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 import { BrainFilter } from "../../ItemsLogics/BrainFilter";
 
-function InstructionPanel({
-  submitAttempt,
-  showPopup,
-  showCodeWhisper,
-  setShowCodeWhisper,
-}) {
+function InstructionPanel({submitAttempt,showPopup,showCodeWhisper,setShowCodeWhisper,setTimesUp}) {
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
   const { Userdata, refetch } = useUserDetails();
   const { activeBuffs, loading } = useActiveBuffs();
 
-  const [timer, buffApplied, buffType] = useCodeRushTimer(
-    gameModeData?.timer,
-    gamemodeId,
-    gameModeData,
-    showPopup,
-    Userdata?.activeBuffs,
-    refetch
-  );
+  const [timer, buffApplied, buffType] = useCodeRushTimer(gameModeData?.timer,gamemodeId,gameModeData,showPopup,Userdata?.activeBuffs,refetch,);
   const { animatedValue } = useAnimatedNumber(buffApplied ? 30 : 0);
 
   // Format the Code to Display
@@ -81,12 +65,29 @@ function InstructionPanel({
       console.log("Wrong");
     }
   };
-
   const FormatTimer = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  };
+  }; 
+
+
+  // TIMES UP LOSE HP
+const [started, setStarted] = useState(false);
+// mark as started when timer initializes with a real value
+useEffect(() => {
+  if (gamemodeId === "CodeRush" && gameModeData?.timer) {
+    setStarted(true);
+  }
+}, [gamemodeId, gameModeData?.timer]);
+// only deduct when countdown finishes AFTER starting
+useEffect(() => {
+  if (started && gamemodeId === "CodeRush" && timer === 0) {
+    setTimesUp(true);
+  }
+}, [started, timer, gamemodeId, submitAttempt]);
+
+
 
   const [filtteredOpttions, setFilteredOptions] = useState([]);
   const [used, setUsed] = useState(false);
