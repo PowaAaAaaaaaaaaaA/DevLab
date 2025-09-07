@@ -8,16 +8,21 @@ import { LanguageSupport } from "@codemirror/language";
 import { autocompletion } from "@codemirror/autocomplete";
 // Animation
 import Animation from '../../../assets/Lottie/OutputLottie.json'
+
 import Lottie from "lottie-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 // Utils
 import { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 //
-import { useErrorShield } from "../../../ItemsLogics/ErrorShield";
+import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
+import useUserDetails from "../../../components/Custom Hooks/useUserDetails";
 
 
-function Html_TE({submitAttempt}) {
+function Html_TE({setIsCorrect,setShowisCorrect}) {
+
+
+  const {Userdata, isLoading } = useUserDetails();
 
     const {gamemodeId} = useParams();
     // For the Code Mirror Input/Output
@@ -26,13 +31,23 @@ function Html_TE({submitAttempt}) {
     const [hasRunCode, setRunCode] = useState(false);
     const [isCorrect, setCorrect] = useState(false)
 
+const extractTags = (html) => {
+  const tagRegex = /<([a-zA-Z0-9]+)(\s|>)/g;
+  const tags = [];
+  let match;
+
+  while ((match = tagRegex.exec(html)) !== null) {
+    tags.push(`<${match[1].toLowerCase()}>`);
+  }
+  return [...new Set(tags)]; // remove duplicates
+};
+
     const runCode = () =>{
       if (gamemodeId === "Lesson"){
         
       }else{
-        submitAttempt(isCorrect);
+        setIsCorrect(isCorrect);
       }
-
       setRunCode(true);
       setTimeout(() => {
         const fullCode = `
@@ -50,8 +65,13 @@ function Html_TE({submitAttempt}) {
         doc.write(fullCode);
         doc.close();
       }, 0);
+  // --- TAG USAGE ACHIEVEMENT ---
+  const usedTags = extractTags(code); 
+  if (usedTags.length > 0) {
+    unlockAchievement(Userdata?.uid, "Html", "tagUsed", { usedTags, isCorrect});
+  }
+  setShowisCorrect(true)
     }
-
   return (
     <>
       <div className="bg-[#191a26] h-[95%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] w-[47%] ml-auto">
@@ -107,6 +127,9 @@ function Html_TE({submitAttempt}) {
           </div>
         )}
       </div>
+
+
+
     </>
   );
 }

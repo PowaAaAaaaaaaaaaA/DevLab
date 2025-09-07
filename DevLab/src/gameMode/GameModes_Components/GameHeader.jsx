@@ -15,7 +15,7 @@ function GameHeader({heart}) {
 
   return (
     <div className="flex justify-between h-[10%] p-3 items-center">
-      <div className="flex items-center p-3 border ">
+      <div className="flex items-center p-3">
         <Link to="/Main" className="text-[3rem] text-white">
           <MdArrowBackIos />
         </Link>
@@ -31,7 +31,7 @@ function GameHeader({heart}) {
           </div>
       )}
 
-      <div className="w-auto h-[90%] flex items-center gap-2 mr-[10px] border ">
+      <div className="w-auto h-[90%] flex items-center gap-2 mr-[10px]">
         <div className="border rounded-full bg-gray-600 overflow-hidden w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16">
           <img
             src={Userdata?.profileImage || "/defaultAvatar.png"}

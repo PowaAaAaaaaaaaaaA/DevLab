@@ -17,6 +17,7 @@ import { LuChevronFirst } from "react-icons/lu";
 function LessonPage() {
   const { subject } = useParams();
   const [isEditorVisible, setIsEditorVisible] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(true);
 
   // Helper function to render editor dynamically
   const renderEditor = () => {
@@ -66,7 +67,7 @@ function LessonPage() {
 
 
       {/* Footer */}
-      <GameFooter />
+      <GameFooter isCorrect={isCorrect} />
     </div>
   );
 }

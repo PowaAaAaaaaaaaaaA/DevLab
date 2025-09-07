@@ -7,7 +7,10 @@ import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
 import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
 // for Animation / Icons
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence,motion } from "framer-motion";
+import Correct from '../assets/Lottie/correctAnsLottie.json'
+import Wrong from '../assets/Lottie/wrongAnsLottie.json'
+import Lottie from "lottie-react";
 // Components
 import GameHeader from "./GameModes_Components/GameHeader";
 import GameFooter from "./GameModes_Components/GameFooter";
@@ -29,26 +32,29 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [showisCorrect, setShowisCorrect] = useState()
 
 const [stageCon, setStageCon] = useState("");
 
-  useEffect(()=>{
-    if (gamemodeId =="Lesson"){
-      setStageCon(stageId);
-    }
-  },[gamemodeId])
+useEffect(() => {
+  if (gamemodeId === "Lesson") {
+    setStageCon(stageId);
+  }
+}, [gamemodeId, stageId]);
+
 
   // Dynamically render editor based on subject
   const renderEditor = () => {
     switch (subject) {
       case "Html":
-        return <Html_TE submitAttempt={submitAttempt} />;
+        return <Html_TE  setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect} />;
       case "Css":
-        return <Css_TE submitAttempt={submitAttempt}/>;
+        return <Css_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect}/>;
       case "JavaScript":
-        return <JavaScript_TE submitAttempt={submitAttempt}/>;
+        return <JavaScript_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect}/>;
       case "Database":
-        return <Database_TE submitAttempt={submitAttempt}/>;
+        return <Database_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect}/>;
       default:
         return <div className="text-white">Invalid or missing subject.</div>;
     }
@@ -80,6 +86,7 @@ const [stageCon, setStageCon] = useState("");
         <GameFooter
           setLevelComplete={setLevelComplete}
           setShowCodeWhisper={setShowCodeWhisper}
+          isCorrect={isCorrect}
         />
       </div>
 
@@ -118,6 +125,53 @@ Your mission:
           <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
         )}
       </AnimatePresence>
+        {showisCorrect && (
+        <AnimatePresence>
+          {isCorrect ? (
+            <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+              <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4"> 
+              <Lottie
+              animationData={Correct}
+              loop={false}
+              className="w-[70%] h-[70%]"/>
+              <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
+        <motion.button
+        onClick={()=>{
+          submitAttempt(true)
+          setShowisCorrect(false)}}
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ bounceDamping: 100 }}
+          className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
+          Continue
+        </motion.button>
+              </div>
+            </div>
+          ):(
+            <AnimatePresence>
+          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+              <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4"> 
+              <Lottie
+              animationData={Wrong}
+              loop={false}
+              className="w-[100%] h-[100%]"/>
+              <h1 className="font-exo font-bold text-black text-3xl">Wrong Answer</h1> 
+        <motion.button
+        onClick={()=>{
+          submitAttempt(false)
+          setShowisCorrect(false)}}
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ bounceDamping: 100 }}
+          className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
+          Retry
+        </motion.button>
+              </div>
+          </div>
+          </AnimatePresence>
+          )}
+        </AnimatePresence>
+        )}
     </>
   );
 }

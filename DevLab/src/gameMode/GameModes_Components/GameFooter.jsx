@@ -11,10 +11,10 @@ import ItemsUse from "../../ItemsLogics/ItemsUse";
 
 
 
-function GameFooter({setLevelComplete,setShowCodeWhisper}) {
+function GameFooter({setLevelComplete,setShowCodeWhisper,isCorrect}) {
 
   const navigate = useNavigate();
-
+console.log(isCorrect)
   const {Userdata, isLoading} = useUserDetails();
   const {gameModeData,levelData, subject, lessonId, levelId, stageId, gamemodeId} = useGameModeData();
   return (
@@ -36,12 +36,15 @@ function GameFooter({setLevelComplete,setShowCodeWhisper}) {
         <div className="w-[10%]">
           <motion.button
             whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05, background: "#7e22ce" }}
-            transition={{ bounceDamping: 100 }}
+            whileHover={isCorrect ? { scale: 1.05, background: "#7e22ce" } : {background: "#a0aec0"}}
+            transition={{ bounceDamping: 100, }}
             onClick={() =>
               goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
             }
-            className="bg-[#9333EA] text-white font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
+          disabled={!isCorrect}
+          className={`${
+            isCorrect ? "bg-[#9333EA] cursor-pointer" : "bg-gray-500"} 
+            text-white bg-[#7e22ce] font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]`}>
             Next
           </motion.button>
         </div>

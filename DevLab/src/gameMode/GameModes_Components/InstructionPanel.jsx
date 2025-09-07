@@ -13,18 +13,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import Lottie from "lottie-react";
 import Loading from '../../assets/Lottie/LoadingDots.json';
+
 //
 import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 import { BrainFilter } from "../../ItemsLogics/BrainFilter";
 
-function InstructionPanel({submitAttempt,showPopup,showCodeWhisper,setShowCodeWhisper,setTimesUp}) {
+function InstructionPanel({submitAttempt,showPopup,showCodeWhisper,setShowCodeWhisper,setTimesUp,pauseTimer}) {
+  console.log(showPopup)
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
   const { Userdata, refetch } = useUserDetails();
   const { activeBuffs, loading } = useActiveBuffs();
 
-  const [timer, buffApplied, buffType] = useCodeRushTimer(gameModeData?.timer,gamemodeId,gameModeData,showPopup,Userdata?.activeBuffs,refetch,);
+  const [timer, buffApplied, buffType] = useCodeRushTimer(gameModeData?.timer,gamemodeId,gameModeData,showPopup,pauseTimer);
   const { animatedValue } = useAnimatedNumber(buffApplied ? 30 : 0);
 
   // Format the Code to Display

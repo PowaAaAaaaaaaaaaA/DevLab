@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 
-function Database_TE() {
+function Database_TE({setIsCorrect,setShowisCorrect}) {
 
   const [outputHtml, setOutputHtml] = useState();
   const [hasRunQuery, setHasRunQuery] = useState(false);
@@ -18,7 +18,14 @@ function Database_TE() {
   const [query , setQuery] = useState("");
   const dbRef = useRef(null);
 
+    const [isCorrect, setCorrect] = useState(false)
+
   const runCode =()=>{
+          if (gamemodeId === "Lesson"){
+        
+      }else{
+        setIsCorrect(isCorrect);
+      }
           try {
         setHasRunQuery(true);
         const res = dbRef.current.exec(query);
@@ -58,6 +65,7 @@ function Database_TE() {
           `<span class="text-red-500 font-medium">${err.message}</span>`
         );
       }
+        setShowisCorrect(true)
   }
 
 // Data Base (Data sa Table)

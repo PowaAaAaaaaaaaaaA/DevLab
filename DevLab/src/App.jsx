@@ -1,7 +1,10 @@
 // REACt
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+
 import { useEffect, useState } from "react";
+
+import { Toaster } from "react-hot-toast";
 // FIREBASE
 import { auth } from "./Firebase/Firebase";
 import { db } from "./Firebase/Firebase";
@@ -165,6 +168,7 @@ useEffect(() => {
           />
         </Routes>
         <ToastContainer />
+        <Toaster position="top-center" reverseOrder={false} />
       </QueryClientProvider>
     </>
   );

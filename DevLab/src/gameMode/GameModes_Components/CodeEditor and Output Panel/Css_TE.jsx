@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import { useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
-function Css_TE({submitAttempt}) {
+function Css_TE({setIsCorrect,setShowisCorrect}) {
     const {gamemodeId} = useParams();
   const tabs = ["HTML", "CSS"];
   const [activeTab, setActiveTab] = useState("CSS");
@@ -45,12 +45,12 @@ const onChange = useCallback((val) => {
 }));
 }, [activeTab]);
 
-
+  const [isCorrect, setCorrect] = useState(true)
   const runCode = () => {
       if (gamemodeId === "Lesson"){
         
       }else{
-        submitAttempt(false);
+        setIsCorrect(isCorrect);
       }
     setRunCode(true);
     setTimeout(() => {
@@ -70,6 +70,7 @@ const onChange = useCallback((val) => {
       doc.write(fullCode);
       doc.close();
     }, 0);
+      setShowisCorrect(true)
   };
 
   return (

@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-function JavaScript_TE({submitAttempt}) {
+function JavaScript_TE({setIsCorrect,setShowisCorrect}) {
       const {gamemodeId} = useParams();
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("JavaScript");
@@ -55,6 +55,11 @@ function JavaScript_TE({submitAttempt}) {
 
   // Run code in iframe and capture logs
   const runCode = () => {
+          if (gamemodeId === "Lesson"){
+        
+      }else{
+        setIsCorrect(isCorrect);
+      }
     setRunCode(true);
     // Clear logs
     consoleRef.current = [];
@@ -94,6 +99,7 @@ function JavaScript_TE({submitAttempt}) {
       doc.write(fullCode);
       doc.close();
     }, 0);
+      setShowisCorrect(true)
   };
 
   // Listen for messages from iframe for console logs

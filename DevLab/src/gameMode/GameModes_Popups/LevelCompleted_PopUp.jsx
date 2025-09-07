@@ -132,6 +132,7 @@ const unlockNextLevel = async (goContinue) => {
         navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Stage1/Lesson`);
       }
     } else {
+      await unlockAchievement(userId, subj, "lessonComplete", { lessonId });
       // Go to NEXT lesson's Level1
       const currentLessonNum = parseInt(lessonId.replace("Lesson", ""));
       const nextLessonId = `Lesson${currentLessonNum + 1}`;
@@ -201,10 +202,8 @@ console.log(subj)
             await unlockNextLevel(false);
             await setLevelComplete(false);
             await RewardAdd();
-                          // Unlock achievements for completing 1st Lesson
-              await unlockAchievement(Userdata.uid, subj, "lessonComplete", lessonId);
-                          // Unlock achievements for completing 1st Level
-              await unlockAchievement(Userdata.uid, subj, "levelComplete", LevelId);
+              // Unlock achievements for completing 1st Level
+              await unlockAchievement(Userdata.uid, subj, "firstLevelComplete", {LevelId, lessonId});
             await navigate("/Main",{ replace: true });
           }}
           className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-70s0 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">

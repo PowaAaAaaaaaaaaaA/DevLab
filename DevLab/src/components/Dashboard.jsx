@@ -13,6 +13,7 @@ import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
 
 import useShopItems from './Custom Hooks/useShopItems'
+import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
 import { auth } from '../Firebase/Firebase'
 import Loading from './Loading'
 import '../index.css'
@@ -34,6 +35,12 @@ function Dashboard() {
 
     // // Shop Items (Custom Hook)
     const {items} = useShopItems();
+    
+    const { data: HtmlData, } = useAchievementsData("Html");
+    const { data:CssData,  } = useAchievementsData("Css");
+    const { data:JsData,  } = useAchievementsData("JavaScript");
+    const { data:DatabaseData, } = useAchievementsData("Database");
+    
 
   // Timer for loading screen
 const [hasLoadedBefore, setHasLoadedBefore] = useState(false);
@@ -55,34 +62,34 @@ useEffect(() => {
     setLoading(false);
   }
 }, []);
-// useEffect(() => {
-//     const fetchData = async () => {
-//       const currentUser = auth.currentUser;
+useEffect(() => {
+    const fetchData = async () => {
+      const currentUser = auth.currentUser;
 
-//       const token = await currentUser?.getIdToken(true);
+      const token = await currentUser?.getIdToken(true);
 
-//       try {
-//         const res = await fetch("http://localhost:8082/fireBase/Shop", {
-//           method: "GET",
-//           headers: {
-//             authorization: `Bearer ${token}`,
-//           },
-//         });
+      try {
+        const res = await fetch("http://localhost:8082/fireBase/Shop", {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        });
 
-//         if (!res.ok) {
-//           console.log("It is not ok lol");
-//           return;
-//         }
+        if (!res.ok) {
+          console.log("It is not ok lol");
+          return;
+        }
 
-//         const data = await res.json();
-//         console.log(data);
-//       } catch (error) {
-//         console.log(error);
-//         return;
-//       }
-//     };
-//     fetchData();
-//   }, []);
+        const data = await res.json();
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
+    fetchData();
+  }, []);
 
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
@@ -288,28 +295,31 @@ console.log(subject)
 <div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3  '>
   <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
   <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-4 scrollbar-custom'>
-  {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
-    inventory.filter(item => item.id !== "placeholder").map(item => (
-        <div 
-          key={item.id}
-          className="border rounded-2xl border-gray-600 min-h-[25%] max-h-[25%] bg-[#0D1117] flex items-center p-1 justify-around gap-8">
-          <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
-            <img 
-              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 
-              alt="" 
-              className='w-full h-full'/>
-          </div>
-          <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">
-            {item.title}
-          </h2>
-          <p className="rounded-lg bg-gray-700 p-2 text-[0.9rem] font-exo text-white">
-            {item.quantity}
-          </p>
-        </div>
-      ))
-  ) : (
-    <p className="text-gray-400 text-lg font-exo p-3">No Items</p>
-  )}
+{inventory && inventory.length > 0 ? (
+  inventory.map(item => (
+    <div 
+      key={item.id}
+      className="border rounded-2xl border-gray-600 min-h-[25%] max-h-[25%] bg-[#0D1117] flex items-center p-1 justify-around gap-8"
+    >
+      <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
+        <img 
+          src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 
+          alt={item.title} 
+          className="w-full h-full"
+        />
+      </div>
+      <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">
+        {item.title}
+      </h2>
+      <p className="rounded-lg bg-gray-700 p-2 text-[0.9rem] font-exo text-white">
+        {item.quantity}
+      </p>
+    </div>
+  ))
+) : (
+  <p className="text-gray-400 text-lg font-exo p-3">No Items</p>
+)}
+
   </div>
 
 </div>

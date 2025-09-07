@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { db, auth } from "../Firebase/Firebase";
 import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 
-export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, showPopup,) {
+export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, showPopup,pauseTimer) {
   const [timer, setTimer] = useState(1);
   const [buffApplied, setBuffApplied] = useState(false);
   const [isFrozen, setIsFrozen] = useState(false);
@@ -22,14 +22,16 @@ export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, 
 // }, [timer, gamemodeId]);
 
   // Countdown logic
+console.log(!pauseTimer);
   useEffect(() => {
-    if (gamemodeId === "CodeRush" && !showPopup && !isFrozen ) {
+    if (gamemodeId === "CodeRush" && !showPopup && !isFrozen && !pauseTimer ) {
       const countdown = setInterval(() => {
         setTimer((prev) => Math.max(prev - 1, 0));
       }, 1000);
       return () => clearInterval(countdown);
+
     }
-  }, [gamemodeId, showPopup, isFrozen,]);
+  }, [gamemodeId, showPopup, isFrozen,pauseTimer]);
   // Buffs
   useEffect(() => {
     if (gamemodeId !== "CodeRush") return;
