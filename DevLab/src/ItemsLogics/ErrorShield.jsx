@@ -1,10 +1,9 @@
 import { useCallback, useState } from "react";
-import { doc, updateDoc, arrayRemove } from "firebase/firestore";
-import { db, auth } from "../Firebase/Firebase";
-import useActiveBuffs from "../components/Custom Hooks/useActiveBuffs";
+import { useInventoryStore } from "./Items-Store/useInventoryStore";
 
 export const useErrorShield = () => {
-  const { activeBuffs } = useActiveBuffs();
+  const { removeBuff } = useInventoryStore.getState();
+  const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const [consuming, setConsuming] = useState(false);
 
   const hasShield = activeBuffs.includes("errorShield");
@@ -15,8 +14,8 @@ export const useErrorShield = () => {
 
     setConsuming(true);// prevent double-consume in same tick
     try {
-      const userRef = doc(db, "Users", auth.currentUser.uid);
-      await updateDoc(userRef, { activeBuffs: arrayRemove("errorShield") });
+          removeBuff("errorShield");
+          console.log("removing the area");
       return true;
     } finally {
       setConsuming(false);

@@ -29,7 +29,7 @@ function Html_TE({setIsCorrect,setShowisCorrect}) {
     const [code, setCode] = useState("");
     const iFrame = useRef(null);
     const [hasRunCode, setRunCode] = useState(false);
-    const [isCorrect, setCorrect] = useState(false)
+    const [isCorrect, setCorrect] = useState(true)
 
 const extractTags = (html) => {
   const tagRegex = /<([a-zA-Z0-9]+)(\s|>)/g;

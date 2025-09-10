@@ -21,7 +21,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
       setStageData(null);
     }
   };
-
   const [instruction, setInstruction] = useState('');
   const [description, setDescription] = useState('');
   const [gameModeTitle, setTitle] = useState('');
@@ -46,6 +45,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
         description: description || stageData?.description || null,
         instruction: instruction || stageData?.instruction || null,
         codingInterface: preCode || stageData?.preCode || null,
+        isHidden: activeTab === "Lesson" ? false : true, //
       };
 
       if (activeTab === "BugBust" || activeTab === "CodeCrafter") {
@@ -64,29 +64,25 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
       if (activeTab === "BrainBytes") {
         stagePayload = {
           ...stagePayload,
-          options: {
+          choices: {
             A: answers.A || stageData?.options?.A,
-            B: answers.B || stageData?.options?.B,
-            C: answers.C || stageData?.options?.C,
-            D: answers.D || stageData?.options?.D,
+            b: answers.B || stageData?.options?.B,
+            c: answers.C || stageData?.options?.C,
+            d: answers.D || stageData?.options?.D,
+            correctAnswer: answers.correct || stageData?.correctAnswer,
           },
-          correctAnswer: answers.correct || stageData?.correctAnswer,
         };
       }
-
       await setDoc(stageRef, stagePayload, { merge: true });
-
       toast.success("Stage updated successfully!", {
         position: "top-center",
         theme: "colored"
       });
-
       await fetchStage();
     } catch (error) {
       console.error(error);
     }
   };
-
   useEffect(() => {
     fetchStage();
   }, []);
@@ -102,7 +98,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
       toast.error('Failed to delete stage.');
     }
   };
-  console.log(subject)
 
   return (
     <div className='bg-[#25293B]'>

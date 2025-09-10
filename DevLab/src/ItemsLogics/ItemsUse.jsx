@@ -5,40 +5,17 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import useUserInventory from "../components/Custom Hooks/useUserInventory";
 
-import { db, auth } from "../Firebase/Firebase";
-import { doc, updateDoc, increment, arrayUnion, deleteDoc, getDoc} from "firebase/firestore";
-
-import { useErrorShield } from "./ErrorShield";
+import { useInventoryStore } from "./Items-Store/useInventoryStore";
 
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
     const [showInventory, setShowInventory] = useState(false);
-    const { inventory, loading} = useUserInventory();
-    
-      const useItem = async(itemId, buffName)=>{
-      const userId = auth.currentUser.uid;
-        // Reduce quantity in Inventory
-      const inventoryRef = doc(db, "Users", userId, "Inventory", itemId);
-      await updateDoc(inventoryRef, {
-        quantity: increment(-1)
-      });
-        // Check the updated quantity
-      const snapshot = await getDoc(inventoryRef);
-      const updatedData = snapshot.data();
-    
-          if (buffName) {
-        const userRef = doc(db, "Users", userId);
-        await updateDoc(userRef, {
-          activeBuffs: arrayUnion(buffName)
-        });
-      }
-      
-      if (updatedData?.quantity <= 0) {
-        await deleteDoc(inventoryRef);
-        return; // stop here so buff doesn't apply if no quantity
-      }
-    }
+    const { inventory:userInventory, loading} = useUserInventory();
 
+    
+  const inventory = useInventoryStore((state) => state.inventory);
+  const useItem = useInventoryStore((state) => state.useItem);
+  const activeBuffs =useInventoryStore()
     const itemActions = {
       "Coin Surge": (item) => useItem(item.id, "doubleCoins"),
       "Code Whisper": async (item) => {
@@ -97,8 +74,8 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   >
     <div className="h-[100%] w-[100%] border border-gray-500 rounded-2xl bg-[#111827] p-4 flex flex-col gap-4 overflow-scroll overflow-x-hidden scrollbar-custom">
       <h1 className="text-white font-exo text-4xl">Inventory</h1>
-{inventory && inventory.length > 0 ? (
-  inventory.map((Items) => (
+{userInventory && userInventory.length > 0 ? (
+  userInventory.map((Items) => (
     <button
       key={Items.id}
       onClick={() => itemActions[Items.title]?.(Items)}

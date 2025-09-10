@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  setDoc,
-  doc,
-  deleteDoc,
-  updateDoc,
-} from "firebase/firestore";
+import {collection,getDocs,setDoc,doc,deleteDoc,updateDoc,} from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiArrowDownTray } from "react-icons/hi2";
@@ -23,11 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SortableStage from "./contentManagement Components/SortableStage";
 
 import { DndContext, closestCorners } from "@dnd-kit/core";
-import {
-  horizontalListSortingStrategy,
-  SortableContext,
-  arrayMove,
-} from "@dnd-kit/sortable";
+import {horizontalListSortingStrategy,SortableContext,arrayMove,} from "@dnd-kit/sortable";
 
 function ContentManagement() {
   const queryClient = useQueryClient();
@@ -71,15 +60,7 @@ function ContentManagement() {
     try {
       for (let i = 0; i < stages.length; i++) {
         const stage = stages[i];
-        const stageRef = doc(
-          db,
-          subject,
-          `Lesson${lessonId}`,
-          "Levels",
-          levelId,
-          "Stages",
-          stage.id
-        );
+        const stageRef = doc(db,subject,`Lesson${lessonId}`,"Levels",levelId,"Stages",stage.id);
         await updateDoc(stageRef, { order: i + 1 });
       }
     } catch (error) {
@@ -88,37 +69,39 @@ function ContentManagement() {
   };
 
   // Handle drag end
-  const handleDragEnd = async (event, lessonId, levelId) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
+const handleDragEnd = async (event, lessonId, levelId) => {
+  const { active, over } = event;
+  if (!over || active.id === over.id) return;
 
-    setLevelStages((prev) => {
-      const updatedStages = [...prev[levelId]];
-      const activeIndex = updatedStages.findIndex(
-        (stage) => stage.id === active.id
-      );
-      const overIndex = updatedStages.findIndex(
-        (stage) => stage.id === over.id
-      );
+  const uniqueKey = `${lessonId}_${levelId}`;
 
-      if (activeIndex === -1 || overIndex === -1) return prev;
+  setLevelStages((prev) => {
+    const updatedStages = [...(prev[uniqueKey] || [])]; // fallback to []
+    const activeIndex = updatedStages.findIndex(
+      (stage) => stage.id === active.id
+    );
+    const overIndex = updatedStages.findIndex(
+      (stage) => stage.id === over.id
+    );
 
-      const reorderedStages = arrayMove(
-        updatedStages,
-        activeIndex,
-        overIndex
-      ).map((stage, index) => ({ ...stage, order: index + 1 }));
+    if (activeIndex === -1 || overIndex === -1) return prev;
 
-      // Save to Firestore
-      updateStageOrder(activeTab, lessonId, levelId, reorderedStages);
-      console.log("Old stages:", updatedStages);
-      console.log("Reordered stages:", reorderedStages);
-      return {
-        ...prev,
-        [levelId]: reorderedStages,
-      };
-    });
-  };
+    const reorderedStages = arrayMove(
+      updatedStages,
+      activeIndex,
+      overIndex
+    ).map((stage, index) => ({ ...stage, order: index + 1 }));
+
+    // Save to Firestore
+    updateStageOrder(activeTab, lessonId, levelId, reorderedStages);
+
+    return {
+      ...prev,
+      [uniqueKey]: reorderedStages,
+    };
+  });
+};
+
 
   const openPopup = () => {
     setShowPopup(true);
@@ -140,14 +123,7 @@ function ContentManagement() {
 
   const addNewTopic = async (subject, lessonId, levelId) => {
     try {
-      const topicsRef = collection(
-        db,
-        subject,
-        `Lesson${lessonId}`,
-        "Levels",
-        levelId,
-        "Stages"
-      );
+      const topicsRef = collection(db,subject,`Lesson${lessonId}`,"Levels",levelId,"Stages");
       const snapshot = await getDocs(topicsRef);
 
       const topicNumbers = snapshot.docs.map((doc) => {

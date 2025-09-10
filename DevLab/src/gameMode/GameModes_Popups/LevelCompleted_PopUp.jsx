@@ -11,17 +11,21 @@ import { doc, getDoc, setDoc, updateDoc,arrayRemove, collection, getDocs } from 
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 // Items
+import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 import CoinSurge from "../../ItemsLogics/CoinSurge";
 
 import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete}) {
 
+  const {removeBuff} = useInventoryStore.getState();
+  const activeBuffs = useInventoryStore((state) => state.activeBuffs);
+
+
   const navigate = useNavigate(); 
   const [LevelData , setLevelData] = useState("");
 
   const { Userdata,refetch } = useUserDetails();
-  console.log(Userdata.uid)
   // Level Data
 useEffect(()=>{
   const fetchLevelData = async ()=>{
@@ -34,6 +38,8 @@ useEffect(()=>{
   fetchLevelData();
 },[subj,lessonId,LevelId])
 
+console.log(LevelId);
+console.log(lessonId);
 // Exp and Coins
   const addExp = async (userId,  Exp, coinsAmmount) => {
   const userRef = doc(db, 'Users', userId);
@@ -63,7 +69,6 @@ const RewardAdd = async () => {
   const user = auth.currentUser;
   const userLevelRef = doc(db, "Users", user.uid, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
   const levelSnap = await getDoc(userLevelRef);
-  const userRef = doc(db, "Users", user.uid)  
 
   if (levelSnap.exists()) { 
     const levelData = levelSnap.data();
@@ -72,19 +77,16 @@ const RewardAdd = async () => {
       return;
     }
       // Coin Surge 
-    if (Userdata.activeBuffs?.includes("doubleCoins")) {
-    const { DoubleCoins } = CoinSurge(LevelData.coinsReward);
-    const doubled = DoubleCoins();
-        const expReward = LevelData.expReward;
-        await addExp(user.uid, expReward, doubled);
-          // Mark reward as claimed
-          await updateDoc(userLevelRef, {
-      rewardClaimed: true,  
-    });
-    await updateDoc(userRef, {
-      activeBuffs: arrayRemove("doubleCoins")
-    });
-  }else{
+if (activeBuffs.includes("doubleCoins")) {
+  removeBuff("doubleCoins");
+
+  const { DoubleCoins } = CoinSurge(LevelData.coinsReward);
+  const doubled = DoubleCoins();
+  const expReward = LevelData.expReward;
+  
+  await addExp(user.uid, expReward, doubled);
+  await updateDoc(userLevelRef, { rewardClaimed: true });
+}else{
     const expReward = LevelData.expReward;
     const coinsReward = LevelData.coinsReward;
     await addExp(user.uid, expReward, coinsReward);
@@ -95,7 +97,7 @@ const RewardAdd = async () => {
   }
 };
 
-  const finalCoinReward = Userdata.activeBuffs?.includes("doubleCoins")
+  const finalCoinReward = activeBuffs.includes("doubleCoins")
   ? LevelData?.coinsReward * 2
   : LevelData?.coinsReward;
   const {animatedValue: Coins} = useAnimatedNumber(finalCoinReward || 0);
@@ -111,7 +113,7 @@ const unlockNextLevel = async (goContinue) => {
     const levels = levelsSnap.docs.map(doc => doc.id);
     const totalLevels = levels.length;
 
-    const currentLevelNum = parseInt(LevelId.replace("Level", ""));
+    const currentLevelNum = parseInt(LevelId.replace("Level",""));
 
     if (currentLevelNum < totalLevels) {
       // Unlock next level in the SAME lesson
@@ -156,12 +158,6 @@ const unlockNextLevel = async (goContinue) => {
     console.error("Error unlocking next level:", error);
   }
 };
-
-
-// Items Check
-
-console.log(subj)
-
 
 
   return (

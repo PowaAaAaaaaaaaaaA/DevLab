@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { db, auth } from "../Firebase/Firebase";
-import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
+import { useInventoryStore } from "./Items-Store/useInventoryStore";
 
 export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, showPopup,pauseTimer) {
   const [timer, setTimer] = useState(1);
@@ -8,6 +7,8 @@ export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, 
   const [isFrozen, setIsFrozen] = useState(false);
   const [buffType, setBuffType] = useState("")
 
+  const activeBuffs = useInventoryStore((state) => state.activeBuffs);
+  const { removeBuff } = useInventoryStore.getState();
   // Initialize the timer
   useEffect(() => {
     if (gamemodeId === "CodeRush" && initialTime) {
@@ -22,7 +23,6 @@ export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, 
 // }, [timer, gamemodeId]);
 
   // Countdown logic
-console.log(!pauseTimer);
   useEffect(() => {
     if (gamemodeId === "CodeRush" && !showPopup && !isFrozen && !pauseTimer ) {
       const countdown = setInterval(() => {
@@ -33,40 +33,38 @@ console.log(!pauseTimer);
     }
   }, [gamemodeId, showPopup, isFrozen,pauseTimer]);
   // Buffs
-  useEffect(() => {
-    if (gamemodeId !== "CodeRush") return;
+// Buffs
+useEffect(() => {
+  if (gamemodeId !== "CodeRush") return;
+  if (!activeBuffs.length) return;
 
-    const userDb = doc(db, "Users", auth.currentUser.uid);
-    const unsubscribe = onSnapshot(userDb, (snap) => {
-      const data = snap.data();
+  // Extra Time Buff (+30s)
+  if (activeBuffs.includes("extraTime")) {
+    setTimer((prev) => prev + 30);
+    setBuffApplied(true);
+    setBuffType("extraTime");
 
-      // Extra Time Buff (+30s)
-      if (data?.activeBuffs?.includes("extraTime")) {
-        setTimer((prev) => prev + 30);
-        setBuffApplied(true);
-        setBuffType("extraTime");
+    removeBuff("extraTime"); // update Zustand + Firestore
+    setTimeout(() => setBuffApplied(false), 1000);
+  }
 
-        updateDoc(userDb, { activeBuffs: arrayRemove("extraTime") });
-        setTimeout(() => setBuffApplied(false), 1000);
-      }
+  // Time Freeze Buff (pauses countdown for 5s)
+  if (activeBuffs.includes("timeFreeze")) {
+    setIsFrozen(true);
+    setBuffApplied(true);
+    setBuffType("timeFreeze");
 
-      // Time Freeze Buff (pauses countdown for 5s)
-      if (data?.activeBuffs?.includes("timeFreeze")) {
-        setIsFrozen(true);
-        setBuffApplied(true);
-        setBuffType("timeFreeze");
+    removeBuff("timeFreeze"); // update Zustand + Firestore
+    setTimeout(() => {
+      setIsFrozen(false);
+      setBuffApplied(false);
+    }, 5000);
+  }
+}, [gamemodeId, activeBuffs, removeBuff]);
 
-        updateDoc(userDb, { activeBuffs: arrayRemove("timeFreeze") });
 
-        setTimeout(() => {
-          setIsFrozen(false);
-          setBuffApplied(false);
-        }, 5000); // freeze lasts 5s
-      }
-    });
-
-    return () => unsubscribe();
-  }, [gamemodeId]);
+  console.log(buffType)
+  console.log(buffApplied)
 
   return [timer, buffApplied,buffType];
 }

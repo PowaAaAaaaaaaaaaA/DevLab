@@ -120,10 +120,9 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
           <LevelCompleted_PopUp
             subj={subject}
             lessonId={lessonId}
-            levelId={levelId}
+            LevelId={levelId}
             heartsRemaining={heart}
-            setLevelComplete={setLevelComplete}
-          />
+            setLevelComplete={setLevelComplete}/>
         )}
       </AnimatePresence>
 

@@ -4,10 +4,8 @@ import { useParams } from "react-router-dom";
 import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
 // Hooks
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
-import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
-import useActiveBuffs from "../../components/Custom Hooks/useActiveBuffs";
-
+import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 // Animation
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
@@ -20,12 +18,9 @@ import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 import { BrainFilter } from "../../ItemsLogics/BrainFilter";
 
 function InstructionPanel({submitAttempt,showPopup,showCodeWhisper,setShowCodeWhisper,setTimesUp,pauseTimer}) {
-  console.log(showPopup)
+const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
-  const { Userdata, refetch } = useUserDetails();
-  const { activeBuffs, loading } = useActiveBuffs();
-
   const [timer, buffApplied, buffType] = useCodeRushTimer(gameModeData?.timer,gamemodeId,gameModeData,showPopup,pauseTimer);
   const { animatedValue } = useAnimatedNumber(buffApplied ? 30 : 0);
 
@@ -52,21 +47,22 @@ function InstructionPanel({submitAttempt,showPopup,showCodeWhisper,setShowCodeWh
   // BrainBytes Options
   const [selectedOption, setSelectedOption] = useState(null);
   // !! For BrainBytes (Checking Selected Answer)
-  const answerCheck = () => {
-    if (!selectedOption) {
-      toast.error("Select Answer", {
-        position: "top-right",
-        theme: "colored",
-      });
-      return;
-    }
-    if (selectedOption === gameModeData.correctAnswer) {
-      console.log("Correct Answer");
-    } else {
-      submitAttempt(false);
-      console.log("Wrong");
-    }
-  };
+const answerCheck = () => {
+  if (!selectedOption) {
+    toast.error("Select Answer", {
+      position: "top-right",
+      theme: "colored",
+    });
+    return;
+  }
+  if (selectedOption === gameModeData.choices.correctAnswer) {
+    console.log("Correct Answer");
+  } else {
+    submitAttempt(false);
+    console.log("Wrong");
+  }
+};
+  // FormatTimer For CodeRush
   const FormatTimer = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -93,23 +89,23 @@ useEffect(() => {
 
   const [filtteredOpttions, setFilteredOptions] = useState([]);
   const [used, setUsed] = useState(false);
-  useEffect(() => {
-    if (!gameModeData?.options || loading) return; // wait for buffs to load
+useEffect(() => {
+  if (!gameModeData?.choices) return; // wait for choices to load
+  let optionsArray = Object.entries(gameModeData.choices)
+    .filter(([key]) => key !== "correctAnswer")
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
 
-    let optionsArray = Object.entries(gameModeData.options).sort(
-      ([keyA], [keyB]) => keyA.localeCompare(keyB)
-    );
-    console.log(activeBuffs);
-    if (activeBuffs.includes("brainFilter")) {
-      setUsed(true);
-      BrainFilter(filtteredOpttions, gameModeData.correctAnswer)
-        .then((filtered) => setFilteredOptions(filtered))
-        .catch(console.error);
-    } else if (!used) {
-      setFilteredOptions(optionsArray);
-      console.log("else");
-    }
-  }, [gameModeData, activeBuffs, loading]);
+  if (activeBuffs.includes("brainFilter")) {
+    setUsed(true);
+    BrainFilter(filtteredOpttions, gameModeData.choices.correctAnswer)
+      .then((filtered) => setFilteredOptions(filtered))
+      .catch(console.error);
+  } else if (!used) {
+    setFilteredOptions(optionsArray);
+    console.log("else");
+  }
+}, [gameModeData, activeBuffs]);
+console.log(activeBuffs)
   return (
     <div
       className="h-[100%] w-full bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5 scrollbar-custom">
