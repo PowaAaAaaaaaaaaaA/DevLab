@@ -2,10 +2,13 @@
 import Example from '../assets/Images/Example1.jpg'
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import Lottie from 'lottie-react';
+import Claim from '../assets/Lottie/ClaimAchievement.json'
 
 import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
 import useUserDetails from './Custom Hooks/useUserDetails'
 import useUserAchievements from './Custom Hooks/useUserAchievements.jsx'
+import useAchievementsProgressBar from './Custom Hooks/useAchievementProgressBar.jsx';
 
 import { doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
@@ -13,11 +16,12 @@ import { db } from "../Firebase/Firebase";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import '../index.css'
-import Lottie from "lottie-react";
 import Loading from '../assets/Lottie/LoadingDots.json'
 import { useState } from 'react'  
 
 function Achievements() {
+
+
 
   const { data: HtmlData, isLoading: loading, error } = useAchievementsData("Html");
   const { data:CssData,  } = useAchievementsData("Css");
@@ -25,7 +29,11 @@ function Achievements() {
   const { data:DatabaseData, } = useAchievementsData("Database");
   const {Userdata, isLoading } = useUserDetails();
 
- // Use your new hook here
+  const {animatedBar:HtmlBar} = useAchievementsProgressBar(Userdata?.uid, "Html");
+  const {animatedBar:CssBar} = useAchievementsProgressBar(Userdata?.uid, "Css");
+  const {animatedBar:JsBar} = useAchievementsProgressBar(Userdata?.uid, "JavaScript");
+  const {animatedBar:DatabaseBar} = useAchievementsProgressBar(Userdata?.uid, "Database");
+
 const { data: userAchievements, } = useUserAchievements(Userdata?.uid);
 const [LoadingClaim , setLoadingClaim] = useState(false);
 
@@ -78,26 +86,56 @@ const handleClaim = (item) => {
 
 const showClaimToast = (item) => {
   toast.custom(
-    (t) => (
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 30, scale: 0.95 }}
-        transition={{ duration: 0.3 }}
-        className="bg-white rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 text-sm font-medium text-green-700 flex-col p-4">
-          <h1 className='font-exo text-green-700 font-bold text-2xl'>Congratulations</h1>
-          <div>        
-          <p>You claimed <span className="font-bold text-purple-700">{item.title}</span> Reward!</p>
-        <div className='flex gap-5'>
-          <p className='text-sm'>DevCoins: +<span className='font-bold text-yellow-400'>{item.coinsReward}</span></p>
-          <p className='text-sm'>Exp: +<span className='font-bold text-cyan-400'>{item.expReward}</span></p>
-        </div></div>
+(t) => (
+<motion.div
+  initial={{ opacity: 0, y: 50, scale: 0.85 }}
+  animate={{ opacity: 1, y: 0, scale: 1 }}
+  exit={{ opacity: 0, y: 50, scale: 0.85 }}
+  transition={{ type: "spring", stiffness: 150, damping: 15 }}
+  className="bg-white rounded-2xl shadow-2xl px-8 py-6 flex items-center gap-4 text-center max-w-sm w-full mx-auto ">
+  {/* Lottie Animation */}
+  <Lottie
+    animationData={Claim}
+    loop={false}
+    autoplay
+    style={{ width: 50, height: 50 }}
+  />
+<div className='flex flex-col'>
+  {/* Title */}
+  <h1 className="font-exo text-green-700 font-extrabold text-2xl drop-shadow-sm">
+    🎉 Congratulations!
+  </h1>
 
-      </motion.div>),
-    {
-      duration: 2000, // ⏱ disappears after 2s
-      position: "top-center",
-    }
+  {/* Reward Info */}
+  <p className="text-gray-700 text-base">
+    You claimed <span className="font-bold text-purple-700">{item.title}</span> reward!
+  </p>
+
+  {/* Rewards Breakdown */}
+  <div className="flex flex-wrap justify-center gap-4 mt-3">
+    {/* DevCoins */}
+    <div className="bg-yellow-100 px-4 py-2 rounded-xl shadow-sm">
+      <p className="text-sm text-yellow-700 font-bold">
+        DevCoins: <span className="text-yellow-600">+{item.coinsReward}</span>
+      </p>
+    </div>
+
+    {/* Exp */}
+    <div className="bg-cyan-100 px-4 py-2 rounded-xl shadow-sm">
+      <p className="text-sm text-cyan-700 font-bold">
+        Exp: <span className="text-cyan-600">+{item.expReward}</span>
+      </p>
+    </div>
+  </div>
+</div>
+</motion.div>
+
+),
+{
+  duration: 3000, // stays for 3s for a more satisfying effect
+  position: "top-center",
+}
+
   );
 };
 
@@ -119,16 +157,16 @@ const showClaimToast = (item) => {
       <div className='h-[35%] w-[95%] m-auto flex items-end'>
         <div className='flex justify-around items-center h-[80%] w-[100%]'>
           <div className='w-[20%] h-[80%] font-exo font-bold text-white text-shadow-lg/30 backdrop-blur-[20px] rounded-xl flex flex-col gap-2 items-center justify-center'>HTML ACHIEVEMENTS  <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}></div>
+          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: `${HtmlBar}%`}}></div>
         </div></div>
           <div className='w-[20%] h-[80%] font-exo font-bold text-white text-shadow-lg/30  backdrop-blur-[20px] rounded-xl flex flex-col gap-2 items-center justify-center'>CSSACHIEVEMENTS  <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}></div>
+          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: `${CssBar}%`}}></div>
         </div></div>
           <div className='w-[20%] h-[80%] font-exo font-bold text-white text-shadow-lg/30  backdrop-blur-[20px] rounded-xl flex flex-col gap-2 items-center justify-center'>JAVASCRIPT ACHIEVEMENTS  <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}></div>
+          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: `${JsBar}%`}}></div>
         </div></div>
           <div className='w-[20%] h-[80%] font-exo font-bold text-white text-shadow-lg/30  backdrop-blur-[20px] rounded-xl flex flex-col gap-2 items-center justify-center'>DATABASE QUERYING ACHIEVEMENTS  <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: '56%'}}></div>
+          <div className="h-4 rounded-full dark:bg-[#2CB67D]" style={{width: `${DatabaseBar}%`}}></div>
         </div></div>
         </div>
       </div>
@@ -145,7 +183,6 @@ const showClaimToast = (item) => {
 {HtmlData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
   const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
-  console.log(`${item.id} - ${isClaimed}`)
   return (
     <div
       key={item.id}
@@ -160,10 +197,14 @@ const showClaimToast = (item) => {
 <button 
 onClick={() => isUnlocked && !isClaimed && handleClaim(item)}
 className={`px-4 py-1 rounded-full font-semibold cursor-pointer 
-  ${isClaimed ? "bg-green-500 text-white" : "bg-yellow-500 text-black"}`}> 
-  {isClaimed ? "COMPLETED" : "UNCLAIMED"}
+  ${isClaimed ? "bg-green-500 text-white"       // COMPLETED
+  : isUnlocked 
+  ? "bg-yellow-500 text-black"    // UNCLAIMED
+  : "bg-red-500 text-white"       // LOCKED
+  }`}> 
+{isClaimed ? "COMPLETED" : isUnlocked
+    ? "UNCLAIMED" : "LOCKED"}
 </button>
-
       </div>
     </div>
   );

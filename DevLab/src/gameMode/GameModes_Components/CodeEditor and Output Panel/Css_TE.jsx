@@ -3,6 +3,8 @@ import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { css } from '@codemirror/lang-css';
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+import { EditorView } from "@codemirror/view";
+import { autocompletion } from "@codemirror/autocomplete";
 // Animation
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
@@ -11,7 +13,11 @@ import { motion } from "framer-motion";
 import { useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
+import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
+import useUserDetails from "../../../components/Custom Hooks/useUserDetails";
+
 function Css_TE({setIsCorrect,setShowisCorrect}) {
+    const {Userdata, isLoading } = useUserDetails();
     const {gamemodeId} = useParams();
   const tabs = ["HTML", "CSS"];
   const [activeTab, setActiveTab] = useState("CSS");
@@ -25,17 +31,47 @@ function Css_TE({setIsCorrect,setShowisCorrect}) {
 
   // Determine the CodeMirror extension based on active tab
 const getLanguageExtension = () => {
-    switch (activeTab) {
-        case "HTML":
-    return html();
-        case "CSS":
-    return css();
-
+  switch (activeTab) {
+    case "HTML":
+      return html({ autoCloseTags: false });
+    case "CSS":
+      return css();
+    case "JavaScript":
+      return javascript({ jsx: true });
     default:
-    return html();
-    }
+      return html({ autoCloseTags: false });
+  }
 };
 
+const checkCssAchievements = (cssCode) => {
+  const achievements = [];
+  //  class usage
+  if (/\.[a-zA-Z0-9_-]+/.test(cssCode)) {
+    achievements.push("Class Act");
+  }
+  //  ID usage
+  if (/#\w+/.test(cssCode)) {
+    achievements.push("ID Insider");
+  }
+  //   color property
+  if (/(color|background-color)\s*:\s*[^;]+;/.test(cssCode)) {
+    achievements.push("Color Coder");
+  }
+  //   flex or grid layout
+  if (/display\s*:\s*(flex|grid)/.test(cssCode)) {
+    achievements.push("Layout Master");
+  }
+  //   box model usage
+  if (/(margin|padding|border)\s*:\s*[^;]+;/.test(cssCode)) {
+    achievements.push("Box Modeler");
+  }
+  // font styling
+  if (/(font-size|font-family|font-weight)\s*:\s*[^;]+;/.test(cssCode)) {
+    achievements.push("Font Styler");
+  }
+
+  return achievements;
+};
 
 // Handle code change based on active tab
 const onChange = useCallback((val) => {
@@ -71,6 +107,13 @@ const onChange = useCallback((val) => {
       doc.close();
     }, 0);
       setShowisCorrect(true)
+        // **Check CSS achievements**
+  const unlocked = checkCssAchievements(code.CSS);
+  if (unlocked.length > 0) {
+    unlocked.forEach(title => {
+      unlockAchievement(Userdata.uid, "Css", "cssAction", { achievementTitle: title});
+    });
+  }
   };
 
   return (
@@ -99,7 +142,7 @@ const onChange = useCallback((val) => {
           onChange={onChange}
           height="100%"
           width="100%"
-          extensions={[getLanguageExtension()]}
+          extensions={[getLanguageExtension(), autocompletion({ override: [] }), EditorView.lineWrapping]}
           theme={tokyoNight}/>
         </div>   
         <div className="flex justify-around w-full">

@@ -3,11 +3,13 @@ import { getDoc, doc, setDoc, deleteDoc} from "firebase/firestore";
 import { db } from "../../Firebase/Firebase";
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 function LessonEdit({ subject, lessonId, levelId, stageId }) {
 
   const gameModes = ["Lesson", "BugBust", "CodeRush", "CodeCrafter", "BrainBytes"];
 
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("Lesson");
   const [stageData, setStageData] = useState();
 
@@ -65,7 +67,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
         stagePayload = {
           ...stagePayload,
           choices: {
-            A: answers.A || stageData?.options?.A,
+            a: answers.A || stageData?.options?.A,
             b: answers.B || stageData?.options?.B,
             c: answers.C || stageData?.options?.C,
             d: answers.D || stageData?.options?.D,
@@ -87,18 +89,25 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
     fetchStage();
   }, []);
 
-    // Delete stage
-  const handleDelete = async () => {
-    try {
-      const stageRef = doc(db,subject,lessonId,"Levels",levelId,"Stages",stageId);
-      await deleteDoc(stageRef);
-      toast.success('Stage deleted successfully!');
-    } catch (error) {
-      console.log(error);
-      toast.error('Failed to delete stage.');
-    }
-  };
+  // Delete stage mutation
+const deleteStageMutation = useMutation({
+  mutationFn: async (stageIdToDelete) => {
+    const stageRef = doc(db, subject, lessonId, "Levels", levelId, "Stages", stageIdToDelete);
+    await deleteDoc(stageRef);
+  },
+  onSuccess: () => {
+    toast.success('Stage deleted successfully!');
+    queryClient.invalidateQueries(['stages', lessonId, levelId]);
+  },
+  onError: (error) => {
+    console.error(error);
+    toast.error('Failed to delete stage.');
+  }
+});
 
+  const handleDelete = () => {
+    deleteStageMutation.mutate(stageId);
+  };
   return (
     <div className='bg-[#25293B]'>
       <div className='h-auto p-5 flex flex-col gap-s'>

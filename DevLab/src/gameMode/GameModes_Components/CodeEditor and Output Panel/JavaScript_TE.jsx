@@ -4,6 +4,9 @@ import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { javascript } from "@codemirror/lang-javascript";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+import { EditorView } from "@codemirror/view";
+import { autocompletion } from "@codemirror/autocomplete";
+
 // Animation
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
@@ -29,19 +32,18 @@ function JavaScript_TE({setIsCorrect,setShowisCorrect}) {
   const [logs, setLogs] = useState([]);
   const consoleRef = useRef([]);
   // Get language for CodeMirror
-  const getLanguageExtension = () => {
-    switch (activeTab) {
-      case "HTML":
-        return html();
-      case "CSS":
-        return css();
-      case "JavaScript":
-        return javascript({ jsx: true });
-      default:
-        return html();
-    }
-  };
-
+const getLanguageExtension = () => {  
+  switch (activeTab) {
+    case "HTML":
+      return html({ autoCloseTags: false });
+    case "CSS":
+      return css();
+    case "JavaScript":
+      return javascript({ jsx: true });
+    default:
+      return html({ autoCloseTags: false });
+  }
+};
   // Handle editor changes
   const onChange = useCallback(
     (val) => {
@@ -144,7 +146,7 @@ function JavaScript_TE({setIsCorrect,setShowisCorrect}) {
               onChange={onChange}
               height="100%"
               width="100%"
-              extensions={[getLanguageExtension()]}
+              extensions={[getLanguageExtension(), autocompletion({ override: [] }), EditorView.lineWrapping]}
               theme={tokyoNight}
             />
           </div>

@@ -181,8 +181,7 @@ const handleDragEnd = async (event, lessonId, levelId) => {
           <h1 className="text-[3.2rem] font-bold">Content Management</h1>
           <button
             onClick={openPopup}
-            className="rounded-2xl w-[20%] h-[60%] flex gap-5 items-center p-5 justify-center bg-[#4CAF50] font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]"
-          >
+            className="rounded-2xl w-[20%] h-[60%] flex gap-5 items-center p-5 justify-center bg-[#4CAF50] font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]">
             <span className=" text-2xl">
               <HiArrowDownTray />
             </span>
@@ -217,36 +216,30 @@ const handleDragEnd = async (event, lessonId, levelId) => {
           {levelsData.map((lesson) => (
             <div key={lesson.id} className="p-5 flex flex-col gap-15">
               <h2 className="text-white font-exo text-5xl">
-                Lesson {lesson.Lesson}
+                Lesson {lesson.Lesson} 
               </h2>
               <div className="flex flex-wrap justify-center gap-5">
                 {lesson.levels.map((level) => (
                   <div
                     key={level.id}
-                    className="relative border-[#56EBFF] border w-full sm:w-[48%] lg:w-[42%] p-4 flex flex-col gap-4 min-h-[180px] rounded-2xl bg-[#111827] transition-all duration-400"
-                  >
-                    <h2 className="text-xl md:text-3xl font-exo font-bold text-white mediuText-laptop">
+                    className="relative border-[#56EBFF] border w-full sm:w-[48%] lg:w-[42%] p-4 flex flex-col gap-4 min-h-[180px] rounded-2xl bg-[#111827] transition-all duration-400">
+                    <h2 className="text-xl md:text-3xl font-exo font-bold w-[73%] text-white mediuText-laptop">
                       {level.title}
                     </h2>
-                    <p className="text-white font-exo text-sm md:text-base">
-                      {level.desc}
-                    </p>
                     <div className="flex flex-wrap gap-3 mt-3">
                       <div className="border flex flex-wrap p-2 rounded-lg border-gray-500 gap-3 w-full">
                         <DndContext
                           collisionDetection={closestCorners}
                           onDragEnd={(event) =>
                             handleDragEnd(event, lesson.Lesson, level.id)
-                          }
-                        >
+                          }>
                           <SortableContext
                             items={
                               levelStages[`${lesson.Lesson}_${level.id}`]?.map(
                                 (stage) => stage.id
                               ) || []
                             }
-                            strategy={horizontalListSortingStrategy}
-                          >
+                            strategy={horizontalListSortingStrategy}>
                             {levelStages[`${lesson.Lesson}_${level.id}`]?.map(
                               (stage) => (
                                 <SortableStage
@@ -308,14 +301,12 @@ const handleDragEnd = async (event, lessonId, levelId) => {
           className={`fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50 transition-all duration-300 ${
             popupVisible ? "opacity-100" : "opacity-0"
           }`}
-          onClick={closePopup}
-        >
+          onClick={closePopup}>
           <div
             onClick={(e) => e.stopPropagation()}
             className={`w-[40%] h-[60%] transition-all duration-300 ${
               popupVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"
-            }`}
-          >
+            }`}>
             <AddContent
               subject={activeTab}
               closePopup={() => setShowPopup(false)}
@@ -328,15 +319,13 @@ const handleDragEnd = async (event, lessonId, levelId) => {
         {showForm && (
           <div
             onClick={() => setShowForm(false)}
-            className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center "
-          >
+            className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center ">
             <motion.div
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0 }}
-              className="w-[40%] h-[90%] transition-all overflow-x-hidden rounded-2xl scrollbar-custom"
-            >
+              className="w-[40%] h-[90%] transition-all overflow-x-hidden rounded-2xl scrollbar-custom">
               <LessonEdit
                 subject={activeTab}
                 lessonId={`Lesson${lessonId}`}

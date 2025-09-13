@@ -2,13 +2,13 @@
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+import { EditorView } from "@codemirror/view";
 // (Disable Auto Complete for Mode "Bugbust")
 import { htmlLanguage } from "@codemirror/lang-html";
 import { LanguageSupport } from "@codemirror/language";
 import { autocompletion } from "@codemirror/autocomplete";
 // Animation
 import Animation from '../../../assets/Lottie/OutputLottie.json'
-
 import Lottie from "lottie-react";
 import { motion, AnimatePresence } from "framer-motion";
 // Utils
@@ -18,10 +18,7 @@ import { useParams } from "react-router-dom";
 import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
 import useUserDetails from "../../../components/Custom Hooks/useUserDetails";
 
-
 function Html_TE({setIsCorrect,setShowisCorrect}) {
-
-
   const {Userdata, isLoading } = useUserDetails();
 
     const {gamemodeId} = useParams();
@@ -32,13 +29,18 @@ function Html_TE({setIsCorrect,setShowisCorrect}) {
     const [isCorrect, setCorrect] = useState(true)
 
 const extractTags = (html) => {
-  const tagRegex = /<([a-zA-Z0-9]+)(\s|>)/g;
+  const tagRegex = /<([a-zA-Z0-9]+)(\s|>)|<!--[\s\S]*?-->/g;
   const tags = [];
   let match;
 
   while ((match = tagRegex.exec(html)) !== null) {
-    tags.push(`<${match[1].toLowerCase()}>`);
+    if (match[0].startsWith('<!--')) {
+      tags.push(match[0]); // push the whole comment
+    } else {
+      tags.push(`<${match[1].toLowerCase()}>`); // push normal tags
+    }
   }
+
   return [...new Set(tags)]; // remove duplicates
 };
 
@@ -55,7 +57,7 @@ const extractTags = (html) => {
         <html lang="en">
         <head>
         </head>
-        <body>${ code }
+        <body>${code}
         </body>
         </html>`;
         const doc =
@@ -70,6 +72,7 @@ const extractTags = (html) => {
   if (usedTags.length > 0) {
     unlockAchievement(Userdata?.uid, "Html", "tagUsed", { usedTags, isCorrect});
   }
+  console.log(usedTags);
   setShowisCorrect(true)
     }
   return (
@@ -82,10 +85,11 @@ const extractTags = (html) => {
           onChange={(val) => setCode(val)}
           height="100%"
           width="100%"
-          extensions={gamemodeId === "BugBust"
-            ? new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })])
-            : html()
-          }
+          extensions={[
+            new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })]),
+            html({ autoCloseTags: false }), 
+            EditorView.lineWrapping
+          ]}
           theme={tokyoNight} />
         </div>
         <div className="flex justify-around w-full">
@@ -113,7 +117,7 @@ const extractTags = (html) => {
             ref={iFrame}
             title="output"
             className="w-full h-full rounded-xl"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
           />
         ) : (
           <div className="w-full h-full flex items-center flex-col">

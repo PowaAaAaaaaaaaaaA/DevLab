@@ -22,9 +22,7 @@
           const levelsSnapshot = await getDocs(levelsRef);
           totalLevels += levelsSnapshot.size; // .size gives the number of documents
         }
-
         setTotal(totalLevels);
-        console.log("Total Levels:", totalLevels);
       };
 
       useEffect(() => {

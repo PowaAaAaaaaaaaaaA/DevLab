@@ -1,5 +1,6 @@
 // Database Querying Playground 
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import initSqlJs from "sql.js";
 import CodeMirror from '@uiw/react-codemirror';
 import { sql } from "@codemirror/lang-sql";
@@ -9,6 +10,7 @@ import Animation from '../assets/Lottie/OutputLottie.json'
 import {  motion } from "framer-motion";
 
 function DataqueriesPlayground() {
+    const navigate = useNavigate();
 const dbRef = useRef(null);
 const [query, setQuery] = useState("SELECT users.name, orders.item FROM users JOIN orders ON users.id = orders.user_id;");
 const [outputHtml, setOutputHtml] = useState();
@@ -103,17 +105,11 @@ const runQuery = () => {
 };
 return (
 <div className="flex bg-[#16161A] h-screen  flex-col gap-3 p-4 overflow-hidden">
-    <h1 className="text-[1.9rem] font-bold font-exo text-white p-8">DEVLAB</h1>
+    <div 
+    className="text-5xl font-exo font-bold p-10 text-white"><span className="cursor-pointer"onClick={()=>navigate("/main")}>DEVLAB</span></div>
     <div className="flex w-[100%] h-[100%] gap-10">
     <div className="flex flex-col w-[60%] h-[80%] gap-4">
-        <div className=" h-[30%] overflow-scroll overflow-x-hidden p-4 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl 
-        [&::-webkit-scrollbar]:w-1
-        [&::-webkit-scrollbar-track]:rounded-full
-        [&::-webkit-scrollbar-track]:bg-gray-100
-        [&::-webkit-scrollbar-thumb]:rounded-full
-        [&::-webkit-scrollbar-thumb]:bg-gray-300
-        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+        <div className=" h-[30%] overflow-scroll overflow-x-hidden p-4 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl scrollbar-custom">
             <h2 className="text-[1.5rem] font-semibold mb-2 text-white font-exo">Database Tables</h2>
             <div dangerouslySetInnerHTML={{ __html: tablesHtml }} className="text-white" />
         </div>

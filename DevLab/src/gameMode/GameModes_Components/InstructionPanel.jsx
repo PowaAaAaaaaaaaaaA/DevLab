@@ -17,7 +17,7 @@ import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 import { BrainFilter } from "../../ItemsLogics/BrainFilter";
 
-function InstructionPanel({submitAttempt,showPopup,showCodeWhisper,setShowCodeWhisper,setTimesUp,pauseTimer}) {
+function InstructionPanel({setIsCorrect,setShowisCorrect,submitAttempt,showPopup,showCodeWhisper,setShowCodeWhisper,setTimesUp,pauseTimer}) {
 const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
@@ -47,6 +47,8 @@ const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   // BrainBytes Options
   const [selectedOption, setSelectedOption] = useState(null);
   // !! For BrainBytes (Checking Selected Answer)
+const [isCorrect, setCorrect] = useState(null); // use only ONE state
+
 const answerCheck = () => {
   if (!selectedOption) {
     toast.error("Select Answer", {
@@ -55,13 +57,17 @@ const answerCheck = () => {
     });
     return;
   }
-  if (selectedOption === gameModeData.choices.correctAnswer) {
+  const result = selectedOption === gameModeData.choices.correctAnswer;
+  setIsCorrect(result); 
+  setShowisCorrect(true);
+
+  if (result) {
     console.log("Correct Answer");
   } else {
-    submitAttempt(false);
     console.log("Wrong");
   }
 };
+;
   // FormatTimer For CodeRush
   const FormatTimer = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -89,7 +95,7 @@ useEffect(() => {
 
   const [filtteredOpttions, setFilteredOptions] = useState([]);
   const [used, setUsed] = useState(false);
-useEffect(() => {
+useEffect(() => { 
   if (!gameModeData?.choices) return; // wait for choices to load
   let optionsArray = Object.entries(gameModeData.choices)
     .filter(([key]) => key !== "correctAnswer")

@@ -66,7 +66,7 @@ useEffect(() => {
       if (userData?.suspend) {
         // Immediately sign out suspended user
         await signOut(auth);
-        toast.error("Your account is suspended. Please contact support.", {
+        toast.error("Your account is suspended.", {
           position: "bottom-center",
           theme: "colored",
         });

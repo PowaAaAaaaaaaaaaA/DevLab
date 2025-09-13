@@ -6,13 +6,16 @@ import { useState } from "react";
 import useUserInventory from "../components/Custom Hooks/useUserInventory";
 
 import { useInventoryStore } from "./Items-Store/useInventoryStore";
+import { unlockAchievement } from "../components/Custom Hooks/UnlockAchievement";
+import useUserDetails from "../components/Custom Hooks/useUserDetails";
+
 
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
     const [showInventory, setShowInventory] = useState(false);
     const { inventory:userInventory, loading} = useUserInventory();
 
-    
+  const { Userdata,refetch } = useUserDetails();
   const inventory = useInventoryStore((state) => state.inventory);
   const useItem = useInventoryStore((state) => state.useItem);
   const activeBuffs =useInventoryStore()
@@ -62,7 +65,6 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
       <LuAlignJustify
         onClick={() => setShowInventory((prev) => !prev)}
         className="text-4xl cursor-pointer"/>
-
           {/*Inventory Show*/}
   <AnimatePresence >
 {showInventory && (
@@ -70,15 +72,21 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
     initial={{ opacity: 0, scale: 0 }}
     animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0 }}
-    className="w-[20%] h-[50%] fixed bottom-20 left-5"
-  >
+    className="w-[20%] h-[50%] fixed bottom-20 left-5">
     <div className="h-[100%] w-[100%] border border-gray-500 rounded-2xl bg-[#111827] p-4 flex flex-col gap-4 overflow-scroll overflow-x-hidden scrollbar-custom">
       <h1 className="text-white font-exo text-4xl">Inventory</h1>
 {userInventory && userInventory.length > 0 ? (
   userInventory.map((Items) => (
     <button
       key={Items.id}
-      onClick={() => itemActions[Items.title]?.(Items)}
+onClick={() => {
+    // Trigger any predefined item action
+    itemActions[Items.title]?.(Items);
+    // Call unlockAchievement for this item
+    unlockAchievement(Userdata.uid, "Html", "itemUse", {
+      itemName: Items.title
+    });
+  }}
       className="cursor-pointer border rounded-2xl border-gray-600 min-h-[15%] bg-[#0D1117] flex items-center p-2 gap-7 w-auto">
       <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
         <img
