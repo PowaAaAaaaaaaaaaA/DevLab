@@ -45,31 +45,30 @@ const getLanguageExtension = () => {
 
 const checkCssAchievements = (cssCode) => {
   const achievements = [];
-  //  class usage
+  // class usage
   if (/\.[a-zA-Z0-9_-]+/.test(cssCode)) {
-    achievements.push("Class Act");
+    achievements.push("styleStrategist");
   }
-  //  ID usage
+  // ID usage
   if (/#\w+/.test(cssCode)) {
-    achievements.push("ID Insider");
+    achievements.push("selectorStrategist");
   }
-  //   color property
+  //  color property
   if (/(color|background-color)\s*:\s*[^;]+;/.test(cssCode)) {
-    achievements.push("Color Coder");
+    achievements.push("colorCrafter");
   }
-  //   flex or grid layout
+  //  flex or grid layout
   if (/display\s*:\s*(flex|grid)/.test(cssCode)) {
-    achievements.push("Layout Master");
+    achievements.push("layoutLegend");
   }
-  //   box model usage
+  //  box model usage
   if (/(margin|padding|border)\s*:\s*[^;]+;/.test(cssCode)) {
-    achievements.push("Box Modeler");
+    achievements.push("boxBuilder");
   }
   // font styling
   if (/(font-size|font-family|font-weight)\s*:\s*[^;]+;/.test(cssCode)) {
-    achievements.push("Font Styler");
+    achievements.push("fontFanatic");
   }
-
   return achievements;
 };
 

@@ -97,8 +97,6 @@ console.log(total);
                     {lesson.levels.map((level) => {
                       // Level Locked or Unlocked
                       const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
-                      console.log (lesson.id,level.id);
-                      console.log(isUnlocked);
                       // unique identifier
                       const isExpanded = expandedLevel === `${lesson.id}-${level.id}`;
                       const toggleLevel = (lessonId, levelId) => {
@@ -115,7 +113,7 @@ console.log(total);
                               show: { opacity: isUnlocked ?  1 : 0.4, y: 0 },
                             }}
                             whileHover={{ scale: 1.02 }}
-                            className={`relative group w-full border flex gap-5 rounded-4xl h-[120px] 
+                            className={`group w-full border flex gap-5 rounded-4xl h-[120px] relative
                             ${
                               isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
                             } cursor-pointer`}
@@ -136,16 +134,17 @@ console.log(total);
                                 }}
                               toggleLevel(lesson.id, level.id);
                             }}>
-                            <div className="text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center">
+                              {!isUnlocked && (
+                                <motion.div 
+                                className="absolute w-full h-full flex items-center justify-center text-white">
+                                  <FaLock className="text-[3rem] text-white" />
+                                </motion.div>
+                              )}
+                            <div className="text-white bg-black min-w-[20%] text-[3rem] font-bold rounded-4xl flex justify-center items-center">
                               <span className="pb-4">{level.symbol}</span>
                             </div>
                             <div className="p-4 text-white font-exo">
                               <p className="text-[1.4rem]">{level.title}</p>
-                              {!isUnlocked && (
-                                <div className="absolute top-10 right-0 left-105 text-white">
-                                  <FaLock className="text-[3rem] text-white" />
-                                </div>
-                              )}
                               <p className="text-[0.7rem] line-clamp-3 text-gray-500">
                                 {level.description}
                               </p>
@@ -213,7 +212,7 @@ console.log(total);
                                             {stage.description}
                                           </p>
                                           {!isStageUnlocked && (
-                                            <div className="absolute top-7 right-0 left-105 text-white">
+                                            <div className="absolute inset-0 flex items-center justify-center text-white">
                                               <FaLock className="text-[3rem] text-white" />
                                             </div>
                                           )}

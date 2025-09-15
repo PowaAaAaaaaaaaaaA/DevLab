@@ -35,7 +35,7 @@ const extractTags = (html) => {
 
   while ((match = tagRegex.exec(html)) !== null) {
     if (match[0].startsWith('<!--')) {
-      tags.push(match[0]); // push the whole comment
+      tags.push('<!--'); // push the whole comment
     } else {
       tags.push(`<${match[1].toLowerCase()}>`); // push normal tags
     }
@@ -45,11 +45,6 @@ const extractTags = (html) => {
 };
 
     const runCode = () =>{
-      if (gamemodeId === "Lesson"){
-        
-      }else{
-        setIsCorrect(isCorrect);
-      }
       setRunCode(true);
       setTimeout(() => {
         const fullCode = `
@@ -67,13 +62,17 @@ const extractTags = (html) => {
         doc.write(fullCode);
         doc.close();
       }, 0);
-  // --- TAG USAGE ACHIEVEMENT ---
+
+      if (gamemodeId === "Lesson"){  
+      }else{
+        setIsCorrect(isCorrect);
+          // --- TAG USAGE ACHIEVEMENT ---
   const usedTags = extractTags(code); 
   if (usedTags.length > 0) {
     unlockAchievement(Userdata?.uid, "Html", "tagUsed", { usedTags, isCorrect});
   }
-  console.log(usedTags);
   setShowisCorrect(true)
+      }
     }
   return (
     <>

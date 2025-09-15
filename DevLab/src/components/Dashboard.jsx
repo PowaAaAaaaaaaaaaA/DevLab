@@ -18,6 +18,8 @@ import { auth } from '../Firebase/Firebase'
 import Loading from './Loading'
 import '../index.css'
 
+import defaultAvatar from './../assets/Images/profile_handler.png'
+
 
 function Dashboard() {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
@@ -62,6 +64,7 @@ useEffect(() => {
     setLoading(false);
   }
 }, []);
+
 useEffect(() => {
     const fetchData = async () => {
       const currentUser = auth.currentUser;
@@ -115,7 +118,7 @@ console.log(subject)
 
   // Show Loading Screen first
   // Show Loading Screen
- if (loadingDashboard) {
+if (loadingDashboard) {
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-50">
       <Loading />
@@ -137,7 +140,7 @@ console.log(subject)
   <div className="w-[40%] h-[90%] flex items-center flex-col gap-5 p-2">
     <div className="w-[55%] h-[80%] rounded-full overflow-hidden">
       <img
-        src={Userdata?.profileImage || "/defaultAvatar.png"}
+        src={Userdata?.profileImage || defaultAvatar}
         alt="Profile"
         className="w-full h-full object-cover"/>
     </div>

@@ -20,7 +20,7 @@ export const unlockAchievement = async (userId, subject, actionType, payload = {
 let match = false;
 switch (actionType) {
   case "firstLevelComplete":
-    match = condition?.levelId === payload?.levelId && condition?.lessonId === payload?.lessonId;
+    match = condition?.levelId === payload?.LevelId && condition?.lessonId === payload?.lessonId && condition?.subject === subject;
     break;
   case "lessonComplete":
     match = payload.lessonId && condition?.lessonId === payload?.lessonId;
@@ -32,20 +32,21 @@ switch (actionType) {
     match = payload?.itemName === condition?.itemReq && subject === condition?.subject;
     break;
     case "cssAction":
-    match = payload?.achievementTitle === condition?.title;
+    match = payload?.achievementTitle === condition?.title && condition.subject === subject;
+    break;
+  case "subjectComplete":
+    match = condition?.type === "subjectCompletion" && condition?.subject === subject;
     break;
 }
       if (match) {
         const userAchRef = doc(db, "Users", userId, "Achievements", achievementId);
         const userAchSnap = await getDoc(userAchRef);
-
         if (!userAchSnap.exists()) {
           await setDoc(userAchRef, {
             ...achievement,
             dateUnlocked: new Date(),
             claimed: false,
           });
-
           // Show Tailwind styled toast
 toast.custom((t) => (
 <AnimatePresence mode="popLayout">

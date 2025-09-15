@@ -1,5 +1,5 @@
 // Navigation
-import { useParams, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { goToNextStage } from "../GameModes_Utils/Util_Navigation";
 // Hooks
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";

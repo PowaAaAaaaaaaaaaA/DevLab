@@ -54,6 +54,7 @@ for (const subject of subjects) {
     doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
     {
     status: true,
+    completed:false,
     rewardClaimed: false,
     });
 

@@ -9,16 +9,21 @@ import { useInventoryStore } from "./Items-Store/useInventoryStore";
 import { unlockAchievement } from "../components/Custom Hooks/UnlockAchievement";
 import useUserDetails from "../components/Custom Hooks/useUserDetails";
 
+import { useParams } from "react-router-dom";
+
 
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
+
+  const {subject} = useParams();
+
+
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
     const [showInventory, setShowInventory] = useState(false);
     const { inventory:userInventory, loading} = useUserInventory();
 
   const { Userdata,refetch } = useUserDetails();
-  const inventory = useInventoryStore((state) => state.inventory);
   const useItem = useInventoryStore((state) => state.useItem);
-  const activeBuffs =useInventoryStore()
+
     const itemActions = {
       "Coin Surge": (item) => useItem(item.id, "doubleCoins"),
       "Code Whisper": async (item) => {
@@ -83,7 +88,7 @@ onClick={() => {
     // Trigger any predefined item action
     itemActions[Items.title]?.(Items);
     // Call unlockAchievement for this item
-    unlockAchievement(Userdata.uid, "Html", "itemUse", {
+    unlockAchievement(Userdata.uid, subject, "itemUse", {
       itemName: Items.title
     });
   }}

@@ -3,14 +3,23 @@ import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+import { EditorView } from "@codemirror/view";
 // Utils
 import { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
 // Animation
 import { motion } from "framer-motion";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 
+import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
+import useUserDetails from "../../../components/Custom Hooks/useUserDetails";
+
+
 function Database_TE({setIsCorrect,setShowisCorrect}) {
+  const {Userdata, isLoading } = useUserDetails();  
+
+  const {gamemodeId} = useParams();
 
   const [outputHtml, setOutputHtml] = useState();
   const [hasRunQuery, setHasRunQuery] = useState(false);
@@ -18,21 +27,20 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
   const [query , setQuery] = useState("");
   const dbRef = useRef(null);
 
-    const [isCorrect, setCorrect] = useState(false)
+    const [isCorrect, setCorrect] = useState(true)
 
   const runCode =()=>{
-          if (gamemodeId === "Lesson"){
-        
-      }else{
-        setIsCorrect(isCorrect);
-      }
           try {
         setHasRunQuery(true);
         const res = dbRef.current.exec(query);
         if (res.length === 0) {
-          setOutputHtml("Query executed successfully. No results.");
+          setOutputHtmlsetOutputHtml(`
+  <div class="p-3 bg-green-100 border border-green-400 text-green-800 rounded-xl text-center font-semibold shadow-md">
+    Query executed successfully <span class="font-normal">(No results returned)</span>
+  </div>
+`);
+;
           renderAllTables();
-          return;
         }
         const { columns, values } = res[0];
         const table = `
@@ -51,8 +59,7 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
                 (row) => `
                 <tr>${row
                   .map((cell) => `<td class="border px-4 py-1">${cell}</td>`)
-                  .join("")}</tr>
-            `
+                  .join("")}</tr>`
               )
               .join("")}
             </tbody>
@@ -60,12 +67,23 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
         </div>`;
         setOutputHtml(table);
         renderAllTables();
+    if (gamemodeId === "Lesson"){
+        
+      }else{
+        setIsCorrect(isCorrect);
+        setShowisCorrect(true)
+          // --- TAG USAGE ACHIEVEMENT ---
+  const usedTags = extractSqlKeywords(query); 
+  if (usedTags.length > 0) {
+    unlockAchievement(Userdata?.uid, "Database", "tagUsed", { usedTags, isCorrect});
+  }
+  console.log(usedTags)
+}
       } catch (err) {
         setOutputHtml(
           `<span class="text-red-500 font-medium">${err.message}</span>`
         );
       }
-        setShowisCorrect(true)
   }
 
 // Data Base (Data sa Table)
@@ -136,6 +154,19 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
     }
   };
 
+
+  // Achievements Checker 
+  const extractSqlKeywords = (query) =>{
+    const keywordRegex = /\b(SELECT|AND|NOT|UPDATE|LIKE|BETWEEN|DELETE)\b/gi;
+    const keywords = [];
+    let match; 
+    
+    while ((match = keywordRegex.exec(query)) !== null) {
+    keywords.push(match[1].toUpperCase());
+  }
+  return [...new Set(keywords)]; // remove duplicates
+  }
+
   return (
 <>
   <div className="bg-[#191a26] w-[47%] ml-auto h-[95%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
@@ -144,7 +175,7 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
       className="text-[1rem] "
       height="100%"
       width="100%"
-      extensions={[sql()]}
+      extensions={[sql(),EditorView.lineWrapping]}
       theme={tokyoNight}
       onChange={(value) => setQuery(value)}/>
     </div>

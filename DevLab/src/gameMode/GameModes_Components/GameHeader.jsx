@@ -7,6 +7,9 @@ import { useParams } from "react-router-dom";
 // Icons
 import { MdArrowBackIos } from "react-icons/md";
 import { LuHeart } from "react-icons/lu";
+
+import defaultAvatar from '../../assets/Images/profile_handler.png'
+
 function GameHeader({heart}) {
 
     const { animatedExp } = useLevelBar();
@@ -34,7 +37,7 @@ function GameHeader({heart}) {
       <div className="w-auto h-[90%] flex items-center gap-2 mr-[10px]">
         <div className="border rounded-full bg-gray-600 overflow-hidden w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16">
           <img
-            src={Userdata?.profileImage || "/defaultAvatar.png"}
+            src={Userdata?.profileImage || defaultAvatar}
             alt="Profile"
             className="w-full h-full object-cover"/>
         </div>

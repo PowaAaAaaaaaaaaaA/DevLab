@@ -1,34 +1,15 @@
+async function checkSubjectCompletion(userId, subjectName) {
+  //Get total levels in the subject
+  const levelsSnapshot = await getDocs(collection(db, `${subjectName}/Levels`));
+  const totalLevels = levelsSnapshot.size;
 
-// Use Hook for UserDetails
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../Firebase/Firebase";
-import { useQuery } from "@tanstack/react-query";
+  // Get user's completed levels count
+  const userProgressRef = doc(db, "users", userId, "progress", subjectName);
+  const userProgressSnap = await getDoc(userProgressRef);
+  const completedLevels = userProgressSnap.data()?.completedLevels?.length || 0;
 
-export default function useUserDetails() {
-
-  const fetchUserData = () => {
-    return new Promise((resolve) => {
-      const unsubscribe = auth.onAuthStateChanged(async (user) => {
-        unsubscribe(); 
-
-        if (user) {
-          const getUser = doc(db, "Users", user.uid);
-          const userDocs = await getDoc(getUser);
-
-          if (userDocs.exists()) {
-            resolve(userDocs.data()); 
-          } 
-        } 
-      });
-    });
-  };
-
-
-  const { data: Userdata, isLoading, refetch } = useQuery({
-    queryKey: ["User_Details"],
-    queryFn: fetchUserData,
-  });
-
-  return { Userdata, isLoading, refetch };
+  // Compare and unlock if complete
+  if (completedLevels >= totalLevels) {
+    unlockAchievement(userId, "finishHTML");
+  }
 }
-
