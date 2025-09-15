@@ -2,6 +2,7 @@
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+import { EditorView } from "@codemirror/view";
 // (Disable Auto Complete for Mode "Bugbust")
 import { htmlLanguage } from "@codemirror/lang-html";
 import { LanguageSupport } from "@codemirror/language";
@@ -9,15 +10,16 @@ import { autocompletion } from "@codemirror/autocomplete";
 // Animation
 import Animation from '../../../assets/Lottie/OutputLottie.json'
 import Lottie from "lottie-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 // Utils
 import { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 //
-import { useErrorShield } from "../../../ItemsLogics/ErrorShield";
+import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
+import useUserDetails from "../../../components/Custom Hooks/useUserDetails";
 
-
-function Html_TE({submitAttempt}) {
+function Html_TE({setIsCorrect,setShowisCorrect}) {
+  const {Userdata, isLoading } = useUserDetails();
 
     const {gamemodeId} = useParams();
     // For the Code Mirror Input/Output
@@ -26,13 +28,23 @@ function Html_TE({submitAttempt}) {
     const [hasRunCode, setRunCode] = useState(false);
     const [isCorrect, setCorrect] = useState(false)
 
-    const runCode = () =>{
-      if (gamemodeId === "Lesson"){
-        
-      }else{
-        submitAttempt(isCorrect);
-      }
+const extractTags = (html) => {
+  const tagRegex = /<([a-zA-Z0-9]+)(\s|>)|<!--[\s\S]*?-->/g;
+  const tags = [];
+  let match;
 
+  while ((match = tagRegex.exec(html)) !== null) {
+    if (match[0].startsWith('<!--')) {
+      tags.push('<!--'); // push the whole comment
+    } else {
+      tags.push(`<${match[1].toLowerCase()}>`); // push normal tags
+    }
+  }
+
+  return [...new Set(tags)]; // remove duplicates
+};
+
+    const runCode = () =>{
       setRunCode(true);
       setTimeout(() => {
         const fullCode = `
@@ -40,7 +52,7 @@ function Html_TE({submitAttempt}) {
         <html lang="en">
         <head>
         </head>
-        <body>${ code }
+        <body>${code}
         </body>
         </html>`;
         const doc =
@@ -50,8 +62,18 @@ function Html_TE({submitAttempt}) {
         doc.write(fullCode);
         doc.close();
       }, 0);
-    }
 
+      if (gamemodeId === "Lesson"){  
+      }else{
+        setIsCorrect(isCorrect);
+          // --- TAG USAGE ACHIEVEMENT ---
+  const usedTags = extractTags(code); 
+  if (usedTags.length > 0) {
+    unlockAchievement(Userdata?.uid, "Html", "tagUsed", { usedTags, isCorrect});
+  }
+  setShowisCorrect(true)
+      }
+    }
   return (
     <>
       <div className="bg-[#191a26] h-[95%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] w-[47%] ml-auto">
@@ -62,10 +84,11 @@ function Html_TE({submitAttempt}) {
           onChange={(val) => setCode(val)}
           height="100%"
           width="100%"
-          extensions={gamemodeId === "BugBust"
-            ? new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })])
-            : html()
-          }
+          extensions={[
+            new LanguageSupport(htmlLanguage, [autocompletion({ override: [] })]),
+            html({ autoCloseTags: false }), 
+            EditorView.lineWrapping
+          ]}
           theme={tokyoNight} />
         </div>
         <div className="flex justify-around w-full">
@@ -93,7 +116,7 @@ function Html_TE({submitAttempt}) {
             ref={iFrame}
             title="output"
             className="w-full h-full rounded-xl"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
           />
         ) : (
           <div className="w-full h-full flex items-center flex-col">
@@ -107,6 +130,9 @@ function Html_TE({submitAttempt}) {
           </div>
         )}
       </div>
+
+
+
     </>
   );
 }

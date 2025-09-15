@@ -1,19 +1,14 @@
 // components/CodeWhisper.jsx
 import { useEffect } from "react";
-import { db, auth } from "../Firebase/Firebase";
-import { doc, updateDoc, arrayRemove } from "firebase/firestore";
 import { motion,AnimatePresence } from "framer-motion";
 
+import { useInventoryStore } from "./Items-Store/useInventoryStore";
 const CodeWhisper = ({ hint, onClose }) => {
+    const { removeBuff } = useInventoryStore.getState();
   useEffect(() => {
     const removeRevealHint = async () => {
-      const userId = auth.currentUser.uid;
-      const userRef = doc(db, "Users", userId);
 
-      await updateDoc(userRef, {
-        activeBuffs: arrayRemove("revealHint"),
-      });
-
+removeBuff("revealHint");
       console.log("revealHint buff removed from userBuff.");
     };
 

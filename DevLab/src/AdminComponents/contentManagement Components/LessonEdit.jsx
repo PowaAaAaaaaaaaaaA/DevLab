@@ -3,11 +3,13 @@ import { getDoc, doc, setDoc, deleteDoc} from "firebase/firestore";
 import { db } from "../../Firebase/Firebase";
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 function LessonEdit({ subject, lessonId, levelId, stageId }) {
 
   const gameModes = ["Lesson", "BugBust", "CodeRush", "CodeCrafter", "BrainBytes"];
 
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("Lesson");
   const [stageData, setStageData] = useState();
 
@@ -21,7 +23,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
       setStageData(null);
     }
   };
-
   const [instruction, setInstruction] = useState('');
   const [description, setDescription] = useState('');
   const [gameModeTitle, setTitle] = useState('');
@@ -46,6 +47,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
         description: description || stageData?.description || null,
         instruction: instruction || stageData?.instruction || null,
         codingInterface: preCode || stageData?.preCode || null,
+        isHidden: activeTab === "Lesson" ? false : true, //
       };
 
       if (activeTab === "BugBust" || activeTab === "CodeCrafter") {
@@ -64,46 +66,48 @@ function LessonEdit({ subject, lessonId, levelId, stageId }) {
       if (activeTab === "BrainBytes") {
         stagePayload = {
           ...stagePayload,
-          options: {
-            A: answers.A || stageData?.options?.A,
-            B: answers.B || stageData?.options?.B,
-            C: answers.C || stageData?.options?.C,
-            D: answers.D || stageData?.options?.D,
+          choices: {
+            a: answers.A || stageData?.options?.A,
+            b: answers.B || stageData?.options?.B,
+            c: answers.C || stageData?.options?.C,
+            d: answers.D || stageData?.options?.D,
+            correctAnswer: answers.correct || stageData?.correctAnswer,
           },
-          correctAnswer: answers.correct || stageData?.correctAnswer,
         };
       }
-
       await setDoc(stageRef, stagePayload, { merge: true });
-
       toast.success("Stage updated successfully!", {
         position: "top-center",
         theme: "colored"
       });
-
       await fetchStage();
     } catch (error) {
       console.error(error);
     }
   };
-
   useEffect(() => {
     fetchStage();
   }, []);
 
-    // Delete stage
-  const handleDelete = async () => {
-    try {
-      const stageRef = doc(db,subject,lessonId,"Levels",levelId,"Stages",stageId);
-      await deleteDoc(stageRef);
-      toast.success('Stage deleted successfully!');
-    } catch (error) {
-      console.log(error);
-      toast.error('Failed to delete stage.');
-    }
-  };
-  console.log(subject)
+  // Delete stage mutation
+const deleteStageMutation = useMutation({
+  mutationFn: async (stageIdToDelete) => {
+    const stageRef = doc(db, subject, lessonId, "Levels", levelId, "Stages", stageIdToDelete);
+    await deleteDoc(stageRef);
+  },
+  onSuccess: () => {
+    toast.success('Stage deleted successfully!');
+    queryClient.invalidateQueries(['stages', lessonId, levelId]);
+  },
+  onError: (error) => {
+    console.error(error);
+    toast.error('Failed to delete stage.');
+  }
+});
 
+  const handleDelete = () => {
+    deleteStageMutation.mutate(stageId);
+  };
   return (
     <div className='bg-[#25293B]'>
       <div className='h-auto p-5 flex flex-col gap-s'>

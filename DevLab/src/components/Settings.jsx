@@ -13,6 +13,8 @@ import useUserDetails from "./Custom Hooks/useUserDetails";
 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+import defaultAvatar from '../assets/Images/profile_handler.png'
+import defaultBg from '../assets/Images/edit.png'
 function Settings() {
 
 
@@ -98,7 +100,7 @@ function Settings() {
   whileHover={{ opacity: 0.5 }}
   transition={{ duration: 0.3, ease: "easeInOut" }}>
   <img
-    src={Userdata?.profileImage || "/defaultAvatar.png"}
+    src={Userdata?.profileImage || defaultAvatar}
     alt="Profile"
     className="w-full h-full object-cover"/>
   <input
@@ -121,7 +123,7 @@ function Settings() {
   transition={{ duration: 0.3, ease: "easeInOut" }}
 className="w-[70%] h-[10%] rounded-3xl overflow-hidden border border-gray-600 relative">
   <img
-    src={Userdata?.backgroundImage || "/defaultBackground.png"}
+    src={Userdata?.backgroundImage || defaultAvatar}
     alt="Background"
     className="w-full h-full object-cover"/>
   <input

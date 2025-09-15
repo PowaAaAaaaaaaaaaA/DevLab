@@ -1,32 +1,15 @@
-import { getAuth } from "firebase/auth";
+async function checkSubjectCompletion(userId, subjectName) {
+  //Get total levels in the subject
+  const levelsSnapshot = await getDocs(collection(db, `${subjectName}/Levels`));
+  const totalLevels = levelsSnapshot.size;
 
+  // Get user's completed levels count
+  const userProgressRef = doc(db, "users", userId, "progress", subjectName);
+  const userProgressSnap = await getDoc(userProgressRef);
+  const completedLevels = userProgressSnap.data()?.completedLevels?.length || 0;
 
-useEffect(() => {
-    const fetchPing = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) {
-        return null;
-    }
-    const token = await user.getIdToken(true);
-    console.log("Token being sent:", token);
-    try {
-            console.log("sadas")
-const response = await fetch("http://127.0.0.1:5174/openAI/evaluate", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  },
-  body: JSON.stringify({ prompt: "Do you know iyot puno saging" }),
-});
- // replace with your server URL
-        const data = await response.json();
-        console.log(data);
-    } catch (error) {
-        console.error("Error fetching ping:", error);
-    }
-    };
-
-    fetchPing();
-}, []);
+  // Compare and unlock if complete
+  if (completedLevels >= totalLevels) {
+    unlockAchievement(userId, "finishHTML");
+  }
+}

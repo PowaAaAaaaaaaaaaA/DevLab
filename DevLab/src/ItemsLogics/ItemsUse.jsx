@@ -5,39 +5,24 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import useUserInventory from "../components/Custom Hooks/useUserInventory";
 
-import { db, auth } from "../Firebase/Firebase";
-import { doc, updateDoc, increment, arrayUnion, deleteDoc, getDoc} from "firebase/firestore";
+import { useInventoryStore } from "./Items-Store/useInventoryStore";
+import { unlockAchievement } from "../components/Custom Hooks/UnlockAchievement";
+import useUserDetails from "../components/Custom Hooks/useUserDetails";
 
-import { useErrorShield } from "./ErrorShield";
+import { useParams } from "react-router-dom";
+
 
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
+
+  const {subject} = useParams();
+
+
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
     const [showInventory, setShowInventory] = useState(false);
-    const { inventory, loading} = useUserInventory();
-    
-      const useItem = async(itemId, buffName)=>{
-      const userId = auth.currentUser.uid;
-        // Reduce quantity in Inventory
-      const inventoryRef = doc(db, "Users", userId, "Inventory", itemId);
-      await updateDoc(inventoryRef, {
-        quantity: increment(-1)
-      });
-        // Check the updated quantity
-      const snapshot = await getDoc(inventoryRef);
-      const updatedData = snapshot.data();
-    
-          if (buffName) {
-        const userRef = doc(db, "Users", userId);
-        await updateDoc(userRef, {
-          activeBuffs: arrayUnion(buffName)
-        });
-      }
-      
-      if (updatedData?.quantity <= 0) {
-        await deleteDoc(inventoryRef);
-        return; // stop here so buff doesn't apply if no quantity
-      }
-    }
+    const { inventory:userInventory, loading} = useUserInventory();
+
+  const { Userdata,refetch } = useUserDetails();
+  const useItem = useInventoryStore((state) => state.useItem);
 
     const itemActions = {
       "Coin Surge": (item) => useItem(item.id, "doubleCoins"),
@@ -85,7 +70,6 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
       <LuAlignJustify
         onClick={() => setShowInventory((prev) => !prev)}
         className="text-4xl cursor-pointer"/>
-
           {/*Inventory Show*/}
   <AnimatePresence >
 {showInventory && (
@@ -93,33 +77,38 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
     initial={{ opacity: 0, scale: 0 }}
     animate={{ opacity: 1, scale: 1 }}
     exit={{ opacity: 0, scale: 0 }}
-    className="w-[20%] h-[50%] fixed bottom-20 left-5"
-  >
+    className="w-[20%] h-[50%] fixed bottom-20 left-5">
     <div className="h-[100%] w-[100%] border border-gray-500 rounded-2xl bg-[#111827] p-4 flex flex-col gap-4 overflow-scroll overflow-x-hidden scrollbar-custom">
       <h1 className="text-white font-exo text-4xl">Inventory</h1>
-      {inventory && inventory.filter(item => item.id !== "placeholder").length > 0 ? (
-        inventory
-          .filter(item => item.id !== "placeholder")
-          .map(Items => (
-            <button
-              key={Items.id}
-              onClick={() => itemActions[Items.title]?.(Items)}
-              className="cursor-pointer border rounded-2xl border-gray-600 min-h-[15%] bg-[#0D1117] flex items-center p-1 gap-7"
-            >
-              <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
-                <img
-                  src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default}
-                  alt=""
-                  className="w-full h-full"
-                />
-              </div>
-              <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">{Items.title}</h2>
-              <p className="rounded-lg bg-gray-700 p-3 text-[0.8rem]">{Items.quantity}</p>
-            </button>
-          ))
-      ) : (
-        <p className="text-gray-400 text-center mt-4">No items in inventory</p>
-      )}
+{userInventory && userInventory.length > 0 ? (
+  userInventory.map((Items) => (
+    <button
+      key={Items.id}
+onClick={() => {
+    // Trigger any predefined item action
+    itemActions[Items.title]?.(Items);
+    // Call unlockAchievement for this item
+    unlockAchievement(Userdata.uid, subject, "itemUse", {
+      itemName: Items.title
+    });
+  }}
+      className="cursor-pointer border rounded-2xl border-gray-600 min-h-[15%] bg-[#0D1117] flex items-center p-2 gap-7 w-auto">
+      <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
+        <img
+          src={icons[`../assets/ItemsIcon/${Items.Icon}`]?.default}
+          alt={Items.title}
+          className="w-full h-full"/>
+      </div>
+      <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">
+        {Items.title}
+      </h2>
+      <p className="rounded-lg bg-gray-700 p-2 text-[0.8rem]">{Items.quantity}</p>
+    </button>
+  ))
+) : (
+  <p className="text-gray-400 text-center mt-4">No items in inventory</p>
+)}
+
     </div>
   </motion.div>
 )}

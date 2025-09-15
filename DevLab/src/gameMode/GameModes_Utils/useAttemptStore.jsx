@@ -13,6 +13,7 @@ export const useAttemptStore = create((set, get) => ({
   heart: 0,
   roundKey: 0,
   gameOver: false,
+
   loadHearts: async () => {
     const userRef = await getRef();
     const unsub = onSnapshot(userRef, (snap) => {
@@ -24,9 +25,11 @@ export const useAttemptStore = create((set, get) => ({
     });
     return unsub;
   },
+
   submitAttempt: async (isCorrect) => {
     const { heart, gameOver } = get();
     if (isCorrect || gameOver) return;
+
     // Just decrement — shield logic will be handled outside
     const userRef = await getRef();
     await updateDoc(userRef, { healthPoints: increment(-1) });

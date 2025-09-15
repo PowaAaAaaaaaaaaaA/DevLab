@@ -4,6 +4,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+import { EditorView } from "@codemirror/view"; //
 import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/OutputLottie.json";
 import { motion } from "framer-motion";
@@ -119,7 +120,7 @@ function CodePlayground() {
                 className="text-xl h-full scrollbar-custom"
                 height="100%"
                 value={code[activeTab]}
-                extensions={[getLanguageExtension()]}
+                extensions={[getLanguageExtension(), EditorView.lineWrapping]}
                 onChange={onChange}
                 theme={tokyoNight}
               />
@@ -144,7 +145,7 @@ function CodePlayground() {
               title="output"
               ref={iFrame}
               className="w-full h-full rounded-3xl"
-              sandbox="allow-scripts allow-same-origin allow-modals"
+              sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
             />
           ) : (
             <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl bg-[#F8F3FF]">

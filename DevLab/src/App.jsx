@@ -1,7 +1,10 @@
 // REACt
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+
 import { useEffect, useState } from "react";
+
+import { Toaster } from "react-hot-toast";
 // FIREBASE
 import { auth } from "./Firebase/Firebase";
 import { db } from "./Firebase/Firebase";
@@ -47,7 +50,6 @@ function App() {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setAdmin] = useState(null);
-
 useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged(async (user) => {
     if (!user) {
@@ -64,7 +66,7 @@ useEffect(() => {
       if (userData?.suspend) {
         // Immediately sign out suspended user
         await signOut(auth);
-        toast.error("Your account is suspended. Please contact support.", {
+        toast.error("Your account is suspended.", {
           position: "bottom-center",
           theme: "colored",
         });
@@ -166,6 +168,7 @@ useEffect(() => {
           />
         </Routes>
         <ToastContainer />
+        <Toaster position="top-center" reverseOrder={false} />
       </QueryClientProvider>
     </>
   );

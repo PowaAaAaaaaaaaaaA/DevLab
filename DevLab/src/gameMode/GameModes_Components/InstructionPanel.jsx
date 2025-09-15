@@ -1,46 +1,27 @@
 // Utils
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  html as beautifyHTML,
-  css as beautifyCSS,
-  js as beautifyJS,
-} from "js-beautify";
+import {html as beautifyHTML,css as beautifyCSS,js as beautifyJS,} from "js-beautify";
 // Hooks
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
-import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
-import useActiveBuffs from "../../components/Custom Hooks/useActiveBuffs";
-
+import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 // Animation
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import Lottie from "lottie-react";
 import Loading from '../../assets/Lottie/LoadingDots.json';
+
 //
 import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 import { BrainFilter } from "../../ItemsLogics/BrainFilter";
 
-function InstructionPanel({
-  submitAttempt,
-  showPopup,
-  showCodeWhisper,
-  setShowCodeWhisper,
-}) {
+function InstructionPanel({setIsCorrect,setShowisCorrect,submitAttempt,showPopup,showCodeWhisper,setShowCodeWhisper,setTimesUp,pauseTimer}) {
+const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
-  const { Userdata, refetch } = useUserDetails();
-  const { activeBuffs, loading } = useActiveBuffs();
-
-  const [timer, buffApplied, buffType] = useCodeRushTimer(
-    gameModeData?.timer,
-    gamemodeId,
-    gameModeData,
-    showPopup,
-    Userdata?.activeBuffs,
-    refetch
-  );
+  const [timer, buffApplied, buffType] = useCodeRushTimer(gameModeData?.timer,gamemodeId,gameModeData,showPopup,pauseTimer);
   const { animatedValue } = useAnimatedNumber(buffApplied ? 30 : 0);
 
   // Format the Code to Display
@@ -66,47 +47,71 @@ function InstructionPanel({
   // BrainBytes Options
   const [selectedOption, setSelectedOption] = useState(null);
   // !! For BrainBytes (Checking Selected Answer)
-  const answerCheck = () => {
-    if (!selectedOption) {
-      toast.error("Select Answer", {
-        position: "top-right",
-        theme: "colored",
-      });
-      return;
-    }
-    if (selectedOption === gameModeData.correctAnswer) {
-      console.log("Correct Answer");
-    } else {
-      submitAttempt(false);
-      console.log("Wrong");
-    }
-  };
+const [isCorrect, setCorrect] = useState(null); // use only ONE state
 
+const answerCheck = () => {
+  if (!selectedOption) {
+    toast.error("Select Answer", {
+      position: "top-right",
+      theme: "colored",
+    });
+    return;
+  }
+  const result = selectedOption === gameModeData.choices.correctAnswer;
+  setIsCorrect(result); 
+  setShowisCorrect(true);
+
+  if (result) {
+    console.log("Correct Answer");
+  } else {
+    console.log("Wrong");
+  }
+};
+;
+  // FormatTimer For CodeRush
   const FormatTimer = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  };
+  }; 
+
+
+  // TIMES UP LOSE HP
+const [started, setStarted] = useState(false);
+// mark as started when timer initializes with a real value
+useEffect(() => {
+  if (gamemodeId === "CodeRush" && gameModeData?.timer) {
+    setStarted(true);
+  }
+}, [gamemodeId, gameModeData?.timer]);
+// only deduct when countdown finishes AFTER starting
+useEffect(() => {
+  if (started && gamemodeId === "CodeRush" && timer === 0) {
+    setTimesUp(true);
+  }
+}, [started, timer, gamemodeId, submitAttempt]);
+
+
 
   const [filtteredOpttions, setFilteredOptions] = useState([]);
   const [used, setUsed] = useState(false);
-  useEffect(() => {
-    if (!gameModeData?.options || loading) return; // wait for buffs to load
+useEffect(() => { 
+  if (!gameModeData?.choices) return; // wait for choices to load
+  let optionsArray = Object.entries(gameModeData.choices)
+    .filter(([key]) => key !== "correctAnswer")
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
 
-    let optionsArray = Object.entries(gameModeData.options).sort(
-      ([keyA], [keyB]) => keyA.localeCompare(keyB)
-    );
-    console.log(activeBuffs);
-    if (activeBuffs.includes("brainFilter")) {
-      setUsed(true);
-      BrainFilter(filtteredOpttions, gameModeData.correctAnswer)
-        .then((filtered) => setFilteredOptions(filtered))
-        .catch(console.error);
-    } else if (!used) {
-      setFilteredOptions(optionsArray);
-      console.log("else");
-    }
-  }, [gameModeData, activeBuffs, loading]);
+  if (activeBuffs.includes("brainFilter")) {
+    setUsed(true);
+    BrainFilter(filtteredOpttions, gameModeData.choices.correctAnswer)
+      .then((filtered) => setFilteredOptions(filtered))
+      .catch(console.error);
+  } else if (!used) {
+    setFilteredOptions(optionsArray);
+    console.log("else");
+  }
+}, [gameModeData, activeBuffs]);
+console.log(activeBuffs)
   return (
     <div
       className="h-[100%] w-full bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5 scrollbar-custom">

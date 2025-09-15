@@ -38,7 +38,10 @@ function Gameover_PopUp({ gameOver, resetHearts, Back }) {
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
-          onClick={()=> navigate("/main")}
+          onClick={()=> {
+              navigate("/main")
+              resetHearts();
+          }}
           className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
           Go Back to Dashboard
         </motion.button>

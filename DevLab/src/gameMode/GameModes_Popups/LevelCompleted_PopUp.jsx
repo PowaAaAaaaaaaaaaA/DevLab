@@ -11,16 +11,20 @@ import { doc, getDoc, setDoc, updateDoc,arrayRemove, collection, getDocs } from 
 import useUserDetails from "../../components/Custom Hooks/useUserDetails";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 // Items
+import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 import CoinSurge from "../../ItemsLogics/CoinSurge";
 
+import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
+import { useSubjectCheckComplete } from "../../components/Custom Hooks/useSubjectCheckComplete";
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete}) {
 
-  console.log(LevelId)
+  const {removeBuff} = useInventoryStore.getState();
+  const activeBuffs = useInventoryStore((state) => state.activeBuffs);
+
 
   const navigate = useNavigate(); 
   const [LevelData , setLevelData] = useState("");
-
 
   const { Userdata,refetch } = useUserDetails();
   // Level Data
@@ -64,7 +68,6 @@ const RewardAdd = async () => {
   const user = auth.currentUser;
   const userLevelRef = doc(db, "Users", user.uid, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
   const levelSnap = await getDoc(userLevelRef);
-  const userRef = doc(db, "Users", user.uid)  
 
   if (levelSnap.exists()) { 
     const levelData = levelSnap.data();
@@ -73,19 +76,16 @@ const RewardAdd = async () => {
       return;
     }
       // Coin Surge 
-    if (Userdata.activeBuffs?.includes("doubleCoins")) {
-    const { DoubleCoins } = CoinSurge(LevelData.coinsReward);
-    const doubled = DoubleCoins();
-        const expReward = LevelData.expReward;
-        await addExp(user.uid, expReward, doubled);
-          // Mark reward as claimed
-          await updateDoc(userLevelRef, {
-      rewardClaimed: true,  
-    });
-    await updateDoc(userRef, {
-      activeBuffs: arrayRemove("doubleCoins")
-    });
-  }else{
+if (activeBuffs.includes("doubleCoins")) {
+  removeBuff("doubleCoins");
+
+  const { DoubleCoins } = CoinSurge(LevelData.coinsReward);
+  const doubled = DoubleCoins();
+  const expReward = LevelData.expReward;
+  
+  await addExp(user.uid, expReward, doubled);
+  await updateDoc(userLevelRef, { rewardClaimed: true });
+}else{
     const expReward = LevelData.expReward;
     const coinsReward = LevelData.coinsReward;
     await addExp(user.uid, expReward, coinsReward);
@@ -93,81 +93,83 @@ const RewardAdd = async () => {
       rewardClaimed: true,  
     });
   }
-
-
-
   }
 };
-  const finalCoinReward = Userdata.activeBuffs?.includes("doubleCoins")
+
+  const finalCoinReward = activeBuffs.includes("doubleCoins")
   ? LevelData?.coinsReward * 2
   : LevelData?.coinsReward;
-
   const {animatedValue: Coins} = useAnimatedNumber(finalCoinReward || 0);
   const {animatedValue: Exp} = useAnimatedNumber(LevelData?.expReward || 0);
 
 
 const unlockNextLevel = async (goContinue) => {
-  const userId = auth.currentUser.uid;
+  const userId = Userdata.uid;
+
   try {
-    // Get reference to Levels collection of the current lesson
+    // Unlock first level achievement
+    await unlockAchievement(userId, subj, "firstLevelComplete", { LevelId, lessonId });
+
+    // Get all levels in current lesson
     const levelsRef = collection(db, subj, lessonId, "Levels");
     const levelsSnap = await getDocs(levelsRef);
     const levels = levelsSnap.docs.map(doc => doc.id);
     const totalLevels = levels.length;
 
     const currentLevelNum = parseInt(LevelId.replace("Level", ""));
+    const currentLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
+
+    // Mark current level as completed
+    await setDoc(currentLevelRef, { completed: true }, { merge: true });
 
     if (currentLevelNum < totalLevels) {
-      // Unlock next level in the SAME lesson
-      const nextLevelId = `Level${currentLevelNum + 1}`;            
-      const currentLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
-      await setDoc(currentLevelRef, { status: true }, { merge: true });
-
+      // There is a next level in the same lesson
+      const nextLevelId = `Level${currentLevelNum + 1}`;
       const nextLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", nextLevelId);
-      await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
-          // Unlock the next stage in user's progress
-    const nextStageRef = doc(db,"Users",userId,"Progress",subj,"Lessons",lessonId,"Levels",nextLevelId,"Stages","Stage1");
-    await setDoc(
-      nextStageRef,
-      {status: true,},
-      {merge: true }
-    );
+      await setDoc(nextLevelRef, { status: true, rewardClaimed: false, completed: false }, { merge: true });
+
+      const nextStageRef = doc(db, "Users", userId, "Progress", subj, "Lessons", lessonId, "Levels", nextLevelId, "Stages", "Stage1");
+      await setDoc(nextStageRef, { status: true }, { merge: true });
 
       if (goContinue) {
         navigate(`/Main/Lessons/${subj}/${lessonId}/${nextLevelId}/Stage1/Lesson`);
       }
     } else {
-      // Go to NEXT lesson's Level1
+      // Last level of the lesson completed
+      await unlockAchievement(userId, subj, "lessonComplete", { lessonId });
+
       const currentLessonNum = parseInt(lessonId.replace("Lesson", ""));
       const nextLessonId = `Lesson${currentLessonNum + 1}`;
-      const nextLevelId = "Level1";
 
-      // Unlock Level1 of the next lesson
-      const nextLevelRef = doc(db, "Users", userId, "Progress", "Html", "Lessons", nextLessonId, "Levels", nextLevelId);
-      await setDoc(nextLevelRef, { status: true, rewardClaimed: false }, { merge: true });
-    const nextStageRef = doc(db,"Users",userId,"Progress","Html","Lessons",nextLessonId,"Levels",nextLevelId,"Stages","Stage1");
-    await setDoc(
-      nextStageRef,
-      {status: true,},
-      {merge: true }
-    );
+      // Check if next lesson exists
+      const nextLessonRefCheck = doc(db, subj, nextLessonId);
+      const nextLessonSnap = await getDoc(nextLessonRefCheck);
 
-      if (goContinue) {
-        navigate(`/Main/Lessons/${subj}/${nextLessonId}/${nextLevelId}/Stage1/Lesson`);
+      if (nextLessonSnap.exists()) {
+        // Unlock first level of next lesson
+        const nextLevelId = "Level1";
+        const nextLevelRef = doc(db, "Users", userId, "Progress", subj, "Lessons", nextLessonId, "Levels", nextLevelId);
+        await setDoc(nextLevelRef, { status: true, rewardClaimed: false, completed: false }, { merge: true });
+
+        const nextStageRef = doc(db, "Users", userId, "Progress", subj, "Lessons", nextLessonId, "Levels", nextLevelId, "Stages", "Stage1");
+        await setDoc(nextStageRef, { status: true }, { merge: true });
+
+        if (goContinue) {
+          navigate(`/Main/Lessons/${subj}/${nextLessonId}/${nextLevelId}/Stage1/Lesson`);
+        }
+      } else {
+        // Last lesson of subject completed, no more lessons
+        if (goContinue) {
+          navigate("/Main"); // or show a "Subject Completed" popup
+        }
       }
     }
-
-    console.log("Level completed and next level/lesson unlocked.");
   } catch (error) {
     console.error("Error unlocking next level:", error);
   }
 };
 
-
-// Items Check
-
-console.log(subj)
-
+    useSubjectCheckComplete(Userdata.uid, subj);
 
 
   return (

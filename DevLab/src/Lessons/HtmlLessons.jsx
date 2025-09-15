@@ -34,9 +34,8 @@ console.log(levelsData);
         <div className=" h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#FF5733] to-[#FFC300]">
           <div className="w-[80%] flex flex-col gap-7">
             <div className="p-3 flex flex-col gap-4">
-              <h1 className="font-exo text-white text-[3.5rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
-                {" "}
-                HTML: The Gateway to Web Adventure
+              <h1 className="font-exo text-white text-[2.8rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
+                {"< >"} HTML: The Gateway to Web Adventure
               </h1>
               <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop">
                 Step into the world of Front-End Development with HTML and CSS
@@ -113,7 +112,7 @@ console.log(levelsData);
                               show: { opacity: isUnlocked ?  1 : 0.4, y: 0 },
                             }}
                             whileHover={{ scale: 1.02 }}
-                            className={`relative group w-full border flex gap-5 rounded-4xl h-[120px] 
+                            className={`group w-full border flex gap-5 rounded-4xl h-[120px] relative
                             ${
                               isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
                             } cursor-pointer`}
@@ -134,16 +133,16 @@ console.log(levelsData);
                                 }}
                               toggleLevel(lesson.id, level.id);
                             }}>
-                            <div className="text-white bg-black min-w-[15%] text-[4rem] font-bold rounded-4xl flex justify-center items-center">
-                              <span className="pb-4">{level.symbol}</span>
-                            </div>
-                            <div className="p-4 text-white font-exo">
-                              <p className="text-[1.4rem]">{level.title}</p>
                               {!isUnlocked && (
                                 <div className="absolute top-10 right-0 left-105 text-white">
                                   <FaLock className="text-[3rem] text-white" />
                                 </div>
                               )}
+                            <div className="text-white bg-black min-w-[20%] text-[3rem] font-bold rounded-4xl flex justify-center items-center">
+                              <span className="pb-4">{level.symbol}</span>
+                            </div>
+                            <div className="p-4 text-white font-exo">
+                              <p className="text-[1.4rem]">{level.title}</p>
                               <p className="text-[0.7rem] line-clamp-3 text-gray-500">
                                 {level.description}
                               </p>
@@ -211,7 +210,7 @@ console.log(levelsData);
                                             {stage.description}
                                           </p>
                                           {!isStageUnlocked && (
-                                            <div className="absolute top-7 right-0 left-105 text-white">
+                                            <div className="absolute inset-0 flex items-center justify-center text-white">
                                               <FaLock className="text-[3rem] text-white" />
                                             </div>
                                           )}

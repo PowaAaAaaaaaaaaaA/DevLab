@@ -1,9 +1,9 @@
 // src/ItemsLogics/PerfectPrecision.js
-import { doc, updateDoc, arrayRemove } from "firebase/firestore";
-import { db, auth } from "../Firebase/Firebase";
-
+import { useInventoryStore } from "./Items-Store/useInventoryStore";
 
 export async function BrainFilter(optionsArray, correctAnswer) {
+
+  const { removeBuff } = useInventoryStore.getState();
   // Find wrong options
   const wrongOptions = optionsArray.filter(([key]) => key !== correctAnswer);
 
@@ -18,11 +18,8 @@ export async function BrainFilter(optionsArray, correctAnswer) {
     ([key]) => key !== optionToRemove
   );
 
-  // Remove the buff from Firestore (single-use)
-  const userRef = doc(db, "Users", auth.currentUser.uid);
-  await updateDoc(userRef, {
-    activeBuffs: arrayRemove("brainFilter"),
-  }).catch(console.error);
-
+  // Remove the buff (single-use)
+  removeBuff("brainFilter");
+  console.log("removing the area")
   return filteredOptions;
 }

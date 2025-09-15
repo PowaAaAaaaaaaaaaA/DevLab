@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { auth, db } from '../Firebase/Firebase'
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { setDoc, doc, deleteDoc } from 'firebase/firestore';
+import { setDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
 
@@ -19,10 +19,9 @@ function Register() {
         try{
             await createUserWithEmailAndPassword(auth, email,password);
             const user = auth.currentUser;
-            console.log(user);
 if (user) {
   // Save main profile data
-  await setDoc(doc(db, "Users", user.uid), {
+    await setDoc(doc(db, "Users", user.uid), {
     email: user.email,
     username: username,
     age: age,
@@ -32,40 +31,36 @@ if (user) {
     bio: "",
     isAdmin: false,
     suspend: false,
+    healthPoints:3,
     lastOpenedLevel: {
-      subject: "Html",
-      lessonId: "Lesson1",
-      levelId: "Level1",
-    },
-  });
-  // Optional: Add empty Inventory doc
-  await setDoc(doc(db, "Users", user.uid, "Inventory", "placeholder"), {
-  });
-// Initialize Level1 unlocked for each subject, including Stage1
-const subjects = ["Html", "Css", "JavaScript", "Database"];
+        subject: "Html",
+        lessonId: "Lesson1",
+        levelId: "Level1",
+    },});
 
+const subjects = ["Html", "Css", "JavaScript", "Database"];
 for (const subject of subjects) {
   // Create Level1 document
-  await setDoc(
+    await setDoc(
     doc(db, "Users", user.uid, "Progress", subject),
     {
         status: true, 
     });
-      await setDoc(
+    await setDoc(
     doc(db, "Users", user.uid, "Progress", subject,"Lessons","Lesson1"),
     {
         status: true, 
     });
-  await setDoc(
+    await setDoc(
     doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
     {
     status: true,
+    completed:false,
     rewardClaimed: false,
-    }
-  );
+    });
 
   // Create Stage1 document inside Stages subcollection of Level1
-  await setDoc(
+    await setDoc(
     doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1","Stages","Stage1"),
     {
     status: true,
