@@ -21,8 +21,11 @@ import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/Ja
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
 
+import { useErrorShield } from "../ItemsLogics/ErrorShield";
+
 function BugBust({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const type = "Bug Bust";
+  const { hasShield, consumeErrorShield } = useErrorShield();
 
   // Route params
   const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
@@ -146,9 +149,15 @@ Your mission:
                 <Lottie animationData={Wrong} loop={false} className="w-[100%] h-[100%]"/>
                 <h1 className="font-exo font-bold text-black text-3xl">Wrong Answer</h1> 
                 <motion.button
-                  onClick={()=>{
-                    submitAttempt(false)
-                    setShowisCorrect(false)}}
+        onClick={async () => {
+          setShowisCorrect(false);
+          //  Check for Error Shield first
+          if (await consumeErrorShield()) {
+            console.log("ErrorShield consumed! Preventing heart loss.");
+            return; // Do NOT call submitAttempt(false)
+          }
+          submitAttempt(false);
+        }}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}

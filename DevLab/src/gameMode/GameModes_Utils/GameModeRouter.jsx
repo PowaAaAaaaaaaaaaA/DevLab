@@ -5,8 +5,7 @@ import LessonPage from "../../Lessons/LessonPage";
 import BugBust from "../BugBust";
 import CodeCrafter from "../CodeCrafter";
 import { useEffect, useState } from "react";
-import useAttemptCounter from "./AttemptCounter";
-
+import { useAttemptStore } from "../GameModes_Utils/useAttemptStore"
 import Gameover_PopUp from "../GameModes_Popups/Gameover_PopUp";
 
 const GameModeRouter = () => {
@@ -15,18 +14,27 @@ const GameModeRouter = () => {
   const [stageCon, setStageCon] = useState("");
   const [back, setBack] = useState(null);
 
-  const navigate = useNavigate();
+  const {heart,roundKey,gameOver,submitAttempt,resetHearts,loadHearts, } = useAttemptStore();
 
-  const { heart, roundKey, gameOver, submitAttempt, resetHearts } = useAttemptCounter(3);
+  // Load hearts from Firestore when component mounts
+  useEffect(() => {
+    let unsub;
+    (async () => {
+      unsub = await loadHearts(); // start listening to Firestore
+    })();
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [loadHearts]);
 
-  // Update stageCon if the gamemode is Lesson
+  // Track Lesson stage (same as before)
   useEffect(() => {
     if (gamemodeId === "Lesson") {
       setStageCon(stageId);
     }
   }, [gamemodeId, stageId]);
 
-  // When game over, prepare the back route
+  // Prepare back route when game over
   useEffect(() => {
     if (gameOver) {
       setBack(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${stageCon}/Lesson`);

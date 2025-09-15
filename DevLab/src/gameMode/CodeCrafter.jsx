@@ -20,11 +20,11 @@ import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 
-
+import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
 function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const type = "Code Crafter";
-
+  const { hasShield, consumeErrorShield } = useErrorShield();
   // Route params
   const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
 
@@ -128,6 +128,7 @@ Your mission:
         {showisCorrect && (
         <AnimatePresence>
           {isCorrect ? (
+            // CORRECT ANSWER POPUP
             <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
               <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4"> 
               <Lottie
@@ -148,6 +149,7 @@ Your mission:
               </div>
             </div>
           ):(
+            // WRONG ANSWER POPUP
             <AnimatePresence>
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
               <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4"> 
@@ -157,9 +159,15 @@ Your mission:
               className="w-[100%] h-[100%]"/>
               <h1 className="font-exo font-bold text-black text-3xl">Wrong Answer</h1> 
         <motion.button
-        onClick={()=>{
-          submitAttempt(false)
-          setShowisCorrect(false)}}
+        onClick={async () => {
+          setShowisCorrect(false);
+          //  Check for Error Shield first
+          if (await consumeErrorShield()) {
+            console.log("ErrorShield consumed! Preventing heart loss.");
+            return; // Do NOT call submitAttempt(false)
+          }
+          submitAttempt(false);
+        }}
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
