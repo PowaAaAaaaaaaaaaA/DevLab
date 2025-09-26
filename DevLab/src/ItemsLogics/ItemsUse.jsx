@@ -7,7 +7,7 @@ import useUserInventory from "../components/Custom Hooks/useUserInventory";
 
 import { useInventoryStore } from "./Items-Store/useInventoryStore";
 import { unlockAchievement } from "../components/Custom Hooks/UnlockAchievement";
-import useUserDetails from "../components/Custom Hooks/useUserDetails";
+import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 
 import { useParams } from "react-router-dom";
 
@@ -15,18 +15,24 @@ import { useParams } from "react-router-dom";
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
 
   const {subject} = useParams();
-
+  const { userData, isLoading, isError, refetch } = useFetchUserData();
 
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
     const [showInventory, setShowInventory] = useState(false);
     const { inventory:userInventory, loading} = useUserInventory();
 
-  const { Userdata,refetch } = useUserDetails();
   const useItem = useInventoryStore((state) => state.useItem);
 
     const itemActions = {
       "Coin Surge": (item) => useItem(item.id, "doubleCoins"),
       "Code Whisper": async (item) => {
+        if (gamemodeId !== "BugBust"){
+      toast.error("Cannot use Item in this Game mode", {
+      position: "top-right",
+      theme: "colored",
+    });
+      return;
+        }
         await useItem(item.id, "revealHint");
         setShowCodeWhisper(true); // Trigger the popup after applying the buff
       },
@@ -88,7 +94,7 @@ onClick={() => {
     // Trigger any predefined item action
     itemActions[Items.title]?.(Items);
     // Call unlockAchievement for this item
-    unlockAchievement(Userdata.uid, subject, "itemUse", {
+    unlockAchievement(userData.uid, subject, "itemUse", {
       itemName: Items.title
     });
   }}

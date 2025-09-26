@@ -1,24 +1,27 @@
-import { useEffect, useState } from "react";
+// Uis
 import { IoPerson } from "react-icons/io5";
-import { auth, db,storage } from "../Firebase/Firebase";
-import { Link, useNavigate } from "react-router-dom";
-import { updateDoc,doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Lottie from "lottie-react";
-import AdminLogin from "../assets/Lottie/AdminLogin.json";
 import LogoutAnimation from "../assets/Lottie/SadSignout.json";
-import { AnimatePresence, motion } from "framer-motion";
-
-import useUserDetails from "./Custom Hooks/useUserDetails";
-
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
 import defaultAvatar from '../assets/Images/profile_handler.png'
-import defaultBg from '../assets/Images/edit.png'
+// Firebase
+import { auth, db,storage } from "../Firebase/Firebase";
+import { updateDoc,doc, setDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// Utils
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+// Components
+import AdminLogin from "../assets/Lottie/AdminLogin.json";
+// Data
+import useFetchUserData from "./BackEnd_Data/useFetchUserData";
+
+
 function Settings() {
 
 
-  const {Userdata, isLoading,refetch } = useUserDetails();
+  const { userData, refetch } = useFetchUserData();
 
   const [showLogoutPopUp, setShowLogoutPopUp] = useState(false);
   const [showAdminPopup, setAdminPopup] = useState(false);
@@ -48,11 +51,11 @@ function Settings() {
   const [newUserName, setUserName] = useState("");
   const [newBio, setBio] = useState("");
   useEffect(() => {
-    if (Userdata) {
-      setUserName(Userdata.username || "");
-      setBio(Userdata.bio || "");
+    if (userData) {
+      setUserName(userData.username || "");
+      setBio(userData.bio || "");
     }
-  }, [Userdata]);
+  }, [userData]);
   // Save Button
   const saveDetails = async (e) => {
     e.preventDefault();
@@ -65,8 +68,8 @@ function Settings() {
     });
     try {
       await updateDoc(getUser, {
-        username: newUserName || Userdata.username,
-        bio: newBio || Userdata.bio,
+        username: newUserName || userData.username,
+        bio: newBio || userData.bio,
       });
     } catch (error) {
       console.log(error);
@@ -100,7 +103,7 @@ function Settings() {
   whileHover={{ opacity: 0.5 }}
   transition={{ duration: 0.3, ease: "easeInOut" }}>
   <img
-    src={Userdata?.profileImage || defaultAvatar}
+    src={userData?.profileImage || defaultAvatar}
     alt="Profile"
     className="w-full h-full object-cover"/>
   <input
@@ -123,7 +126,7 @@ function Settings() {
   transition={{ duration: 0.3, ease: "easeInOut" }}
 className="w-[70%] h-[10%] rounded-3xl overflow-hidden border border-gray-600 relative">
   <img
-    src={Userdata?.backgroundImage || defaultAvatar}
+    src={userData?.backgroundImage || defaultAvatar}
     alt="Background"
     className="w-full h-full object-cover"/>
   <input
@@ -141,18 +144,18 @@ className="w-[70%] h-[10%] rounded-3xl overflow-hidden border border-gray-600 re
 </motion.div>
         <form
           action=""
-          className="w-[55%] h-[50%] flex flex-col gap-4 p-1 "
+          className="w-[55%] h-[50%] flex flex-col gap-3 p-1 "
           onSubmit={saveDetails}>
           <label htmlFor="" className="text-white font-exo font-light">
             Username
           </label>
-          <div className="relative w-[100%] h-[15%]">
+          <div className="relative w-[100%] h-[15%] flex justify-items-start items-center">
             <input
               type="text"
-              placeholder={Userdata ? Userdata.username : "Loading..."}
+              placeholder={userData ? userData.username : "Loading..."}
               onChange={(e) => setUserName(e.target.value)}
               className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl  p-2 pl-10"/>
-            <IoPerson className="absolute top-2 left-2 text-white text-2xl" />
+            <IoPerson className="absolute text-white text-2xl ml-2" />
           </div>
           <label htmlFor="" className="text-white font-exo font-light">
             Bio
@@ -162,7 +165,7 @@ className="w-[70%] h-[10%] rounded-3xl overflow-hidden border border-gray-600 re
               name=""
               id=""
               maxLength="50"
-              placeholder={Userdata ? Userdata.bio : "Loading..."}
+              placeholder={userData ? userData.bio : "Loading..."}
               onChange={(e) => setBio(e.target.value)}
               className="w-[100%] h-[100%] text-white bg-[#1E212F] rounded-2xl p-2 resize-none ">
               </textarea>

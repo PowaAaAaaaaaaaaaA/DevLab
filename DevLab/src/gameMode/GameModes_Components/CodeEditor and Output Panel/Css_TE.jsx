@@ -8,28 +8,39 @@ import { autocompletion } from "@codemirror/autocomplete";
 // Animation
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
-import { motion } from "framer-motion";
+import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
 // Utils
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
-
+import { checkCssAchievements } from "../../../components/Achievements Utils/Css_KeyExtract";
 import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
-import useUserDetails from "../../../components/Custom Hooks/useUserDetails";
+// Data
+import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
+// Open AI
+import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
-function Css_TE({setIsCorrect,setShowisCorrect}) {
-    const {Userdata, isLoading } = useUserDetails();
+function Css_TE({setIsCorrect}) {
+    //Data
+    const { userData } = useFetchUserData();
     const {gamemodeId} = useParams();
+    // Utils
   const tabs = ["HTML", "CSS"];
   const [activeTab, setActiveTab] = useState("CSS");
+  const [isCorrect, setCorrect] = useState(true)
+  const [evaluationResult, setEvaluationResult] = useState(null);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  // PopUp
+    const [showPopup, setShowPopup] = useState(false);
   // For the Code Mirror Input/Output
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
 });
+// Output Panel
   const iFrame = useRef(null);
   const [hasRunCode, setRunCode] = useState(false);
-
-  // Determine the CodeMirror extension based on active tab
+ // Determine the CodeMirror extension based on active tab
 const getLanguageExtension = () => {
   switch (activeTab) {
     case "HTML":
@@ -42,36 +53,6 @@ const getLanguageExtension = () => {
       return html({ autoCloseTags: false });
   }
 };
-
-const checkCssAchievements = (cssCode) => {
-  const achievements = [];
-  // class usage
-  if (/\.[a-zA-Z0-9_-]+/.test(cssCode)) {
-    achievements.push("styleStrategist");
-  }
-  // ID usage
-  if (/#\w+/.test(cssCode)) {
-    achievements.push("selectorStrategist");
-  }
-  //  color property
-  if (/(color|background-color)\s*:\s*[^;]+;/.test(cssCode)) {
-    achievements.push("colorCrafter");
-  }
-  //  flex or grid layout
-  if (/display\s*:\s*(flex|grid)/.test(cssCode)) {
-    achievements.push("layoutLegend");
-  }
-  //  box model usage
-  if (/(margin|padding|border)\s*:\s*[^;]+;/.test(cssCode)) {
-    achievements.push("boxBuilder");
-  }
-  // font styling
-  if (/(font-size|font-family|font-weight)\s*:\s*[^;]+;/.test(cssCode)) {
-    achievements.push("fontFanatic");
-  }
-  return achievements;
-};
-
 // Handle code change based on active tab
 const onChange = useCallback((val) => {
     setCode((prev) => ({
@@ -79,8 +60,7 @@ const onChange = useCallback((val) => {
     [activeTab]: val,
 }));
 }, [activeTab]);
-
-  const [isCorrect, setCorrect] = useState(true)
+// Run Button
   const runCode = () => {
       if (gamemodeId === "Lesson"){
         
@@ -105,14 +85,36 @@ const onChange = useCallback((val) => {
       doc.write(fullCode);
       doc.close();
     }, 0);
-      setShowisCorrect(true)
         // **Check CSS achievements**
   const unlocked = checkCssAchievements(code.CSS);
   if (unlocked.length > 0) {
     unlocked.forEach(title => {
-      unlockAchievement(Userdata.uid, "Css", "cssAction", { achievementTitle: title});
+      unlockAchievement(userData.uid, "Css", "cssAction", { achievementTitle: title});
     });
   }
+  };
+  // Eval Button (For Lesson mode Only)
+  const handleEvaluate = async () => {
+    setIsEvaluating(true);
+    try {
+      const result = await lessonPrompt({
+        receivedCode: {
+          html: code.HTML,
+          css: code.CSS,
+          js: "",
+        },
+        instruction: "Change the background color of the body to lightblue.",
+        description: "CSS Basics - Background Color",
+      });
+
+      setEvaluationResult(result);
+      setShowPopup(true);
+
+    } catch (error) {
+      console.error("Error evaluating code:", error);
+    } finally {
+      setIsEvaluating(false);
+    }
   };
 
   return (
@@ -153,12 +155,17 @@ const onChange = useCallback((val) => {
             className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
             RUN
           </motion.button>
+          {/* EVALUATE BUTTON */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05, background: "#7e22ce" }}
             transition={{ bounceDamping: 100 }}
-            className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-            EVALUATE
+            onClick={handleEvaluate}
+            disabled={isEvaluating}
+            className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
+              isEvaluating ? "opacity-50 cursor-not-allowed" : ""
+            }`}>
+            {isEvaluating ? "Evaluating..." : "EVALUATE"}
           </motion.button>
         </div>
       </div>
@@ -186,6 +193,18 @@ const onChange = useCallback((val) => {
           </div>
         )}
       </div>
+      {/* Evaluation Popup */}
+      <AnimatePresence>
+        {showPopup && evaluationResult && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}>
+              <Evaluation_Popup evaluationResult={evaluationResult} setShowPopup={setShowPopup}/>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

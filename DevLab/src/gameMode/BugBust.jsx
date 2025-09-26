@@ -3,6 +3,8 @@ import { useState,useEffect } from "react";
 
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
+import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
+import { useNavigate } from "react-router-dom";
 // PopUps
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
@@ -25,7 +27,8 @@ import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
 function BugBust({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const type = "Bug Bust";
-  const { hasShield, consumeErrorShield } = useErrorShield();
+      const navigate = useNavigate();
+  const {consumeErrorShield } = useErrorShield();
 
   // Route params
   const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
@@ -49,13 +52,13 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const renderEditor = () => {
     switch (subject) {
       case "Html":
-        return <Html_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect} />;
+        return <Html_TE setIsCorrect={setIsCorrect}  />;
       case "Css":
-        return <Css_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect}/>;
+        return <Css_TE setIsCorrect={setIsCorrect} />;
       case "JavaScript":
-        return <JavaScript_TE  setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect} />;
+        return <JavaScript_TE  setIsCorrect={setIsCorrect}  />;
       case "Database":
-        return <Database_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect} />;
+        return <Database_TE setIsCorrect={setIsCorrect}  />;
       default:
         return <div className="text-white">Invalid subject</div>;
     }
@@ -86,7 +89,7 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
         <GameFooter
           setLevelComplete={setLevelComplete}
           setShowCodeWhisper={setShowCodeWhisper}
-          isCorrect={isCorrect}
+          setShowisCorrect={setShowisCorrect}
         />
       </div>
 
@@ -134,7 +137,10 @@ Your mission:
                 <Lottie animationData={Correct} loop={false} className="w-[70%] h-[70%]"/>
                 <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
                 <motion.button
-                  onClick={()=>{setShowisCorrect(false)}}
+                  onClick={()=>{
+                    submitAttempt(true)
+                    goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
+                  }}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}

@@ -1,4 +1,4 @@
-// for the Text Editor
+// Code Mirror
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
@@ -6,31 +6,39 @@ import { javascript } from "@codemirror/lang-javascript";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 import { EditorView } from "@codemirror/view";
 import { autocompletion } from "@codemirror/autocomplete";
-
-// Animation
+// Ui's // PopUps
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
+// Utils
 import { motion } from "framer-motion";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
+import { extractJsKeywords } from "../../../components/Achievements Utils/Js_KeyExtract";
+// Data
+import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 
-function JavaScript_TE({setIsCorrect,setShowisCorrect}) {
-      const {gamemodeId} = useParams();
+function JavaScript_TE({setIsCorrect}) {
+  // Data
+  const {gamemodeId} = useParams();
+  const { userData } = useFetchUserData();
+  // UTils
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("JavaScript");
+  const [isCorrect, setCorrect] = useState(true)
+    // Output states
+  const iFrame = useRef(null);
+  const [hasRunCode, setRunCode] = useState(false);
   // Code states
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
     JavaScript: "// Hello World"
   });
-  const [isCorrect, setCorrect] = useState(false)
-  // Output states
-  const iFrame = useRef(null);
-  const [hasRunCode, setRunCode] = useState(false);
   // Console log states
   const [logs, setLogs] = useState([]);
   const consoleRef = useRef([]);
+
   // Get language for CodeMirror
 const getLanguageExtension = () => {  
   switch (activeTab) {
@@ -54,56 +62,62 @@ const getLanguageExtension = () => {
     },
     [activeTab]
   );
+// Run Button
+const runCode = () => {
+  if (gamemodeId === "Lesson") {
+    // skip achievement tracking for lesson preview
+  } else {
+    setIsCorrect(isCorrect);
+  }
+  setRunCode(true);
+  consoleRef.current = [];
+  setLogs([]);
+  if (gamemodeId !== "Lesson") {
+    const usedTags = extractJsKeywords(code.JavaScript);
+    if (usedTags.length > 0) {
+      unlockAchievement(userData?.uid, "JavaScript", "tagUsed", {
+        usedTags,
+        isCorrect,
+      });
+    }
+    console.log("Used JS tags:", usedTags);
+  }
+  setTimeout(() => {
+    if (gamemodeId === "Lesson") {
+      // do nothing special for lesson
+    } else {
+      submitAttempt(isCorrect);
+    }
+    const fullCode = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <style>${code.CSS}</style>
+      </head>
+      <body>
+        ${code.HTML}
+        <script>
+          const sendLog = (...args) => {
+            window.parent.postMessage({ type: 'console-log', args }, '*');
+          };
+          console.log = sendLog;
+          try {
+            ${code.JavaScript}
+          } catch (err) {
+            sendLog('Error:', err.message);
+          }
+        </script>
+      </body>
+      </html>
+    `;
+    const doc =
+      iFrame.current.contentDocument || iFrame.current.contentWindow.document;
+    doc.open();
+    doc.write(fullCode);
+    doc.close();
+  }, 0);
 
-  // Run code in iframe and capture logs
-  const runCode = () => {
-          if (gamemodeId === "Lesson"){
-        
-      }else{
-        setIsCorrect(isCorrect);
-      }
-    setRunCode(true);
-    // Clear logs
-    consoleRef.current = [];
-    setLogs([]);
-
-    setTimeout(() => {
-            if (gamemodeId === "Lesson"){
-        
-      }else{
-        submitAttempt(isCorrect);
-      }
-      const fullCode = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <style>${code.CSS}</style>
-        </head>
-        <body>
-          ${code.HTML}
-          <script>
-            const sendLog = (...args) => {
-              window.parent.postMessage({ type: 'console-log', args }, '*');
-            };
-            console.log = sendLog;
-            try {
-              ${code.JavaScript}
-            } catch (err) {
-              sendLog('Error:', err.message);
-            }
-          </script>
-        </body>
-        </html>
-      `;
-
-      const doc = iFrame.current.contentDocument || iFrame.current.contentWindow.document;
-      doc.open();
-      doc.write(fullCode);
-      doc.close();
-    }, 0);
-      setShowisCorrect(true)
-  };
-
+};
   // Listen for messages from iframe for console logs
   useEffect(() => {
     const handleMessage = (event) => {

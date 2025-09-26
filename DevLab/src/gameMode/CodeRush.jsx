@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
+import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
+import { useNavigate } from "react-router-dom";
 // PopUps
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
@@ -24,7 +26,8 @@ import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
 function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const type = "Code Rush";
-  const { hasShield, consumeErrorShield } = useErrorShield();
+  const navigate = useNavigate();
+  const { consumeErrorShield } = useErrorShield();
   // Route params
   const { subject, lessonId, levelId, stageId, gamemodeId } = useParams();
 
@@ -55,13 +58,13 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const renderEditor = () => {
     switch (subject) {
       case "Html":
-        return <Html_TE  setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect}/>;
+        return <Html_TE  setIsCorrect={setIsCorrect}/>;
       case "Css":
-        return <Css_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect} />;
+        return <Css_TE setIsCorrect={setIsCorrect} />;
       case "JavaScript":
-        return <JavaScript_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect} />;
+        return <JavaScript_TE setIsCorrect={setIsCorrect} />;
       case "Database":
-        return <Database_TE setIsCorrect={setIsCorrect} setShowisCorrect={setShowisCorrect} />;
+        return <Database_TE setIsCorrect={setIsCorrect} />;
       default:
         return <div className="text-white">Invalid subject</div>;
     }
@@ -97,7 +100,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         <GameFooter
           setLevelComplete={setLevelComplete}
           setShowCodeWhisper={setShowCodeWhisper}
-          isCorrect={isCorrect}
+          setShowisCorrect={setShowisCorrect}
         />
       </div>
 
@@ -168,7 +171,9 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         <motion.button
         onClick={()=>{
           submitAttempt(true)
-          setShowisCorrect(false)}}
+          setShowisCorrect(false)
+          goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
+        }}
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}

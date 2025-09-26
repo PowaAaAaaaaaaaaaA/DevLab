@@ -8,29 +8,34 @@ import Loading from '../assets/Lottie/LoadingDots.json'
 import Lottie from 'lottie-react';
 import { motion } from "framer-motion";
 
-import useUserDetails from './Custom Hooks/useUserDetails'
+import useFetchUserData from './BackEnd_Data/useFetchUserData';
 import useShopItems from './Custom Hooks/useShopItems'
 import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
+
+import useFetchShopItems from './BackEnd_Data/useFethShopItems';
 
 import '../index.css'
 
 
 function Shop() {
 
+  const { shopItems } = useFetchShopItems();
+
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
 
   // User Details (Custom Hook)
-  const {Userdata, refetch } = useUserDetails();
+  const { userData, isLoading, isError, refetch } = useFetchUserData();
+
   // Shop Items (Custom Hook)
   const {items, loading} = useShopItems();
   //
-  const {animatedValue} = useAnimatedNumber(Userdata?.coins);
+  const {animatedValue} = useAnimatedNumber(userData?.coins);
 // Buy Button
   const [isBuying, setIsBuying] = useState(false);
 
   const buyItem = async (item) => {
     const user = auth.currentUser;
-    if (Userdata.coins < item.cost) {
+    if (userData.coins < item.cost) {
       alert("Not enough coins!");
       return;
     }
@@ -39,7 +44,7 @@ function Shop() {
       // Deduct Coins
       const userRef = doc(db, "Users", user.uid);
       await updateDoc(userRef, {
-        coins: Userdata.coins - item.cost,
+        coins: userData.coins - item.cost,
       });
       refetch(); // Refresh user details (coins)
       // Add to Inventory
@@ -64,7 +69,7 @@ function Shop() {
       setIsBuying(false);
     }
   };
-
+console.log(shopItems);
 if(loading) return <p>Loading</p>
 
   return (
@@ -96,7 +101,7 @@ if(loading) return <p>Loading</p>
     dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500'>
       
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-20 w-full h-[100%] p-4 '>
-        {items.map(item=>(
+        {shopItems.map(item=>(
           <div 
           key={item.id}
           className="p-[2px] rounded-xl bg-gradient-to-b from-teal-400 via-blue-500 to-purple-500 shadow-md h-[100%]">

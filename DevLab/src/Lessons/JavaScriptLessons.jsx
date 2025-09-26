@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaLock } from "react-icons/fa";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
+import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress"
+import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
 import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
@@ -17,9 +19,9 @@ import '../index.css'
 
 function JavaScriptLessons() {
   // Level Fetch (Custom Hooks)
-  const { levelsData, isLoading } = useLevelsData("JavaScript");
+  const { levelsData, isLoading, isError, refetch } = useFetchLevelsData("JavaScript");
   // Unlocked and Locked Levels
-  const {userProgress,isLoading: progressLoading,userStageProgress} = useUserProgress("JavaScript");
+  const {userProgress,userStageProgress,completedLevels,completedStages,isLoading: progressLoading} = useFetchUserProgress("JavaScript");
   // Subject Levels Progress Bar
   const { animatedBar,total} = useSubjProgressBar("JavaScript");
   const navigate = useNavigate();
@@ -134,7 +136,7 @@ console.log(total);
                               toggleLevel(lesson.id, level.id);
                             }}>
                               {!isUnlocked && (
-                                <div className="absolute top-10 right-0 left-105 text-white">
+                                <div className="absolute flex items-center justify-center w-full h-full text-white">
                                   <FaLock className="text-[3rem] text-white" />
                                 </div>
                               )}

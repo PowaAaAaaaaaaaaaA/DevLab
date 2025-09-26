@@ -2,10 +2,11 @@ import { db, auth } from "../../Firebase/Firebase";
 import { collection, getDocs } from "firebase/firestore";
 import useLevelsData from "./useLevelsData";
 import { useQuery } from "@tanstack/react-query";
+import useFetchLevelsData from "../BackEnd_Data/useFetchLevelsData";
+
 
 export default function useUserProgress(subject) {
-  const { levelsData, isLoading: levelsLoading } = useLevelsData(subject);
-
+  const { levelsData, isLoading:levelsLoading, isError, refetch } = useFetchLevelsData(subject);
   const fetchProgress = async () => {
     const userId = auth.currentUser.uid;
     const allProgress = {}; // stores level completion
@@ -18,9 +19,9 @@ export default function useUserProgress(subject) {
     for (const lesson of levelsData) {
       const lessonId = lesson.id;
       const levelsRef = collection(db, "Users", userId, "Progress", subject, "Lessons", lessonId, "Levels");
-      const levelsSnap = await getDocs(levelsRef);
+      const levelsSnap = await getDocs(levelsRef); 
 
-      for (const levelDoc of levelsSnap.docs) {
+      for (const levelDoc of levelsSnap.docs) { 
         const levelId = levelDoc.id;
         const status = levelDoc.data().status;
         allProgress[`${lessonId}-${levelId}`] = status;

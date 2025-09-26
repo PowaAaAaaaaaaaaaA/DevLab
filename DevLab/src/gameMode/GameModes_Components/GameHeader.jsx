@@ -1,20 +1,19 @@
 // Utils / Custom Hooks
 import useLevelBar from "../../components/Custom Hooks/useLevelBar";
-import useUserDetails from "../../components/Custom Hooks/useUserDetails";
+import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 // Navigation
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 // Icons
 import { MdArrowBackIos } from "react-icons/md";
 import { LuHeart } from "react-icons/lu";
-
 import defaultAvatar from '../../assets/Images/profile_handler.png'
 
 function GameHeader({heart}) {
 
     const { animatedExp } = useLevelBar();
     const {gamemodeId} = useParams();
-    const { Userdata, isLoading } = useUserDetails();
+    const { userData, isLoading, isError, refetch } = useFetchUserData();
 
   return (
     <div className="flex justify-between h-[10%] p-3 items-center">
@@ -37,7 +36,7 @@ function GameHeader({heart}) {
       <div className="w-auto h-[90%] flex items-center gap-2 mr-[10px]">
         <div className="border rounded-full bg-gray-600 overflow-hidden w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16">
           <img
-            src={Userdata?.profileImage || defaultAvatar}
+            src={userData?.profileImage || defaultAvatar}
             alt="Profile"
             className="w-full h-full object-cover"/>
         </div>
@@ -52,10 +51,10 @@ function GameHeader({heart}) {
           </div>
           <div className=" flex justify-between">
             <p className="text-white font-inter font-bold">
-              Lvl {Userdata?.userLevel}
+              Lvl {userData?.userLevel}
             </p>
             <p className="text-white font-inter font-bold">
-              {Userdata?.exp} / 100xp
+              {userData?.exp} / 100xp
             </p>
           </div>
         </div>

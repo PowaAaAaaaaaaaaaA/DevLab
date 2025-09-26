@@ -1,16 +1,16 @@
 // for Level Bar Anomation
 
 import { useState, useEffect } from "react";
-import useUserDetails from "./useUserDetails";
+import useFetchUserData from "../BackEnd_Data/useFetchUserData";
 
 export default function useLevelBar() {
   const [animatedExp, setAnimatedExp] = useState(0);
-  const { Userdata, isLoading } = useUserDetails();
+  const { userData, isLoading, isError, refetch } = useFetchUserData();
 
   useEffect(() => {
-    if (Userdata?.exp >= 0) {
+    if (userData?.exp >= 0) {
       let start = animatedExp;
-      const target = Userdata.exp;
+      const target = userData.exp;
       const step = () => {
         if (start < target) {
           start = Math.min(start + 2, target);
@@ -22,7 +22,7 @@ export default function useLevelBar() {
       };
       requestAnimationFrame(step);
     }
-  }, [Userdata?.exp]);
+  }, [userData?.exp]);
 
   return { animatedExp, isLoading };
 

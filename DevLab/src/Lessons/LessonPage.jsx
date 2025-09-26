@@ -4,6 +4,7 @@ import { useState } from "react";
 // Components
 import GameHeader from "../gameMode/GameModes_Components/GameHeader";
 import InstructionPanel from "../gameMode/GameModes_Components/InstructionPanel";
+import LessonInstructionPanel from "../gameMode/GameModes_Components/LessonInstructionPanel";
 import GameFooter from "../gameMode/GameModes_Components/GameFooter";
 import Html_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Html_TE";
 import Css_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Css_TE";
@@ -46,7 +47,7 @@ function LessonPage() {
   <div
     className={`transition-all duration-500
       ${isEditorVisible ? "h-[40%] md:w-[35%] md:h-full w-full" : "w-full h-full"}`}>
-    <InstructionPanel />
+    <LessonInstructionPanel />
   </div>
 
   {/* Code Editor and Output Panel */}

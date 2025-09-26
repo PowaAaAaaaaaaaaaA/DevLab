@@ -1,14 +1,7 @@
 import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../Firebase/Firebase";
 
-export const goToNextStage = async ({
-  subject,
-  lessonId,
-  levelId,
-  stageId,
-  navigate,
-  setLevelComplete,
-}) => {
+export const goToNextStage = async ({subject,lessonId,levelId,stageId,navigate,setLevelComplete}) => {
   const user = auth.currentUser;
   if (!user) return;
 

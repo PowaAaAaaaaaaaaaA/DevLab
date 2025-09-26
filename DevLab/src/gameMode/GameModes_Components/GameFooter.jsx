@@ -2,21 +2,32 @@
 import { useNavigate } from "react-router-dom"
 import { goToNextStage } from "../GameModes_Utils/Util_Navigation";
 // Hooks
-import useUserDetails from "../../components/Custom Hooks/useUserDetails";
+import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useGameModeData from "../../components/Custom Hooks/useGameModeData"
 // Icons // Motion
-import { motion, AnimatePresence} from "framer-motion";
+import { motion} from "framer-motion";
 
 import ItemsUse from "../../ItemsLogics/ItemsUse";
 
 
 
-function GameFooter({setLevelComplete,setShowCodeWhisper,isCorrect}) {
+function GameFooter({setLevelComplete,setShowCodeWhisper,setShowisCorrect}) {
 
   const navigate = useNavigate();
-console.log(isCorrect)
-  const {Userdata, isLoading} = useUserDetails();
-  const {gameModeData,levelData, subject, lessonId, levelId, stageId, gamemodeId} = useGameModeData();
+
+  const { userData } = useFetchUserData();
+  const {levelData, subject, lessonId, levelId, stageId, gamemodeId} = useGameModeData();
+
+    const handleClick = () => {
+    if (gamemodeId === "Lesson") {
+      // Go to next stage directly
+      goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete,});
+    } else {
+      //  Show popup first (Correct/Wrong)
+      setShowisCorrect(true);
+    }
+  };
+  const isBrainBytes = gamemodeId === "BrainBytes";
   return (
 <>
     <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white ">
@@ -34,23 +45,24 @@ console.log(isCorrect)
           </div>
         </div>
         <div className="w-[10%]">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={isCorrect ? { scale: 1.05, background: "#7e22ce" } : {background: "#a0aec0"}}
-            transition={{ bounceDamping: 100, }}
-            onClick={() =>
-              goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
-            }
-          disabled={!isCorrect}
-          className={`${
-            isCorrect ? "bg-[#9333EA] cursor-pointer" : "bg-gray-500"} 
-            text-white bg-[#7e22ce] font-bold rounded-xl w-full py-2 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]`}>
-            Next
-          </motion.button>
+<motion.button
+  whileTap={{ scale: 0.95 }}
+  whileHover={!isBrainBytes ? { scale: 1.05, background: "#7e22ce" } : {}}
+  transition={{ bounceDamping: 100 }}
+  onClick={!isBrainBytes ? handleClick : undefined}
+  disabled={isBrainBytes}
+  className={`font-bold rounded-xl w-full py-2 ${
+    isBrainBytes
+      ? "bg-gray-600 cursor-not-allowed"
+      : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+  }`}>
+  Next
+</motion.button>
+
         </div>
         <div>
           <p className="text-xl">
-            {Userdata ? `${Userdata.coins} Coins` : "Loading..."}
+            {userData ? `${userData.coins} Coins` : "Loading..."}
           </p>
         </div>
     </div>

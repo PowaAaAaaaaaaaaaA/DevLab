@@ -25,9 +25,22 @@ switch (actionType) {
   case "lessonComplete":
     match = payload.lessonId && condition?.lessonId === payload?.lessonId;
     break;
-  case "tagUsed":
-    match = payload.usedTags?.includes(condition?.tagReq) && payload.isCorrect === true;
-    break;
+case "tagUsed": {
+  const usedTags = Array.isArray(payload.usedTags) ? payload.usedTags : [];
+  
+  // Normalize tagReq to always be an array
+  const requiredTags = Array.isArray(condition?.tagReq)
+    ? condition.tagReq
+    : [condition?.tagReq].filter(Boolean); // filter removes undefined/null
+
+  // Check if any required tag is in usedTags AND the answer is correct
+  match =
+    requiredTags.some(tag => usedTags.includes(tag)) &&
+    payload.isCorrect === true;
+  break;
+}
+
+
   case "itemUse":
     match = payload?.itemName === condition?.itemReq && subject === condition?.subject;
     break;

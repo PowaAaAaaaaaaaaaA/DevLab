@@ -5,6 +5,8 @@ import { LuCog } from "react-icons/lu";
 import { IoChevronDownOutline } from "react-icons/io5";
 import { IoCodeSlash, IoCode } from "react-icons/io5";
 
+import SettingsIcon from "../assets/navbarIcons/settings.png"
+
 function Navbar() {
   const [open, setOpen] = useState(null); // Dropdown state
   const [collapsed, setCollapsed] = useState(false); // Collapse toggle (xl only)
@@ -33,8 +35,8 @@ function Navbar() {
           fixed top-0 left-0 z-40
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           lg:${mobileOpen ? "translate-x-0" : "-translate-x-full"} 
-          ${collapsed && "xl:w-20"}
-          ${!collapsed && "xl:w-70"}
+          ${collapsed && "xl:w-22"}
+          ${!collapsed && "xl:w-75"}
           xl:relative xl:translate-x-0
           ${mobileOpen ? "w-70 bg-[#0D1117]" : ""}
         `}>
@@ -65,7 +67,7 @@ function Navbar() {
               >
                 <NavLink
                   to={item.path}
-                  className="flex items-center gap-3 font-inter text-[1.2rem] relative rounded px-5 p-3 border-b border-gray-500 overflow-hidden group hover:bg-[#9333EA] transition-all ease-out duration-300 NavBarText-laptop">
+                  className="flex items-center gap-3 font-inter text-[1.2rem] relative rounded px-5 p-3  overflow-hidden group hover:bg-[#9333EA] transition-all ease-out duration-300 NavBarText-laptop">
                   <span className="text-xl">{item.icon}</span>
                   {(!collapsed || mobileOpen) && item.label}
                   {item.children && (!collapsed || mobileOpen) && (
@@ -85,8 +87,7 @@ function Navbar() {
                     open === item.key
                       ? "max-h-96 opacity-100"
                       : "max-h-0 opacity-0"
-                  }`}
-                >
+                  }`}>
                   {item.children &&
                     item.children.map((sub) => (
                       <NavLink
@@ -113,7 +114,7 @@ function Navbar() {
             }`
           }
         >
-          <LuCog className="text-xl" />
+                  <img src={SettingsIcon} alt="HTML Icon" className="w-6 h-6" />
           {(!collapsed || mobileOpen) && <span>Settings</span>}
         </NavLink>
       </div>
