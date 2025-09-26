@@ -2,6 +2,8 @@
 import { useState } from "react";
 // Navigation
 import { useParams } from "react-router-dom";
+import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
+import { useNavigate } from "react-router-dom";
 // Pop Ups
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
@@ -24,9 +26,9 @@ import { useErrorShield } from "../ItemsLogics/ErrorShield";
 function BrainBytes({ heart, gameOver, submitAttempt, roundKey }) {
   const type = "Brain Bytes";
   const { hasShield, consumeErrorShield } = useErrorShield();
-
+  const navigate = useNavigate();
   // Route params
-  const { subject, lessonId, levelId, gamemodeId, topicId } = useParams();
+  const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
 
   // Popups
   const [levelComplete, setLevelComplete] = useState(false);
@@ -119,7 +121,9 @@ Your mission:
                 <Lottie animationData={Correct} loop={false} className="w-[70%] h-[70%]"/>
                 <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
                 <motion.button
-                  onClick={()=>{setShowisCorrect(false)}}
+                  onClick={()=>{setShowisCorrect(false)
+                                goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
+                  }}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}

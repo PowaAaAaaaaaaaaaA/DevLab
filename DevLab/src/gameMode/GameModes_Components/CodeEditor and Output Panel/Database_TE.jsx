@@ -1,34 +1,36 @@
-// for the Text Editor
+// Code Mirror
 import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
 import initSqlJs from "sql.js";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 import { EditorView } from "@codemirror/view";
-// Utils
-import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
 // Animation
-import { motion } from "framer-motion";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
-
+// Utils
+import { motion } from "framer-motion";
+import { extractSqlKeywords } from "../../../components/Achievements Utils/Db_KeyExtract";
 import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
-import useUserDetails from "../../../components/Custom Hooks/useUserDetails";
+import { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+// Data
+import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 
 
-function Database_TE({setIsCorrect,setShowisCorrect}) {
-  const {Userdata, isLoading } = useUserDetails();  
-
+function Database_TE({setIsCorrect}) {
+  //Data
+  const { userData } = useFetchUserData();
   const {gamemodeId} = useParams();
-
+  // Output 
   const [outputHtml, setOutputHtml] = useState();
   const [hasRunQuery, setHasRunQuery] = useState(false);
   const [tablesHtml, setTablesHtml] = useState("");
+  // utils
   const [query , setQuery] = useState("");
   const dbRef = useRef(null);
+  const [isCorrect, setCorrect] = useState(true)
 
-    const [isCorrect, setCorrect] = useState(true)
-
+  // Run Button
   const runCode =()=>{
           try {
         setHasRunQuery(true);
@@ -68,14 +70,12 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
         setOutputHtml(table);
         renderAllTables();
     if (gamemodeId === "Lesson"){
-        
       }else{
         setIsCorrect(isCorrect);
-        setShowisCorrect(true)
           // --- TAG USAGE ACHIEVEMENT ---
   const usedTags = extractSqlKeywords(query); 
   if (usedTags.length > 0) {
-    unlockAchievement(Userdata?.uid, "Database", "tagUsed", { usedTags, isCorrect});
+    unlockAchievement(userData?.uid, "Database", "tagUsed", { usedTags, isCorrect});
   }
   console.log(usedTags)
 }
@@ -85,7 +85,6 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
         );
       }
   }
-
 // Data Base (Data sa Table)
   useEffect(() => {
       initSqlJs({
@@ -106,7 +105,6 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
         dbRef.current = db;
         renderAllTables();
       });
-
   }, []);
 
 // Display Table for Database Subj
@@ -153,19 +151,6 @@ function Database_TE({setIsCorrect,setShowisCorrect}) {
       console.error("Error displaying tables:", err);
     }
   };
-
-
-  // Achievements Checker 
-  const extractSqlKeywords = (query) =>{
-    const keywordRegex = /\b(SELECT|AND|NOT|UPDATE|LIKE|BETWEEN|DELETE)\b/gi;
-    const keywords = [];
-    let match; 
-    
-    while ((match = keywordRegex.exec(query)) !== null) {
-    keywords.push(match[1].toUpperCase());
-  }
-  return [...new Set(keywords)]; // remove duplicates
-  }
 
   return (
 <>

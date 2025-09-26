@@ -1,30 +1,31 @@
-import { useEffect, useState } from 'react'
+// Ui
 import HtmlIcons from '../assets/Images/html-Icon.png'
 import CssIcons from '../assets/Images/css-Icon.png'
 import DataIcons from '../assets/Images/Data-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
-import { db} from "../Firebase/Firebase"
-import {doc, getDoc } from 'firebase/firestore';
+import Loading from './Loading'
+import '../index.css'
+import defaultAvatar from './../assets/Images/profile_handler.png'
+// Utils and Hooks
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import useUserDetails from './Custom Hooks/useUserDetails'
 import useLevelBar from './Custom Hooks/useLevelBar'
 import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
-
 import useShopItems from './Custom Hooks/useShopItems'
 import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
-import { auth } from '../Firebase/Firebase'
-import Loading from './Loading'
-import '../index.css'
+// Firebase
+import { db} from "../Firebase/Firebase"
+import {doc, getDoc } from 'firebase/firestore';
 
-import defaultAvatar from './../assets/Images/profile_handler.png'
-
+import useFetchUserData from './BackEnd_Data/useFetchUserData.jsx'
 
 function Dashboard() {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
   // User Details (Custom Hook)
-  const {Userdata, isLoading } = useUserDetails();
+
+  const { userData, isLoading, isError, refetch } = useFetchUserData();
   const {animatedExp} = useLevelBar();
   const {inventory, loading} = useUserInventory();
   // Subject ProgressbAr
@@ -34,19 +35,13 @@ function Dashboard() {
   const {animatedBar: DbProgress} = useSubjProgressBar("Database")
 
   const [loadingDashboard , setLoading] = useState(true);
-
     // // Shop Items (Custom Hook)
-    const {items} = useShopItems();
-    
+    const {items} = useShopItems();    
     const { data: HtmlData, } = useAchievementsData("Html");
     const { data:CssData,  } = useAchievementsData("Css");
     const { data:JsData,  } = useAchievementsData("JavaScript");
     const { data:DatabaseData, } = useAchievementsData("Database");
     
-
-  // Timer for loading screen
-const [hasLoadedBefore, setHasLoadedBefore] = useState(false);
-
 
 useEffect(() => {
   const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
@@ -65,41 +60,12 @@ useEffect(() => {
   }
 }, []);
 
-useEffect(() => {
-    const fetchData = async () => {
-      const currentUser = auth.currentUser;
-
-      const token = await currentUser?.getIdToken(true);
-
-      try {
-        const res = await fetch("http://localhost:8082/fireBase/Shop", {
-          method: "GET",
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          console.log("It is not ok lol");
-          return;
-        }
-
-        const data = await res.json();
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-    };
-    fetchData();
-  }, []);
-
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
 useEffect(() => {
   const fetchLevelInfo = async () => {
-    if (Userdata?.lastOpenedLevel) {
-      const { subject, lessonId, levelId } = Userdata.lastOpenedLevel;
+    if (userData?.lastOpenedLevel) {
+      const { subject, lessonId, levelId } = userData.lastOpenedLevel;
 console.log(subject)
       // Full dynamic path
       const getUser = doc(db, subject, lessonId, "Levels", levelId);
@@ -114,7 +80,7 @@ console.log(subject)
   };
 
   fetchLevelInfo();
-}, [Userdata]);
+}, [userData]);
 
   // Show Loading Screen first
   // Show Loading Screen
@@ -125,40 +91,37 @@ if (loadingDashboard) {
     </div>
   );
 }
-
   return (
-    
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
     { !isLoading ? 
     (<div
   className="shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-5 bg-cover bg-center"
   style={{
-    backgroundImage: `url(${Userdata?.backgroundImage})`,
+    backgroundImage: `url(${userData?.backgroundImage})`,
     backgroundColor: "#111827", // fallback if no image
   }}>
   <div className="w-[40%] h-[90%] flex items-center flex-col gap-5 p-2">
     <div className="w-[55%] h-[80%] rounded-full overflow-hidden">
       <img
-        src={Userdata?.profileImage || defaultAvatar}
+        src={userData?.profileImage || defaultAvatar}
         alt="Profile"
         className="w-full h-full object-cover"/>
     </div>
 
-    <div className="text-white font-inter text-[0.85rem] break-words w-[60%] rounded-2xl backdrop-blur-[10px]">
-      <p className="text-center">{Userdata.bio}</p>
+    <div className="text-white font-inter text-[0.85rem] break-words w-[60%] rounded-2xl backdrop-blur-[10px] text-shadow-lg/60">
+      <p className="text-center">{userData.bio}</p>
     </div>
   </div>
 
   <div className="h-auto w-[100%] flex flex-col p-2 gap-2 backdrop-blur-[2px] rounded-3xl">
-    <p className="text-white font-inter font-bold">Good to see you!</p>
-    <h1 className="sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight text-shadow-lg/30">
-      {Userdata.username}
+    <p className="text-white font-inter font-bold text-shadow-lg/60">Good to see you!</p>
+    <h1 className="sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight text-shadow-lg/60">
+      {userData.username}
     </h1>
-    <p className="text-white font-inter font-bold mb-0.5 text-shadow-lg/30">
-      Level {Userdata.userLevel}
+    <p className="text-white font-inter font-bold mb-0.5 text-shadow-lg/60">
+      Level {userData.userLevel}
     </p>
-
     {/* Progress Bar */}
     <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
       <div
@@ -166,14 +129,13 @@ if (loadingDashboard) {
         style={{ width: `${(animatedExp / 100) * 100}%` }}
       ></div>
     </div>
-    {/* Progress Bar */}
-
+    {/* Progress Bar */}  
     <div className="flex w-[40%] justify-around mt-[10px]">
-      <p className="text-white font-inter font-bold text-shadow-lg/30">
-        User Xp: {Userdata.exp} / 100
+      <p className="text-white font-inter font-bold text-shadow-lg/60">
+        User Xp: {userData.exp} / 100
       </p>
-      <div className="text-white font-inter font-bold text-shadow-lg/30">
-        User Money: {Userdata.coins}
+      <div className="text-white font-inter font-bold text-shadow-lg/60">
+        User Money: {userData.coins}
       </div>
     </div>
   </div>
@@ -204,9 +166,9 @@ if (loadingDashboard) {
 
       <div className='w-[70%] h-[100%] flex flex-col'>
         <div className='h-[35%] p-1 flex flex-col gap-4 '>
-          <h2 className='text-white font-exo font-bold text-[2rem]'>Jump Back In</h2>
+          <h2 className='text-white font-exo font-bold text-[2rem] text-shadow-lg/60'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
-          {levelInfo ? (<Link to={`/Main/Lessons/${Userdata.lastOpenedLevel.subject}/${Userdata.lastOpenedLevel.lessonId}/${Userdata.lastOpenedLevel.levelId}/Stage1/Lesson`} className='h-[100%]'>
+          {levelInfo ? (<Link to={`/Main/Lessons/${userData.lastOpenedLevel.subject}/${userData.lastOpenedLevel.lessonId}/${userData.lastOpenedLevel.levelId}/Stage1/Lesson`} className='h-[100%]'>
           <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[100px]'>
             <div className='bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
             <div className='p-2 flex-col flex gap-2'>
@@ -226,7 +188,7 @@ if (loadingDashboard) {
         </div>
 
         <div className='flex flex-col p-3 gap-5 flex-grow mt-3'>
-          <h2 className='text-white font-exo font-bold text-[2rem]'>View Your Progress</h2>
+          <h2 className='text-white font-exo font-bold text-[2rem] text-shadow-lg/60'>View Your Progress</h2>
           <div className='w-[100%] h-[80%] flex items-center justify-around'>
             
             <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-4'>

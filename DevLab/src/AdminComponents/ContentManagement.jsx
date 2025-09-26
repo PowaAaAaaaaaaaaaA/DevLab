@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from "react";
-import {collection,getDocs,setDoc,doc,deleteDoc,updateDoc,} from "firebase/firestore";
+import {doc,updateDoc,} from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiArrowDownTray } from "react-icons/hi2";
@@ -7,21 +8,23 @@ import { GoPlus, GoTrash } from "react-icons/go";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import Lottie from "lottie-react";
 
-import useLevelsData from "../components/Custom Hooks/useLevelsData";
 
+import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
 import AddContent from "./contentManagement Components/AddContent";
 import LessonEdit from "./contentManagement Components/LessonEdit";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import SortableStage from "./contentManagement Components/SortableStage";
 
 import { DndContext, closestCorners } from "@dnd-kit/core";
 import {horizontalListSortingStrategy,SortableContext,arrayMove,} from "@dnd-kit/sortable";
 
+import { useDeleteLevel } from "./contentManagement Components/BackEndFuntions/useDeleteLevel";
+import {useAddStage} from "./contentManagement Components/BackEndFuntions/useAddStage"
+
 function ContentManagement() {
-  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("Html");
-  const { levelsData, isLoading } = useLevelsData(activeTab);
+  // const { levelsData, isLoading } = useLevelsData(activeTab);
+  const { levelsData, isLoading, } = useFetchLevelsData(activeTab);
   const subjects = ["Html", "Css", "JavaScript", "Database"];
 
   const [showForm, setShowForm] = useState(false);
@@ -33,6 +36,9 @@ function ContentManagement() {
   const [showPopup, setShowPopup] = useState(false);
 
   const [levelStages, setLevelStages] = useState({});
+
+    const deleteLevelMutation = useDeleteLevel(activeTab);
+    const  addStageMutation  = useAddStage(activeTab);
 
   // Load initial stages
   useEffect(() => {
@@ -112,66 +118,6 @@ const handleDragEnd = async (event, lessonId, levelId) => {
     setTimeout(() => setShowPopup(false), 100);
   };
 
-  // Adding new stage
-  const addNewTopicMutation = useMutation({
-    mutationFn: ({ subject, lessonId, levelId }) =>
-      addNewTopic(subject, lessonId, levelId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lesson_data", activeTab] });
-    },
-  });
-
-  const addNewTopic = async (subject, lessonId, levelId) => {
-    try {
-      const topicsRef = collection(db,subject,`Lesson${lessonId}`,"Levels",levelId,"Stages");
-      const snapshot = await getDocs(topicsRef);
-
-      const topicNumbers = snapshot.docs.map((doc) => {
-        const match = doc.id.match(/Stage(\d+)/);
-        return match ? parseInt(match[1]) : 0;
-      });
-
-      const nextNumber =
-        (topicNumbers.length > 0 ? Math.max(...topicNumbers) : 0) + 1;
-      const newTopicId = `Stage${nextNumber}`;
-
-      await setDoc(doc(topicsRef, newTopicId), {
-        title: newTopicId,
-        order: nextNumber,
-        createdAt: new Date(),
-      });
-    } catch (error) {
-      console.error("Error adding topic:", error);
-    }
-  };
-
-  // Delete level
-  const DeleteLevelMutaion = useMutation({
-    mutationFn: ({ subject, lessonId, levelId }) =>
-      deleteLevel(subject, lessonId, levelId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lesson_data", activeTab] });
-    },
-  });
-
-  const deleteLevel = async (subject, lessonId, levelId) => {
-    const lessonIds = `Lesson${lessonId}`;
-    try {
-      await deleteDoc(doc(db, subject, lessonIds, "Levels", levelId));
-
-      const levelsRef = collection(db, subject, lessonIds, "Levels");
-      const remainingLevels = await getDocs(levelsRef);
-
-      if (remainingLevels.empty) {
-        await deleteDoc(doc(db, subject, `Lesson${lessonId}`));
-        console.log(
-          `Lesson '${lessonId}' deleted because it had no more levels.`
-        );
-      }
-    } catch (error) {
-      console.error("Error deleting level:", error);
-    }
-  };
 
   return (
     <div className="h-full overflow-hidden px-4 sm:px-6 lg:px-10">
@@ -261,25 +207,24 @@ const handleDragEnd = async (event, lessonId, levelId) => {
                     <div className="flex justify-end gap-3 absolute top-3 right-5">
                       <div className="text-white text-2xl">
                         <button
-                          className="hover:cursor-pointer hover:bg-gray-600 rounded p-2 border-gray-500 border"
+                          className="hover:cursor-pointer hover:bg-green-500 rounded p-2 border-gray-500 border "
                           onClick={() =>
-                            addNewTopicMutation.mutate({
-                              subject: activeTab,
-                              lessonId: lesson.Lesson,
-                              levelId: level.id,
+                            addStageMutation.mutate({
+                              category: activeTab,   
+                              lessonId: `Lesson${lesson.Lesson}`,     
+                              levelId: level.id,           
                             })
-                          }
-                        >
+                          }>
                           <GoPlus />
                         </button>
                       </div>
                       <div className="text-white text-2xl">
                         <button
-                          className="hover:cursor-pointer hover:bg-gray-600 rounded p-2 border-gray-500 border"
+                          className="hover:cursor-pointer hover:bg-red-600 rounded p-2 border-gray-500 border "
                           onClick={() =>
-                            DeleteLevelMutaion.mutate({
-                              subject: activeTab,
-                              lessonId: lesson.Lesson,
+                            deleteLevelMutation.mutate({
+                              category: activeTab,
+                              lessonId: `Lesson${lesson.Lesson}`,
                               levelId: level.id,
                             })
                           }
@@ -295,7 +240,6 @@ const handleDragEnd = async (event, lessonId, levelId) => {
           ))}
         </div>
       )}
-
       {showPopup && (
         <div
           className={`fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50 transition-all duration-300 ${
@@ -331,6 +275,7 @@ const handleDragEnd = async (event, lessonId, levelId) => {
                 lessonId={`Lesson${lessonId}`}
                 levelId={levelId}
                 stageId={stageId}
+                setShowForm={setShowForm}
               />
             </motion.div>
           </div>

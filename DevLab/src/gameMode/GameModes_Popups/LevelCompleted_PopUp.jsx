@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { db,auth} from "../../Firebase/Firebase";
 import { doc, getDoc, setDoc, updateDoc,arrayRemove, collection, getDocs } from "firebase/firestore";
 
-import useUserDetails from "../../components/Custom Hooks/useUserDetails";
+import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 // Items
 import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
@@ -25,8 +25,7 @@ function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelCom
 
   const navigate = useNavigate(); 
   const [LevelData , setLevelData] = useState("");
-
-  const { Userdata,refetch } = useUserDetails();
+  const { userData, isLoading, isError, refetch } = useFetchUserData();
   // Level Data
 useEffect(()=>{
   const fetchLevelData = async ()=>{
@@ -102,9 +101,8 @@ if (activeBuffs.includes("doubleCoins")) {
   const {animatedValue: Coins} = useAnimatedNumber(finalCoinReward || 0);
   const {animatedValue: Exp} = useAnimatedNumber(LevelData?.expReward || 0);
 
-
 const unlockNextLevel = async (goContinue) => {
-  const userId = Userdata.uid;
+  const userId = userData.uid;
 
   try {
     // Unlock first level achievement
@@ -169,7 +167,7 @@ const unlockNextLevel = async (goContinue) => {
   }
 };
 
-    useSubjectCheckComplete(Userdata.uid, subj);
+    useSubjectCheckComplete(userData.uid, subj);
 
 
   return (

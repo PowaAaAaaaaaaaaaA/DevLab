@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaLock } from "react-icons/fa";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
+import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress"
+import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
 import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
@@ -17,16 +19,15 @@ import "../index.css";
 
 function HtmlLessons() {
   // Level Fetch (Custom Hooks)
-  const { levelsData, isLoading } = useLevelsData("Html");
+  const { levelsData, isLoading, isError, refetch } = useFetchLevelsData("Html");
   // Unlocked and Locked Levels
-  const {userProgress,isLoading: progressLoading,userStageProgress} = useUserProgress("Html");
+  const {userProgress,userStageProgress,completedLevels,completedStages,isLoading: progressLoading} = useFetchUserProgress("Html");
   // Subject Levels Progress Bar
   const { animatedBar,total} = useSubjProgressBar("Html");
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
 
   const [expandedLevel, setExpandedLevel] = useState(null);
-console.log(levelsData);
   return (
     <>
       <div className="h-[100%]">
@@ -112,7 +113,7 @@ console.log(levelsData);
                               show: { opacity: isUnlocked ?  1 : 0.4, y: 0 },
                             }}
                             whileHover={{ scale: 1.02 }}
-                            className={`group w-full border flex gap-5 rounded-4xl h-[120px] relative
+                            className={`group w-full border flex gap-5 rounded-4xl h-[120px] relative 
                             ${
                               isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
                             } cursor-pointer`}
@@ -134,7 +135,7 @@ console.log(levelsData);
                               toggleLevel(lesson.id, level.id);
                             }}>
                               {!isUnlocked && (
-                                <div className="absolute top-10 right-0 left-105 text-white">
+                                <div className="absolute flex items-center justify-center w-full h-full text-white">
                                   <FaLock className="text-[3rem] text-white" />
                                 </div>
                               )}

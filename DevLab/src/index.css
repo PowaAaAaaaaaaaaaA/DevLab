@@ -19,12 +19,42 @@
 @import "tailwindcss";
 
 /*Laptop View*/
-@media (max-height: 750px) {
+@media (max-height: 850px) {
 
   
 
   .large-heading {
-    font-size: 2rem !important;  /* shrink big fonts */
+    font-size: 3rem !important;  /* shrink big fonts */
+  }
+
+  /* Adjust padding/margins to fit */
+  .padding-heavy {
+    padding: 0.5rem !important;
+  }
+  .textSmall-laptop {
+    font-size: 0.8rem;
+  }.mediuText-laptop{
+    font-size: 1.5rem;
+  }
+  .bigText-laptop{
+    font-size: 1.8rem;
+  }.NavBarText-laptop{
+    font-size: 1rem;
+  }
+
+  /*Cotainers*/
+  .Achievements-container{
+    max-height: 400px;
+  }.Shop-container{
+    max-height: 450px;
+  }
+}
+@media (max-height: 650px) {
+
+  
+
+  .large-heading {
+    font-size: 3rem !important;  /* shrink big fonts */
   }
 
   /* Adjust padding/margins to fit */
@@ -34,10 +64,10 @@
   .textSmall-laptop {
     font-size: 0.7rem;
   }.mediuText-laptop{
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   .bigText-laptop{
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }.NavBarText-laptop{
     font-size: 1rem;
   }

@@ -11,6 +11,8 @@ import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import { motion, AnimatePresence } from "framer-motion";
 
 import useLevelsData from "../components/Custom Hooks/useLevelsData";
+import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
+import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress"
 import useUserProgress from "../components/Custom Hooks/useUserProgress";
 import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
@@ -18,9 +20,9 @@ import '../index.css'
 
 function DataLessons() {
   // Level Fetch (Custom Hooks)
-  const { levelsData, isLoading } = useLevelsData("Database");
+  const { levelsData, isLoading, isError, refetch } = useFetchLevelsData("Database");
   // Unlocked and Locked Levels
-  const {userProgress,isLoading: progressLoading,userStageProgress} = useUserProgress("Database");
+  const {userProgress,userStageProgress,completedLevels,completedStages,isLoading: progressLoading} = useFetchUserProgress("Database");
   // Subject Levels Progress Bar
   const { animatedBar,total} = useSubjProgressBar("Database");
   const navigate = useNavigate();
