@@ -160,8 +160,6 @@ function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, le
         </a>
       )}
     </div>
-
-
       {/* Add Block Section */}
       <div className="bg-slate-600 px-1 my-3 py-3 rounded-2xl">
         <div className="flex flex-row justify-between bg-[#111827] border-cyan-400 border-2 p-3 rounded-2xl">

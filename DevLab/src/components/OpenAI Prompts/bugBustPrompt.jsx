@@ -1,21 +1,21 @@
 import axios from "axios";
-import {auth} from "../../Firebase/Firebase"
+import { auth } from "../../Firebase/Firebase";
 
-const lessonPrompt = async ({ receivedCode, instruction, description }) => {
-  if (!receivedCode) return null;
+const bugBustPrompt = async ({submittedCode,instruction,providedCode,description,subject}) => {
+  if (!submittedCode) return null;
 
   try {
     const currentUser = auth.currentUser;
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/lessonPrompt`,
+      `http://localhost:8082/openAI/bugBustPrompt`,
       {
-        instructions: instruction,
+        submittedCode,
+        instruction,
+        providedCode,
         description,
-        html: receivedCode.html || "",
-        css: receivedCode.css || "",
-        js: receivedCode.js || "",
+        subject,
       },
       {
         headers: {
@@ -26,7 +26,7 @@ const lessonPrompt = async ({ receivedCode, instruction, description }) => {
 
     let raw = res.data.response;
     // Clean response if wrapped in ```json ... ```
-    if (typeof raw === "string") {
+    if (typeof raw === "string") {  
       raw = raw.replace(/```json|```/g, "").trim();
     }
     let parsed = null;
@@ -35,11 +35,12 @@ const lessonPrompt = async ({ receivedCode, instruction, description }) => {
     } catch (e) {
       console.error("Failed to parse JSON:", e, raw);
     }
+
     return parsed;
   } catch (error) {
-    console.error("lessonPrompt API call failed:", error);
+    console.error("bugBustPrompt API call failed:", error);
     return null;
   }
 };
 
-export default lessonPrompt;
+export default bugBustPrompt;

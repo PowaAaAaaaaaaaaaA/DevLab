@@ -155,7 +155,7 @@ function Database_TE({setIsCorrect}) {
   return (
 <>
   <div className="bg-[#191a26] w-[47%] ml-auto h-[95%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-    <div className="flex-1 min-h-0 overflow-auto w-full rounded-3xl p-2">
+    <div className="flex-1 min-h-0 overflow-auto w-full rounded-3xl p-2 scrollbar-custom">
     <CodeMirror
       className="text-[1rem] "
       height="100%"

@@ -9,26 +9,39 @@ import { autocompletion } from "@codemirror/autocomplete";
 // Ui's // PopUps
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
+import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
 // Utils
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
 import { extractJsKeywords } from "../../../components/Achievements Utils/Js_KeyExtract";
+import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
+import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+// Open AI
+import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
 function JavaScript_TE({setIsCorrect}) {
   // Data
-  const {gamemodeId} = useParams();
   const { userData } = useFetchUserData();
+  const { gamemodeId } = useParams();
+  const { gameModeData } = useGameModeData();
+  const [description, setDescription] = useState("");
   // UTils
+  const isCorrect = useGameStore((state) => state.isCorrect);
+  const setSubmittedCode = useGameStore((state) => state.setSubmittedCode);
+
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("JavaScript");
-  const [isCorrect, setCorrect] = useState(true)
+  const [evaluationResult, setEvaluationResult] = useState(null);
+  const [isEvaluating, setIsEvaluating] = useState(false);
     // Output states
   const iFrame = useRef(null);
   const [hasRunCode, setRunCode] = useState(false);
+    //  Popup state
+  const [showPopup, setShowPopup] = useState(false);
   // Code states
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
@@ -52,72 +65,97 @@ const getLanguageExtension = () => {
       return html({ autoCloseTags: false });
   }
 };
-  // Handle editor changes
-  const onChange = useCallback(
-    (val) => {
-      setCode((prev) => ({
-        ...prev,
-        [activeTab]: val,
-      }));
-    },
-    [activeTab]
-  );
+// Handle editor changes
+const onChange = useCallback(
+  (val) => {
+    setCode((prev) => ({
+      ...prev,
+      [activeTab]: val,
+    }));
+
+    // Only store JavaScript code in zustand
+    if (activeTab === "JavaScript") {
+      setSubmittedCode(val);
+    }
+  },
+  [activeTab, setSubmittedCode]
+);
+
+
+
 // Run Button
 const runCode = () => {
-  if (gamemodeId === "Lesson") {
-    // skip achievement tracking for lesson preview
-  } else {
-    setIsCorrect(isCorrect);
-  }
-  setRunCode(true);
   consoleRef.current = [];
   setLogs([]);
+  setRunCode(true);
+
   if (gamemodeId !== "Lesson") {
     const usedTags = extractJsKeywords(code.JavaScript);
     if (usedTags.length > 0) {
-      unlockAchievement(userData?.uid, "JavaScript", "tagUsed", {
-        usedTags,
-        isCorrect,
-      });
+      unlockAchievement(userData?.uid, "JavaScript", "tagUsed", {usedTags,isCorrect});
     }
-    console.log("Used JS tags:", usedTags);
   }
-  setTimeout(() => {
-    if (gamemodeId === "Lesson") {
-      // do nothing special for lesson
-    } else {
-      submitAttempt(isCorrect);
-    }
-    const fullCode = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <style>${code.CSS}</style>
-      </head>
-      <body>
-        ${code.HTML}
-        <script>
-          const sendLog = (...args) => {
-            window.parent.postMessage({ type: 'console-log', args }, '*');
-          };
-          console.log = sendLog;
-          try {
-            ${code.JavaScript}
-          } catch (err) {
-            sendLog('Error:', err.message);
-          }
-        </script>
-      </body>
-      </html>
-    `;
-    const doc =
-      iFrame.current.contentDocument || iFrame.current.contentWindow.document;
-    doc.open();
-    doc.write(fullCode);
-    doc.close();
-  }, 0);
-
+setTimeout(()=>{
+  const fullCode = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <style>${code.CSS}</style>
+    </head>
+    <body>
+      ${code.HTML}
+      <script>
+        const sendLog = (...args) => {
+          window.parent.postMessage({ type: 'console-log', args }, '*');
+        };
+        console.log = sendLog;
+        try {
+          ${code.JavaScript}
+        } catch (err) {
+          sendLog('Error:', err.message);
+        }
+      </script>
+    </body>
+    </html>
+  `;
+  // This forces iframe reload every run
+  if (iFrame.current) {
+    iFrame.current.srcdoc = fullCode;
+  }
+},0)
 };
+
+// Eval Button (For Lesson mode Only)
+  const handleEvaluate = async () => {
+        if (gameModeData?.blocks) {
+      const paragraphs = gameModeData.blocks
+        .filter(block => block.type === "Paragraph")
+        .map(block => block.value)
+        .join("\n") || "";
+      setDescription(paragraphs);
+    }
+    setIsEvaluating(true);
+    try {
+      const result = await lessonPrompt({
+        receivedCode: {
+          html: code.HTML,
+          css: code.CSS,
+          js: code.JavaScript,
+        },
+        instruction: gameModeData.instruction,
+        description: description,
+      });
+
+      setEvaluationResult(result);
+      setShowPopup(true);
+
+    } catch (error) {
+      console.error("Error evaluating code:", error);
+    } finally {
+      setIsEvaluating(false);
+    }
+
+  };
   // Listen for messages from iframe for console logs
   useEffect(() => {
     const handleMessage = (event) => {
@@ -129,11 +167,10 @@ const runCode = () => {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
-
   return (
     <>
       {/* Code Editor */}
-      <div className="w-[47%] ml-auto h-full">
+      <div className="w-[47%] ml-auto h-full ">
         <div className="flex p-4 text-2xl gap-10 h-[10%] w-full">
           {tabs.map((tab) => (
             <motion.button
@@ -142,7 +179,7 @@ const runCode = () => {
               transition={{ bounceDamping: 100 }}
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`font-exo font-bold rounded-2xl w-[30%] h-auto text-[1rem] bg-[#191a26] cursor-pointer ${
+              className={`font-exo font-bold rounded-2xl w-[30%] h-auto text-[1rem] bg-[#191a26] cursor-pointer  ${
                 activeTab === tab
                   ? "text-white"
                   : "text-gray-500 hover:text-white"
@@ -153,7 +190,7 @@ const runCode = () => {
           ))}
         </div>
         <div className="bg-[#191a26] h-[88%] w-full rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          <div className="flex-1 min-h-0 overflow-auto w-full">
+          <div className="flex-1 min-h-0 overflow-auto w-full scrollbar-custom">
             <CodeMirror
               className="text-[1rem]"
               value={code[activeTab]}
@@ -174,14 +211,21 @@ const runCode = () => {
             >
               RUN
             </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            >
-              EVALUATE
-            </motion.button>
+  {/* EVALUATE BUTTON — only for Lesson mode */}
+  {gamemodeId === "Lesson" && (
+    <motion.button
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.05, background: "#7e22ce" }}
+      transition={{ bounceDamping: 100 }}
+      onClick={handleEvaluate}
+      disabled={isEvaluating}
+      className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
+        isEvaluating ? "opacity-50 cursor-not-allowed" : ""
+      }`}
+    >
+      {isEvaluating ? "Evaluating..." : "EVALUATE"}
+    </motion.button>
+  )}
           </div>
         </div>
       </div>
@@ -195,7 +239,7 @@ const runCode = () => {
               ref={iFrame}
               title="output"
               className="w-full h-full rounded-xl"
-              sandbox="allow-scripts allow-same-origin"
+              sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
             />
           ) : (
             <div className="w-full h-full flex items-center flex-col">
@@ -210,16 +254,31 @@ const runCode = () => {
             </div>
           )}
         </div>
+<div className="h-32 p-2 bg-black text-gray-400 font-mono overflow-auto rounded-xl border shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] scrollbar-custom">
+  {!hasRunCode ? (
+    <div className="text-gray-500 ">Console output will appear here...</div>
+  ) : logs.length > 0 ? (
+    logs.map((log, i) => <div key={i}>{log}</div>)
+  ) : (
+    <div className="text-gray-500">No console output</div>
+  )}
+</div>
 
-        {/* Console Output */}
-        <div className="h-32 p-2 bg-black text-green-400 font-mono overflow-auto rounded-xl shadow-inner border border-white">
-          {logs.length > 0 ? (
-            logs.map((log, i) => <div key={i}>{log}</div>)
-          ) : (
-            <div className="text-gray-500">Console output will appear here...</div>
-          )}
-        </div>
+
+
       </div>
+      {/* Evaluation Popup */}
+      <AnimatePresence>
+        {showPopup && evaluationResult && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}>
+              <Evaluation_Popup evaluationResult={evaluationResult} setShowPopup={setShowPopup}/>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

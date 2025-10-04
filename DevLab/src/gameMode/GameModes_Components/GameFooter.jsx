@@ -6,8 +6,10 @@ import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useGameModeData from "../../components/Custom Hooks/useGameModeData"
 // Icons // Motion
 import { motion} from "framer-motion";
-
+// Utils
 import ItemsUse from "../../ItemsLogics/ItemsUse";
+import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
+import { gameModeSubmitHandlers } from "../GameModes_Utils/gameModeSubmitHandler";
 
 
 
@@ -16,17 +18,40 @@ function GameFooter({setLevelComplete,setShowCodeWhisper,setShowisCorrect}) {
   const navigate = useNavigate();
 
   const { userData } = useFetchUserData();
-  const {levelData, subject, lessonId, levelId, stageId, gamemodeId} = useGameModeData();
+  const {gameModeData,levelData, subject, lessonId, levelId, stageId, gamemodeId} = useGameModeData();
+    //for OpenAI
+  const submittedCode = useGameStore((state) => state.submittedCode);
+  const setIsCorrect = useGameStore((state) => state.setIsCorrect);
+  const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
-    const handleClick = () => {
-    if (gamemodeId === "Lesson") {
-      // Go to next stage directly
-      goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete,});
-    } else {
-      //  Show popup first (Correct/Wrong)
-      setShowisCorrect(true);
+console.log(gameModeData?.replicationFile);
+
+
+const handleClick = async () => {
+  if (gamemodeId === "Lesson") {
+    goToNextStage({ subject, lessonId, levelId, stageId, gamemodeId, navigate, setLevelComplete });
+  } else {
+    const handler = gameModeSubmitHandlers[gamemodeId];
+    if (handler) {
+      handler({
+        submittedCode,
+        setIsCorrect,
+        setShowIsCorrect,
+        instruction: gameModeData?.instruction,
+        providedCode: gamemodeId === "CodeCrafter" 
+          ? gameModeData?.replicationFile // Pass replicationFile for CodeCrafter
+          : gameModeData?.codingInterface, // Pass codingInterface for others
+        description: gameModeData?.description,
+        subject,
+        levelId,
+        stageId
+      });
     }
-  };
+  }
+};
+
+
+console.log(gamemodeId);
   const isBrainBytes = gamemodeId === "BrainBytes";
   return (
 <>
@@ -36,7 +61,7 @@ function GameFooter({setLevelComplete,setShowCodeWhisper,setShowisCorrect}) {
           <div className="min-w-[80%] font-exo">
             <p>
               {levelData
-                ? `${levelData.order}. ${levelData.title}`
+                ? `${levelData.levelOrder}. ${levelData.title}`
                 : "Loading..."}
             </p>
             <p className="text-[#58D28F]">

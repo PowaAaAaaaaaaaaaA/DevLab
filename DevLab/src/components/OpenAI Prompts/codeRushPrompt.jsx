@@ -1,22 +1,16 @@
 import axios from "axios";
-import {auth} from "../../Firebase/Firebase"
+import { auth } from "../../Firebase/Firebase";
 
-const lessonPrompt = async ({ receivedCode, instruction, description }) => {
-  if (!receivedCode) return null;
+const codeRushPrompt = async ({submittedCode,instruction,providedCode,description,subject,}) => {
+  if (!submittedCode) return null;
 
   try {
     const currentUser = auth.currentUser;
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/lessonPrompt`,
-      {
-        instructions: instruction,
-        description,
-        html: receivedCode.html || "",
-        css: receivedCode.css || "",
-        js: receivedCode.js || "",
-      },
+      `http://localhost:8082/openAI/codeRushPrompt`,
+      {submittedCode,instruction,providedCode,description,subject,},
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -25,21 +19,24 @@ const lessonPrompt = async ({ receivedCode, instruction, description }) => {
     );
 
     let raw = res.data.response;
-    // Clean response if wrapped in ```json ... ```
+
+    // Clean response if wrapped in triple backticks
     if (typeof raw === "string") {
       raw = raw.replace(/```json|```/g, "").trim();
     }
+
     let parsed = null;
     try {
       parsed = JSON.parse(raw);
     } catch (e) {
       console.error("Failed to parse JSON:", e, raw);
     }
+
     return parsed;
   } catch (error) {
-    console.error("lessonPrompt API call failed:", error);
+    console.error("codeRushPrompt API call failed:", error);
     return null;
   }
 };
 
-export default lessonPrompt;
+export default codeRushPrompt;

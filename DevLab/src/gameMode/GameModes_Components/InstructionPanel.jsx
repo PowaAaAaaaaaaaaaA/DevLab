@@ -34,10 +34,12 @@ const activeBuffs = useInventoryStore((state) => state.activeBuffs);
         setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
         break;
       case "Css":
-        setFormattedCode(beautifyCSS(rawCode, { indent_size: 2 }));
+        setFormattedCode(beautifyCSS(rawCode, { indent_size: 2 })) ||
+        setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
         break;
       case "JavaScript":
-        setFormattedCode(beautifyJS(rawCode, { indent_size: 2 }));
+        setFormattedCode(beautifyJS(rawCode, { indent_size: 2 })) ||
+        setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 }));
         break;
       default:
         setFormattedCode(rawCode);
@@ -111,64 +113,12 @@ useEffect(() => {
     console.log("else");
   }
 }, [gameModeData, activeBuffs]);
-console.log(activeBuffs)
   return (
     <div
       className="h-[100%] w-full bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5 scrollbar-custom">
       {levelData && gameModeData ? (
         <>
-          {subject === "Html" && (
-            <>
-              <h2
-                className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${
-                  gameModeData?.type === "Lesson"
-                    ? "text-[#FF5733]"
-                    : "text-[#E35460]"
-                }`}
-              >
-                {levelData.order}. {gameModeData.title}
-              </h2>
-            </>
-          )}
-          {subject === "Css" && (
-            <>
-              <h2
-                className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${
-                  gameModeData?.type === "Lesson"
-                    ? "text-[#1E90FF]"
-                    : "text-[#E35460]"
-                }`}
-              >
-                {levelData.order}. {gameModeData.title}
-              </h2>
-            </>
-          )}
-          {subject === "Database" && (
-            <>
-              <h2
-                className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${
-                  gameModeData?.type === "Lesson"
-                    ? "text-[#4CAF50]"
-                    : "text-[#E35460]"
-                }`}
-              >
-                {levelData.order}. {gameModeData.title}
-              </h2>
-            </>
-          )}
-          {subject === "JavaScript" && (
-            <>
-              <h2
-                className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${
-                  gameModeData?.type === "Lesson"
-                    ? "text-[#F7DF1E]"
-                    : "text-[#E35460]"
-                }`}
-              >
-                {levelData.order}. {gameModeData.title}
-              </h2>
-            </>
-          )}
+          <h2 className="text-[2rem] font-bold text-shadow-lg text-shadow-black text-[#E35460]">{levelData.levelOrder}. {gameModeData.title}</h2>
           <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] font-exo">
             {gameModeData.description}
           </p>
@@ -273,6 +223,20 @@ console.log(activeBuffs)
               </AnimatePresence>
             </div>
           ) : null}
+          {/* CodeCrafter Replication Panel */}
+{gameModeData?.type === "CodeCrafter" && gameModeData?.replicationFile && (
+  <div className="mt-6 p-4 bg-[#25293B] rounded-2xl flex flex-col gap-3">
+    <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
+      Replication Target
+    </h3>
+    <iframe
+      src={gameModeData.replicationFile} // Firebase Storage URL
+      title="Replication Preview"
+      className="w-full h-[400px] bg-white rounded-xl shadow-md"
+      sandbox="allow-scripts allow-same-origin"
+    />
+  </div>
+)}
           {/*Code Whisper*/}
           <AnimatePresence>
             {showCodeWhisper && (

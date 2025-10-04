@@ -127,7 +127,8 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
             lessonId={lessonId}
             LevelId={levelId}
             heartsRemaining={heart}
-            setLevelComplete={setLevelComplete}/>
+            setLevelComplete={setLevelComplete}
+            resetHearts={resetHearts}/>
         )}
       </AnimatePresence>
 

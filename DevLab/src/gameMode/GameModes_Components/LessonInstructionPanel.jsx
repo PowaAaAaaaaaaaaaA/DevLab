@@ -102,18 +102,33 @@ function LessonInstructionPanel() {
           }
         })}
       </div>
-
       {/* Coding Interface (if available) */}
       {gameModeData.codingInterface && (
         <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
-          <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
+          <h4 className="font-bold text-2xl mb-2 text-shadow-lg text-shadow-black ">Instruction</h4>
+          <p className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem] font-exo">{gameModeData.instruction}</p>
+          <p className="text-1xl mb-2 text-shadow-lg text-shadow-black font-bold mt-3">
             Code Example
-          </h3>
+          </p>
           <p className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
             {formattedCode}
           </p>
         </div>
       )}
+
+      {/* Video Presentation (if available) */}
+{gameModeData.videoPresentation && (
+  <div className="mt-6 p-4 bg-[#25293B] rounded-2xl">
+    <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
+      Video Presentation
+    </h3>
+    <video
+      src={gameModeData.videoPresentation}
+      controls
+      className="w-full rounded-xl shadow-lg"
+    />
+  </div>
+)}
     </div>
   );
 }

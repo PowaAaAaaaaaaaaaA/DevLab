@@ -45,7 +45,7 @@ import axios from "axios";
         <div className="border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]">
           <h1 className="font-exo text-white text-[2rem] mb-[10px]">Stage Title:</h1>
           <textarea
-          value={(stageData?.type === activeTab ? stageData?.title : "")}
+          value={state.title || stageData?.title || ""}
             onChange={(e) =>
               dispatch({ type: "UPDATE_FIELD", field: "title", value: e.target.value })
             }

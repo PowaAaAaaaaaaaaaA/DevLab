@@ -15,6 +15,7 @@ import Wrong from '../assets/Lottie/wrongAnsLottie.json';
 // Components
 import GameHeader from "./GameModes_Components/GameHeader";
 import InstructionPanel from "./GameModes_Components/InstructionPanel";
+import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
 import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE";
 import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
@@ -23,7 +24,7 @@ import GameFooter from "./GameModes_Components/GameFooter";
 
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
-function BrainBytes({ heart, gameOver, submitAttempt, roundKey }) {
+function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const type = "Brain Bytes";
   const { hasShield, consumeErrorShield } = useErrorShield();
   const navigate = useNavigate();
@@ -83,7 +84,12 @@ function BrainBytes({ heart, gameOver, submitAttempt, roundKey }) {
           isCorrect={isCorrect}
         />
       </div>
-
+      {/*Game Over Popup*/ }
+      <AnimatePresence>
+        {gameOver &&(
+          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
+        )}
+      </AnimatePresence>
       {/* Instruction Pop Up */}
       <AnimatePresence>
         {showPopup && (
@@ -109,6 +115,7 @@ Your mission:
             LevelId={levelId}
             heartsRemaining={heart}
             setLevelComplete={setLevelComplete}
+            resetHearts={resetHearts}
           />
         )}
       </AnimatePresence>

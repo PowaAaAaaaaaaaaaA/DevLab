@@ -8,7 +8,7 @@ function BugbustForm({stageData, state, dispatch,activeTab}) {
       <div className="border-cyan-400 border rounded-2xl w-full h-[20%] p-4 bg-[#111827]">
         <h1 className="font-exo text-white text-[2rem] mb-[10px]">Stage Title:</h1>
         <textarea
-
+          value={state.title || stageData?.title || ""}
           onChange={(e) =>
             dispatch({ type: "UPDATE_FIELD", field: "title", value: e.target.value || stageData?.title  })
           }

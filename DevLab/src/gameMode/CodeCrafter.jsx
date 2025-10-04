@@ -1,5 +1,6 @@
 // React
 import { useEffect, useState } from "react";
+import { useGameStore } from "../components/OpenAI Prompts/useBugBustStore";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -21,7 +22,7 @@ import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE"
 import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
-
+// Items
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
 function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
@@ -36,28 +37,30 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [levelComplete, setLevelComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [showisCorrect, setShowisCorrect] = useState()
 
 const [stageCon, setStageCon] = useState("");
-
 useEffect(() => {
   if (gamemodeId === "Lesson") {
     setStageCon(stageId);
   }
 }, [gamemodeId, stageId]);
 
+  //for OpenAI
+  const isCorrect = useGameStore((state) => state.isCorrect);
+  const showIsCorrect = useGameStore((state) => state.showIsCorrect);
+  const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
+
   // Dynamically render editor based on subject
   const renderEditor = () => {
     switch (subject) {
       case "Html":
-        return <Html_TE  setIsCorrect={setIsCorrect} />;
+        return <Html_TE />;
       case "Css":
-        return <Css_TE setIsCorrect={setIsCorrect}/>;
+        return <Css_TE/>;
       case "JavaScript":
-        return <JavaScript_TE setIsCorrect={setIsCorrect}/>;
+        return <JavaScript_TE />;
       case "Database":
-        return <Database_TE setIsCorrect={setIsCorrect}/>;
+        return <Database_TE/>;
       default:
         return <div className="text-white">Invalid or missing subject.</div>;
     }
@@ -89,7 +92,6 @@ useEffect(() => {
         <GameFooter
           setLevelComplete={setLevelComplete}
           setShowCodeWhisper={setShowCodeWhisper}
-          setShowisCorrect={setShowisCorrect}
         />
       </div>
 
@@ -118,6 +120,7 @@ Your mission:
             LevelId={levelId}
             heartsRemaining={heart}
             setLevelComplete={setLevelComplete}
+            resetHearts={resetHearts}
           />
         )}
       </AnimatePresence>
@@ -128,7 +131,7 @@ Your mission:
           <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
         )}
       </AnimatePresence>
-        {showisCorrect && (
+        {showIsCorrect && (
         <AnimatePresence>
           {isCorrect ? (
             // CORRECT ANSWER POPUP
@@ -141,7 +144,7 @@ Your mission:
               <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
         <motion.button
         onClick={()=>{
-          submitAttempt(true)
+          setShowIsCorrect(false)
           goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
         }}
           whileTap={{ scale: 0.95 }}
@@ -164,7 +167,7 @@ Your mission:
               <h1 className="font-exo font-bold text-black text-3xl">Wrong Answer</h1> 
         <motion.button
         onClick={async () => {
-          setShowisCorrect(false);
+          setShowIsCorrect(false);
           //  Check for Error Shield first
           if (await consumeErrorShield()) {
             console.log("ErrorShield consumed! Preventing heart loss.");

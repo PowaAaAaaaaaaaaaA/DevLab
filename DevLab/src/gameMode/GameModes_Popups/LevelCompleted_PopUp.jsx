@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Lottie from "lottie-react";
 import confetti from "../../assets/Lottie/Confetti.json"
 
+
+
 import { useEffect, useState } from "react";
 import { db,auth} from "../../Firebase/Firebase";
 import { doc, getDoc, setDoc, updateDoc,arrayRemove, collection, getDocs } from "firebase/firestore";
@@ -16,8 +18,9 @@ import CoinSurge from "../../ItemsLogics/CoinSurge";
 
 import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
 import { useSubjectCheckComplete } from "../../components/Custom Hooks/useSubjectCheckComplete";
+import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
 
-function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete}) {
+function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete,resetHearts}) {
 
   const {removeBuff} = useInventoryStore.getState();
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
@@ -37,7 +40,6 @@ useEffect(()=>{
   }
   fetchLevelData();
 },[subj,lessonId,LevelId])
-
 // Exp and Coins
   const addExp = async (userId,  Exp, coinsAmmount) => {
   const userRef = doc(db, 'Users', userId);
@@ -63,6 +65,12 @@ useEffect(()=>{
     });
   }
 };
+
+const { getStageFeedbacks } = useGameStore.getState();
+const levelStageFeedbacks = getStageFeedbacks(LevelId);
+console.log(levelStageFeedbacks);
+
+
 const RewardAdd = async () => {
   const user = auth.currentUser;
   const userLevelRef = doc(db, "Users", user.uid, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
@@ -204,6 +212,7 @@ const unlockNextLevel = async (goContinue) => {
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
           onClick={async() => {
+            await resetHearts();
             await refetch();
             await unlockNextLevel(false);
             await setLevelComplete(false);
@@ -218,6 +227,7 @@ const unlockNextLevel = async (goContinue) => {
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
           onClick={async () => {
+          await resetHearts();
           await unlockNextLevel(true);
           await RewardAdd();
           await refetch();
