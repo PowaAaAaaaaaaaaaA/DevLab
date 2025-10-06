@@ -1,6 +1,9 @@
 import bugBustPrompt from "../../components/OpenAI Prompts/bugBustPrompt";
 import codeCrafterPrompt from "../../components/OpenAI Prompts/codeCrafterPrompt";
-import codeRushPrompt from "../../components/OpenAI Prompts/codeRushPrompts";
+import codeRushPrompt from "../../components/OpenAI Prompts/codeRushPrompt";
+
+import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
+
 
 export const gameModeSubmitHandlers = {
   BugBust: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject}) => {
@@ -12,6 +15,9 @@ export const gameModeSubmitHandlers = {
         description,
         subject,
       });
+      if (result?.correct && result?.feedback) {
+        useGameStore.getState().addStageFeedback(result.feedback);
+      }
       setIsCorrect(result?.correct || false);
       setShowIsCorrect(true);
       console.log(result);
@@ -27,11 +33,13 @@ export const gameModeSubmitHandlers = {
       const result = await codeCrafterPrompt({
         submittedCode,
         instruction,
-        providedCode: providedCodeContent || "",
+        providedCode,
         description,
         subject,
       });
-
+      if (result?.correct && result?.feedback) {
+        useGameStore.getState().addStageFeedback(result.feedback);
+      }
       setIsCorrect(result?.correct || false);
       setShowIsCorrect(true);
       console.log(result);
@@ -51,7 +59,9 @@ export const gameModeSubmitHandlers = {
         description,
         subject,
       });
-
+      if (result?.correct && result?.feedback) {
+        useGameStore.getState().addStageFeedback(result.feedback);
+      }
       setIsCorrect(result?.correct || false);
       setShowIsCorrect(true);
       console.log(result);

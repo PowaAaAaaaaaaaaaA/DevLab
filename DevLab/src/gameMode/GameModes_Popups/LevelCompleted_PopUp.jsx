@@ -3,12 +3,9 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Lottie from "lottie-react";
 import confetti from "../../assets/Lottie/Confetti.json"
-
-
-
 import { useEffect, useState } from "react";
 import { db,auth} from "../../Firebase/Firebase";
-import { doc, getDoc, setDoc, updateDoc,arrayRemove, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from "firebase/firestore";
 
 import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
@@ -18,13 +15,25 @@ import CoinSurge from "../../ItemsLogics/CoinSurge";
 
 import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
 import { useSubjectCheckComplete } from "../../components/Custom Hooks/useSubjectCheckComplete";
-import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
+
+import { fetchLevelSummary } from "../../components/OpenAI Prompts/feedbackPrompt";
+
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete,resetHearts}) {
 
   const {removeBuff} = useInventoryStore.getState();
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
+  const [levelSummary, setLevelSummary] = useState("");
+    useEffect(() => {
+    const getFeedbackSummary = async () => {
+      const summary = await fetchLevelSummary();
+      if (summary) {
+        setLevelSummary(summary);
+      }
+    };
 
+    getFeedbackSummary();
+  }, []);
 
   const navigate = useNavigate(); 
   const [LevelData , setLevelData] = useState("");
@@ -65,11 +74,6 @@ useEffect(()=>{
     });
   }
 };
-
-const { getStageFeedbacks } = useGameStore.getState();
-const levelStageFeedbacks = getStageFeedbacks(LevelId);
-console.log(levelStageFeedbacks);
-
 
 const RewardAdd = async () => {
   const user = auth.currentUser;
@@ -193,8 +197,7 @@ const unlockNextLevel = async (goContinue) => {
           <h1 className="font-exo font-bold text-[3rem] text-[#F2FF43]">LEVEL COMPLETED</h1>
           <div className="bg-[#080C14] rounded-2xl border border-gray-700 p-8 font-exo w-[90%]"> 
             <p className="text-white text-center text-base/7">
-            🌑 The Terminal Falls Silent You’ve emerged from the code—scarred, but wiser. The system yields, for now, recognizing your resolve. Yet beneath the surface, deeper logic churns… ancient, unrefined, waiting.
-🕳️ This is not the end. Only the next beginning.
+            {levelSummary || "Generating feedback summary..."}
             </p>
           </div> 
           <hr className="text-white w-[95%]"/>

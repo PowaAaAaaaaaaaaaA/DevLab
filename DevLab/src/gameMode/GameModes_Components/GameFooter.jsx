@@ -24,7 +24,8 @@ function GameFooter({setLevelComplete,setShowCodeWhisper,setShowisCorrect}) {
   const setIsCorrect = useGameStore((state) => state.setIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
-console.log(gameModeData?.replicationFile);
+const feedbackList = useGameStore((state) => state.stageFeedbacks);
+console.log(feedbackList)
 
 
 const handleClick = async () => {

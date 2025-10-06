@@ -110,17 +110,17 @@ if (loadingDashboard) {
     </div>
 
     <div className="text-white font-inter text-[0.85rem] break-words w-[60%] rounded-2xl backdrop-blur-[10px] text-shadow-lg/60">
-      <p className="text-center">{userData.bio}</p>
+      <p className="text-center">{userData?.bio}</p>
     </div>
   </div>
 
   <div className="h-auto w-[100%] flex flex-col p-2 gap-2 backdrop-blur-[2px] rounded-3xl">
     <p className="text-white font-inter font-bold text-shadow-lg/60">Good to see you!</p>
     <h1 className="sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight text-shadow-lg/60">
-      {userData.username}
+      {userData?.username}
     </h1>
     <p className="text-white font-inter font-bold mb-0.5 text-shadow-lg/60">
-      Level {userData.userLevel}
+      Level {userData?.userLevel}
     </p>
     {/* Progress Bar */}
     <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
@@ -132,10 +132,10 @@ if (loadingDashboard) {
     {/* Progress Bar */}  
     <div className="flex w-[40%] justify-around mt-[10px]">
       <p className="text-white font-inter font-bold text-shadow-lg/60">
-        User Xp: {userData.exp} / 100
+        User Xp: {userData?.exp} / 100
       </p>
       <div className="text-white font-inter font-bold text-shadow-lg/60">
-        User Money: {userData.coins}
+        User Money: {userData?.coins}
       </div>
     </div>
   </div>

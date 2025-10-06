@@ -9,27 +9,18 @@ export const useGameStore = create((set) => ({
 
   showIsCorrect: false,
   setShowIsCorrect: (value) => set({ showIsCorrect: value }),
-stageFeedbacks: {},
-    // Add feedback for a stage
-  addStageFeedback: (levelId, stageFeedback) =>
-    set((state) => {
-      const current = state?.stageFeedbacks[levelId] || [];
-      return {
-        stageFeedbacks: {
-          ...state.stageFeedbacks,
-          [levelId]: [...current, stageFeedback],
-        },
-      };
-    }),
 
-  // Get all feedback for a level
-  getStageFeedbacks: (levelId) => get().stageFeedbacks[levelId] || [],
+  stageFeedbacks: [],
 
-  // Clear feedback for a level
-  clearStageFeedbacks: (levelId) =>
-    set((state) => {
-      const updated = { ...state.stageFeedbacks };
-      delete updated[levelId];
-      return { stageFeedbacks: updated };
-    }),
+  // Add a feedback entry (from AI evaluation)
+  addStageFeedback: (feedback) =>
+    set((state) => ({
+      stageFeedbacks: [...state.stageFeedbacks, feedback],
+    })),
+
+  // Get all collected feedback
+  getAllFeedbacks: () => get().stageFeedbacks,
+
+  // Clear all feedback (e.g. at end of level)
+  clearAllFeedbacks: () => set({ stageFeedbacks: [] }),
 }));

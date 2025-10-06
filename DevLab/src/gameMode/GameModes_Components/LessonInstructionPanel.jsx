@@ -44,7 +44,7 @@ function LessonInstructionPanel() {
   }
 
   return (
-    <div className="h-[100%] w-full bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5 scrollbar-custom">
+    <div className="h-[100%] w-full bg-[#393F59] rounded-xl text-white overflow-y-scroll p-5 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-4 scrollbar-custom">
       {/* Title Section */}
       <h2
         className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${

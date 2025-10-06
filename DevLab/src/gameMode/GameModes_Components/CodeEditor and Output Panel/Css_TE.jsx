@@ -22,7 +22,8 @@ import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
-function Css_TE({setIsCorrect}) {
+
+function Css_TE() {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
@@ -197,26 +198,33 @@ const onChange = useCallback(
 
 
 
-      {/* Output */}
-      <div className="h-[100%] w-[47%] ml-auto rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-        {hasRunCode ? (
-          <iframe
-            ref={iFrame}
-            title="output"
-            className="w-full h-full rounded-xl"
-            sandbox="allow-scripts allow-same-origin"/>
-        ) : (
-          <div className="w-full h-full flex items-center flex-col">
-            <Lottie
-              animationData={Animation}
-              loop={true}
-              className="w-[70%] h-[70%]"/>
-            <p className="text-[0.8rem]">
-              YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-            </p>
-          </div>
-        )}
-      </div>
+{/* Output */}
+<div
+  className="h-full w-[47%] ml-auto rounded-2xl p-2 bg-[#F8F3FF]
+             shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]
+             resize-x overflow-auto min-w-[300px] max-w-[90vw]"
+>
+  {hasRunCode ? (
+    <iframe
+      ref={iFrame}
+      title="output"
+      className="w-full h-full rounded-xl"
+      sandbox="allow-scripts allow-same-origin"
+    />
+  ) : (
+    <div className="w-full h-full flex items-center flex-col">
+      <Lottie
+        animationData={Animation}
+        loop
+        className="w-[70%] h-[70%]"
+      />
+      <p className="text-[0.8rem]">
+        YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
+      </p>
+    </div>
+  )}
+</div>
+
       {/* Evaluation Popup */}
       <AnimatePresence>
         {showPopup && evaluationResult && (
