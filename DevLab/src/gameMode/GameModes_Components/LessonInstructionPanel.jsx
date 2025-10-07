@@ -64,44 +64,55 @@ function LessonInstructionPanel() {
         {levelData.order}. {gameModeData.title}
       </h2>
 
-      {/* Render Blocks Dynamically */}
-      <div className="flex flex-col gap-4">
-        {gameModeData.blocks?.map((block) => {
-          switch (block.type) {
-            case "Header":
-              return (
-                <h3
-                  key={block.id}
-                  className="text-xl font-bold text-shadow-lg text-shadow-black"
-                >
-                  {block.value}
-                </h3>
-              );
-            case "Paragraph":
-              return (
-                <p
-                  key={block.id}
-                  className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem] font-exo"
-                >
-                  {block.value}
-                </p>
-              );
-            case "Divider":
-              return (
-                <div
-                  key={block.id}
-                  className={`my-6 h-[2px] w-full rounded-full 
-                    ${subject === "Html" ? "bg-gradient-to-r from-[#FF7F50] to-[#FF5733]" : ""} 
-                    ${subject === "Css" ? "bg-gradient-to-r from-[#1E90FF] to-[#4169E1]" : ""} 
-                    ${subject === "Database" ? "bg-gradient-to-r from-[#66BB6A] to-[#4CAF50]" : ""} 
-                    ${subject === "JavaScript" ? "bg-gradient-to-r from-[#FFF176] to-[#F7DF1E]" : ""} 
-                    shadow-[0_0_10px_rgba(255,255,255,0.1)]`}
-                />);
-            default:
-              return null;
-          }
-        })}
-      </div>
+{/* Render Blocks Dynamically */}
+<div className="flex flex-col gap-4">
+  {gameModeData.blocks?.map((block) => {
+    switch (block.type) {
+      case "Header":
+        return (
+          <h3
+            key={block.id}
+            className="text-xl font-bold text-shadow-lg text-shadow-black"
+          >
+            {block.value}
+          </h3>
+        );
+      case "Paragraph":
+        return (
+          <p
+            key={block.id}
+            className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem] font-exo"
+          >
+            {block.value}
+          </p>
+        );
+      case "Divider":
+        return (
+          <div
+            key={block.id}
+            className={`my-6 h-[2px] w-full rounded-full 
+              ${subject === "Html" ? "bg-gradient-to-r from-[#FF7F50] to-[#FF5733]" : ""} 
+              ${subject === "Css" ? "bg-gradient-to-r from-[#1E90FF] to-[#4169E1]" : ""} 
+              ${subject === "Database" ? "bg-gradient-to-r from-[#66BB6A] to-[#4CAF50]" : ""} 
+              ${subject === "JavaScript" ? "bg-gradient-to-r from-[#FFF176] to-[#F7DF1E]" : ""} 
+              shadow-[0_0_10px_rgba(255,255,255,0.1)]`}
+          />
+        );
+      case "Image":
+        return (
+          <img
+            key={block.id}
+            src={block.value} // it's already a URL string
+            alt={"Stage Block"} // optional: use an alt property if available
+            className="my-4 w-full max-h-[400px] object-contain rounded-2xl shadow-md"
+          />
+        );
+      default:
+        return null;
+    }
+  })}
+</div>
+
       {/* Coding Interface (if available) */}
       {gameModeData.codingInterface && (
         <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">

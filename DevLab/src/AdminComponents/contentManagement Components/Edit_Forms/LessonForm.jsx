@@ -15,25 +15,29 @@ function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, le
     : 0;
 
   const [selectedItem, setSelectedItem] = useState("");
-  const [counter, setCounter] = useState(lastBlockId + 1);
 
-  const addBlocks = () => {
-    if (selectedItem === "") {
-      console.log("empty");
-      return;
-    }
-    dispatch({
-      type: "ADD_BLOCK",
-      payload: {
-        id: counter,
-        type: selectedItem,
-        value: "",
-      },
-    });
+const addBlocks = () => {
+  if (!selectedItem) return;
 
-    setCounter((prev) => prev + 1);
-    setSelectedItem("");
-  };
+  // Compute max ID dynamically
+  const maxId = state.blocks.length
+    ? Math.max(...state.blocks.map((b) => b.id))
+    : 0;
+
+  const newId = maxId + 1;
+
+  dispatch({
+    type: "ADD_BLOCK",
+    payload: {
+      id: newId,
+      type: selectedItem,
+      value: "",
+    },
+  });
+
+  setSelectedItem("");
+};
+
 
   
   const [videoFile, setVideoFile] = useState(null);
@@ -58,7 +62,7 @@ function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, le
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "x-source": "mobile-app",
             Authorization: `Bearer ${token}`,
           },
         }

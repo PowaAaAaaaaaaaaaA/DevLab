@@ -13,7 +13,7 @@ import { gameModeSubmitHandlers } from "../GameModes_Utils/gameModeSubmitHandler
 
 
 
-function GameFooter({setLevelComplete,setShowCodeWhisper,setShowisCorrect}) {
+function GameFooter({setLevelComplete,setShowCodeWhisper}) {
 
   const navigate = useNavigate();
 
@@ -24,8 +24,10 @@ function GameFooter({setLevelComplete,setShowCodeWhisper,setShowisCorrect}) {
   const setIsCorrect = useGameStore((state) => state.setIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
+
+
 const feedbackList = useGameStore((state) => state.stageFeedbacks);
-console.log(feedbackList)
+
 
 
 const handleClick = async () => {

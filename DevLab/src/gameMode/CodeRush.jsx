@@ -1,5 +1,6 @@
-// React
+// Utils / Custom Hooks
 import { useState, useEffect } from "react";
+import { useGameStore } from "../components/OpenAI Prompts/useBugBustStore";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -21,7 +22,7 @@ import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
-
+// Items
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
 function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
@@ -37,17 +38,22 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
   const [timesUp, setTimesUp] = useState(false);
   const [stageCon, setStageCon] = useState("");
-  const [isCorrect, setIsCorrect] = useState();
-  const [showisCorrect, setShowisCorrect] = useState(false);
+
   const [pauseTimer, setPauseTimer] = useState(false);
 
+    //for OpenAI
+  const isCorrect = useGameStore((state) => state.isCorrect);
+  const showIsCorrect = useGameStore((state) => state.showIsCorrect);
+  const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
+  const isEvaluating = useGameStore((state) => state.isEvaluating);
+console.log("this IS ",isEvaluating)
   useEffect(()=>{
-    if(showisCorrect ||isCorrect ){
+    if(showIsCorrect ||isCorrect || isEvaluating){
       setPauseTimer(true);
     }else{
       setPauseTimer(false);
     }
-  },[showisCorrect]);
+  },[showIsCorrect,isEvaluating]);
   useEffect(() => {
     if (gamemodeId === "Lesson") {
       setStageCon(stageId);
@@ -58,13 +64,13 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const renderEditor = () => {
     switch (subject) {
       case "Html":
-        return <Html_TE  setIsCorrect={setIsCorrect}/>;
+        return <Html_TE />;
       case "Css":
-        return <Css_TE setIsCorrect={setIsCorrect} />;
+        return <Css_TE />;
       case "JavaScript":
-        return <JavaScript_TE setIsCorrect={setIsCorrect} />;
+        return <JavaScript_TE  />;
       case "Database":
-        return <Database_TE setIsCorrect={setIsCorrect} />;
+        return <Database_TE/>;
       default:
         return <div className="text-white">Invalid subject</div>;
     }
@@ -100,7 +106,6 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         <GameFooter
           setLevelComplete={setLevelComplete}
           setShowCodeWhisper={setShowCodeWhisper}
-          setShowisCorrect={setShowisCorrect}
         />
       </div>
 
@@ -159,7 +164,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
 
       {/* Correct / Wrong Popup */}
       <AnimatePresence>
-        {showisCorrect && (
+        {showIsCorrect && (
         <AnimatePresence>
           {isCorrect ? (
             <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
@@ -172,7 +177,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         <motion.button
         onClick={()=>{
           submitAttempt(true)
-          setShowisCorrect(false)
+          setShowIsCorrect(false)
           goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
         }}
           whileTap={{ scale: 0.95 }}
@@ -194,7 +199,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
               <h1 className="font-exo font-bold text-black text-3xl">Wrong Answer</h1> 
         <motion.button
         onClick={async () => {
-          setShowisCorrect(false);
+          setShowIsCorrect(false);
           //  Check for Error Shield first
           if (await consumeErrorShield()) {
             console.log("ErrorShield consumed! Preventing heart loss.");

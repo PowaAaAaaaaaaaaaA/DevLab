@@ -10,6 +10,9 @@ export const useGameStore = create((set) => ({
   showIsCorrect: false,
   setShowIsCorrect: (value) => set({ showIsCorrect: value }),
 
+isEvaluating: false,
+setIsEvaluating: (value) => set({ isEvaluating: value }),
+
   stageFeedbacks: [],
 
   // Add a feedback entry (from AI evaluation)

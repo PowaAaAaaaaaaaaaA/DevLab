@@ -9,8 +9,8 @@ const codeRushPrompt = async ({submittedCode,instruction,providedCode,descriptio
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/codeRushPrompt`,
-      {submittedCode,instruction,providedCode,description,subject,},
+      `http://localhost:8082/openAI/codeRushPrompts`,
+      {submittedCode,instruction,providedCode,description,subject},
       {
         headers: {
           Authorization: `Bearer ${token}`,

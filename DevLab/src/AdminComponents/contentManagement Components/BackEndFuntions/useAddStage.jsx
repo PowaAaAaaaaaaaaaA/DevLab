@@ -5,6 +5,7 @@ export function useAddStage(activeTab) {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['addStage'],
     mutationFn: addStage,
     onSuccess: () => {
       queryClient.invalidateQueries({

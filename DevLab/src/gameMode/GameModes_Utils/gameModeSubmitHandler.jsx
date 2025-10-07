@@ -5,6 +5,8 @@ import codeRushPrompt from "../../components/OpenAI Prompts/codeRushPrompt";
 import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
 
 
+
+
 export const gameModeSubmitHandlers = {
   BugBust: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject}) => {
     try {
@@ -51,7 +53,9 @@ export const gameModeSubmitHandlers = {
   },
 
   CodeRush: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject}) => {
+    const { setIsEvaluating } = useGameStore.getState();
     try {
+      setIsEvaluating(true);
       const result = await codeRushPrompt({
         submittedCode,
         instruction,
@@ -69,6 +73,8 @@ export const gameModeSubmitHandlers = {
       console.error("CodeRush handler error:", error);
       setIsCorrect(false);
       setShowIsCorrect(true);
+    }finally {
+      setIsEvaluating(false);
     }
   },
 
