@@ -7,7 +7,11 @@ import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 import { EditorView } from "@codemirror/view"; //
 import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/OutputLottie.json";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+
+import CodePlaygroundEval_PopUp from "../gameMode/GameModes_Popups/CodePlaygroundEval_PopUp";
+import codePlaygroundEval from "./OpenAI Prompts/codePlaygroundEval";
 
 import '../index.css'
 import { useNavigate } from "react-router-dom";
@@ -17,6 +21,9 @@ function CodePlayground() {
   const [run, setRun] = useState(false);
 
   const navigate = useNavigate();
+
+    const [evaluationResult, setEvaluationResult] = useState(null);
+    const [showPopup, setShowPopup] = useState(false);
 
   // useRef
   const iFrame = useRef(null);
@@ -58,19 +65,21 @@ function CodePlayground() {
     // Slight delay to allow iframe to mount first ( kase kelangan double click yung "run" btn kapag wlaang delay TT)
     setTimeout(() => {
       const fullCode = `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <style>${code.CSS}</style>
-    </head>
-    <body>
-    ${code.HTML}
-    <script>
+<html lang="en">
+<head>
+  <style>${code.CSS}</style>
+</head>
+<body>
+  ${code.HTML}
+  <script>
+  (() => {
     ${code.JavaScript}
-    </script>
-    </body>
-    </html>`;
+  })();
+  </script>
+</body>
+</html>`;
 
-    console.log(fullCode); // For debugging purposes
+
       const iframe = iFrame.current;
       if (iframe) {
         const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -80,6 +89,26 @@ function CodePlayground() {
       }
     }, 0);
   };
+const [isEvaluating, setIsEvaluating] = useState(false);
+  //Eval
+  const handleEvaluate = async () => {
+  setIsEvaluating(true);
+  try {
+    const result = await codePlaygroundEval({
+      html: code.HTML,
+      css: code.CSS,
+      js: code.JavaScript,
+    });
+
+    console.log(result);
+    setEvaluationResult(result);
+    setShowPopup(true);
+  } catch (error) {
+    console.error("Error evaluating code:", error);
+  } finally {
+    setIsEvaluating(false);
+  }
+};
   return (
     <div className="bg-[#16161A] h-screen text-white font-exo flex flex-col p-3">
       <div 
@@ -126,15 +155,29 @@ function CodePlayground() {
               />
             </div>
 
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              onClick={runCode}
-              className="ml-auto px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            >
-              Run Code
-            </motion.button>
+<motion.div className="flex justify-end gap-3">
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={{ scale: 1.05, background: "#7e22ce" }}
+    transition={{ bounceDamping: 100 }}
+    onClick={handleEvaluate}
+    disabled={isEvaluating}
+    className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+  >
+    {isEvaluating ? "Evaluating..." : "EVALUATE"}
+  </motion.button>
+
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={{ scale: 1.05, background: "#7e22ce" }}
+    transition={{ bounceDamping: 100 }}
+    onClick={runCode}
+    className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+  >
+    Run Code
+  </motion.button>
+</motion.div>
+
           </div>
         </div>
 
@@ -157,6 +200,19 @@ function CodePlayground() {
           )}
         </div>
       </div>
+      
+      <AnimatePresence>
+        {showPopup && evaluationResult && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}>
+              <CodePlaygroundEval_PopUp evaluationResult={evaluationResult} setShowPopup={setShowPopup}/>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

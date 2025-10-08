@@ -23,11 +23,11 @@ import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
-function JavaScript_TE({setIsCorrect}) {
+function JavaScript_TE() {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
-  const { gameModeData } = useGameModeData();
+  const { gameModeData,subject } = useGameModeData();
   const [description, setDescription] = useState("");
   // UTils
   const isCorrect = useGameStore((state) => state.isCorrect);
@@ -82,8 +82,8 @@ const onChange = useCallback(
 );
 
 
-
 // Run Button
+
 const runCode = () => {
   consoleRef.current = [];
   setLogs([]);
@@ -92,38 +92,45 @@ const runCode = () => {
   if (gamemodeId !== "Lesson") {
     const usedTags = extractJsKeywords(code.JavaScript);
     if (usedTags.length > 0) {
-      unlockAchievement(userData?.uid, "JavaScript", "tagUsed", {usedTags,isCorrect});
+      unlockAchievement(userData?.uid, "JavaScript", "tagUsed", { usedTags, isCorrect });
     }
   }
-setTimeout(()=>{
-  const fullCode = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <style>${code.CSS}</style>
-    </head>
-    <body>
-      ${code.HTML}
-      <script>
-        const sendLog = (...args) => {
-          window.parent.postMessage({ type: 'console-log', args }, '*');
-        };
-        console.log = sendLog;
-        try {
-          ${code.JavaScript}
-        } catch (err) {
-          sendLog('Error:', err.message);
-        }
-      </script>
-    </body>
-    </html>
-  `;
-  // This forces iframe reload every run
-  if (iFrame.current) {
-    iFrame.current.srcdoc = fullCode;
-  }
-},0)
+
+  setTimeout(() => {
+    // CHANGED: JS now wrapped inside an IIFE (() => { ... })()
+    // This prevents re-declaration errors on re-run (isolates scope per run)
+    const fullCode = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <style>${code.CSS}</style>
+      </head>
+      <body>
+        ${code.HTML}
+        <script>
+          (() => {
+            const sendLog = (...args) => {
+              window.parent.postMessage({ type: 'console-log', args }, '*');
+            };
+            console.log = sendLog;
+            try {
+              ${code.JavaScript}
+            } catch (err) {
+              sendLog('Error:', err.message);
+            }
+          })();
+        </script>
+      </body>
+      </html>
+    `;
+
+    // CHANGED: use srcdoc to fully refresh iframe each run (safer & cleaner)
+    if (iFrame.current) {
+      iFrame.current.srcdoc = fullCode;
+    }
+  }, 0);
 };
+
 
 // Eval Button (For Lesson mode Only)
   const handleEvaluate = async () => {
@@ -144,8 +151,9 @@ setTimeout(()=>{
         },
         instruction: gameModeData.instruction,
         description: description,
+        subject,
       });
-
+      console.log(description);
       setEvaluationResult(result);
       setShowPopup(true);
 

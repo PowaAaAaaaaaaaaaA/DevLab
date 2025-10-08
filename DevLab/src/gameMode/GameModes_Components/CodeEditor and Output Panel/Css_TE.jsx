@@ -27,7 +27,7 @@ function Css_TE() {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
-  const { gameModeData } = useGameModeData();
+  const { gameModeData, subject } = useGameModeData();
   const [description, setDescription] = useState("");
     // Utils
   const isCorrect = useGameStore((state) => state.isCorrect);
@@ -126,6 +126,7 @@ const onChange = useCallback(
         },
         instruction: gameModeData.instruction,
         description: description,
+        subject,
       });
 
       setEvaluationResult(result);

@@ -27,7 +27,7 @@ function Html_TE({ setIsCorrect }) {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
-  const { gameModeData } = useGameModeData();
+  const { gameModeData, subject } = useGameModeData();
   const [description, setDescription] = useState("");
 
   // Utils
@@ -88,6 +88,7 @@ function Html_TE({ setIsCorrect }) {
         },
         instruction: gameModeData.instruction,
         description: description,
+        subject,
       });
       console.log(result);
       setEvaluationResult(result);
