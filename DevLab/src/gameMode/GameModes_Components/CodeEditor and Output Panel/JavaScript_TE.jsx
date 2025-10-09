@@ -97,8 +97,6 @@ const runCode = () => {
   }
 
   setTimeout(() => {
-    // CHANGED: JS now wrapped inside an IIFE (() => { ... })()
-    // This prevents re-declaration errors on re-run (isolates scope per run)
     const fullCode = `
       <!DOCTYPE html>
       <html lang="en">
@@ -108,28 +106,28 @@ const runCode = () => {
       <body>
         ${code.HTML}
         <script>
-          (() => {
-            const sendLog = (...args) => {
-              window.parent.postMessage({ type: 'console-log', args }, '*');
-            };
-            console.log = sendLog;
-            try {
-              ${code.JavaScript}
-            } catch (err) {
-              sendLog('Error:', err.message);
-            }
-          })();
+          // Override console.log to send logs to parent
+          const sendLog = (...args) => {
+            window.parent.postMessage({ type: 'console-log', args }, '*');
+          };
+          console.log = sendLog;
+
+          try {
+            ${code.JavaScript}
+          } catch (err) {
+            sendLog('Error:', err.message);
+          }
         </script>
       </body>
       </html>
     `;
 
-    // CHANGED: use srcdoc to fully refresh iframe each run (safer & cleaner)
     if (iFrame.current) {
       iFrame.current.srcdoc = fullCode;
     }
   }, 0);
 };
+
 
 
 // Eval Button (For Lesson mode Only)

@@ -54,17 +54,17 @@ for (const subject of subjects) {
     await setDoc(
     doc(db, "Users", user.uid, "Progress", subject),
     {
-        status: true, 
+        isActive: true, 
     });
     await setDoc(
     doc(db, "Users", user.uid, "Progress", subject,"Lessons","Lesson1"),
     {
-        status: true, 
+        isActive: true, 
     });
     await setDoc(
     doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
     {
-    status: true,
+    isActive: true,
     completed:false,
     rewardClaimed: false,
     });
@@ -73,7 +73,7 @@ for (const subject of subjects) {
     await setDoc(
     doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1","Stages","Stage1"),
     {
-    status: true,
+    isActive: true,
     });
 }
 }

@@ -157,7 +157,7 @@ Take your time — accuracy matters more than speed!`
                 <motion.button
                   onClick={() => {
                     setShowIsCorrect(false);
-                    goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete,});
+                    goToNextStage({subject,lessonId,levelId,stageId,navigate,setLevelComplete});
                   }}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}

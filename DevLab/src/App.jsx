@@ -42,6 +42,7 @@ import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 //
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import FullscreenLoader from "./components/FullScreenLoader";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,7 @@ useEffect(() => {
 
   return (
     <>
+    <FullscreenLoader/>
       <QueryClientProvider client={queryClient}>
         <Routes>
           {/* Public Routes */}

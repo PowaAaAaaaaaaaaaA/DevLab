@@ -1,5 +1,5 @@
 // Utils / Custom Hooks
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // Navigation
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -37,6 +37,15 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showisCorrect, setShowisCorrect] = useState(false);
+
+    const [stageCon, setStageCon] = useState("");
+
+    
+      useEffect(() => {
+        if (gamemodeId == "Lesson") {
+          setStageCon(stageId);
+        }
+      }, [gamemodeId, stageId]);
 
   // Dynamic editor rendering
   const renderEditor = () => {

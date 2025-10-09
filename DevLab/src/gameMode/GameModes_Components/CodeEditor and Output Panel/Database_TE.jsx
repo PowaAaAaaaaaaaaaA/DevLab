@@ -7,17 +7,22 @@ import { EditorView } from "@codemirror/view";
 // Animation
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
+import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
 // Utils
-import { motion } from "framer-motion";
+import { motion,AnimatePresence } from "framer-motion";
 import { extractSqlKeywords } from "../../../components/Achievements Utils/Db_KeyExtract";
 import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
+import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+//
+import lessonPromptDb from "../../../components/OpenAI Prompts/lessonPromptDb";
 
 
-function Database_TE({setIsCorrect}) {
+
+function Database_TE() {
   //Data
   const { userData } = useFetchUserData();
   const {gamemodeId} = useParams();
@@ -29,6 +34,13 @@ function Database_TE({setIsCorrect}) {
   const [query , setQuery] = useState("");
   const dbRef = useRef(null);
   const [isCorrect, setCorrect] = useState(true)
+
+
+  const [isEvaluating, setIsEvaluating] = useState(false);
+const [evaluationResult, setEvaluationResult] = useState(null);
+const [showPopup, setShowPopup] = useState(false);
+const [description, setDescription] = useState("");
+const { gameModeData, subject } = useGameModeData();
 
   // Run Button
   const runCode =()=>{
@@ -71,7 +83,6 @@ function Database_TE({setIsCorrect}) {
         renderAllTables();
     if (gamemodeId === "Lesson"){
       }else{
-        setIsCorrect(isCorrect);
           // --- TAG USAGE ACHIEVEMENT ---
   const usedTags = extractSqlKeywords(query); 
   if (usedTags.length > 0) {
@@ -152,6 +163,37 @@ function Database_TE({setIsCorrect}) {
     }
   };
 
+
+  // Evaluate Button (for Lesson mode only)
+const handleEvaluate = async () => {
+  if (gameModeData?.blocks) {
+    const paragraphs = gameModeData.blocks
+      .filter((block) => block.type === "Paragraph")
+      .map((block) => block.value)
+      .join("\n") || "";
+    setDescription(paragraphs);
+  }
+
+  setIsEvaluating(true);
+  try {
+    const result = await lessonPromptDb({
+      receivedQuery: query,
+      instruction: gameModeData.instruction,
+      description,
+      subject,
+    });
+
+    console.log("Database Evaluation Result:", result);
+    setEvaluationResult(result);
+    setShowPopup(true);
+  } catch (error) {
+    console.error("Error evaluating query:", error);
+  } finally {
+    setIsEvaluating(false);
+  }
+};
+
+
   return (
 <>
   <div className="bg-[#191a26] w-[47%] ml-auto h-[95%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
@@ -173,13 +215,19 @@ function Database_TE({setIsCorrect}) {
         className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ">
         RUN
       </motion.button>
-      <motion.button
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.05 }}
-        transition={{ bounceDamping: 100 }}
-        className=" bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-        EVALUATE
-      </motion.button>
+<motion.button
+  whileTap={{ scale: 0.95 }}
+  whileHover={{ scale: 1.05 }}
+  transition={{ bounceDamping: 100 }}
+  onClick={handleEvaluate}
+  disabled={isEvaluating}
+  className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
+    isEvaluating ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+>
+  {isEvaluating ? "Evaluating..." : "EVALUATE"}
+</motion.button>
+
     </div>
   </div>
         <div className="h-[100%] w-[47%] ml-auto p-4 flex flex-col justify-center gap-7">
@@ -211,6 +259,22 @@ function Database_TE({setIsCorrect}) {
             )}
           </div>
         </div>
+
+        <AnimatePresence>
+  {showPopup && evaluationResult && (
+    <motion.div
+      className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <Evaluation_Popup
+        evaluationResult={evaluationResult} setShowPopup={setShowPopup}
+      />
+    </motion.div>
+  )}
+</AnimatePresence>
+
 </>
   )
 }

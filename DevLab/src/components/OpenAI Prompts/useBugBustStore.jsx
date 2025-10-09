@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export const useGameStore = create((set) => ({
+
   submittedCode: "",
   setSubmittedCode: (code) => set({ submittedCode: code }),
 
@@ -12,6 +13,10 @@ export const useGameStore = create((set) => ({
 
 isEvaluating: false,
 setIsEvaluating: (value) => set({ isEvaluating: value }),
+
+
+  loading: false,
+  setLoading: (value) => set({ loading: value }),
 
   stageFeedbacks: [],
 

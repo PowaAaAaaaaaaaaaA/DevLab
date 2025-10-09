@@ -2,8 +2,8 @@ import { useState}from 'react'
 import { doc, updateDoc, setDoc , getDoc, increment} from "firebase/firestore";
 import { db, auth } from '../Firebase/Firebase';
 
-import ShopIcon from '../assets/Images/Shop_Icon.png'
-import MoneyIcon from '../assets/Images/Money_Icon.png'
+import ShopIcon from '../assets/navbarIcons/Shop.png'
+import MoneyIcon from '../assets/Images/DevCoins.png'
 import Loading from '../assets/Lottie/LoadingDots.json'
 import Lottie from 'lottie-react';
 import { motion } from "framer-motion";
@@ -78,7 +78,6 @@ if(loading) return <p>Loading</p>
       <div className='border flex h-[30%] rounded-3xl bg-[#111827]'> 
         <div className='p-5 w-[80%] flex flex-col gap-5'>
           <div className='flex gap-3.5'>
-            <img src={ShopIcon} alt="" />
             <h1 className='font-exo font-bold text-white text-[5rem]'>DEVSHOP</h1>
           </div>
           <p className='font-exo text-white'>Welcome to the DevLab Shop, where learning meets gamification! Earn rewards as you code, learn, and complete challenges, then spend them on awesome upgrades to enhance your experience.</p>

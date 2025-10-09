@@ -23,7 +23,7 @@ import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
-function Html_TE({ setIsCorrect }) {
+function Html_TE() {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
@@ -33,6 +33,7 @@ function Html_TE({ setIsCorrect }) {
   // Utils
   const isCorrect = useGameStore((state) => state.isCorrect);
   const setSubmittedCode = useGameStore((state) => state.setSubmittedCode);
+  const { setHtmlCode } = useGameStore();
 
   const iFrame = useRef(null);
   const [evaluationResult, setEvaluationResult] = useState(null);
@@ -66,6 +67,7 @@ function Html_TE({ setIsCorrect }) {
         unlockAchievement(userData?.uid, "Html", "tagUsed", { usedTags, isCorrect });
       }
     }
+    setHtmlCode(code);
   };
 
 // Eval Button (For Lesson mode Only)

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import Lottie from 'lottie-react';
 import defaultAvatar from './../assets/Images/profile_handler.png';
+import AchIcon from '../assets/Images/Achievemen-Icon.png'
 import Loading from '../assets/Lottie/LoadingDots.json'
 // Assets
 import Claim from '../assets/Lottie/ClaimAchievement.json'
@@ -186,7 +187,7 @@ const showClaimToast = (item) => {
         hover:scale-110 hover:shadow-lg hover:shadow-gray-400
         ${isUnlocked ? "opacity-100 " : "opacity-40 cursor-not-allowed hover:shadow-none"}`}>
       <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
-        <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
+        <img src={AchIcon} alt="Achievements Icon" className="w-20 h-20" />
         <hr className="border-t border-gray-700 w-full" />
         <h3 className="text-white text-lg font-bold">{item.title}</h3>
         <p className="text-gray-400 text-sm">{item.description} </p>

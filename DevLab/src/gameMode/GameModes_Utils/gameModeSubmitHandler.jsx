@@ -5,10 +5,8 @@ import codeRushPrompt from "../../components/OpenAI Prompts/codeRushPrompt";
 import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
 
 
-
-
 export const gameModeSubmitHandlers = {
-  BugBust: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject}) => {
+  BugBust: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject, stageId}) => {
     try {
       const result = await bugBustPrompt({
         submittedCode,
@@ -18,7 +16,11 @@ export const gameModeSubmitHandlers = {
         subject,
       });
       if (result?.correct && result?.feedback) {
-        useGameStore.getState().addStageFeedback(result.feedback);
+          useGameStore.getState().addStageFeedback({
+    stageId: stageId || "UnknownStage", // or pass this in params
+    evaluation: result.correct ? "Correct" : "Incorrect",
+    feedback: result.feedback,
+  });
       }
       setIsCorrect(result?.correct || false);
       setShowIsCorrect(true);
@@ -29,9 +31,9 @@ export const gameModeSubmitHandlers = {
       setShowIsCorrect(true);
     }
   },
-  CodeCrafter: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject}) => {
+  CodeCrafter: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject, stageId}) => {
     try {
-
+      console.log("na cacall ba ako?")
       const result = await codeCrafterPrompt({
         submittedCode,
         instruction,
@@ -40,7 +42,11 @@ export const gameModeSubmitHandlers = {
         subject,
       });
       if (result?.correct && result?.feedback) {
-        useGameStore.getState().addStageFeedback(result.feedback);
+          useGameStore.getState().addStageFeedback({
+    stageId: stageId || "UnknownStage", // or pass this in params
+    evaluation: result.correct ? "Correct" : "Incorrect",
+    feedback: result.feedback,
+  });
       }
       setIsCorrect(result?.correct || false);
       setShowIsCorrect(true);
@@ -52,7 +58,7 @@ export const gameModeSubmitHandlers = {
     }
   },
 
-  CodeRush: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject}) => {
+  CodeRush: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject, stageId}) => {
     const { setIsEvaluating } = useGameStore.getState();
     try {
       setIsEvaluating(true);
@@ -64,7 +70,11 @@ export const gameModeSubmitHandlers = {
         subject,
       });
       if (result?.correct && result?.feedback) {
-        useGameStore.getState().addStageFeedback(result.feedback);
+          useGameStore.getState().addStageFeedback({
+    stageId: stageId || "UnknownStage", // or pass this in params
+    evaluation: result.correct ? "Correct" : "Incorrect",
+    feedback: result.feedback,
+  });
       }
       setIsCorrect(result?.correct || false);
       setShowIsCorrect(true);

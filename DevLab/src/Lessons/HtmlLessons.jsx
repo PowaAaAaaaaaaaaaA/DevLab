@@ -28,6 +28,9 @@ function HtmlLessons() {
   const [showLockedModal, setShowLockedModal] = useState(false);
 
   const [expandedLevel, setExpandedLevel] = useState(null);
+
+
+
   return (
     <>
       <div className="h-[100%]">
@@ -142,8 +145,8 @@ function HtmlLessons() {
                             <div className="text-white bg-black min-w-[20%] text-[3rem] font-bold rounded-4xl flex justify-center items-center">
                               <span className="pb-4">{level.symbol}</span>
                             </div>
-                            <div className="p-4 text-white font-exo">
-                              <p className="text-[1.4rem]">{level.title}</p>
+                            <div className="p-3 text-white font-exo flex flex-col gap-2">
+                              <p className="text-[1.2rem]">{level.title}</p>
                               <p className="text-[0.7rem] line-clamp-3 text-gray-500">
                                 {level.description}
                               </p>

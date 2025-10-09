@@ -1,9 +1,11 @@
 import axios from "axios";
 import {auth} from "../../Firebase/Firebase"
+import { useGameStore } from "./useBugBustStore";
 
 const lessonPrompt = async ({ receivedCode, instruction, description,subject }) => {
   if (!receivedCode) return null;
-
+  const setLoading = useGameStore.getState().setLoading;
+  setLoading(true);
   try {
     const currentUser = auth.currentUser;
     const token = await currentUser?.getIdToken(true);
@@ -40,6 +42,8 @@ const lessonPrompt = async ({ receivedCode, instruction, description,subject }) 
   } catch (error) {
     console.error("lessonPrompt API call failed:", error);
     return null;
+  }finally {
+    setLoading(false); // HIDE loader
   }
 };
 

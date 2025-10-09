@@ -1,8 +1,13 @@
 import axios from "axios";
 import { auth } from "../../Firebase/Firebase";
 
+import { useGameStore } from "./useBugBustStore";
+
 const dbPlaygroundEval = async ({ sql }) => {
   if (!sql) return null;
+
+    const setLoading = useGameStore.getState().setLoading;
+  setLoading(true);
 
   try {
     const currentUser = auth.currentUser;
@@ -36,6 +41,8 @@ const dbPlaygroundEval = async ({ sql }) => {
   } catch (error) {
     console.error("dbPlaygroundEval API call failed:", error);
     return null;
+  }finally {
+    setLoading(false); // HIDE loader
   }
 };
 

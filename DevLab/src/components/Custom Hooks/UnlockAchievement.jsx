@@ -35,8 +35,7 @@ case "tagUsed": {
 
   // Check if any required tag is in usedTags AND the answer is correct
   match =
-    requiredTags.some(tag => usedTags.includes(tag)) &&
-    payload?.isCorrect === true;
+    requiredTags.some(tag => usedTags.includes(tag)) 
   break;
 }
   case "itemUse":

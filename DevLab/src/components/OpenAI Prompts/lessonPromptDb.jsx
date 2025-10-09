@@ -3,15 +3,13 @@ import { auth } from "../../Firebase/Firebase";
 
 import { useGameStore } from "./useBugBustStore";
 
-const codeCrafterPrompt = async ({
-  submittedCode,
+const lessonPromptDb = async ({
+  receivedQuery,
   instruction,
-  providedCode,
   description,
   subject,
 }) => {
-  if (!submittedCode) return null;
-
+  if (!receivedQuery) return null;
   const setLoading = useGameStore.getState().setLoading;
   setLoading(true);
   try {
@@ -19,12 +17,11 @@ const codeCrafterPrompt = async ({
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/codeCrafter`,
+      `http://localhost:8082/openAI/lessonPromptDb`,
       {
-        submittedCode,
-        instruction,
-        providedCode,
+        instructions: instruction,
         description,
+        sql: receivedQuery || "",
         subject,
       },
       {
@@ -35,7 +32,6 @@ const codeCrafterPrompt = async ({
     );
 
     let raw = res.data.response;
-
     // Clean response if wrapped in ```json ... ```
     if (typeof raw === "string") {
       raw = raw.replace(/```json|```/g, "").trim();
@@ -50,11 +46,11 @@ const codeCrafterPrompt = async ({
 
     return parsed;
   } catch (error) {
-    console.error("codeCrafterCall API failed:", error);
+    console.error("lessonPromptDatabase API call failed:", error);
     return null;
   }finally {
     setLoading(false); // HIDE loader
   }
 };
 
-export default codeCrafterPrompt;
+export default lessonPromptDb;

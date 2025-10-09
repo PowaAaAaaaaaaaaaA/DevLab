@@ -1,8 +1,11 @@
 import axios from "axios";
 import { auth } from "../../Firebase/Firebase";
+import { useGameStore } from "./useBugBustStore";
 
 const codeRushPrompt = async ({submittedCode,instruction,providedCode,description,subject,}) => {
   if (!submittedCode) return null;
+    const setLoading = useGameStore.getState().setLoading;
+  setLoading(true);
 
   try {
     const currentUser = auth.currentUser;
@@ -36,6 +39,8 @@ const codeRushPrompt = async ({submittedCode,instruction,providedCode,descriptio
   } catch (error) {
     console.error("codeRushPrompt API call failed:", error);
     return null;
+  }finally {
+    setLoading(false); // HIDE loader
   }
 };
 

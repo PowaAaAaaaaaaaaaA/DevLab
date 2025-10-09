@@ -1,8 +1,12 @@
 import axios from "axios";
 import { auth } from "../../Firebase/Firebase";
 
+import { useGameStore } from "./useBugBustStore";
+
 const codePlaygroundEval = async ({ html, css, js }) => {
   if (!html && !css && !js) return null;
+    const setLoading = useGameStore.getState().setLoading;
+  setLoading(true);
 
   try {
     const currentUser = auth.currentUser;
@@ -36,6 +40,8 @@ const codePlaygroundEval = async ({ html, css, js }) => {
   } catch (error) {
     console.error("codePlaygroundEval API call failed:", error);
     return null;
+  }finally {
+    setLoading(false); // HIDE loader
   }
 };
 

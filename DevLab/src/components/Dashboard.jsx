@@ -3,6 +3,8 @@ import HtmlIcons from '../assets/Images/html-Icon.png'
 import CssIcons from '../assets/Images/css-Icon.png'
 import DataIcons from '../assets/Images/Data-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
+import Coins from '../assets/Images/DevCoins.png'
+
 import Loading from './Loading'
 import '../index.css'
 import defaultAvatar from './../assets/Images/profile_handler.png'
@@ -15,6 +17,8 @@ import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
 import useShopItems from './Custom Hooks/useShopItems'
 import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
+
+
 // Firebase
 import { db} from "../Firebase/Firebase"
 import {doc, getDoc } from 'firebase/firestore';
@@ -24,7 +28,6 @@ import useFetchUserData from './BackEnd_Data/useFetchUserData.jsx'
 function Dashboard() {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
   // User Details (Custom Hook)
-
   const { userData, isLoading, isError, refetch } = useFetchUserData();
   const {animatedExp} = useLevelBar();
   const {inventory, loading} = useUserInventory();
@@ -91,6 +94,7 @@ if (loadingDashboard) {
     </div>
   );
 }
+
   return (
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
@@ -135,7 +139,17 @@ if (loadingDashboard) {
         User Xp: {userData?.exp} / 100
       </p>
       <div className="text-white font-inter font-bold text-shadow-lg/60">
-        User Money: {userData?.coins}
+        <div className="flex items-center gap-2 sm:gap-3 text-white font-inter font-bold text-shadow-lg/60">
+  <img 
+    src={Coins} 
+    alt="Coins" 
+    className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" 
+  />
+  <span className="text-sm sm:text-base md:text-lg lg:text-xl truncate">
+    {userData?.coins}
+  </span>
+</div>
+
       </div>
     </div>
   </div>
