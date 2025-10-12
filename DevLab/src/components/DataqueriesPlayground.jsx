@@ -1,14 +1,17 @@
-// Database Querying Playground
-import React, { useEffect, useRef, useState } from "react";
+// Utils
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import initSqlJs from "sql.js";
+// CodeMirror
 import CodeMirror from "@uiw/react-codemirror";
+import initSqlJs from "sql.js";
 import { sql } from "@codemirror/lang-sql";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+// Ui
 import Lottie from "lottie-react";
-import Animation from "../assets/Lottie/OutputLottie.json";
 import { motion,AnimatePresence } from "framer-motion";
-
+// assets
+import Animation from "../assets/Lottie/OutputLottie.json";
+// Components
 import DBPlaygroundEval_Popup from "../gameMode/GameModes_Popups/DbPlaygroundEval_PopUp"
 import dbPlaygroundEval from "./OpenAI Prompts/dbPlaygroundEval";
 
@@ -21,11 +24,11 @@ function DataqueriesPlayground() {
   const [outputHtml, setOutputHtml] = useState();
   const [tablesHtml, setTablesHtml] = useState("");
   const [hasRunQuery, setHasRunQuery] = useState(false);
-
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [showEvalPopup, setShowEvalPopup] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
 
+  // Initial DataTable
   useEffect(() => {
     initSqlJs({
       locateFile: (file) =>
@@ -54,7 +57,6 @@ function DataqueriesPlayground() {
         "SELECT name FROM sqlite_master WHERE type='table';"
       );
       if (!tables.length) return;
-
       let html = "";
       for (const table of tables[0].values) {
         const tableName = table[0];
@@ -77,9 +79,7 @@ function DataqueriesPlayground() {
                     (row) => `
                 <tr>${row
                   .map((cell) => `<td class="border px-4 py-1">${cell}</td>`)
-                  .join("")}</tr>
-                `
-                  )
+                  .join("")}</tr>`)
                   .join("")}
             </tbody>
             </table>
@@ -91,7 +91,7 @@ function DataqueriesPlayground() {
       console.error("Error displaying tables:", err);
     }
   };
-
+  // Run Button
   const runQuery = () => {
     try {
       setHasRunQuery(true);
@@ -133,14 +133,11 @@ function DataqueriesPlayground() {
       );
     }
   };
-
-  // EVAL
+  // EVALButton
   const handleEvaluateSQL = async () => {
     setIsEvaluating(true);
     try {
       const result = await dbPlaygroundEval({ sql: query });
-
-      console.log(result); // { queryFeedback, queryImprovement }
       setEvaluationResult(result);
       setShowEvalPopup(true);
     } catch (error) {
@@ -165,8 +162,7 @@ function DataqueriesPlayground() {
             </h2>
             <div
               dangerouslySetInnerHTML={{ __html: tablesHtml }}
-              className="text-white"
-            />
+              className="text-white"/>
           </div>
           <div className="px-4 w-full flex flex-col flex-1 min-h-0 gap-3 rounded-3xl p-3 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
             <div className="flex-1 min-h-0 overflow-auto">
@@ -175,8 +171,7 @@ function DataqueriesPlayground() {
                 height="100%"
                 theme={tokyoNight}
                 extensions={[sql()]}
-                onChange={(value) => setQuery(value)}
-              />
+                onChange={(value) => setQuery(value)}/>
             </div>
             <motion.div className="flex justify-end gap-3">
               <motion.button
@@ -185,18 +180,15 @@ function DataqueriesPlayground() {
                 transition={{ bounceDamping: 100 }}
                 onClick={handleEvaluateSQL}
                 disabled={isEvaluating}
-                className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-              >
+                className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
                 {isEvaluating ? "Evaluating..." : "EVALUATE"}
               </motion.button>
-
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.05, background: "#9333EA" }}
                 transition={{ bounceDamping: 100 }}
                 onClick={runQuery}
-                className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-              >
+                className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
                 Run Query
               </motion.button>
             </motion.div>
@@ -224,16 +216,13 @@ function DataqueriesPlayground() {
           )}
         </div>
       </div>
-
-
 <AnimatePresence>
   {showEvalPopup && evaluationResult && (
     <motion.div
       className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
+      exit={{ opacity: 0 }}>
       <DBPlaygroundEval_Popup
         evaluationResult={evaluationResult}
         setShowEvalPopup={setShowEvalPopup}
@@ -241,10 +230,7 @@ function DataqueriesPlayground() {
     </motion.div>
   )}
 </AnimatePresence>
-
-
-
-    </div>
+</div>
   );
 }
 

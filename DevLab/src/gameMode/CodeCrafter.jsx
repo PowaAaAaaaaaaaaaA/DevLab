@@ -38,12 +38,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
-const [stageCon, setStageCon] = useState("");
-useEffect(() => {
-  if (gamemodeId === "Lesson") {
-    setStageCon(stageId);
-  }
-}, [gamemodeId, stageId]);
+
 
   //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
@@ -128,7 +123,7 @@ Your mission:
       {/**/}
       <AnimatePresence>
         {gameOver &&(
-          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
+          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts}></Gameover_PopUp>
         )}
       </AnimatePresence>
         {showIsCorrect && (

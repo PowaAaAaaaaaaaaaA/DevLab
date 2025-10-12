@@ -37,7 +37,6 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
   const [timesUp, setTimesUp] = useState(false);
-  const [stageCon, setStageCon] = useState("");
 
   const [pauseTimer, setPauseTimer] = useState(false);
 
@@ -54,11 +53,6 @@ console.log("this IS ",isEvaluating)
       setPauseTimer(false);
     }
   },[showIsCorrect,isEvaluating]);
-  useEffect(() => {
-    if (gamemodeId === "Lesson") {
-      setStageCon(stageId);
-    }
-  }, [gamemodeId, stageId]);
 
   // Dynamically render editor based on subject
   const renderEditor = () => {
@@ -157,8 +151,7 @@ console.log("this IS ",isEvaluating)
         {gameOver && (
           <Gameover_PopUp
             gameOver={gameOver}
-            resetHearts={resetHearts}
-            stageCon={stageCon}/>
+            resetHearts={resetHearts}/>
         )}
       </AnimatePresence>
 

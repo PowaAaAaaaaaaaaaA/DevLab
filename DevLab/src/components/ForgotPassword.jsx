@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+// Firebase
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../Firebase/Firebase";
+// Ui
 import { toast } from "react-toastify";
 
 function ForgotPassword({ onClose }) {
@@ -16,7 +18,6 @@ function ForgotPassword({ onClose }) {
       });
       return;
     }
-
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
@@ -48,13 +49,11 @@ function ForgotPassword({ onClose }) {
         className="relative bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[2px] w-[90%] max-w-md text-white"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.8, opacity: 0 }}
-      >
+        exit={{ scale: 0.8, opacity: 0 }}>
         <div className="bg-[#1E212F] rounded-2xl p-6">
           <button
             onClick={onClose}
-            className="absolute top-3 right-4 text-white hover:text-gray-300 text-lg"
-          >
+            className="absolute top-3 right-4 text-white hover:text-gray-300 text-lg">
             ✕
           </button>
           <h2 className="text-xl font-bold mb-4 text-center">
@@ -68,8 +67,7 @@ function ForgotPassword({ onClose }) {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 rounded-md bg-[#2C2F3F] text-white outline-none mb-4 border border-gray-600 focus:border-cyan-400"
-          />
+            className="w-full p-2 rounded-md bg-[#2C2F3F] text-white outline-none mb-4 border border-gray-600 focus:border-cyan-400"/>
           <button
             disabled={loading}
             onClick={handleForgotPassword}
@@ -77,8 +75,7 @@ function ForgotPassword({ onClose }) {
               loading
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-[#7F5AF0] hover:bg-[#6A4CD4]"
-            }`}
-          >
+            }`}>
             {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </div>

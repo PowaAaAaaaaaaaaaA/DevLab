@@ -1,39 +1,40 @@
-import React, { useState, useCallback, useRef } from "react";
+// Utils
+import { useState, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import '../index.css'
+// CodeMirror
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
-import { EditorView } from "@codemirror/view"; //
+import { EditorView } from "@codemirror/view"; 
+// Ui
 import Lottie from "lottie-react";
-import Animation from "../assets/Lottie/OutputLottie.json";
 import { motion, AnimatePresence } from "framer-motion";
-
-
+// Assets
+import Animation from "../assets/Lottie/OutputLottie.json";
+// Components
 import CodePlaygroundEval_PopUp from "../gameMode/GameModes_Popups/CodePlaygroundEval_PopUp";
 import codePlaygroundEval from "./OpenAI Prompts/codePlaygroundEval";
 
-import '../index.css'
-import { useNavigate } from "react-router-dom";
+
 function CodePlayground() {
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("HTML");
   const [run, setRun] = useState(false);
-
   const navigate = useNavigate();
-
-    const [evaluationResult, setEvaluationResult] = useState(null);
-    const [showPopup, setShowPopup] = useState(false);
-
+  const [evaluationResult, setEvaluationResult] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   // useRef
   const iFrame = useRef(null);
+
   // Initial Text Each Tab
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
     JavaScript: "// Write your JavaScript code here",
   });
-
   // Handle code change based on active tab
   const onChange = useCallback(
     (val) => {
@@ -44,7 +45,6 @@ function CodePlayground() {
     },
     [activeTab]
   );
-
   // Determine the CodeMirror extension based on active tab
   const getLanguageExtension = () => {
     switch (activeTab) {
@@ -59,7 +59,7 @@ function CodePlayground() {
     }
   };
 
-  // This will run the code when the Button is pressed hehe
+  // This will run the code when the Button is pressed 
   const runCode = () => {
     setRun(true); // trigger iframe to appear
     // Slight delay to allow iframe to mount first ( kase kelangan double click yung "run" btn kapag wlaang delay TT)
@@ -78,8 +78,6 @@ function CodePlayground() {
   </script>
 </body>
 </html>`;
-
-
       const iframe = iFrame.current;
       if (iframe) {
         const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -89,8 +87,9 @@ function CodePlayground() {
       }
     }, 0);
   };
+
 const [isEvaluating, setIsEvaluating] = useState(false);
-  //Eval
+//Eval Button
   const handleEvaluate = async () => {
   setIsEvaluating(true);
   try {
@@ -99,8 +98,6 @@ const [isEvaluating, setIsEvaluating] = useState(false);
       css: code.CSS,
       js: code.JavaScript,
     });
-
-    console.log(result);
     setEvaluationResult(result);
     setShowPopup(true);
   } catch (error) {
@@ -109,6 +106,7 @@ const [isEvaluating, setIsEvaluating] = useState(false);
     setIsEvaluating(false);
   }
 };
+
   return (
     <div className="bg-[#16161A] h-screen text-white font-exo flex flex-col p-3">
       <div 
@@ -154,7 +152,6 @@ const [isEvaluating, setIsEvaluating] = useState(false);
                 theme={tokyoNight}
               />
             </div>
-
 <motion.div className="flex justify-end gap-3">
   <motion.button
     whileTap={{ scale: 0.95 }}
@@ -162,8 +159,7 @@ const [isEvaluating, setIsEvaluating] = useState(false);
     transition={{ bounceDamping: 100 }}
     onClick={handleEvaluate}
     disabled={isEvaluating}
-    className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-  >
+    className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
     {isEvaluating ? "Evaluating..." : "EVALUATE"}
   </motion.button>
 
@@ -172,15 +168,12 @@ const [isEvaluating, setIsEvaluating] = useState(false);
     whileHover={{ scale: 1.05, background: "#7e22ce" }}
     transition={{ bounceDamping: 100 }}
     onClick={runCode}
-    className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-  >
+    className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
     Run Code
   </motion.button>
 </motion.div>
-
           </div>
         </div>
-
         {/* Output Panel */}
         <div className="bg-[#F8F3FF] w-[39%] h-full rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
           {run ? (
@@ -200,7 +193,6 @@ const [isEvaluating, setIsEvaluating] = useState(false);
           )}
         </div>
       </div>
-      
       <AnimatePresence>
         {showPopup && evaluationResult && (
           <motion.div

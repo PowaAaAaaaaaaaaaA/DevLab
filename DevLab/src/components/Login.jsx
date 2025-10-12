@@ -1,28 +1,27 @@
 
+
+// Assets
 import Image from '../assets/Images/Login-Image.jpg';
+import Loading from '../assets/Lottie/LoadingDots.json';
+// Utils
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+// Firebase
 import { signInWithEmailAndPassword,signOut,
         setPersistence,
         browserLocalPersistence,
         browserSessionPersistence,} from 'firebase/auth';
 import { doc,getDoc } from 'firebase/firestore';
-
 import { auth,db } from '../Firebase/Firebase';
-import { useState } from 'react';
+// Ui
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-
 import Lottie from 'lottie-react';
-import Loading from '../assets/Lottie/LoadingDots.json';
-
 import { IoPerson } from "react-icons/io5";
 import { IoLockOpen } from "react-icons/io5";
 import { IoEye, IoEyeOff } from "react-icons/io5";
-
+// Components
 import ForgotPassword from './ForgotPassword';
-
-
-
 
 function Login() {
 
@@ -35,7 +34,6 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
 
-
   const admin = async () => {
     try {
       //await auth.signOut();
@@ -44,8 +42,6 @@ function Login() {
       console.log(error);
     }
   };
-
-
 const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);

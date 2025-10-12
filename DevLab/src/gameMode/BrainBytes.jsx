@@ -38,14 +38,6 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [isCorrect, setIsCorrect] = useState(false);
   const [showisCorrect, setShowisCorrect] = useState(false);
 
-    const [stageCon, setStageCon] = useState("");
-
-    
-      useEffect(() => {
-        if (gamemodeId == "Lesson") {
-          setStageCon(stageId);
-        }
-      }, [gamemodeId, stageId]);
 
   // Dynamic editor rendering
   const renderEditor = () => {
@@ -96,7 +88,7 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
       {/*Game Over Popup*/ }
       <AnimatePresence>
         {gameOver &&(
-          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} stageCon={stageCon}></Gameover_PopUp>
+          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts}></Gameover_PopUp>
         )}
       </AnimatePresence>
       {/* Instruction Pop Up */}

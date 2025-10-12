@@ -1,34 +1,33 @@
-// Ui
+// Assets
 import HtmlIcons from '../assets/Images/html-Icon.png'
 import CssIcons from '../assets/Images/css-Icon.png'
 import DataIcons from '../assets/Images/Data-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
 import Coins from '../assets/Images/DevCoins.png'
-
-import Loading from './Loading'
-import '../index.css'
 import defaultAvatar from './../assets/Images/profile_handler.png'
-// Utils and Hooks
+import Loading from './Loading'
+// Utils
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
+import { useQueryClient } from '@tanstack/react-query'
+import '../index.css'
+// Components
 import useLevelBar from './Custom Hooks/useLevelBar'
 import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
-import useShopItems from './Custom Hooks/useShopItems'
 import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
-
-
+import useFetchUserData from './BackEnd_Data/useFetchUserData.jsx'
+import { fetchShopItems } from './BackEnd_Data/useFethShopItems.jsx'
 // Firebase
 import { db} from "../Firebase/Firebase"
 import {doc, getDoc } from 'firebase/firestore';
 
-import useFetchUserData from './BackEnd_Data/useFetchUserData.jsx'
+
 
 function Dashboard() {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
   // User Details (Custom Hook)
-  const { userData, isLoading, isError, refetch } = useFetchUserData();
+  const { userData, isLoading } = useFetchUserData();
   const {animatedExp} = useLevelBar();
   const {inventory, loading} = useUserInventory();
   // Subject ProgressbAr
@@ -36,16 +35,21 @@ function Dashboard() {
   const {animatedBar: CssProgress} = useSubjProgressBar("Css")
   const {animatedBar: JsProgress} = useSubjProgressBar("JavaScript")
   const {animatedBar: DbProgress} = useSubjProgressBar("Database")
-
+  //
   const [loadingDashboard , setLoading] = useState(true);
-    // // Shop Items (Custom Hook)
-    const {items} = useShopItems();    
-    const { data: HtmlData, } = useAchievementsData("Html");
-    const { data:CssData,  } = useAchievementsData("Css");
-    const { data:JsData,  } = useAchievementsData("JavaScript");
-    const { data:DatabaseData, } = useAchievementsData("Database");
-    
 
+// pre-fetching data sa Achievement and Shop
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    queryClient.prefetchQuery(["ShopItems"], fetchShopItems);
+  }, [queryClient]);
+  const { data: HtmlData, } = useAchievementsData("Html");
+  const { data:CssData,  } = useAchievementsData("Css");
+  const { data:JsData,  } = useAchievementsData("JavaScript");
+  const { data:DatabaseData, } = useAchievementsData("Database");
+
+
+// Intial Loading
 useEffect(() => {
   const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
 
@@ -62,6 +66,7 @@ useEffect(() => {
     setLoading(false);
   }
 }, []);
+
 
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
@@ -81,7 +86,6 @@ console.log(subject)
       }
     }
   };
-
   fetchLevelInfo();
 }, [userData]);
 

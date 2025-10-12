@@ -5,7 +5,7 @@ import { useGameStore } from "./useBugBustStore";
 
 const bugBustPrompt = async ({submittedCode,instruction,providedCode,description,subject}) => {
   if (!submittedCode) return null;
-    const setLoading = useGameStore.getState().setLoading;
+  const setLoading = useGameStore.getState().setLoading;
   setLoading(true);
 
   try {

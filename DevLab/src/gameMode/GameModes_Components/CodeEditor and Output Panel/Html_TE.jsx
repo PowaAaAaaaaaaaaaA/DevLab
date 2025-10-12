@@ -33,7 +33,7 @@ function Html_TE() {
   // Utils
   const isCorrect = useGameStore((state) => state.isCorrect);
   const setSubmittedCode = useGameStore((state) => state.setSubmittedCode);
-  const { setHtmlCode } = useGameStore();
+
 
   const iFrame = useRef(null);
   const [evaluationResult, setEvaluationResult] = useState(null);
@@ -67,7 +67,6 @@ function Html_TE() {
         unlockAchievement(userData?.uid, "Html", "tagUsed", { usedTags, isCorrect });
       }
     }
-    setHtmlCode(code);
   };
 
 // Eval Button (For Lesson mode Only)
@@ -92,7 +91,6 @@ function Html_TE() {
         description: description,
         subject,
       });
-      console.log(result);
       setEvaluationResult(result);
       setShowPopup(true);
 

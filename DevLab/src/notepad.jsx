@@ -1,49 +1,33 @@
-// App.jsx
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LandingPage from "./Pages/LandingPage";
-import Login from "./Pages/Login";
-import Dashboard from "./Pages/Dashboard";
-
-function App() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    setIsMobile(checkMobile);
-  }, []);
-
-  if (isMobile) {
-    // ✅ Show a global download screen
-    return (
-      <div className="w-full h-screen bg-[radial-gradient(circle_at_center,_#9333EA_0%,_#1E1E2E_65%,_#0F0F17_100%)] flex flex-col justify-center items-center text-white text-center p-6 font-exo">
-        <h1 className="text-5xl font-bold mb-4">DevLab Mobile</h1>
-        <p className="text-lg mb-6 max-w-md">
-          DevLab is best experienced through our mobile app.
-          Download it now to start your coding adventure!
-        </p>
-        <a
-          href="https://example.com/devlab-app-download"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-2xl shadow-md transition"
-        >
-          📱 Download DevLab App
-        </a>
-      </div>
-    );
-  }
-
-  // ✅ Normal web app routes for desktop
+<h1 className='text-[#1E90FF] font-exo font-bold text-5xl text-shadow-lg/30'>CSS ACHIEVEMENTS</h1>
+<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
+{CssData?.map((item) => {
+  const isUnlocked = !!userAchievements?.[item.id];
+  const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
+  console.log(`${item.id} - ${isClaimed}`)
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <div
+      key={item.id}
+      className={`p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500 transition duration-500
+        hover:scale-110 hover:shadow-lg hover:shadow-gray-400
+        ${isUnlocked ? "opacity-100 " : "opacity-40 cursor-not-allowed hover:shadow-none"}`}>
+      <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
+        <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
+        <hr className="border-t border-gray-700 w-full" />
+        <h3 className="text-white text-lg font-bold">{item.title}</h3>
+        <p className="text-gray-400 text-sm">{item.description} </p>
+<button 
+onClick={() => isUnlocked && !isClaimed && handleClaim(item)}
+className={`px-4 py-1 rounded-full font-semibold cursor-pointer 
+  ${isClaimed ? "bg-green-500 text-white"       // COMPLETED
+  : isUnlocked 
+  ? "bg-yellow-500 text-black"    // UNCLAIMED
+  : "bg-red-500 text-white"       // LOCKED
+  }`}> 
+{isClaimed ? "COMPLETED" : isUnlocked
+    ? "UNCLAIMED" : "LOCKED"}
+</button>
+      </div>
+    </div>
   );
-}
-
-export default App;
+})}
+</div>

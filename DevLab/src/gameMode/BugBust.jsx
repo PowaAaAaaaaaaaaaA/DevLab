@@ -36,21 +36,12 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
-
-  const [stageCon, setStageCon] = useState("");
-
-
   //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
 
-  useEffect(() => {
-    if (gamemodeId == "Lesson") {
-      setStageCon(stageId);
-    }
-  }, [gamemodeId, stageId]);
 
   // Dynamically render editor based on subject
   const renderEditor = () => {
@@ -135,7 +126,6 @@ Take your time — accuracy matters more than speed!`
           <Gameover_PopUp
             gameOver={gameOver}
             resetHearts={resetHearts}
-            stageCon={stageCon}
           ></Gameover_PopUp>
         )}
       </AnimatePresence>

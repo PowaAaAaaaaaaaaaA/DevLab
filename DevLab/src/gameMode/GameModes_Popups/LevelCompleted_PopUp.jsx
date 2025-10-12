@@ -21,12 +21,14 @@ import { useSubjectCheckComplete } from "../../components/Custom Hooks/useSubjec
 import { fetchLevelSummary } from "../../components/OpenAI Prompts/feedbackPrompt";
 
 import { unlockStage } from "../../components/BackEnd_Functions/unlockStage";
+import { useParams } from "react-router-dom";
 
 
 function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelComplete,resetHearts}) {
 
 
 
+  const { stageId} = useParams();
   const {removeBuff} = useInventoryStore.getState();
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const [levelSummary, setLevelSummary] = useState("");
@@ -43,7 +45,7 @@ function LevelCompleted_PopUp({subj,lessonId,LevelId,heartsRemaining,setLevelCom
 
   const navigate = useNavigate(); 
   const [LevelData , setLevelData] = useState("");
-  const { userData, isLoading, isError, refetch } = useFetchUserData();
+  const { userData, refetch } = useFetchUserData();
   // Level Data
 useEffect(()=>{
   const fetchLevelData = async ()=>{
@@ -124,13 +126,14 @@ const unlockNextLevel = async (goContinue) => {
   try {
     const data = await unlockStage(subj, lessonId, LevelId, stageId);
     await unlockAchievement(userId, subj, "firstLevelComplete", { LevelId, lessonId });
+    console.log("ID:", userId,"subj:",subj,"LevelId:",LevelId,"lessn:",lessonId)
 
       if (data.isNextLevelUnlocked) {
       // Case: next level exists
       await unlockAchievement(userId, subj, "firstLevelComplete", { LevelId, lessonId });
       if (goContinue) {
         navigate(
-          `/Main/Lessons/${subject}/${lessonId}/${data.nextLevelId}/${data.firstStageId}/Lesson`
+          `/Main/Lessons/${subj}/${lessonId}/${data.nextLevelId}/Stage1/Lesson`
         );
       }
     } else if (data.isNextLessonUnlocked) {
@@ -138,7 +141,7 @@ const unlockNextLevel = async (goContinue) => {
       await unlockAchievement(userId, subj, "lessonComplete", { lessonId });
       if (goContinue) {
         navigate(
-          `/Main/Lessons/${subject}/${data.nextLessonId}/Level1/${data.firstStageId}/Lesson`
+          `/Main/Lessons/${subj}/${data.nextLessonId}/Level1/Stage1/Lesson`
         );
       }
     } else if (data.isWholeTopicFinished) {

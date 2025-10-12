@@ -46,7 +46,7 @@ function JavaScript_TE() {
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
-    JavaScript: "// Hello World"
+    JavaScript: "// Write your JavaScript code here"
   });
   // Console log states
   const [logs, setLogs] = useState([]);

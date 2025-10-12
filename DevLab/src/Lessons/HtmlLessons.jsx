@@ -21,7 +21,7 @@ function HtmlLessons() {
   // Level Fetch (Custom Hooks)
   const { levelsData, isLoading, isError, refetch } = useFetchLevelsData("Html");
   // Unlocked and Locked Levels
-  const {userProgress,userStageProgress,completedLevels,completedStages,isLoading: progressLoading} = useFetchUserProgress("Html");
+  const {userProgress,userStageProgress,userStageCompleted,isLoading: progressLoading} = useFetchUserProgress("Html");
   // Subject Levels Progress Bar
   const { animatedBar,total} = useSubjProgressBar("Html");
   const navigate = useNavigate();
@@ -35,36 +35,32 @@ function HtmlLessons() {
     <>
       <div className="h-[100%]">
         {/*Upper Panel*/}
-        <div className=" h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#FF5733] to-[#FFC300]">
-          <div className="w-[80%] flex flex-col gap-7">
-            <div className="p-3 flex flex-col gap-4">
-              <h1 className="font-exo text-white text-[2.8rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
-                {"< >"} HTML: The Gateway to Web Adventure
-              </h1>
-              <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop">
-                Step into the world of Front-End Development with HTML and CSS
-                as your weapons of creation. Your adventure begins with
-                mastering the fundamentals—building structure and style to craft
-                stunning, responsive websites. As you level up, you'll unlock
-                the secrets of layout design, styling, and structure, gaining
-                the skills to transform raw code into beautiful web pages.
-                Conquer each challenge to earn badges of mastery and become a
-                true HTML and CSS hero!
-              </p>
-            </div>
-            <div>
-              <div className="w-[70%] min-h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-                <div
-                  className="h-4 rounded-full dark:bg-[#2CB67D]"
-                  style={{ width: `${animatedBar}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-          <div className="w-[30%] flex justify-center p-4">
-            <img src={HtmlImage} alt="" className="w-[60%] h-[90%]" />
-          </div>
-        </div>
+<div className="h-[40%] rounded-3xl p-5 flex items-center bg-linear-to-r from-[#FF5733] to-[#FFC300]">
+  <div className="w-[80%] flex flex-col justify-center gap-6">
+    <div className="p-3 flex flex-col gap-4">
+      <h1 className="font-exo text-white text-[2.8rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
+        {"< >"} HTML: The Gateway to Web Adventure
+      </h1>
+      <p className="w-[75%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop leading-relaxed">
+        Step into the world of Front-End Development with HTML and CSS as your weapons of creation.
+        Your adventure begins with mastering the fundamentals—building structure and style to craft
+        stunning, responsive websites. As you level up, you'll unlock the secrets of layout design,
+        styling, and structure, gaining the skills to transform raw code into beautiful web pages.
+        Conquer each challenge to earn badges of mastery and become a true HTML and CSS hero!
+      </p>
+    </div>
+    <div className="w-[75%] min-h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
+      <div
+        className="h-4 rounded-full dark:bg-[#2CB67D] transition-all duration-500"
+        style={{ width: `${animatedBar}%` }}
+      ></div>
+    </div>
+  </div>
+  <div className="w-[30%] flex justify-center items-center p-4">
+    <img src={HtmlImage} alt="" className="w-[65%] h-[85%] object-contain" />
+  </div>
+</div>
+
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
@@ -182,7 +178,7 @@ function HtmlLessons() {
                                     .map((stage) => {
                                       // Check if stage is unlocked
                                       const isStageUnlocked =
-                                        userStageProgress[`${lesson.id}-${level.id}-${stage.id}`];
+                                        userStageCompleted[`${lesson.id}-${level.id}-${stage.id}`];
                                       return (
                                         <motion.div
                                           variants={{

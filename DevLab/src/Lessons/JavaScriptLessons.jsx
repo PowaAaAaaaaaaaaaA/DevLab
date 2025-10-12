@@ -37,36 +37,33 @@
       <>
         <div className="h-[100%]">
           {/*Upper Panel*/}
-          <div className="h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#DECD41] to-[#FF8C00]">
-            <div className="w-[80%] flex flex-col gap-7">
-              <div className="p-3 flex flex-col gap-4">
-                <h1 className="font-exo text-white text-[2.3rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
-                  {"{ }"} JavaScript: The Magic Behind Interactive Web Realms
-                </h1>
-                <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop">
-                  Step into the enchanted realm of code, where you’ll wield the
-                  powerful magic of JavaScript! As a budding sorcerer, you’ll
-                  learn to cast spells that bring your web pages to life—turning
-                  static sites into interactive, dynamic worlds. From summoning
-                  buttons that respond to clicks to conjuring animations and
-                  real-time interactions, your journey will unlock the secrets of
-                  crafting engaging, magical web experiences. Ready to harness the
-                  power of the web? The realm of interactivity awaits!
-                </p>
-              </div>
-              <div>
-                <div className="w-[70%] min-h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-                  <div
-                    className="h-4 rounded-full dark:bg-[#2CB67D]"
-                    style={{ width: `${animatedBar}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-            <div className="w-[30%] flex justify-center p-4">
-              <img src={JsImage} alt="" className="w-[60%] h-[90%]" />
-            </div>
-          </div>
+<div className="h-[40%] rounded-3xl p-5 flex items-center bg-linear-to-r from-[#DECD41] to-[#FF8C00]">
+  <div className="w-[80%] flex flex-col justify-center gap-6">
+    <div className="p-3 flex flex-col gap-4">
+      <h1 className="font-exo text-white text-[2.5rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
+        {"{ }"} JavaScript: The Magic Behind Interactive Web Realms
+      </h1>
+      <p className="w-[75%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop leading-relaxed">
+        Step into the enchanted realm of code, where you’ll wield the powerful magic of JavaScript!
+        As a budding sorcerer, you’ll learn to cast spells that bring your web pages to life—turning
+        static sites into interactive, dynamic worlds. From summoning buttons that respond to clicks
+        to conjuring animations and real-time interactions, your journey will unlock the secrets of
+        crafting engaging, magical web experiences. Ready to harness the power of the web? The realm
+        of interactivity awaits!
+      </p>
+    </div>
+    <div className="w-[75%] min-h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
+      <div
+        className="h-4 rounded-full dark:bg-[#2CB67D] transition-all duration-500"
+        style={{ width: `${animatedBar}%` }}
+      ></div>
+    </div>
+  </div>
+  <div className="w-[30%] flex justify-center items-center p-4">
+    <img src={JsImage} alt="" className="w-[65%] h-[85%] object-contain" />
+  </div>
+</div>
+
           {/*Lower Part hehe*/}
           <div className="h-[60%] flex p-3">
             {/*Left Panel*/}
