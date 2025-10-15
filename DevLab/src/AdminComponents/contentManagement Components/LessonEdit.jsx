@@ -29,7 +29,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
   useEffect(() => {
     if (stageData?.type) {
       setActiveTab(stageData.type);
-      console.log(stageData.type);
       dispatch({ type: "UPDATE_FIELD", field: "type", value: stageData.type });
     }
   }, [stageData]);
@@ -51,25 +50,15 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
   };
 
   useEffect(() => {
-    if (state.type === "") {
-      dispatch({
-        type: "UPDATE_FIELD",
-        field: "isHidden",
-        value: stageData?.type !== "Lesson",
-      });
-    }
-  }, [state.type]);
-
-  useEffect(() => {
     dispatch({
       type: "UPDATE_ALL_FIELDS",
       payload: {
         title: stageData?.title || "",
         description: stageData?.description || "",
-        isHidden: stageData?.isHidden || "",
+        isHidden: stageData?.isHidden ?? activeTab !== "Lesson",
         type: stageData?.type || "",
         instruction: stageData?.instruction || "",
-        codingInterface: stageData?.codingInterface || "",
+        codingInterface: stageData?.codingInterface || { html: "", css: "", js: "" },
         hint: stageData?.hint || "",
         timer: stageData?.timer || "",
         choices: stageData?.choices || [],
@@ -77,7 +66,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         copyCode: stageData?.copyCode || "",
       },
     });
-  }, [stageData]);
+  }, [stageData, activeTab]);
 
   // Filter function for game mode
   const filterStateByGameMode = (state, activeTab) => {
@@ -106,7 +95,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
     }
   };
 
-  //  Save handler
+  // Save handler
   const handleSave = async (e) => {
     e.preventDefault();
     try {
@@ -115,11 +104,14 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         (block) => block.type === "Image" && block.value instanceof File
       );
 
+      // Automatically set isHidden
+      const updatedState = { ...state, isHidden: activeTab === "Lesson" ? false : true };
+
       let response;
 
       if (!hasImages) {
-        // Normal JSON
-        const filteredState = filterStateByGameMode(state, activeTab);
+        // JSON save
+        const filteredState = filterStateByGameMode(updatedState, activeTab);
         response = await axios.post(
           "http://localhost:8082/fireBaseAdmin/editStage",
           {
@@ -139,9 +131,8 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
           }
         );
       } else {
-        // FormData with images
+        // FormData save
         const formData = new FormData();
-
         formData.append("category", subject);
         formData.append("lessonId", lessonId);
         formData.append("levelId", levelId);
@@ -159,10 +150,11 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         });
 
         const filteredState = filterStateByGameMode(
-          { ...state, blocks: processedBlocks },
+          { ...updatedState, blocks: processedBlocks },
           activeTab
         );
         formData.append("state", JSON.stringify(filteredState));
+
         response = await axios.post(
           "http://localhost:8082/fireBaseAdmin/editStage",
           formData,
@@ -176,11 +168,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         );
       }
 
-      toast.success("Stage updated successfully!", {
-        position: "top-center",
-        theme: "colored",
-      });
-
+      toast.success("Stage updated successfully!", { position: "top-center", theme: "colored" });
       await fetchStage();
     } catch (error) {
       console.error("Failed to save stage:", error);
@@ -211,7 +199,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
           </div>
         </div>
 
-        {/* Dynamic Form */}
         <form className="h-[100%] flex flex-col p-4 gap-5 justify-center">
           {activeTab === "Lesson" && (
             <LessonForm

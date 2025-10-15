@@ -74,6 +74,7 @@ for (const subject of subjects) {
     doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1","Stages","Stage1"),
     {
     isActive: true,
+    isCompleted: true,
     });
 }
 }

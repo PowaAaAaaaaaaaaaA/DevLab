@@ -8,7 +8,11 @@ const initialState = {
   isHidden: false,
   type: "",
   instruction: "",
-  codingInterface: "",
+  codingInterface: {
+    html: "",
+    css: "",
+    js: "",
+  },
 
   // Bug Bust
   hint: "",
@@ -28,17 +32,26 @@ const initialState = {
   // CodeCrafter
   copyCode: "",
 
-  // Common Blocks (Lesson Content)
+  // Common Blocks
   blocks: [],
 };
 
-// Reducer function
+// Reducer
 const reducer = (state, action) => {
   switch (action.type) {
     case "UPDATE_FIELD":
       return {
         ...state,
         [action.field]: action.value,
+      };
+
+    case "UPDATE_CODING_INTERFACE":
+      return {
+        ...state,
+        codingInterface: {
+          ...state.codingInterface,
+          [action.field]: action.value,
+        },
       };
 
     case "UPDATE_FIELD_CHOICES":
@@ -55,11 +68,7 @@ const reducer = (state, action) => {
         ...state,
         blocks: [
           ...state.blocks,
-          {
-            id: action.payload.id,
-            type: action.payload.type,
-            value: action.payload.value,
-          },
+          { id: action.payload.id, type: action.payload.type, value: action.payload.value },
         ],
       };
 
@@ -93,7 +102,6 @@ const reducer = (state, action) => {
 // Custom hook
 const useEditStage = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-
   return { state, dispatch };
 };
 

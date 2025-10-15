@@ -8,33 +8,36 @@ import useGameModeData from "../../components/Custom Hooks/useGameModeData";
 import Lottie from "lottie-react";
 import Loading from "../../assets/Lottie/LoadingDots.json";
 
-
 function LessonInstructionPanel() {
-
   const { gameModeData, levelData, subject } = useGameModeData();
 
-  const [formattedCode, setFormattedCode] = useState("");
+  const [formattedCode, setFormattedCode] = useState({
+    html: "",
+    css: "",
+    js: "",
+  });
 
-  // Format and combine code depending on subject type
+  useEffect(() => {
+    if (!gameModeData || !subject) return;
 
-useEffect(() => { 
-  if (!gameModeData || !subject) return; 
-    const rawCode = gameModeData?.codingInterface || ""; 
-    
-    switch (subject) { 
-    case "Html": setFormattedCode(beautifyHTML(rawCode, { indent_size: 2 })); 
-    break; 
-    case "Css": setFormattedCode(beautifyCSS(rawCode, { indent_size: 2 })); 
-    break; 
-    case "JavaScript": setFormattedCode(beautifyJS(rawCode, { indent_size: 2 })); 
-    break; 
-    default: setFormattedCode(rawCode); } 
+    const codingInterface = gameModeData?.codingInterface || {};
+
+    setFormattedCode({
+      html:
+        codingInterface.html?.trim()
+          ? beautifyHTML(codingInterface.html, { indent_size: 2 })
+          : "",
+      css:
+        codingInterface.css?.trim()
+          ? beautifyCSS(codingInterface.css, { indent_size: 2 })
+          : "",
+      js:
+        codingInterface.js?.trim()
+          ? beautifyJS(codingInterface.js, { indent_size: 2 })
+          : "",
+    });
   }, [gameModeData, subject]);
 
-
-
-
-  // Show loading screen while data loads
   if (!levelData || !gameModeData) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
@@ -43,20 +46,12 @@ useEffect(() => {
     );
   }
 
-  // Dynamic syntax highlight language
-  const syntaxLang =
-    subject === "Html"
-      ? "markup"
-      : subject === "Css"
-      ? "css"
-      : subject === "JavaScript"
-      ? "javascript"
-      : "markup";
+  const hasAnyCode =
+    formattedCode.html || formattedCode.css || formattedCode.js;
 
   return (
     <div className="h-full w-full bg-[#393F59] rounded-xl text-white overflow-y-scroll p-5 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-4 scrollbar-custom">
-      
-      {/*  Title Section */}
+      {/* Title */}
       <h2
         className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${
           gameModeData?.type === "Lesson"
@@ -75,16 +70,13 @@ useEffect(() => {
         {levelData.order}. {gameModeData.title}
       </h2>
 
-      {/* Render Dynamic Blocks */}
+      {/* Dynamic Blocks */}
       <div className="flex flex-col gap-4">
         {gameModeData.blocks?.map((block) => {
           switch (block.type) {
             case "Header":
               return (
-                <h3
-                  key={block.id}
-                  className="text-xl font-bold text-shadow-lg text-shadow-black"
-                >
+                <h3 key={block.id} className="text-xl font-bold text-shadow-lg">
                   {block.value}
                 </h3>
               );
@@ -112,8 +104,7 @@ useEffect(() => {
                         : subject === "JavaScript"
                         ? "bg-gradient-to-r from-[#FFF176] to-[#F7DF1E]"
                         : ""
-                    } 
-                    shadow-[0_0_10px_rgba(255,255,255,0.1)]`}
+                    }`}
                 />
               );
             case "Image":
@@ -131,32 +122,57 @@ useEffect(() => {
         })}
       </div>
 
-      {/*  Coding Interface (if available) */}
-      {gameModeData.codingInterface && (
+      {/* Instruction + Code Example */}
+      {(gameModeData.instruction || hasAnyCode) && (
         <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
-          <h4 className="font-bold text-2xl mb-2 text-shadow-lg text-shadow-black">
-            Instruction
-          </h4>
-          <p className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem] font-exo">
-            {gameModeData.instruction}
-          </p>
+          {gameModeData.instruction && (
+            <>
+              <h4 className="font-bold text-2xl mb-2">Instruction</h4>
+              <p className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem] font-exo">
+                {gameModeData.instruction}
+              </p>
+            </>
+          )}
 
-          <p className="text-1xl mb-2 text-shadow-lg text-shadow-black font-bold mt-3">
-            Code Example
-          </p>
-          <p className="bg-[#191C2B] p-4 rounded-xl text-white whitespace-pre-wrap font-mono text-sm leading-relaxed">
-            {formattedCode}
-          </p>
+          {hasAnyCode && (
+            <>
+              <p className="text-1xl mb-2 font-bold mt-3">Code Example</p>
 
+              {formattedCode.html && (
+                <>
+                  <p className="font-bold mb-1 text-[#FF5733]">HTML</p>
+                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                    {formattedCode.html}
+                  </pre>
+                </>
+              )}
+
+              {formattedCode.css && (
+                <>
+                  <p className="font-bold mb-1 text-[#1E90FF]">CSS</p>
+                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                    {formattedCode.css}
+                  </pre>
+                </>
+              )}
+
+              {formattedCode.js && (
+                <>
+                  <p className="font-bold mb-1 text-[#F7DF1E]">JavaScript</p>
+                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                    {formattedCode.js}
+                  </pre>
+                </>
+              )}
+            </>
+          )}
         </div>
       )}
 
-      {/*  Video Presentation (if available) */}
+      {/* Video Presentation */}
       {gameModeData.videoPresentation && (
         <div className="mt-6 p-4 bg-[#25293B] rounded-2xl">
-          <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">
-            Video Presentation
-          </h3>
+          <h3 className="font-bold text-xl mb-2">Video Presentation</h3>
           <video
             src={gameModeData.videoPresentation}
             controls

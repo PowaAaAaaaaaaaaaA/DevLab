@@ -181,7 +181,7 @@ const [isEvaluating, setIsEvaluating] = useState(false);
               title="output"
               ref={iFrame}
               className="w-full h-full rounded-3xl"
-              sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
+              sandbox="allow-scripts allow-same-origin  allow-modals allow-popups allow-top-navigation-by-user-activation"
             />
           ) : (
             <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl bg-[#F8F3FF]">
