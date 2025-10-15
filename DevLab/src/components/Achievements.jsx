@@ -2,19 +2,20 @@
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import Lottie from 'lottie-react';
-import defaultAvatar from './../assets/Images/profile_handler.png';
-import Loading from '../assets/Lottie/LoadingDots.json'
 // Assets
 import Claim from '../assets/Lottie/ClaimAchievement.json'
-// DATA, Hooks and Utils
+import AchIcon from '../assets/Images/Achievemen-Icon.png'
+import Loading from '../assets/Lottie/LoadingDots.json'
+import defaultAvatar from './../assets/Images/profile_handler.png';
+// DaTa
 import useFetchUserData from "./BackEnd_Data/useFetchUserData.jsx";
-
 import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
 import useUserAchievements from './Custom Hooks/useUserAchievements.jsx'
 import useAchievementsProgressBar from './Custom Hooks/useAchievementProgressBar.jsx';
+// Utils
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react'  
 import '../index.css'
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 // Firebase
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../Firebase/Firebase";
@@ -22,21 +23,24 @@ import { db } from "../Firebase/Firebase";
 function Achievements() {
 
   const { userData } = useFetchUserData();
-
-  const { data: HtmlData, isLoading: loading, error } = useAchievementsData("Html");
-  const { data:CssData,  } = useAchievementsData("Css");
-  const { data:JsData,  } = useAchievementsData("JavaScript");
-  const { data:DatabaseData, } = useAchievementsData("Database");
-
+  // Achievements DATA
+  const { data: HtmlData, isLoading: htmlLoading } = useAchievementsData("Html");
+  const { data: CssData, isLoading: cssLoading } = useAchievementsData("Css");
+  const { data: JsData, isLoading: jsLoading } = useAchievementsData("JavaScript");
+  const { data: DatabaseData, isLoading: dbLoading } = useAchievementsData("Database");
+  // User Achievement ProgressBar
   const {animatedBar:HtmlBar} = useAchievementsProgressBar(userData?.uid, "Html");
   const {animatedBar:CssBar} = useAchievementsProgressBar(userData?.uid, "Css");
   const {animatedBar:JsBar} = useAchievementsProgressBar(userData?.uid, "JavaScript");
   const {animatedBar:DatabaseBar} = useAchievementsProgressBar(userData?.uid, "Database");
-
-const { data: userAchievements, } = useUserAchievements(userData?.uid);
+  // User Achievements
+  const { data: userAchievements, } = useUserAchievements(userData?.uid);
+  // Loading States
 const [LoadingClaim , setLoadingClaim] = useState(false);
-
+ // UTils
 const queryClient = useQueryClient();
+
+// Claime Reward
 const claimMutation = useMutation({
 mutationFn: async (achievement) => {
   const userId = userData.uid;
@@ -72,6 +76,7 @@ mutationFn: async (achievement) => {
     setLoadingClaim(false);
   }
 });
+
 const handleClaim = (item) => {
   setLoadingClaim(true);
   claimMutation.mutate(item, {
@@ -83,6 +88,8 @@ const handleClaim = (item) => {
   });
 };
 
+
+// Show Claim Toast
 const showClaimToast = (item) => {
   toast.custom(
 (t) => (
@@ -127,9 +134,7 @@ const showClaimToast = (item) => {
     </div>
   </div>
 </div>
-</motion.div>
-
-),{
+</motion.div>),{
   duration: 3000, // stays for 3s 
   position: "top-center",
 });
@@ -166,19 +171,60 @@ const showClaimToast = (item) => {
         </div></div>
         </div>
       </div>
-
     </div>
-
-    {/**/}
     <div className=' mt-[5px]'>
     <div className='max-h-[470px] overflow-y-scroll overflow-x-hidden Achievements-container scrollbar-custom p-5'>
-
       <div className='flex flex-col items-center gap-10'>
-        <h1 className='text-[#FF5733] font-exo font-bold text-5xl text-shadow-lg/30'>HTML ACHIEVEMENTS</h1>
+{/** HTML SECTION **/}
+<h1 className='text-[#FF5733] font-exo font-bold text-5xl text-shadow-lg/30'>HTML ACHIEVEMENTS</h1>
 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
-{HtmlData?.map((item) => {
+  {htmlLoading ? (
+    <div className="col-span-full flex justify-center items-center">
+      <Lottie animationData={Loading} loop={true} className="w-[20%]" />
+    </div>
+  ) : (
+    HtmlData?.map((item) => {
+      const isUnlocked = !!userAchievements?.[item.id];
+      const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
+      return (
+        <div
+          key={item.id}
+          className={`p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500 transition duration-500
+            hover:scale-110 hover:shadow-lg hover:shadow-gray-400
+            ${isUnlocked ? "opacity-100 " : "opacity-40 cursor-not-allowed hover:shadow-none"}`}>
+          <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
+            <img src={AchIcon} alt="Achievements Icon" className="w-20 h-20" />
+            <hr className="border-t border-gray-700 w-full" />
+            <h3 className="text-white text-lg font-bold">{item.title}</h3>
+            <p className="text-gray-400 text-sm">{item.description} </p>
+            <button
+              onClick={() => isUnlocked && !isClaimed && handleClaim(item)}
+              className={`px-4 py-1 rounded-full font-semibold cursor-pointer 
+                ${isClaimed ? "bg-green-500 text-white"
+                  : isUnlocked
+                    ? "bg-yellow-500 text-black"
+                    : "bg-red-500 text-white"
+                }`}>
+              {isClaimed ? "COMPLETED" : isUnlocked ? "UNCLAIMED" : "LOCKED"}
+            </button>
+          </div>
+        </div>
+      );
+    })
+  )}
+</div>
+{/** CSS SECTION **/}
+<h1 className='text-[#1E90FF] font-exo font-bold text-5xl text-shadow-lg/30'>CSS ACHIEVEMENTS</h1>
+<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
+  {cssLoading ? (
+    <div className="col-span-full flex justify-center items-center">
+      <Lottie animationData={Loading} loop={true} className="w-[20%]" />
+    </div>
+  ) : (
+CssData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
   const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
+  console.log(`${item.id} - ${isClaimed}`)
   return (
     <div
       key={item.id}
@@ -186,7 +232,7 @@ const showClaimToast = (item) => {
         hover:scale-110 hover:shadow-lg hover:shadow-gray-400
         ${isUnlocked ? "opacity-100 " : "opacity-40 cursor-not-allowed hover:shadow-none"}`}>
       <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
-        <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
+        <img src={AchIcon} alt="Achievements Icon" className="w-20 h-20" />
         <hr className="border-t border-gray-700 w-full" />
         <h3 className="text-white text-lg font-bold">{item.title}</h3>
         <p className="text-gray-400 text-sm">{item.description} </p>
@@ -204,11 +250,18 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
       </div>
     </div>
   );
-})}
+})
+  )}
 </div>
-        <h1 className='text-[#1E90FF] font-exo font-bold text-5xl text-shadow-lg/30'>CSS ACHIEVEMENTS</h1>
+{/** JS SECTION **/}
+<h1 className='text-[#F7DF1E] font-exo font-bold text-5xl text-shadow-lg/30'>JAVASCRIPT ACHIEVEMENTS</h1>
 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
-{CssData?.map((item) => {
+  {jsLoading ? (
+    <div className="col-span-full flex justify-center items-center">
+      <Lottie animationData={Loading} loop={true} className="w-[20%]" />
+    </div>
+  ) : (
+JsData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
   const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
   console.log(`${item.id} - ${isClaimed}`)
@@ -219,7 +272,7 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
         hover:scale-110 hover:shadow-lg hover:shadow-gray-400
         ${isUnlocked ? "opacity-100 " : "opacity-40 cursor-not-allowed hover:shadow-none"}`}>
       <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
-        <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
+        <img src={AchIcon} alt="Achievements Icon" className="w-20 h-20" />
         <hr className="border-t border-gray-700 w-full" />
         <h3 className="text-white text-lg font-bold">{item.title}</h3>
         <p className="text-gray-400 text-sm">{item.description} </p>
@@ -237,11 +290,18 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
       </div>
     </div>
   );
-})}
+})
+  )}
 </div>
-        <h1 className='text-[#F7DF1E] font-exo font-bold text-5xl text-shadow-lg/30'>JAVASCRIPT ACHIEVEMENTS</h1>
+{/** JS SECTION **/}
+<h1 className='text-[#4CAF50] font-exo font-bold text-5xl text-shadow-lg/30'>DATA QUERYING ACHIEVEMENTS</h1>
 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
-{JsData?.map((item) => {
+  {dbLoading ? (
+    <div className="col-span-full flex justify-center items-center">
+      <Lottie animationData={Loading} loop={true} className="w-[20%]" />
+    </div>
+  ) : (
+DatabaseData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
   const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
   console.log(`${item.id} - ${isClaimed}`)
@@ -252,7 +312,7 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
         hover:scale-110 hover:shadow-lg hover:shadow-gray-400
         ${isUnlocked ? "opacity-100 " : "opacity-40 cursor-not-allowed hover:shadow-none"}`}>
       <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
-        <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
+        <img src={AchIcon} alt="Achievements Icon" className="w-20 h-20" />
         <hr className="border-t border-gray-700 w-full" />
         <h3 className="text-white text-lg font-bold">{item.title}</h3>
         <p className="text-gray-400 text-sm">{item.description} </p>
@@ -270,40 +330,8 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
       </div>
     </div>
   );
-})}
-</div>
-        <h1 className='text-[#4CAF50] font-exo font-bold text-5xl text-shadow-lg/30'>DATA QUERYING ACHIEVEMENTS</h1>
-<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-20 w-full h-[100%]'>
-{DatabaseData?.map((item) => {
-  const isUnlocked = !!userAchievements?.[item.id];
-  const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
-  console.log(`${item.id} - ${isClaimed}`)
-  return (
-    <div
-      key={item.id}
-      className={`p-[2px] rounded-xl bg-gradient-to-b from-cyan-400 to-purple-500 transition duration-500
-        hover:scale-110 hover:shadow-lg hover:shadow-gray-400
-        ${isUnlocked ? "opacity-100 " : "opacity-40 cursor-not-allowed hover:shadow-none"}`}>
-      <div className="bg-[#0F172A] rounded-xl p-6 flex flex-col items-center text-center space-y-4 h-[100%]">
-        <img src={item.image} alt="Achievements Icon" className="w-20 h-20" />
-        <hr className="border-t border-gray-700 w-full" />  
-        <h3 className="text-white text-lg font-bold">{item.title}</h3>
-        <p className="text-gray-400 text-sm">{item.description} </p>
-<button 
-onClick={() => isUnlocked && !isClaimed && handleClaim(item)}
-className={`px-4 py-1 rounded-full font-semibold cursor-pointer 
-  ${isClaimed ? "bg-green-500 text-white"       // COMPLETED
-  : isUnlocked 
-  ? "bg-yellow-500 text-black"    // UNCLAIMED
-  : "bg-red-500 text-white"       // LOCKED
-  }`}> 
-{isClaimed ? "COMPLETED" : isUnlocked
-    ? "UNCLAIMED" : "LOCKED"}
-</button>
-      </div>
-    </div>
-  );
-})}
+})
+  )}
 </div>
       </div>
     </div>
@@ -312,6 +340,7 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
       <Lottie animationData={Loading} loop={true} className="w-[50%] h-[50%]" /> 
       </div>
       )}
+
 </div> 
 </>
   )

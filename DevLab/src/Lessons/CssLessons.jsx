@@ -1,45 +1,46 @@
+// Firebase
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
+// Utils
 import { useNavigate } from "react-router-dom";
+import "../index.css";
+// Assets
 import CssImage from "../assets/Images/css-Icon-Big.png";
-import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import LockAnimation from "../assets/Lottie/LockItem.json";
+// Ui
+import Lottie from "lottie-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaLock } from "react-icons/fa";
-
-import useLevelsData from "../components/Custom Hooks/useLevelsData";
+// Components
 import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
-import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress"
-import useUserProgress from "../components/Custom Hooks/useUserProgress";
+import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress";
 import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
-import "../index.css";
-
 function CssLessons() {
-  // Level Fetch (Custom Hooks)
-  const { levelsData, isLoading, isError, refetch } = useFetchLevelsData("Css");
+  // Level Fetch
+  const { levelsData, isLoading } = useFetchLevelsData("Css");
   // Unlocked and Locked Levels
-  const {userProgress,userStageProgress,completedLevels,completedStages,isLoading: progressLoading} = useFetchUserProgress("Css");
+  const {userProgress,userStageCompleted,isLoading: progressLoading} = useFetchUserProgress("Css");
   // Subject Levels Progress Bar
-  const { animatedBar,total} = useSubjProgressBar("Css");
+  const { animatedBar } = useSubjProgressBar("Css");
+  // UTils
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
-
   const [expandedLevel, setExpandedLevel] = useState(null);
-console.log(total);
+
   return (
     <>
       <div className="h-[100%]">
         {/*Upper Panel*/}
-        <div className=" h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#00509E] to-[#00BFFF]">
-          <div className="w-[80%] flex flex-col gap-7">
+        <div className="h-[40%] rounded-3xl p-5 flex items-center bg-linear-to-r from-[#00509E] to-[#00BFFF]">
+          <div className="w-[80%] flex flex-col justify-center gap-6">
             <div className="p-3 flex flex-col gap-4">
-              <h1 className="font-exo text-white text-[3rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
+              <h1 className="font-exo text-white text-[2.8rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
                 # CSS: The Art of Styling Your Digital World
               </h1>
-              <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop">
+              <p className="w-[75%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop leading-relaxed">
                 Step into the world of Front-End Development with HTML and CSS
                 as your weapons of creation. Your adventure begins with
                 mastering the fundamentals—building structure and style to craft
@@ -50,19 +51,22 @@ console.log(total);
                 true HTML and CSS hero!
               </p>
             </div>
-            <div>
-              <div className="w-[70%] min-h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-                <div
-                  className="h-4 rounded-full dark:bg-[#2CB67D]"
-                  style={{ width: `${animatedBar}%` }}
-                ></div>
-              </div>
+            <div className="w-[75%] min-h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
+              <div
+                className="h-4 rounded-full dark:bg-[#2CB67D] transition-all duration-500"
+                style={{ width: `${animatedBar}%` }}
+              ></div>
             </div>
           </div>
-          <div className="w-[30%] flex justify-center p-4">
-            <img src={CssImage} alt="" className="w-[60%] h-[90%]" />
+          <div className="w-[30%] flex justify-center items-center p-4">
+            <img
+              src={CssImage}
+              alt=""
+              className="w-[65%] h-[85%] object-contain"
+            />
           </div>
         </div>
+
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
@@ -73,8 +77,7 @@ console.log(total);
               loop={true}
               className="w-[60%] h-[70%] mt-[30px]"/>
           ) : (
-            <div
-              className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden scrollbar-custom">
+            <div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden scrollbar-custom">
               {levelsData.map((lesson) => (
                 <div key={lesson.id} className="flex flex-col gap-4">
                   <h2 className="font-exo text-[3rem] font-bold text-white">
@@ -97,12 +100,15 @@ console.log(total);
                     className="flex flex-col gap-4">
                     {lesson.levels.map((level) => {
                       // Level Locked or Unlocked
-                      const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+                      const isUnlocked =
+                        userProgress[`${lesson.id}-${level.id}`];
                       // unique identifier
-                      const isExpanded = expandedLevel === `${lesson.id}-${level.id}`;
+                      const isExpanded =
+                        expandedLevel === `${lesson.id}-${level.id}`;
                       const toggleLevel = (lessonId, levelId) => {
-                      const key = `${lessonId}-${levelId}`; 
-                      setExpandedLevel(prev => (prev === key ? null : key));};
+                        const key = `${lessonId}-${levelId}`;
+                        setExpandedLevel((prev) => (prev === key ? null : key));
+                      };
                       return (
                         <motion.div
                           key={`${lesson.id}-${level.id}`}
@@ -111,18 +117,19 @@ console.log(total);
                           <motion.div
                             variants={{
                               hidden: { opacity: 0, y: 100 },
-                              show: { opacity: isUnlocked ?  1 : 0.4, y: 0 },
+                              show: { opacity: isUnlocked ? 1 : 0.4, y: 0 },
                             }}
                             whileHover={{ scale: 1.02 }}
                             className={`group w-full border flex gap-5 rounded-4xl h-[120px] relative
                             ${
                               isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
                             } cursor-pointer`}
-                            onClick={async() => {
+                            onClick={async () => {
                               if (!isUnlocked) {
                                 setShowLockedModal(true);
-                                return;}
-                                if (isUnlocked) {
+                                return;
+                              }
+                              if (isUnlocked) {
                                 const user = auth.currentUser;
                                 if (user) {
                                   const userRef = doc(db, "Users", user.uid);
@@ -133,14 +140,15 @@ console.log(total);
                                       levelId: level.id,
                                     },
                                   });
-                                }}
+                                }
+                              }
                               toggleLevel(lesson.id, level.id);
                             }}>
-                              {!isUnlocked && (
-                                <div className="absolute flex items-center justify-center w-full h-full text-white">
-                                  <FaLock className="text-[3rem] text-white" />
-                                </div>
-                              )}
+                            {!isUnlocked && (
+                              <div className="absolute flex items-center justify-center w-full h-full text-white">
+                                <FaLock className="text-[3rem] text-white" />
+                              </div>
+                            )}
                             <div className="text-white bg-black min-w-[20%] text-[3rem] font-bold rounded-4xl flex justify-center items-center">
                               <span className="pb-2">{level.symbol}</span>
                             </div>
@@ -181,7 +189,9 @@ console.log(total);
                                     .map((stage) => {
                                       // Check if stage is unlocked
                                       const isStageUnlocked =
-                                        userStageProgress[`${lesson.id}-${level.id}-${stage.id}`];
+                                        userStageCompleted[
+                                          `${lesson.id}-${level.id}-${stage.id}`
+                                        ];
                                       return (
                                         <motion.div
                                           variants={{
@@ -269,8 +279,7 @@ console.log(total);
               </p>
               <button
                 className="bg-[#7F5AF0] px-6 py-2 rounded-2xl text-white font-bold hover:bg-[#6A4CD4] transition w-[90%] cursor-pointer"
-                onClick={() => setShowLockedModal(false)}
-              >
+                onClick={() => setShowLockedModal(false)}>
                 Okay
               </button>
             </div>

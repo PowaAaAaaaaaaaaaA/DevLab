@@ -1,44 +1,49 @@
+// Utils
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../index.css";
+// Firebase
 import { doc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../Firebase/Firebase";
-import { useNavigate } from "react-router-dom";
+// Assets
 import HtmlImage from "../assets/Images/html-Icon-Big.png";
-import Lottie from "lottie-react";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import LockAnimation from "../assets/Lottie/LockItem.json";
+// Ui
+import Lottie from "lottie-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaLock } from "react-icons/fa";
-
-import useLevelsData from "../components/Custom Hooks/useLevelsData";
-import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress"
+// Components
+import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress";
 import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
-import useUserProgress from "../components/Custom Hooks/useUserProgress";
 import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
-
-import "../index.css";
 
 function HtmlLessons() {
   // Level Fetch (Custom Hooks)
-  const { levelsData, isLoading, isError, refetch } = useFetchLevelsData("Html");
+  const { levelsData, isLoading } = useFetchLevelsData("Html");
   // Unlocked and Locked Levels
-  const {userProgress,userStageProgress,completedLevels,completedStages,isLoading: progressLoading} = useFetchUserProgress("Html");
+  const {
+    userProgress,
+    userStageCompleted,
+    isLoading: progressLoading,
+  } = useFetchUserProgress("Html");
   // Subject Levels Progress Bar
-  const { animatedBar,total} = useSubjProgressBar("Html");
+  const { animatedBar } = useSubjProgressBar("Html");
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
-
   const [expandedLevel, setExpandedLevel] = useState(null);
+
   return (
     <>
       <div className="h-[100%]">
         {/*Upper Panel*/}
-        <div className=" h-[40%] rounded-3xl p-5 flex bg-linear-to-r from-[#FF5733] to-[#FFC300]">
-          <div className="w-[80%] flex flex-col gap-7">
+        <div className="h-[40%] rounded-3xl p-5 flex items-center bg-linear-to-r from-[#FF5733] to-[#FFC300]">
+          <div className="w-[80%] flex flex-col justify-center gap-6">
             <div className="p-3 flex flex-col gap-4">
               <h1 className="font-exo text-white text-[2.8rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
                 {"< >"} HTML: The Gateway to Web Adventure
               </h1>
-              <p className="w-[70%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop">
+              <p className="w-[75%] text-white font-exo text-shadow-sm text-shadow-black textSmall-laptop leading-relaxed">
                 Step into the world of Front-End Development with HTML and CSS
                 as your weapons of creation. Your adventure begins with
                 mastering the fundamentals—building structure and style to craft
@@ -49,19 +54,22 @@ function HtmlLessons() {
                 true HTML and CSS hero!
               </p>
             </div>
-            <div>
-              <div className="w-[70%] min-h-4 mb-4 bg-gray-200 rounded-full  dark:bg-gray-700">
-                <div
-                  className="h-4 rounded-full dark:bg-[#2CB67D]"
-                  style={{ width: `${animatedBar}%` }}
-                ></div>
-              </div>
+            <div className="w-[75%] min-h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
+              <div
+                className="h-4 rounded-full dark:bg-[#2CB67D] transition-all duration-500"
+                style={{ width: `${animatedBar}%` }}
+              ></div>
             </div>
           </div>
-          <div className="w-[30%] flex justify-center p-4">
-            <img src={HtmlImage} alt="" className="w-[60%] h-[90%]" />
+          <div className="w-[30%] flex justify-center items-center p-4">
+            <img
+              src={HtmlImage}
+              alt=""
+              className="w-[65%] h-[85%] object-contain"
+            />
           </div>
         </div>
+
         {/*Lower Part hehe*/}
         <div className="h-[60%] flex p-3">
           {/*Left Panel*/}
@@ -70,10 +78,10 @@ function HtmlLessons() {
             <Lottie
               animationData={Animation}
               loop={true}
-              className="w-[60%] h-[70%] mt-[30px]"/>
+              className="w-[60%] h-[70%] mt-[30px]"
+            />
           ) : (
-            <div
-              className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden scrollbar-custom">
+            <div className="w-[60%] p-3 h-[100%] overflow-scroll overflow-x-hidden scrollbar-custom">
               {levelsData.map((lesson) => (
                 <div key={lesson.id} className="flex flex-col gap-4">
                   <h2 className="font-exo text-[3rem] font-bold text-white">
@@ -93,34 +101,41 @@ function HtmlLessons() {
                     }}
                     initial="hidden"
                     animate="show"
-                    className="flex flex-col gap-4">
+                    className="flex flex-col gap-4"
+                  >
                     {lesson.levels.map((level) => {
                       // Level Locked or Unlocked
-                      const isUnlocked = userProgress[`${lesson.id}-${level.id}`];
+                      const isUnlocked =
+                        userProgress[`${lesson.id}-${level.id}`];
                       // unique identifier
-                      const isExpanded = expandedLevel === `${lesson.id}-${level.id}`;
+                      const isExpanded =
+                        expandedLevel === `${lesson.id}-${level.id}`;
                       const toggleLevel = (lessonId, levelId) => {
-                      const key = `${lessonId}-${levelId}`; 
-                      setExpandedLevel(prev => (prev === key ? null : key));};
+                        const key = `${lessonId}-${levelId}`;
+                        setExpandedLevel((prev) => (prev === key ? null : key));
+                      };
                       return (
                         <motion.div
                           key={`${lesson.id}-${level.id}`}
-                          className="flex flex-col gap-2">
+                          className="flex flex-col gap-2"
+                        >
                           {/* Level Card */}
                           <motion.div
                             variants={{
                               hidden: { opacity: 0, y: 100 },
-                              show: { opacity: isUnlocked ?  1 : 0.4, y: 0 },
+                              show: { opacity: isUnlocked ? 1 : 0.4, y: 0 },
                             }}
                             whileHover={{ scale: 1.02 }}
                             className={`group w-full border flex gap-5 rounded-4xl h-[120px] relative 
                             ${
                               isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
                             } cursor-pointer`}
-                            onClick={async() => {
+                            onClick={async () => {
                               if (!isUnlocked) {
                                 setShowLockedModal(true);
-                                return;} if (isUnlocked) {
+                                return;
+                              }
+                              if (isUnlocked) {
                                 const user = auth.currentUser;
                                 if (user) {
                                   const userRef = doc(db, "Users", user.uid);
@@ -131,19 +146,21 @@ function HtmlLessons() {
                                       levelId: level.id,
                                     },
                                   });
-                                }}
+                                }
+                              }
                               toggleLevel(lesson.id, level.id);
-                            }}>
-                              {!isUnlocked && (
-                                <div className="absolute flex items-center justify-center w-full h-full text-white">
-                                  <FaLock className="text-[3rem] text-white" />
-                                </div>
-                              )}
+                            }}
+                          >
+                            {!isUnlocked && (
+                              <div className="absolute flex items-center justify-center w-full h-full text-white">
+                                <FaLock className="text-[3rem] text-white" />
+                              </div>
+                            )}
                             <div className="text-white bg-black min-w-[20%] text-[3rem] font-bold rounded-4xl flex justify-center items-center">
                               <span className="pb-4">{level.symbol}</span>
                             </div>
-                            <div className="p-4 text-white font-exo">
-                              <p className="text-[1.4rem]">{level.title}</p>
+                            <div className="p-3 text-white font-exo flex flex-col gap-2">
+                              <p className="text-[1.2rem]">{level.title}</p>
                               <p className="text-[0.7rem] line-clamp-3 text-gray-500">
                                 {level.description}
                               </p>
@@ -160,7 +177,8 @@ function HtmlLessons() {
                                   duration: 0.2,
                                   staggerChildren: 0.1,
                                 }}
-                                className=" p-5 bg-gray-900 rounded-2xl">
+                                className=" p-5 bg-gray-900 rounded-2xl"
+                              >
                                 <motion.div
                                   className="flex flex-col gap-2"
                                   initial="hidden"
@@ -172,14 +190,17 @@ function HtmlLessons() {
                                         staggerChildren: 0.1, // delay between each stage
                                       },
                                     },
-                                  }}>
+                                  }}
+                                >
                                   {level.stages
                                     ?.filter((stage) => stage.type === "Lesson")
                                     .sort((a, b) => a.order - b.order)
                                     .map((stage) => {
                                       // Check if stage is unlocked
                                       const isStageUnlocked =
-                                        userStageProgress[`${lesson.id}-${level.id}-${stage.id}`];
+                                        userStageCompleted[
+                                          `${lesson.id}-${level.id}-${stage.id}`
+                                        ];
                                       return (
                                         <motion.div
                                           variants={{
@@ -203,7 +224,8 @@ function HtmlLessons() {
                                                 `/Main/Lessons/Html/${lesson.id}/${level.id}/${stage.id}/${stage.type}`
                                               );
                                             }
-                                          }}>
+                                          }}
+                                        >
                                           <p className="font-exo">
                                             {stage.title}
                                           </p>

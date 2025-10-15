@@ -10,8 +10,6 @@ import Gameover_PopUp from "../GameModes_Popups/Gameover_PopUp";
 
 const GameModeRouter = () => {
   const { subject, lessonId, levelId, stageId, gamemodeId } = useParams();
-
-  const [stageCon, setStageCon] = useState("");
   const [back, setBack] = useState(null);
 
   const {heart,roundKey,gameOver,submitAttempt,resetHearts,loadHearts, } = useAttemptStore();
@@ -27,19 +25,12 @@ const GameModeRouter = () => {
     };
   }, [loadHearts]);
 
-  // Track Lesson stage (same as before)
-  useEffect(() => {
-    if (gamemodeId === "Lesson") {
-      setStageCon(stageId);
-    }
-  }, [gamemodeId, stageId]);
-
   // Prepare back route when game over
   useEffect(() => {
     if (gameOver) {
-      setBack(`/Main/Lessons/${subject}/${lessonId}/${levelId}/${stageCon}/Lesson`);
+      setBack(`/Main/Lessons/${subject}/${lessonId}/${levelId}/Stage1/Lesson`);
     }
-  }, [gameOver, subject, lessonId, levelId, stageCon]);
+  }, [gameOver, subject, lessonId, levelId]);
 
   const props = { heart, roundKey, gameOver, submitAttempt, resetHearts };
 
@@ -59,6 +50,10 @@ const GameModeRouter = () => {
           gameOver={gameOver}
           resetHearts={resetHearts}
           Back={back}
+          subject={subject}
+          lessonId={lessonId}
+          levelId={levelId}
+          stageId={stageId}
         />
       )}
     </>

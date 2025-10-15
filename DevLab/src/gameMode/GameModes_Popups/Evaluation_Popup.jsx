@@ -1,3 +1,6 @@
+
+// FOR LESSON GAME MODE (ANY SUB)
+
 import { motion} from "framer-motion";
 
 function Evaluation_Popup({evaluationResult, setShowPopup}) {
@@ -10,14 +13,12 @@ function Evaluation_Popup({evaluationResult, setShowPopup}) {
         exit={{ scale: 0.8, opacity: 0 }}>
 <div className="bg-[#111827] h-[100%] w-[100%] rounded-2xl p-5">
           <h2
-          className={`text-xl font-bold mb-2 ${
-            evaluationResult.correct ? "text-green-600" : "text-red-600"
-          }`}>
+          className="text-xl font-bold mb-2 text-amber-600">
           {evaluationResult.evaluation}
-        </h2>
-        <p className="text-gray-100 font-exo mb-2">{evaluationResult.feedback}</p>
+        </h2  >
+        <p className="text-gray-100 font-exo mb-2 text-justify leading-relaxed">{evaluationResult.feedback}</p>
         {evaluationResult.suggestion && (
-          <p className="text-gray-400 text-sm font-exo">
+          <p className="text-gray-400 text-sm font-exo leading-relaxed whitespace-pre-line">
             💡 <strong>Suggestion:</strong> {evaluationResult.suggestion}
           </p>
         )}

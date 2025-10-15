@@ -1,34 +1,47 @@
 
+
+// Assets
 import Image from '../assets/Images/Login-Image.jpg';
+import Loading from '../assets/Lottie/LoadingDots.json';
+// Utils
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+// Firebase
 import { signInWithEmailAndPassword,signOut,
         setPersistence,
         browserLocalPersistence,
         browserSessionPersistence,} from 'firebase/auth';
 import { doc,getDoc } from 'firebase/firestore';
-
 import { auth,db } from '../Firebase/Firebase';
-import { useState } from 'react';
+// Ui
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-
 import Lottie from 'lottie-react';
-import Loading from '../assets/Lottie/LoadingDots.json';
-
 import { IoPerson } from "react-icons/io5";
 import { IoLockOpen } from "react-icons/io5";
-
+import { IoEye, IoEyeOff } from "react-icons/io5";
+// Components
+import ForgotPassword from './ForgotPassword';
 
 function Login() {
-
 
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showForgot, setShowForgot] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
 
+  const admin = async () => {
+    try {
+      //await auth.signOut();
+      navigate("/AdminLogin"); // Use navigate
+    } catch (error) {
+      console.log(error);
+    }
+  };
 const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
@@ -43,8 +56,24 @@ const handleSubmit = async (e) => {
     // Sign in user
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
+    await userCredential.user.reload(); 
+    // Immediately sign out if not verified
+    if (!userCredential.user.emailVerified) {
+      await signOut(auth);
+      toast.error("Your email has not been verified yet", {
+        position: "bottom-center",
+        theme: "colored",
+      });
+      setLoading(false);
+      return;
+    }
+    if(!userCredential.user){
+      return;
+    }
+
+
     // Check Firestore user status BEFORE navigating
-    const userRef = doc(db, "Users", userCredential.user.uid);
+    const userRef = doc(db, "Users", userCredential?.user.uid);
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
@@ -88,7 +117,7 @@ const handleSubmit = async (e) => {
             <div className="h-[70vh] w-[65%] bg-[#25293B] rounded-4xl shadow-lg shadow-cyan-500 flex">
 
             {/*Left pannel*/}
-            <div className=" bg-cover bg-no-repeat h-[100%] w-[50%] rounded-4xl hidden justify-center sm:flex
+            <div className=" bg-cover bg-no-repeat h-[100%] w-[50%] rounded-4xl hidden justify-center sm:flex 
 "style={{ backgroundImage: `url(${Image})` }}>
             <h1 className="self-center font-exo text-[2.5rem] lg:text-[3.5rem] font-bold text-[#F5F5F5] block">DEVLAB</h1>
             </div>
@@ -119,15 +148,25 @@ const handleSubmit = async (e) => {
         <div className='w-[70%] flex justify-center relative m-[3%]'>
                 <input 
                 value={password}
-                onChange={(e) =>
-                setPassword(e.target.value)}
-                type="Password" 
+                onChange={(e) =>setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"} 
                 name="password" 
                 id="Password" 
                 placeholder='Password' 
                 className='relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl  pl-[50px] border-2 border-gray-700 focus:border-cyan-500  focus:outline-none'/>
                 <span className='absolute text-white left-3 self-center text-1xl md:text-2xl'><IoLockOpen/></span>
+              {/* Toggle visibility button */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 self-center text-white text-1xl md:text-2xl hover:text-cyan-400 transition">
+                {showPassword ? <IoEyeOff /> : <IoEye />} {/* toggle icons */}
+              </button>
         </div>
+        <button 
+        type='button'
+        onClick={()=>{setShowForgot(true)}}
+        className='text-white text-sm hover:underline cursor-pointer'>Forgot Password</button>
         {/*Remember Meeee*/}
         <div  className='m-[2%]'>
             <input type="checkbox" 
@@ -140,21 +179,27 @@ const handleSubmit = async (e) => {
         </div>
         <div className='m-[2%] w-[35%]'>
             <button 
+            type='submit'
             className='bg-[#7F5AF0] w-[100%] text-[0.8rem] md:text-[1.2rem] rounded-4xl text-white p-4 font-bold hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.8)]'>Login</button>
         </div>                
             </form>
         {/*Register Link*/}
-        <div className='text-white text-center p-4'>
+        <div className='text-white text-center'>
             <p>Dont have an account? <Link to='/Register'className='text-blue-200 hover:cursor-pointer hover:underline hover:drop-shadow-[0_0_6px_rgba(147,197,253,0.8)] transition-all duration-300'>Register here</Link></p>
         </div>
-
+          <button
+          onClick={admin}
+            className="text-white font-exo  hover:text-red-500 hover:cursor-pointer transition duration-300 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)] text-[0.8rem]">
+            Login as Administrator
+          </button>
             </div>
 
             </div>
+        </div> 
+{showForgot && (
+  <ForgotPassword onClose={() => setShowForgot(false)}></ForgotPassword>
+)}      
 
-
-
-        </div>  
 </>
     )
 }

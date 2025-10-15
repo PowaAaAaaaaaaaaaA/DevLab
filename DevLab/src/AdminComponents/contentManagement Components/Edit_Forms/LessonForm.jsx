@@ -15,25 +15,29 @@ function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, le
     : 0;
 
   const [selectedItem, setSelectedItem] = useState("");
-  const [counter, setCounter] = useState(lastBlockId + 1);
 
-  const addBlocks = () => {
-    if (selectedItem === "") {
-      console.log("empty");
-      return;
-    }
-    dispatch({
-      type: "ADD_BLOCK",
-      payload: {
-        id: counter,
-        type: selectedItem,
-        value: "",
-      },
-    });
+const addBlocks = () => {
+  if (!selectedItem) return;
 
-    setCounter((prev) => prev + 1);
-    setSelectedItem("");
-  };
+  // Compute max ID dynamically
+  const maxId = state.blocks.length
+    ? Math.max(...state.blocks.map((b) => b.id))
+    : 0;
+
+  const newId = maxId + 1;
+
+  dispatch({
+    type: "ADD_BLOCK",
+    payload: {
+      id: newId,
+      type: selectedItem,
+      value: "",
+    },
+  });
+
+  setSelectedItem("");
+};
+
 
   
   const [videoFile, setVideoFile] = useState(null);
@@ -58,7 +62,7 @@ function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, le
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "x-source": "mobile-app",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -106,17 +110,62 @@ function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, le
       </div>
 
       {/* Coding Interface */}
-      <div className="border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]">
-        <h1 className="font-exo text-white text-[2rem] mb-[10px]">Coding Interface:</h1>
-        <textarea
-          value={state.codingInterface || stageData?.codingInterface || ""}
-          onChange={(e) =>
-            dispatch({ type: "UPDATE_FIELD", field: "codingInterface", value: e.target.value })
-          }
-          className="w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-          placeholder="Enter initial code setup here."
-        />
-      </div>
+{/* Coding Interface Section */}
+<div className="border-cyan-400 border rounded-2xl w-full p-4 bg-[#111827] mt-4">
+  <h1 className="font-exo text-white text-[2rem] mb-[10px]">Coding Interface</h1>
+
+  {/* HTML */}
+  <div className="mt-4">
+    <h2 className="font-exo text-white text-lg mb-2">HTML:</h2>
+    <textarea
+      value={state.codingInterface.html || ""}
+      onChange={(e) =>
+        dispatch({
+          type: "UPDATE_CODING_INTERFACE",
+          field: "html",
+          value: e.target.value,
+        })
+      }
+      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+      placeholder="Enter HTML code here..."
+    />
+  </div>
+
+  {/* CSS */}
+  <div className="mt-4">
+    <h2 className="font-exo text-white text-lg mb-2">CSS:</h2>
+    <textarea
+      value={state.codingInterface.css || ""}
+      onChange={(e) =>
+        dispatch({
+          type: "UPDATE_CODING_INTERFACE",
+          field: "css",
+          value: e.target.value,
+        })
+      }
+      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+      placeholder="Enter CSS code here..."
+    />
+  </div>
+
+  {/* JS */}
+  <div className="mt-4">
+    <h2 className="font-exo text-white text-lg mb-2">JavaScript:</h2>
+    <textarea
+      value={state.codingInterface.js || ""}
+      onChange={(e) =>
+        dispatch({
+          type: "UPDATE_CODING_INTERFACE",
+          field: "js",
+          value: e.target.value,
+        })
+      }
+      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+      placeholder="Enter JavaScript code here..."
+    />
+  </div>
+</div>
+
 
       {/* Instruction */}
       <div className="border-cyan-400 border rounded-2xl w-full h-[20%] p-4 bg-[#111827]">
@@ -160,8 +209,6 @@ function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, le
         </a>
       )}
     </div>
-
-
       {/* Add Block Section */}
       <div className="bg-slate-600 px-1 my-3 py-3 rounded-2xl">
         <div className="flex flex-row justify-between bg-[#111827] border-cyan-400 border-2 p-3 rounded-2xl">

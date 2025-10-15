@@ -1,31 +1,33 @@
-// Ui
+// Assets
 import HtmlIcons from '../assets/Images/html-Icon.png'
 import CssIcons from '../assets/Images/css-Icon.png'
 import DataIcons from '../assets/Images/Data-Icon.png'
 import JsIcons from '../assets/Images/js-Icon.png'
-import Loading from './Loading'
-import '../index.css'
+import Coins from '../assets/Images/DevCoins.png'
 import defaultAvatar from './../assets/Images/profile_handler.png'
-// Utils and Hooks
+import Loading from './Loading'
+// Utils
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
+import { useQueryClient } from '@tanstack/react-query'
+import '../index.css'
+// Components
 import useLevelBar from './Custom Hooks/useLevelBar'
 import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
-import useShopItems from './Custom Hooks/useShopItems'
 import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
+import useFetchUserData from './BackEnd_Data/useFetchUserData.jsx'
+import { fetchShopItems } from './BackEnd_Data/useFethShopItems.jsx'
 // Firebase
 import { db} from "../Firebase/Firebase"
 import {doc, getDoc } from 'firebase/firestore';
 
-import useFetchUserData from './BackEnd_Data/useFetchUserData.jsx'
+
 
 function Dashboard() {
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
   // User Details (Custom Hook)
-
-  const { userData, isLoading, isError, refetch } = useFetchUserData();
+  const { userData, isLoading } = useFetchUserData();
   const {animatedExp} = useLevelBar();
   const {inventory, loading} = useUserInventory();
   // Subject ProgressbAr
@@ -33,16 +35,21 @@ function Dashboard() {
   const {animatedBar: CssProgress} = useSubjProgressBar("Css")
   const {animatedBar: JsProgress} = useSubjProgressBar("JavaScript")
   const {animatedBar: DbProgress} = useSubjProgressBar("Database")
-
+  //
   const [loadingDashboard , setLoading] = useState(true);
-    // // Shop Items (Custom Hook)
-    const {items} = useShopItems();    
-    const { data: HtmlData, } = useAchievementsData("Html");
-    const { data:CssData,  } = useAchievementsData("Css");
-    const { data:JsData,  } = useAchievementsData("JavaScript");
-    const { data:DatabaseData, } = useAchievementsData("Database");
-    
 
+// pre-fetching data sa Achievement and Shop
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    queryClient.prefetchQuery(["ShopItems"], fetchShopItems);
+  }, [queryClient]);
+  const { data: HtmlData, } = useAchievementsData("Html");
+  const { data:CssData,  } = useAchievementsData("Css");
+  const { data:JsData,  } = useAchievementsData("JavaScript");
+  const { data:DatabaseData, } = useAchievementsData("Database");
+
+
+// Intial Loading
 useEffect(() => {
   const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
 
@@ -59,6 +66,7 @@ useEffect(() => {
     setLoading(false);
   }
 }, []);
+
 
 // THis will get the last open lesson 
   const [levelInfo, setLevelInfo] =useState();
@@ -78,7 +86,6 @@ console.log(subject)
       }
     }
   };
-
   fetchLevelInfo();
 }, [userData]);
 
@@ -91,6 +98,7 @@ if (loadingDashboard) {
     </div>
   );
 }
+
   return (
 // Dashboard Wrapper
   <div className='h-[100%] w-[100%] flex flex-col gap-2'>
@@ -110,17 +118,17 @@ if (loadingDashboard) {
     </div>
 
     <div className="text-white font-inter text-[0.85rem] break-words w-[60%] rounded-2xl backdrop-blur-[10px] text-shadow-lg/60">
-      <p className="text-center">{userData.bio}</p>
+      <p className="text-center">{userData?.bio}</p>
     </div>
   </div>
 
   <div className="h-auto w-[100%] flex flex-col p-2 gap-2 backdrop-blur-[2px] rounded-3xl">
     <p className="text-white font-inter font-bold text-shadow-lg/60">Good to see you!</p>
     <h1 className="sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight text-shadow-lg/60">
-      {userData.username}
+      {userData?.username}
     </h1>
     <p className="text-white font-inter font-bold mb-0.5 text-shadow-lg/60">
-      Level {userData.userLevel}
+      Level {userData?.userLevel}
     </p>
     {/* Progress Bar */}
     <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
@@ -132,10 +140,20 @@ if (loadingDashboard) {
     {/* Progress Bar */}  
     <div className="flex w-[40%] justify-around mt-[10px]">
       <p className="text-white font-inter font-bold text-shadow-lg/60">
-        User Xp: {userData.exp} / 100
+        User Xp: {userData?.exp} / 100
       </p>
       <div className="text-white font-inter font-bold text-shadow-lg/60">
-        User Money: {userData.coins}
+        <div className="flex items-center gap-2 sm:gap-3 text-white font-inter font-bold text-shadow-lg/60">
+  <img 
+    src={Coins} 
+    alt="Coins" 
+    className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" 
+  />
+  <span className="text-sm sm:text-base md:text-lg lg:text-xl truncate">
+    {userData?.coins}
+  </span>
+</div>
+
       </div>
     </div>
   </div>

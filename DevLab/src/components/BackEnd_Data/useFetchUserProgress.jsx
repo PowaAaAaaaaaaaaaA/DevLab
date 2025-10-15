@@ -31,6 +31,7 @@ export default function useFetchUserProgress(subject) {
   return {
     userProgress: data?.allProgress || {},
     userStageProgress: data?.allStages || {},
+    userStageCompleted: data?.allStagesComplete || {},
     completedLevels: data?.completedLevels || 0,
     completedStages: data?.completedStages || 0,
     isLoading,

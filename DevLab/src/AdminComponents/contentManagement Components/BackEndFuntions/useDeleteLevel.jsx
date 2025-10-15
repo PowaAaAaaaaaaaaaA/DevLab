@@ -5,6 +5,7 @@ export function useDeleteLevel(activeTab) {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['deleteLevel'],
     mutationFn: deleteLevel,
     onSuccess: () => {
       queryClient.invalidateQueries({

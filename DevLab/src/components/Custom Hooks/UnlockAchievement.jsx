@@ -35,12 +35,9 @@ case "tagUsed": {
 
   // Check if any required tag is in usedTags AND the answer is correct
   match =
-    requiredTags.some(tag => usedTags.includes(tag)) &&
-    payload.isCorrect === true;
+    requiredTags.some(tag => usedTags.includes(tag)) 
   break;
 }
-
-
   case "itemUse":
     match = payload?.itemName === condition?.itemReq && subject === condition?.subject;
     break;
@@ -56,9 +53,11 @@ case "tagUsed": {
         const userAchSnap = await getDoc(userAchRef);
         if (!userAchSnap.exists()) {
           await setDoc(userAchRef, {
-            ...achievement,
-            dateUnlocked: new Date(),
-            claimed: false,
+          isClaimed: false,
+          coinsReward: achievement.coinsReward,
+          expReward: achievement.expReward,
+          achievementName: achievement.title,
+          dateUnlocked: new Date(),
           });
           // Show Tailwind styled toast
 toast.custom((t) => (

@@ -101,7 +101,7 @@ function AddContent({ subject, closePopup }) {
         coinsReward: parseInt(coins),
         expReward: parseInt(exp),
         symbol: defaultS,
-        order: nextLevelNum,
+        levelOrder: nextLevelNum,
       };
 
       if (subject === "JavaScript") levelData.type = selectedType;
@@ -195,12 +195,14 @@ function AddContent({ subject, closePopup }) {
             className="border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400"
           />
           <input
+            required
             onChange={(e) => setCoins(e.target.value)}
             type="number"
             placeholder="Coin Reward"
             className="border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400"
           />
           <input
+            required
             onChange={(e) => setExp(e.target.value)}
             type="number"
             placeholder="Exp Reward"

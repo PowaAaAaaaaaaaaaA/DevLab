@@ -1,9 +1,7 @@
 // REACt
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
 import { useEffect, useState } from "react";
-
 import { Toaster } from "react-hot-toast";
 // FIREBASE
 import { auth } from "./Firebase/Firebase";
@@ -32,16 +30,14 @@ import HtmlLessons from "./Lessons/HtmlLessons";
 import CssLessons from "./Lessons/CssLessons";
 import JavaScriptLessons from "./Lessons/JavaScriptLessons";
 import DataLessons from "./Lessons/DataLessons";
-// LESSON PAGES
-import LessonPage from "./Lessons/LessonPage";
-// LOADING
-import Loading from "./components/Loading";
+
 import { getDoc } from "firebase/firestore";
 // GAME MODES
 import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 //
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import FullscreenLoader from "./components/FullScreenLoader";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +46,15 @@ function App() {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setAdmin] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  //  Detect if screen is mobile-sized
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
 useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged(async (user) => {
     if (!user) {
@@ -66,7 +71,7 @@ useEffect(() => {
       if (userData?.suspend) {
         // Immediately sign out suspended user
         await signOut(auth);
-        toast.error("Your account is suspended.", {
+        Toaster.error("Your account is suspended.", {
           position: "bottom-center",
           theme: "colored",
         });
@@ -87,12 +92,25 @@ useEffect(() => {
 
 
     const isLoggedIn = !!user;
-  // Loading (Para Hindi bumalik sa Main Dashboard and mag stay lang sa Admin Dashboard pag nirerefresh yung webapp)
-  // !! LAGYAN LOADING ANIMATION !!
+
   if (loading) return null;
+
+
+
+      // If mobile, show only LandingPage (no routes)
+  if (isMobile) {
+    return (
+      <>
+        <LandingPage />
+        <ToastContainer />
+        <Toaster position="top-center" reverseOrder={false} />
+      </>
+    );
+  }
 
   return (
     <>
+    <FullscreenLoader/>
       <QueryClientProvider client={queryClient}>
         <Routes>
           {/* Public Routes */}

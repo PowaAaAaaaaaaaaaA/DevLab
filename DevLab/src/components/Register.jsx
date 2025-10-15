@@ -1,10 +1,13 @@
 import Image from '../assets/Images/Login-Image.jpg'
 import { useState } from 'react'
 import { auth, db } from '../Firebase/Firebase'
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword,sendEmailVerification,signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { setDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+
+
+
 
 
 function Register() {
@@ -17,9 +20,16 @@ function Register() {
     const handleRegister= async (e)=>{
         e.preventDefault();
         try{
-            await createUserWithEmailAndPassword(auth, email,password);
-            const user = auth.currentUser;
-if (user) {
+const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+const user = userCredential.user;
+    if (user) {
+    console.log("Sending verification email to:", user.email);
+    await sendEmailVerification(user);
+    toast.success("Please check your email for confirmation", {
+        position: "top-center",
+        theme: "colored",
+    });
+
   // Save main profile data
     await setDoc(doc(db, "Users", user.uid), {
     email: user.email,
@@ -44,17 +54,17 @@ for (const subject of subjects) {
     await setDoc(
     doc(db, "Users", user.uid, "Progress", subject),
     {
-        status: true, 
+        isActive: true, 
     });
     await setDoc(
     doc(db, "Users", user.uid, "Progress", subject,"Lessons","Lesson1"),
     {
-        status: true, 
+        isActive: true, 
     });
     await setDoc(
     doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
     {
-    status: true,
+    isActive: true,
     completed:false,
     rewardClaimed: false,
     });
@@ -63,10 +73,12 @@ for (const subject of subjects) {
     await setDoc(
     doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1","Stages","Stage1"),
     {
-    status: true,
+    isActive: true,
+    isCompleted: true,
     });
 }
 }
+    await signOut(auth);
             toast.success("Registered Successfully",{
                 position:"top-center",
                 theme: "colored"

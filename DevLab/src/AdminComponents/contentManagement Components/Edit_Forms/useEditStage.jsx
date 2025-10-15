@@ -8,11 +8,18 @@ const initialState = {
   isHidden: false,
   type: "",
   instruction: "",
-  codingInterface: "",
+  codingInterface: {
+    html: "",
+    css: "",
+    js: "",
+  },
+
   // Bug Bust
   hint: "",
+
   // Code Rush
   timer: undefined,
+
   // BrainBytes
   choices: {
     a: "",
@@ -21,18 +28,32 @@ const initialState = {
     d: "",
     correctAnswer: "",
   },
+
   // CodeCrafter
   copyCode: "",
+
+  // Common Blocks
   blocks: [],
 };
-// Reducer function
+
+// Reducer
 const reducer = (state, action) => {
-  switch (action.type) {  
+  switch (action.type) {
     case "UPDATE_FIELD":
       return {
         ...state,
         [action.field]: action.value,
       };
+
+    case "UPDATE_CODING_INTERFACE":
+      return {
+        ...state,
+        codingInterface: {
+          ...state.codingInterface,
+          [action.field]: action.value,
+        },
+      };
+
     case "UPDATE_FIELD_CHOICES":
       return {
         ...state,
@@ -41,11 +62,16 @@ const reducer = (state, action) => {
           [action.field]: action.value,
         },
       };
+
     case "ADD_BLOCK":
       return {
         ...state,
-        blocks: [...state.blocks, action.payload],
+        blocks: [
+          ...state.blocks,
+          { id: action.payload.id, type: action.payload.type, value: action.payload.value },
+        ],
       };
+
     case "UPDATE_BLOCK":
       return {
         ...state,
@@ -55,15 +81,19 @@ const reducer = (state, action) => {
             : block
         ),
       };
+
     case "REMOVE_BLOCK":
       return {
         ...state,
         blocks: state.blocks.filter((block) => block.id !== action.id),
       };
+
     case "RESET_ALL_FIELD":
-      return initialState;
+      return { ...initialState };
+
     case "UPDATE_ALL_FIELDS":
       return { ...initialState, ...action.payload };
+
     default:
       return state;
   }

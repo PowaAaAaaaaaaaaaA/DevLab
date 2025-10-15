@@ -1,5 +1,5 @@
 
-const blockTypes = ["Header", "Paragraph", "Divider"]; // 
+const blockTypes = ["Header", "Paragraph", "Divider","Image"]; // 
 
 function TestDropDownMenu({ selectedItem, setSelectedItem }) {
   return (

@@ -7,7 +7,8 @@ import { HiArrowDownTray } from "react-icons/hi2";
 import { GoPlus, GoTrash } from "react-icons/go";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import Lottie from "lottie-react";
-
+import { useIsMutating } from "@tanstack/react-query";
+import Loading from '../assets/Lottie/LoadingDots.json'
 
 import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
 import AddContent from "./contentManagement Components/AddContent";
@@ -22,6 +23,8 @@ import { useDeleteLevel } from "./contentManagement Components/BackEndFuntions/u
 import {useAddStage} from "./contentManagement Components/BackEndFuntions/useAddStage"
 
 function ContentManagement() {
+ const isMutating = useIsMutating();
+
   const [activeTab, setActiveTab] = useState("Html");
   // const { levelsData, isLoading } = useLevelsData(activeTab);
   const { levelsData, isLoading, } = useFetchLevelsData(activeTab);
@@ -119,15 +122,27 @@ const handleDragEnd = async (event, lessonId, levelId) => {
   };
 
 
+
+
   return (
     <div className="h-full overflow-hidden px-4 sm:px-6 lg:px-10">
+{/* Global loader overlay */}
+      {isMutating > 0 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
+          <Lottie
+            animationData={Loading}
+            loop={true}
+            className="w-[50%] h-[50%]"
+          />
+        </div>
+      )}
       {/* Header */}
       <div className="border-b border-white h-auto flex flex-col justify-between p-5">
         <div className="flex text-white font-exo justify-between p-10">
-          <h1 className="text-[3.2rem] font-bold">Content Management</h1>
+          <h1 className="text-[3.2rem] font-bold bigText-laptop">Content Management</h1>
           <button
             onClick={openPopup}
-            className="rounded-2xl w-[20%] h-[60%] flex gap-5 items-center p-5 justify-center bg-[#4CAF50] font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]">
+            className="rounded-2xl w-[20%] h-[60%] flex gap-5 items-center p-3 justify-center bg-[#4CAF50] font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]">
             <span className=" text-2xl">
               <HiArrowDownTray />
             </span>
@@ -161,7 +176,7 @@ const handleDragEnd = async (event, lessonId, levelId) => {
         <div className=" h-[60%] p-5 overflow-scroll overflow-x-hidden mt-2 scrollbar-custom">
           {levelsData.map((lesson) => (
             <div key={lesson.id} className="p-5 flex flex-col gap-15">
-              <h2 className="text-white font-exo text-5xl">
+              <h2 className="text-white font-exo text-5xl bigText-laptop">
                 Lesson {lesson.Lesson} 
               </h2>
               <div className="flex flex-wrap justify-center gap-5">
@@ -173,7 +188,7 @@ const handleDragEnd = async (event, lessonId, levelId) => {
                       {level.title}
                     </h2>
                     <div className="flex flex-wrap gap-3 mt-3">
-                      <div className="border flex flex-wrap p-2 rounded-lg border-gray-500 gap-3 w-full">
+                      <div className="border flex flex-wrap p-2 rounded-lg border-gray-500 gap-3 w-full justify-center">
                         <DndContext
                           collisionDetection={closestCorners}
                           onDragEnd={(event) =>

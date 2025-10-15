@@ -1,32 +1,40 @@
-import React, { useState, useCallback, useRef } from "react";
+// Utils
+import { useState, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import '../index.css'
+// CodeMirror
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
-import { EditorView } from "@codemirror/view"; //
+import { EditorView } from "@codemirror/view"; 
+// Ui
 import Lottie from "lottie-react";
+import { motion, AnimatePresence } from "framer-motion";
+// Assets
 import Animation from "../assets/Lottie/OutputLottie.json";
-import { motion } from "framer-motion";
+// Components
+import CodePlaygroundEval_PopUp from "../gameMode/GameModes_Popups/CodePlaygroundEval_PopUp";
+import codePlaygroundEval from "./OpenAI Prompts/codePlaygroundEval";
 
-import '../index.css'
-import { useNavigate } from "react-router-dom";
+
 function CodePlayground() {
   const tabs = ["HTML", "CSS", "JavaScript"];
   const [activeTab, setActiveTab] = useState("HTML");
   const [run, setRun] = useState(false);
-
   const navigate = useNavigate();
-
+  const [evaluationResult, setEvaluationResult] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   // useRef
   const iFrame = useRef(null);
+
   // Initial Text Each Tab
   const [code, setCode] = useState({
     HTML: "<!-- Write your HTML code here -->",
     CSS: "/* Write your CSS code here */",
     JavaScript: "// Write your JavaScript code here",
   });
-
   // Handle code change based on active tab
   const onChange = useCallback(
     (val) => {
@@ -37,7 +45,6 @@ function CodePlayground() {
     },
     [activeTab]
   );
-
   // Determine the CodeMirror extension based on active tab
   const getLanguageExtension = () => {
     switch (activeTab) {
@@ -52,25 +59,25 @@ function CodePlayground() {
     }
   };
 
-  // This will run the code when the Button is pressed hehe
+  // This will run the code when the Button is pressed 
   const runCode = () => {
     setRun(true); // trigger iframe to appear
     // Slight delay to allow iframe to mount first ( kase kelangan double click yung "run" btn kapag wlaang delay TT)
     setTimeout(() => {
       const fullCode = `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <style>${code.CSS}</style>
-    </head>
-    <body>
-    ${code.HTML}
-    <script>
+<html lang="en">
+<head>
+  <style>${code.CSS}</style>
+</head>
+<body>
+  ${code.HTML}
+  <script>
+  (() => {
     ${code.JavaScript}
-    </script>
-    </body>
-    </html>`;
-
-    console.log(fullCode); // For debugging purposes
+  })();
+  </script>
+</body>
+</html>`;
       const iframe = iFrame.current;
       if (iframe) {
         const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -80,6 +87,26 @@ function CodePlayground() {
       }
     }, 0);
   };
+
+const [isEvaluating, setIsEvaluating] = useState(false);
+//Eval Button
+  const handleEvaluate = async () => {
+  setIsEvaluating(true);
+  try {
+    const result = await codePlaygroundEval({
+      html: code.HTML,
+      css: code.CSS,
+      js: code.JavaScript,
+    });
+    setEvaluationResult(result);
+    setShowPopup(true);
+  } catch (error) {
+    console.error("Error evaluating code:", error);
+  } finally {
+    setIsEvaluating(false);
+  }
+};
+
   return (
     <div className="bg-[#16161A] h-screen text-white font-exo flex flex-col p-3">
       <div 
@@ -125,19 +152,28 @@ function CodePlayground() {
                 theme={tokyoNight}
               />
             </div>
+<motion.div className="flex justify-end gap-3">
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={{ scale: 1.05, background: "#7e22ce" }}
+    transition={{ bounceDamping: 100 }}
+    onClick={handleEvaluate}
+    disabled={isEvaluating}
+    className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
+    {isEvaluating ? "Evaluating..." : "EVALUATE"}
+  </motion.button>
 
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              onClick={runCode}
-              className="ml-auto px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            >
-              Run Code
-            </motion.button>
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={{ scale: 1.05, background: "#7e22ce" }}
+    transition={{ bounceDamping: 100 }}
+    onClick={runCode}
+    className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
+    Run Code
+  </motion.button>
+</motion.div>
           </div>
         </div>
-
         {/* Output Panel */}
         <div className="bg-[#F8F3FF] w-[39%] h-full rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
           {run ? (
@@ -145,7 +181,7 @@ function CodePlayground() {
               title="output"
               ref={iFrame}
               className="w-full h-full rounded-3xl"
-              sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
+              sandbox="allow-scripts allow-same-origin  allow-modals allow-popups allow-top-navigation-by-user-activation"
             />
           ) : (
             <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl bg-[#F8F3FF]">
@@ -157,6 +193,18 @@ function CodePlayground() {
           )}
         </div>
       </div>
+      <AnimatePresence>
+        {showPopup && evaluationResult && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}>
+              <CodePlaygroundEval_PopUp evaluationResult={evaluationResult} setShowPopup={setShowPopup}/>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 // Components
 import AdminLogin from "../assets/Lottie/AdminLogin.json";
+import ResetPassword from "./ResetPassword";
 // Data
 import useFetchUserData from "./BackEnd_Data/useFetchUserData";
 
@@ -25,6 +26,7 @@ function Settings() {
 
   const [showLogoutPopUp, setShowLogoutPopUp] = useState(false);
   const [showAdminPopup, setAdminPopup] = useState(false);
+  const [showResetPass, setShowResetPass] = useState(false);
   const navigate = useNavigate();
 
   // Logout
@@ -190,7 +192,10 @@ hover:cursor-pointer"
           },300)}}>
           Logout
         </motion.button>
-
+        <button
+        className="text-white text-sm hover:underline cursor-pointer"
+        onClick={()=>{setShowResetPass(true)}}
+        >Reset Password</button>
         <Link>
           <button
             onClick={() => setAdminPopup(true)}
@@ -278,6 +283,7 @@ hover:cursor-pointer">
         </div>
       ):null}
     </AnimatePresence>
+    {showResetPass && (<ResetPassword onClose={() => setShowResetPass(false)}/>)}
     </>
   );
 }
