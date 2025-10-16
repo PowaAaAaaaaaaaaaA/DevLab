@@ -36,6 +36,7 @@ function LessonInstructionPanel() {
           ? beautifyJS(codingInterface.js, { indent_size: 2 })
           : "",
     });
+      console.log(codingInterface);
   }, [gameModeData, subject]);
 
   if (!levelData || !gameModeData) {
@@ -45,6 +46,7 @@ function LessonInstructionPanel() {
       </div>
     );
   }
+
 
   const hasAnyCode =
     formattedCode.html || formattedCode.css || formattedCode.js;

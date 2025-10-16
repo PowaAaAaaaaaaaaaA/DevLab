@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { setDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
+import Loading from "../assets/Lottie/LoadingDots.json";
+
 
 
 
@@ -16,84 +18,127 @@ function Register() {
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
     const [age, setAge] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleRegister= async (e)=>{
-        e.preventDefault();
-        try{
-const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-const user = userCredential.user;
+
+const handleRegister = async (e) => {
+  e.preventDefault();
+
+  try {
+    // Create the user in Firebase
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
     if (user) {
-    console.log("Sending verification email to:", user.email);
-    await sendEmailVerification(user);
-    toast.success("Please check your email for confirmation", {
+      console.log("Sending verification email to:", user.email);
+
+      // Send verification email
+      await sendEmailVerification(user);
+      toast.success("Verification email sent! Please check your inbox.", {
         position: "top-center",
         theme: "colored",
-    });
+      });
 
-  // Save main profile data
-    await setDoc(doc(db, "Users", user.uid), {
-    email: user.email,
-    username: username,
-    age: age,
-    exp: 0,
-    userLevel: 1,
-    coins: 0,
-    bio: "",
-    isAdmin: false,
-    suspend: false,
-    healthPoints:3,
-    lastOpenedLevel: {
-        subject: "Html",
-        lessonId: "Lesson1",
-        levelId: "Level1",
-    },});
+      // Save main profile data
+      await setDoc(doc(db, "Users", user.uid), {
+        email: user.email,
+        username: username,
+        age: age,
+        exp: 0,
+        userLevel: 1,
+        coins: 0,
+        bio: "",
+        isAdmin: false,
+        suspend: false,
+        healthPoints: 3,
+        lastOpenedLevel: {
+          subject: "Html",
+          lessonId: "Lesson1",
+          levelId: "Level1",
+        },
+      });
 
-const subjects = ["Html", "Css", "JavaScript", "Database"];
-for (const subject of subjects) {
-  // Create Level1 document
-    await setDoc(
-    doc(db, "Users", user.uid, "Progress", subject),
-    {
-        isActive: true, 
-    });
-    await setDoc(
-    doc(db, "Users", user.uid, "Progress", subject,"Lessons","Lesson1"),
-    {
-        isActive: true, 
-    });
-    await setDoc(
-    doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
-    {
-    isActive: true,
-    completed:false,
-    rewardClaimed: false,
-    });
+      // Initialize progress for each subject
+      const subjects = ["Html", "Css", "JavaScript", "Database"];
+      for (const subject of subjects) {
+        await setDoc(doc(db, "Users", user.uid, "Progress", subject), {
+          isActive: true,
+        });
+        await setDoc(doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1"), {
+          isActive: true,
+        });
+        await setDoc(
+          doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
+          {
+            isActive: true,
+            completed: false,
+            rewardClaimed: false,
+          }
+        );
+        await setDoc(
+          doc(
+            db,
+            "Users",
+            user.uid,
+            "Progress",
+            subject,
+            "Lessons",
+            "Lesson1",
+            "Levels",
+            "Level1",
+            "Stages",
+            "Stage1"
+          ),
+          {
+            isActive: true,
+            isCompleted: true,
+          }
+        );
+      }
 
-  // Create Stage1 document inside Stages subcollection of Level1
-    await setDoc(
-    doc(db,"Users",user.uid,"Progress",subject,"Lessons","Lesson1","Levels","Level1","Stages","Stage1"),
-    {
-    isActive: true,
-    isCompleted: true,
-    });
-}
-}
-    await signOut(auth);
-            toast.success("Registered Successfully",{
-                position:"top-center",
-                theme: "colored"
-            })
-            navigate('/Login');
-        }catch(error){
-            
-            toast.error(error.message,{
-                position:"bottom-center",
-                theme: "colored"
-            })
-        }
+      // ✅ Sign out and redirect only AFTER Firebase confirms logout
+      signOut(auth)
+        .then(() => {
+          toast.success(
+            "Registered successfully! Please verify your email before logging in.",
+            {
+              position: "top-center",
+              theme: "colored",
+            }
+          );
+          navigate("/Login");
+        })
+        .catch((err) => {
+          console.error("Sign-out failed:", err);
+          toast.error("Error signing out. Please try again.", {
+            position: "top-center",
+            theme: "colored",
+          });
+        });
     }
+  } catch (error) {
+    toast.error(error.message, {
+      position: "bottom-center",
+      theme: "colored",
+    });
+  }
+};
+
+
+
+
     return (
         <div className="min-h-screen bg-[#0D1117] flex justify-center items-center">
+
+       {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center  bg-black/95">
+          <Lottie
+            animationData={Loading}
+            loop={true}
+            className="w-[50%] h-[50%]"
+          />
+        </div>
+      )}
 
                 {/* Register Wrapper*/}
                 <div className="h-[70vh] w-[65%] bg-[#25293B] rounded-4xl shadow-lg shadow-cyan-500 flex">
@@ -138,18 +183,6 @@ for (const subject of subjects) {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                     </svg>
             </div>
-                    {/* Confirm Password input   
-                <div className='w-[70%] flex justify-center relative '>
-                        <input 
-                        type="Password" 
-                        name="ConfirmPassowrd" 
-                        id="" 
-                        placeholder='Confirm Password' 
-                        className='relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl  pl-[50px] border-2 border-gray-700 focus:border-cyan-500  focus:outline-none'/>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className=' absolute h-[50%] w-[10%] text-[white] left-0 top-3 pl-[10px]'>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                        </svg>
-                </div> */}
                 {/*Username input*/}  
             <div className='w-[70%] flex justify-center relative'>
                     <input 

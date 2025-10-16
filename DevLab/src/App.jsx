@@ -64,18 +64,25 @@ useEffect(() => {
     }
 
     try {
+      //  Block unverified users
+      if (!user.emailVerified) {
+        await auth.signOut();
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       const userRef = doc(db, "Users", user.uid);
       const userSnap = await getDoc(userRef);
       const userData = userSnap.data();
 
       if (userData?.suspend) {
-        // Immediately sign out suspended user
-        await signOut(auth);
-        Toaster.error("Your account is suspended.", {
+        await auth.signOut();
+        toast.error("Your account is suspended.", {
           position: "bottom-center",
           theme: "colored",
         });
-        setUser(null); // Reset user state
+        setUser(null);
       } else {
         setUser(user);
         setAdmin(!!userData?.isAdmin);
@@ -89,6 +96,7 @@ useEffect(() => {
 
   return () => unsubscribe();
 }, []);
+
 
 
     const isLoggedIn = !!user;
@@ -139,9 +147,9 @@ useEffect(() => {
             <Route path="Settings" element={<Settings />} />
           </Route>
 
-          <Route
+            <Route
             path="/Main/Lessons/:subject/:lessonId/:levelId/:stageId/:gamemodeId"
-            element={<GameModeRouter />} />
+            element={isLoggedIn ? <GameModeRouter /> : <Navigate to="/Login" replace />}/>
 
           <Route
             path="/codingPlay"
