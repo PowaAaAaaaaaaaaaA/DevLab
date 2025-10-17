@@ -22,6 +22,7 @@ import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE"
 import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
+import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 // Items
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
@@ -38,6 +39,8 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
+  const { userData, refetch } = useFetchUserData();
+  const userId = userData.uid;
 
 
   //for OpenAI
@@ -140,7 +143,7 @@ Your mission:
         <motion.button
         onClick={()=>{
           setShowIsCorrect(false)
-          goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
+          goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete, userId})
         }}
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}

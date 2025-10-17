@@ -7,6 +7,8 @@ import {
 import useGameModeData from "../../components/Custom Hooks/useGameModeData";
 import Lottie from "lottie-react";
 import Loading from "../../assets/Lottie/LoadingDots.json";
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
 
 function LessonInstructionPanel() {
   const { gameModeData, levelData, subject } = useGameModeData();
@@ -17,27 +19,45 @@ function LessonInstructionPanel() {
     js: "",
   });
 
+useEffect(() => {
+  if (!gameModeData || !subject) return;
+
+  const codingInterface = gameModeData?.codingInterface || {};
+
+  //  Replace literal "\n" with real newlines for proper beautification
+  const fixNewlines = (code) =>
+    code?.replace(/\\n/g, "\n").trim() || "";
+
+  setFormattedCode({
+    html: codingInterface.html?.trim()
+      ? beautifyHTML(fixNewlines(codingInterface.html), {
+          indent_size: 2,
+          preserve_newlines: true,
+          wrap_line_length: 60,
+        })
+      : "",
+    css: codingInterface.css?.trim()
+      ? beautifyCSS(fixNewlines(codingInterface.css), {
+          indent_size: 2,
+          preserve_newlines: true,
+          wrap_line_length: 60,
+        })
+      : "",
+    js: codingInterface.js?.trim()
+      ? beautifyJS(fixNewlines(codingInterface.js), {
+          indent_size: 2,
+          preserve_newlines: true,
+          wrap_line_length: 60,
+        })
+      : "",
+  });
+}, [gameModeData, subject]);
+
+
+  // Re-highlight when formatted code changes
   useEffect(() => {
-    if (!gameModeData || !subject) return;
-
-    const codingInterface = gameModeData?.codingInterface || {};
-
-    setFormattedCode({
-      html:
-        codingInterface.html?.trim()
-          ? beautifyHTML(codingInterface.html, { indent_size: 2 })
-          : "",
-      css:
-        codingInterface.css?.trim()
-          ? beautifyCSS(codingInterface.css, { indent_size: 2 })
-          : "",
-      js:
-        codingInterface.js?.trim()
-          ? beautifyJS(codingInterface.js, { indent_size: 2 })
-          : "",
-    });
-      console.log(codingInterface);
-  }, [gameModeData, subject]);
+    Prism.highlightAll();
+  }, [formattedCode]);
 
   if (!levelData || !gameModeData) {
     return (
@@ -47,12 +67,14 @@ function LessonInstructionPanel() {
     );
   }
 
+  const hasAnyCode = formattedCode.html || formattedCode.css || formattedCode.js;
 
-  const hasAnyCode =
-    formattedCode.html || formattedCode.css || formattedCode.js;
+  const handleCopy = (code) => {
+    navigator.clipboard.writeText(code);
+  };
 
   return (
-    <div className="h-full w-full bg-[#393F59] rounded-xl text-white overflow-y-scroll p-5 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-4 scrollbar-custom">
+    <div className="h-full w-full bg-[#393F59] rounded-xl text-white overflow-y-auto p-5 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-4 font-exo scrollbar-custom">
       {/* Title */}
       <h2
         className={`text-[2rem] font-bold text-shadow-lg text-shadow-black ${
@@ -74,7 +96,7 @@ function LessonInstructionPanel() {
 
       {/* Dynamic Blocks */}
       <div className="flex flex-col gap-4">
-        {gameModeData.blocks?.map((block) => {
+        {gameModeData?.blocks?.map((block) => {
           switch (block.type) {
             case "Header":
               return (
@@ -86,7 +108,7 @@ function LessonInstructionPanel() {
               return (
                 <p
                   key={block.id}
-                  className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem] font-exo"
+                  className="whitespace-pre-line text-justify leading-relaxed text-[0.95rem]"
                 >
                   {block.value}
                 </p>
@@ -130,7 +152,7 @@ function LessonInstructionPanel() {
           {gameModeData.instruction && (
             <>
               <h4 className="font-bold text-2xl mb-2">Instruction</h4>
-              <p className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem] font-exo">
+              <p className="whitespace-pre-line text-justify leading-relaxed text-[0.9rem]">
                 {gameModeData.instruction}
               </p>
             </>
@@ -140,31 +162,58 @@ function LessonInstructionPanel() {
             <>
               <p className="text-1xl mb-2 font-bold mt-3">Code Example</p>
 
+              {/* HTML */}
               {formattedCode.html && (
-                <>
-                  <p className="font-bold mb-1 text-[#FF5733]">HTML</p>
-                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {formattedCode.html}
+                <div className="relative my-4 bg-[#1E1E2E] rounded-xl overflow-hidden border border-[#2A2A3C] shadow-md ">
+                  <div className="flex justify-between items-center bg-[#25293B] px-4 py-2 border-b border-[#2A2A3C] ">
+                    <p className="text-[#FF5733] font-bold text-sm">HTML</p>
+                    <button
+                      onClick={() => handleCopy(formattedCode.html)}
+                      className="text-gray-300 hover:text-white text-xs bg-[#3A3F55] px-2 py-1 rounded transition-all hover:bg-[#4A5068]"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <pre className="language-html m-0 p-4 whitespace-pre-wrap break-words overflow-x-hidden text-sm leading-relaxed scrollbar-custom">
+                    <code className="language-html">{formattedCode.html}</code>
                   </pre>
-                </>
+                </div>
               )}
 
+              {/* CSS */}
               {formattedCode.css && (
-                <>
-                  <p className="font-bold mb-1 text-[#1E90FF]">CSS</p>
-                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {formattedCode.css}
+                <div className="relative my-4 bg-[#1E1E2E] rounded-xl overflow-hidden border border-[#2A2A3C] shadow-md">
+                  <div className="flex justify-between items-center bg-[#25293B] px-4 py-2 border-b border-[#2A2A3C]">
+                    <p className="text-[#1E90FF] font-bold text-sm">CSS</p>
+                    <button
+                      onClick={() => handleCopy(formattedCode.css)}
+                      className="text-gray-300 hover:text-white text-xs bg-[#3A3F55] px-2 py-1 rounded transition-all hover:bg-[#4A5068]"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <pre className="language-css m-0 p-4 whitespace-pre-wrap break-words overflow-x-hidden text-sm leading-relaxed scrollbar-custom">
+                    <code className="language-css">{formattedCode.css}</code>
                   </pre>
-                </>
+                </div>
               )}
 
+              {/* JavaScript */}
               {formattedCode.js && (
-                <>
-                  <p className="font-bold mb-1 text-[#F7DF1E]">JavaScript</p>
-                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {formattedCode.js}
+                <div className="relative my-4 bg-[#1E1E2E] rounded-xl overflow-hidden border border-[#2A2A3C] shadow-md">
+                  <div className="flex justify-between items-center bg-[#25293B] px-4 py-2 border-b border-[#2A2A3C]">
+                    <p className="text-[#F7DF1E] font-bold text-sm">JavaScript</p>
+                    <button
+                      onClick={() => handleCopy(formattedCode.js)}
+                      className="text-gray-300 hover:text-white text-xs bg-[#3A3F55] px-2 py-1 rounded transition-all hover:bg-[#4A5068]"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <pre className="language-js m-0 p-4 whitespace-pre-wrap break-words overflow-x-hidden text-sm leading-relaxed scrollbar-custom">
+                    <code className="language-js">{formattedCode.js}</code>
                   </pre>
-                </>
+                </div>
               )}
             </>
           )}

@@ -24,6 +24,8 @@ import GameFooter from "./GameModes_Components/GameFooter";
 
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
+import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
+
 function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const type = "Brain Bytes";
   const { hasShield, consumeErrorShield } = useErrorShield();
@@ -38,7 +40,8 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [isCorrect, setIsCorrect] = useState(false);
   const [showisCorrect, setShowisCorrect] = useState(false);
 
-
+  const { userData, refetch } = useFetchUserData();
+  const userId = userData.uid;
   // Dynamic editor rendering
   const renderEditor = () => {
     switch (subject) {
@@ -130,7 +133,7 @@ Your mission:
                 <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
                 <motion.button
                   onClick={()=>{setShowisCorrect(false)
-                                goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
+                                goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete,userId})
                   }}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}

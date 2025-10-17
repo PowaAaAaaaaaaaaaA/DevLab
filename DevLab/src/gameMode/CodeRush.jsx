@@ -22,6 +22,7 @@ import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
+import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 // Items
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
@@ -39,6 +40,9 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [timesUp, setTimesUp] = useState(false);
 
   const [pauseTimer, setPauseTimer] = useState(false);
+
+  const { userData, refetch } = useFetchUserData();
+  const userId = userData.uid;
 
     //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
@@ -171,7 +175,7 @@ console.log("this IS ",isEvaluating)
         onClick={()=>{
           submitAttempt(true)
           setShowIsCorrect(false)
-          goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
+          goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete, userId})
         }}
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}

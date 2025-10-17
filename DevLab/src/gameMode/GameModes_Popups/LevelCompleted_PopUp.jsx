@@ -82,7 +82,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
     });
   }, []);
 
-  // 🔹 Reward Add
+  //  Reward Add
   const RewardAdd = useCallback(async () => {
     const user = auth.currentUser;
     if (!user || !LevelData) return;
