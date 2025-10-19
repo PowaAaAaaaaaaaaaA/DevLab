@@ -63,18 +63,17 @@ const getLanguageExtension = () => {
 // Handle code change based on active tab
 const onChange = useCallback(
   (val) => {
-    setCode((prev) => ({
-      ...prev,
-      [activeTab]: val,
-    }));
-
-    // Only store CSS code in zustand
-    if (activeTab === "CSS") {
-      setSubmittedCode(val);
-    }
+    setCode((prev) => {
+      const newCode = { ...prev, [activeTab]: val };
+      setSubmittedCode({ [activeTab]: val }); //  updates only one key
+      return newCode;
+    });
   },
   [activeTab, setSubmittedCode]
 );
+
+
+
 // Run Button
   const runCode = () => {
     setRunCode(true);

@@ -40,7 +40,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
   const { userData, refetch } = useFetchUserData();
-  const userId = userData.uid;
+  const userId = userData?.uid;
 
 
   //for OpenAI

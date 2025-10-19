@@ -22,14 +22,12 @@ function GameFooter({ setLevelComplete, setShowCodeWhisper }) {
   const { userData } = useFetchUserData();
   const { gameModeData, levelData, subject, lessonId, levelId, stageId, gamemodeId } = useGameModeData();
 
-  const { userProgress, userStageProgress,userStageCompleted, isLoading: isProgressLoading } = useFetchUserProgress(subject);
+  const {userStageCompleted } = useFetchUserProgress(subject);
 console.log ("etoo:,",subject,userStageCompleted);
   // Game state
   const submittedCode = useGameStore((state) => state.submittedCode);
   const setIsCorrect = useGameStore((state) => state.setIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
-
-  const feedbackList = useGameStore((state) => state.stageFeedbacks);
 
 const handleClick = async () => {
 

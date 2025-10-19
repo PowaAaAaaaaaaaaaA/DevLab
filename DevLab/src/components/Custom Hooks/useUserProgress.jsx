@@ -1,6 +1,5 @@
 import { db, auth } from "../../Firebase/Firebase";
 import { collection, getDocs } from "firebase/firestore";
-import useLevelsData from "./useLevelsData";
 import { useQuery } from "@tanstack/react-query";
 import useFetchLevelsData from "../BackEnd_Data/useFetchLevelsData";
 

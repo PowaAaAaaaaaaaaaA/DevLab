@@ -109,7 +109,7 @@ function Html_TE() {
             className="text-[1rem] h-full"
             value={code}
               onChange={(val) => {setCode(val)
-                setSubmittedCode(val)
+                setSubmittedCode({ HTML: val })
               }}
             height="100%"
             width="100%"

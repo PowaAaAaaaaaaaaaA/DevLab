@@ -1,34 +1,37 @@
 import { create } from "zustand";
 
-export const useGameStore = create((set) => ({
+export const useGameStore = create((set, get) => ({
+  //  For storing all code snippets
+  submittedCode: {
+    HTML: "",
+    CSS: "",
+    JS: "",
+    SQL: "",
+  },
+  setSubmittedCode: (code) =>
+    set((state) => ({
+      submittedCode: { ...state.submittedCode, ...code },
+    })),
 
-  submittedCode: "",
-  setSubmittedCode: (code) => set({ submittedCode: code }),
-
+  //  Evaluation flags and data
   isCorrect: null,
   setIsCorrect: (value) => set({ isCorrect: value }),
 
   showIsCorrect: false,
   setShowIsCorrect: (value) => set({ showIsCorrect: value }),
 
-isEvaluating: false,
-setIsEvaluating: (value) => set({ isEvaluating: value }),
-
+  isEvaluating: false,
+  setIsEvaluating: (value) => set({ isEvaluating: value }),
 
   loading: false,
   setLoading: (value) => set({ loading: value }),
 
+  //  For AI evaluation feedback
   stageFeedbacks: [],
-
-  // Add a feedback entry (from AI evaluation)
   addStageFeedback: (feedback) =>
     set((state) => ({
       stageFeedbacks: [...state.stageFeedbacks, feedback],
     })),
-
-  // Get all collected feedback
   getAllFeedbacks: () => get().stageFeedbacks,
-
-  // Clear all feedback (e.g. at end of level)
   clearAllFeedbacks: () => set({ stageFeedbacks: [] }),
 }));

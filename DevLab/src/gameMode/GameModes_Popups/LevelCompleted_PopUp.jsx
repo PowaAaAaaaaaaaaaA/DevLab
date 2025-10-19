@@ -27,7 +27,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
   const [levelSummary, setLevelSummary] = useState(null);
   const [LevelData, setLevelData] = useState(null);
 
-  // 🔹 Fetch feedback once
+  //  Fetch feedback once
   useEffect(() => {
     let isMounted = true;
     (async () => {
@@ -39,7 +39,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
     };
   }, []);
 
-  // 🔹 Fetch Level Data
+  //  Fetch Level Data
   useEffect(() => {
     (async () => {
       const levelRef = doc(db, subj, lessonId, "Levels", LevelId);
@@ -48,7 +48,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
     })();
   }, [subj, lessonId, LevelId]);
 
-  // 🔹 Derived rewards (memoized)
+  //  Derived rewards (memoized)
   const finalCoinReward = useMemo(() => {
     if (!LevelData) return 0;
     return activeBuffs.includes("doubleCoins")
@@ -106,7 +106,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
     await batch.commit();
   }, [LevelData, activeBuffs, addExp, subj, lessonId, LevelId, removeBuff]);
 
-  // 🔹 Unlock next level handler
+  //  Unlock next level handler
   const unlockNextLevel = useCallback(
     async (goContinue) => {
       try {

@@ -43,7 +43,7 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
   const { userData, refetch } = useFetchUserData();
-  const userId = userData.uid;
+  const userId = userData?.uid;
 
 
   // Dynamically render editor based on subject

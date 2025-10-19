@@ -26,6 +26,7 @@ export default function useAdminSubjProgressBar(subject, userId) {
       }
 
       setTotal(totalLevels);
+      console.log("herll:", userProgress)
       console.log(`Total Levels for ${subject}:`, totalLevels);
     } catch (err) {
       console.error("Error fetching total levels:", err);

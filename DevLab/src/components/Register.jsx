@@ -71,7 +71,7 @@ const handleRegister = async (e) => {
           doc(db, "Users", user.uid, "Progress", subject, "Lessons", "Lesson1", "Levels", "Level1"),
           {
             isActive: true,
-            completed: false,
+            isCompleted: false,
             rewardClaimed: false,
           }
         );
@@ -96,7 +96,7 @@ const handleRegister = async (e) => {
         );
       }
 
-      // ✅ Sign out and redirect only AFTER Firebase confirms logout
+      // Sign out and redirect only AFTER Firebase confirms logout
       signOut(auth)
         .then(() => {
           toast.success(

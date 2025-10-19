@@ -41,7 +41,7 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [showisCorrect, setShowisCorrect] = useState(false);
 
   const { userData, refetch } = useFetchUserData();
-  const userId = userData.uid;
+  const userId = userData?.uid;
   // Dynamic editor rendering
   const renderEditor = () => {
     switch (subject) {
@@ -99,11 +99,11 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         {showPopup && (
           <GameMode_Instruction_PopUp
             title="Hey Dev!!"
-            message={`Welcome to ${type} — a fast-paced challenge where you’ll write and run code before time runs out!
+            message={`Welcome to ${type} — a test of your logic and knowledge!
 Your mission:
-🧩 Read the task
-💻 Write your code
-🚀 Run it before the timer hits zero!`}
+🧠 Read the question carefully
+💡 Choose or write the correct answer
+🏆 Prove your coding smarts and earn your reward!`}
             onClose={() => setShowPopup(false)}
             buttonText="Start Challenge"
           />

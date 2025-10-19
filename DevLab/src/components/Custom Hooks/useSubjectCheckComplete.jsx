@@ -18,7 +18,7 @@ export function useSubjectCheckComplete(userId, subject) {
 
           for (const levelDoc of levelsSnapshot.docs) {
             const levelData = levelDoc.data();
-            if (!levelData.completed) {
+            if (!levelData.isCompleted) {
               allLevelsCompleted = false;
               break;
             }
@@ -27,7 +27,6 @@ export function useSubjectCheckComplete(userId, subject) {
         }
 
         if (allLevelsCompleted) {
-          console.log("hello");
           await unlockAchievement(userId, subject, "subjectComplete");
         }
       } catch (err) {

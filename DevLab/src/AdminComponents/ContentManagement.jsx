@@ -26,7 +26,6 @@ function ContentManagement() {
  const isMutating = useIsMutating();
 
   const [activeTab, setActiveTab] = useState("Html");
-  // const { levelsData, isLoading } = useLevelsData(activeTab);
   const { levelsData, isLoading, } = useFetchLevelsData(activeTab);
   const subjects = ["Html", "Css", "JavaScript", "Database"];
 

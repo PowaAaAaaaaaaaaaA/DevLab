@@ -42,7 +42,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [pauseTimer, setPauseTimer] = useState(false);
 
   const { userData, refetch } = useFetchUserData();
-  const userId = userData.uid;
+  const userId = userData?.uid;
 
     //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);

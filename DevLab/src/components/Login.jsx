@@ -160,7 +160,7 @@ function Login() {
                   type="Email"
                   name="email"
                   id="Email"
-                  placeholder="Username"
+                  placeholder="Email"
                   className="relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl pl-[50px] border-2 border-gray-700 focus:border-cyan-500 focus:outline-none"
                 />
                 <span className="absolute text-white left-3 self-center text-1xl md:text-2xl">

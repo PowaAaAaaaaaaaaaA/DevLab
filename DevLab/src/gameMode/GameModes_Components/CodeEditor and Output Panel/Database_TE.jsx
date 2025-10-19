@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 //
 import lessonPromptDb from "../../../components/OpenAI Prompts/lessonPromptDb";
 
@@ -33,8 +34,10 @@ function Database_TE() {
   // utils
   const [query , setQuery] = useState("");
   const dbRef = useRef(null);
-  const [isCorrect, setCorrect] = useState(true)
 
+  // Zustand
+  const setSubmittedCode = useGameStore((state) => state.setSubmittedCode);
+  const isCorrect = useGameStore((state) => state.isCorrect);
 
   const [isEvaluating, setIsEvaluating] = useState(false);
 const [evaluationResult, setEvaluationResult] = useState(null);
@@ -117,7 +120,6 @@ const { gameModeData, subject } = useGameModeData();
         renderAllTables();
       });
   }, []);
-
 // Display Table for Database Subj
   const renderAllTables = () => {
     if (!dbRef.current) return;
@@ -163,7 +165,6 @@ const { gameModeData, subject } = useGameModeData();
     }
   };
 
-
   // Evaluate Button (for Lesson mode only)
 const handleEvaluate = async () => {
   if (gameModeData?.blocks) {
@@ -173,7 +174,6 @@ const handleEvaluate = async () => {
       .join("\n") || "";
     setDescription(paragraphs);
   }
-
   setIsEvaluating(true);
   try {
     const result = await lessonPromptDb({
@@ -182,7 +182,6 @@ const handleEvaluate = async () => {
       description,
       subject,
     });
-
     console.log("Database Evaluation Result:", result);
     setEvaluationResult(result);
     setShowPopup(true);
@@ -204,7 +203,11 @@ const handleEvaluate = async () => {
       width="100%"
       extensions={[sql(),EditorView.lineWrapping]}
       theme={tokyoNight}
-      onChange={(value) => setQuery(value)}/>
+      onChange={(value) => {
+        setQuery(value);
+        setSubmittedCode({ SQL: value }); //  Save SQL to Zustand
+        }}
+      />
     </div>
     <div className="w-full flex justify-around">
       <motion.button
@@ -215,18 +218,21 @@ const handleEvaluate = async () => {
         className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ">
         RUN
       </motion.button>
-<motion.button
-  whileTap={{ scale: 0.95 }}
-  whileHover={{ scale: 1.05 }}
-  transition={{ bounceDamping: 100 }}
-  onClick={handleEvaluate}
-  disabled={isEvaluating}
-  className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
-    isEvaluating ? "opacity-50 cursor-not-allowed" : ""
-  }`}
->
-  {isEvaluating ? "Evaluating..." : "EVALUATE"}
-</motion.button>
+  {/* EVALUATE BUTTON — only for Lesson mode */}
+  {gamemodeId === "Lesson" && (
+    <motion.button
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.05, background: "#7e22ce" }}
+      transition={{ bounceDamping: 100 }}
+      onClick={handleEvaluate}
+      disabled={isEvaluating}
+      className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
+        isEvaluating ? "opacity-50 cursor-not-allowed" : ""
+      }`}
+    >
+      {isEvaluating ? "Evaluating..." : "EVALUATE"}
+    </motion.button>
+  )}
 
     </div>
   </div>
