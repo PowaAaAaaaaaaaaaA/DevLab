@@ -25,6 +25,9 @@ export const useGameStore = create((set, get) => ({
 
   loading: false,
   setLoading: (value) => set({ loading: value }),
+  
+  loadingHint: false,
+  setLoadingHint: (value) => set({ loadingHint: value }),
 
   //  For AI evaluation feedback
   stageFeedbacks: [],

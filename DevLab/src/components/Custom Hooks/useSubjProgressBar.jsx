@@ -2,12 +2,11 @@
     import { db } from "../../Firebase/Firebase";
     import { collection, getDocs } from "firebase/firestore";
     import { useState, useEffect } from "react";
-    import useUserProgress from "./useUserProgress"; 
     import useFetcUserProgress from "../../components/BackEnd_Data/useFetchUserProgress"
     export default function useSubjProgressBar(subject) {
 
 
-  const {userProgress,userStageProgress,completedLevels,completedStages,isLoading,isError,refetch,} = useFetcUserProgress(subject);
+  const {completedLevels} = useFetcUserProgress(subject);
         const [animatedBar, setAnimatedBar] = useState(0);
         const [total, setTotal]  = useState(0)
 

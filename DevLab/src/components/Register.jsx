@@ -72,7 +72,7 @@ const handleRegister = async (e) => {
           {
             isActive: true,
             isCompleted: false,
-            rewardClaimed: false,
+            isRewardClaimed: false,
           }
         );
         await setDoc(

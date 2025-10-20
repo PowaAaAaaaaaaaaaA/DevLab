@@ -41,22 +41,26 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
 
   const [pauseTimer, setPauseTimer] = useState(false);
 
-  const { userData, refetch } = useFetchUserData();
+  const { userData } = useFetchUserData();
   const userId = userData?.uid;
 
     //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
+  const { loading } = useGameStore();
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
   const isEvaluating = useGameStore((state) => state.isEvaluating);
-console.log("this IS ",isEvaluating)
-  useEffect(()=>{
-    if(showIsCorrect ||isCorrect || isEvaluating){
+
+
+useEffect(()=>{
+    if(showIsCorrect || isCorrect || isEvaluating||loading){
       setPauseTimer(true);
-    }else{
+    } else {
       setPauseTimer(false);
     }
-  },[showIsCorrect,isEvaluating]);
+}, [showIsCorrect, isCorrect, isEvaluating]);
+
+console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
 
   // Dynamically render editor based on subject
   const renderEditor = () => {

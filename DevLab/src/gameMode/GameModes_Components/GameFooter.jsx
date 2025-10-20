@@ -23,29 +23,28 @@ function GameFooter({ setLevelComplete, setShowCodeWhisper }) {
   const { gameModeData, levelData, subject, lessonId, levelId, stageId, gamemodeId } = useGameModeData();
 
   const {userStageCompleted } = useFetchUserProgress(subject);
-console.log ("etoo:,",subject,userStageCompleted);
   // Game state
   const submittedCode = useGameStore((state) => state.submittedCode);
   const setIsCorrect = useGameStore((state) => state.setIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
 const handleClick = async () => {
-
   const stageKey = `${lessonId}-${levelId}-${stageId}`;
   const isStageLocked = userStageCompleted?.[stageKey] ?? false;
 
-  // Check if next stage is already unlocked
+  // If stage is already unlocked, skip checking and go next
   if (isStageLocked) {
     goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete });
     return;
   }
-  // Checks if the current stage is a Lesson → skip answer checking
+
+  // Skip checking for Lesson mode
   if (gamemodeId === "Lesson") {
     goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete });
     return;
   }
 
-  // Normal answer-check flow for other gamemodes
+  // Normal answer-check flow
   const handler = gameModeSubmitHandlers[gamemodeId];
   if (handler) {
     await handler({
@@ -65,7 +64,10 @@ const handleClick = async () => {
 };
 
 
-  const isBrainBytes = gamemodeId === "BrainBytes";
+const stageKey = `${lessonId}-${levelId}-${stageId}`;
+const isStageLocked = userStageCompleted?.[stageKey] ?? false;
+const isBrainBytes = gamemodeId === "BrainBytes";
+const isDisabled = isBrainBytes && !isStageLocked; 
 
   return (
     <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white">
@@ -82,20 +84,21 @@ const handleClick = async () => {
       </div>
 
       <div className="w-[10%]">
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          whileHover={!isBrainBytes ? { scale: 1.05, background: "#7e22ce" } : {}}
-          transition={{ bounceDamping: 100 }}
-          onClick={!isBrainBytes ? handleClick : undefined}
-          disabled={isBrainBytes}
-          className={`font-bold rounded-xl w-full py-2 ${
-            isBrainBytes
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-          }`}
-        >
-          Next
-        </motion.button>
+<motion.button
+  whileTap={{ scale: 0.95 }}
+  whileHover={!isDisabled ? { scale: 1.05, background: "#7e22ce" } : {}}
+  transition={{ bounceDamping: 100 }}
+  onClick={!isDisabled ? handleClick : undefined}
+  disabled={isDisabled}
+  className={`font-bold rounded-xl w-full py-2 ${
+    isDisabled
+      ? "bg-gray-600 cursor-not-allowed"
+      : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+  }`}
+>
+  Next
+</motion.button>
+
       </div>
 
       <div>

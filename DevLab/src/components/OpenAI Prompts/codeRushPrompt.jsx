@@ -5,6 +5,9 @@ import { useGameStore } from "./useBugBustStore";
 const codeRushPrompt = async ({submittedCode,instruction,providedCode,description,subject,}) => {
   if (!submittedCode) return null;
     const setLoading = useGameStore.getState().setLoading;
+    const { setSubmittedCode } = useGameStore.getState();
+    const { setIsCorrect } = useGameStore.getState();
+
   setLoading(true);
 
   try {
@@ -41,6 +44,13 @@ const codeRushPrompt = async ({submittedCode,instruction,providedCode,descriptio
     return null;
   }finally {
     setLoading(false); // HIDE loader
+      setSubmittedCode({
+      HTML: "",
+      CSS: "",
+      JS: "",
+      SQL: "",
+    });
+    setIsCorrect(null);
   }
 };
 

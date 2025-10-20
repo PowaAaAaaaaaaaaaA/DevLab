@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Lottie from "lottie-react";
 import confetti from "../../assets/Lottie/Confetti.json";
 import smallLoading from "../../assets/Lottie/loadingSmall.json";
+import loadingDots from "../../assets/Lottie/LoadingDots.json"
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { db, auth } from "../../Firebase/Firebase";
 import { doc, getDoc, updateDoc, writeBatch } from "firebase/firestore";
@@ -26,6 +27,10 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
 
   const [levelSummary, setLevelSummary] = useState(null);
   const [LevelData, setLevelData] = useState(null);
+
+  const hearts = heartsRemaining;
+  const [isLoading, setIsLoading] = useState(false);
+
 
   //  Fetch feedback once
   useEffect(() => {
@@ -59,52 +64,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
   const { animatedValue: Coins } = useAnimatedNumber(finalCoinReward || 0);
   const { animatedValue: Exp } = useAnimatedNumber(LevelData?.expReward || 0);
 
-  // 🔹 Add EXP and Coins
-  const addExp = useCallback(async (userId, expGain, coinsGain) => {
-    const userRef = doc(db, "Users", userId);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) return;
 
-    const { exp = 0, userLevel = 1, coins = 0 } = userSnap.data();
-    let newExp = exp + (expGain || 0);
-    let newLevel = userLevel;
-    let newCoins = coins + (coinsGain || 0);
-
-    if (newExp >= 100) {
-      newLevel += Math.floor(newExp / 100);
-      newExp %= 100;
-    }
-
-    await updateDoc(userRef, {
-      exp: newExp,
-      userLevel: newLevel,
-      coins: newCoins,
-    });
-  }, []);
-
-  //  Reward Add
-  const RewardAdd = useCallback(async () => {
-    const user = auth.currentUser;
-    if (!user || !LevelData) return;
-
-    const userLevelRef = doc(db, "Users", user.uid, "Progress", subj, "Lessons", lessonId, "Levels", LevelId);
-    const levelSnap = await getDoc(userLevelRef);
-    if (!levelSnap.exists() || levelSnap.data().rewardClaimed) return;
-
-    let expReward = LevelData.expReward;
-    let coinsReward = LevelData.coinsReward;
-
-    if (activeBuffs.includes("doubleCoins")) {
-      removeBuff("doubleCoins");
-      const { DoubleCoins } = CoinSurge(LevelData.coinsReward);
-      coinsReward = DoubleCoins();
-    }
-
-    const batch = writeBatch(db);
-    await addExp(user.uid, expReward, coinsReward);
-    batch.update(userLevelRef, { rewardClaimed: true });
-    await batch.commit();
-  }, [LevelData, activeBuffs, addExp, subj, lessonId, LevelId, removeBuff]);
 
   //  Unlock next level handler
   const unlockNextLevel = useCallback(
@@ -179,7 +139,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
             <h2 className="font-exo text-white text-[2rem]">PERFORMANCE SUMMARY</h2>
             <div className="flex flex-col gap-3 mt-5">
               <p className="text-white font-exo font-semibold">
-                Lives Remaining: <span className="font-bold text-red-400">{heartsRemaining}x</span>
+                Lives Remaining: <span className="font-bold text-red-400">{hearts}x</span>
               </p>
               <p className="text-white font-exo font-semibold">
                 DevCoins: +<span className="font-bold text-yellow-400">{Coins}</span>
@@ -190,34 +150,64 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
             </div>
           </div>
 
-          <div className="w-[80%] flex items-center justify-around p-4">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ bounceDamping: 100 }}
-              onClick={async () => {
-                await Promise.all([resetHearts(), refetch(), unlockNextLevel(false), RewardAdd()]);
-                navigate("/Main", { replace: true });
-              }}
-              className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"
-            >
-              Back to Main
-            </motion.button>
+<div className="w-[80%] flex items-center justify-around p-4">
+  {/* Back to Main */}
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={{ scale: 1.05 }}
+    transition={{ bounceDamping: 100 }}
+    onClick={() => {
+      // Close popup and navigate immediately
+      setIsLoading(false);
+      navigate("/Main", { replace: true });
 
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ bounceDamping: 100 }}
-              onClick={async () => {
-                await Promise.all([resetHearts(), unlockNextLevel(true), RewardAdd(), refetch()]);
-              }}
-              className="bg-[#36DB4F] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] cursor-pointer"
-            >
-              Continue
-            </motion.button>
-          </div>
+      // Run async tasks in background
+      (async () => {
+        await Promise.all([unlockNextLevel(false), refetch()]);
+        resetHearts(); // reset hearts after tasks
+      })();
+    }}
+    className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"
+  >
+    Back to Main
+  </motion.button>
+
+  {/* Continue */}
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={{ scale: 1.05 }}
+    transition={{ bounceDamping: 100 }}
+    onClick={() => {
+      // Close popup immediately
+      setIsLoading(false);
+
+      // Navigate after a small delay if you want animation to play
+      setTimeout(() => {
+        unlockNextLevel(true); // optionally, you can handle navigation here
+      }, 100);
+
+      // Run async tasks in background
+      (async () => {
+        await Promise.all([refetch()]);
+        resetHearts();
+      })();
+    }}
+    className="bg-[#36DB4F] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] cursor-pointer"
+  >
+    Continue
+  </motion.button>
+</div>
+
         </div>
       </motion.div>
+
+
+{isLoading && (
+  <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+    <Lottie animationData={loadingDots} loop className="w-[15%] h-[15%]" />
+  </div>
+)}
+
     </div>
   );
 }

@@ -164,6 +164,21 @@ const addBlocks = () => {
       placeholder="Enter JavaScript code here..."
     />
   </div>
+    <div className="mt-4">
+    <h2 className="font-exo text-white text-lg mb-2">SQL:</h2>
+    <textarea
+      value={state.codingInterface.sql || ""}
+      onChange={(e) =>
+        dispatch({
+          type: "UPDATE_CODING_INTERFACE",
+          field: "sql",
+          value: e.target.value,
+        })
+      }
+      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+      placeholder="Enter SQL code here..."
+    />
+  </div>
 </div>
 
 

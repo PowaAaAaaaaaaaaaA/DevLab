@@ -12,6 +12,7 @@ const initialState = {
     html: "",
     css: "",
     js: "",
+    sql:"",
   },
 
   // Bug Bust
