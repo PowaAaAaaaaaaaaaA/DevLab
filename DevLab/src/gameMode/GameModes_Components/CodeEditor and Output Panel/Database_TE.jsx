@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 //
 import lessonPromptDb from "../../../components/OpenAI Prompts/lessonPromptDb";
 
@@ -33,8 +34,10 @@ function Database_TE() {
   // utils
   const [query , setQuery] = useState("");
   const dbRef = useRef(null);
-  const [isCorrect, setCorrect] = useState(true)
 
+  // Zustand
+  const setSubmittedCode = useGameStore((state) => state.setSubmittedCode);
+  const isCorrect = useGameStore((state) => state.isCorrect);
 
   const [isEvaluating, setIsEvaluating] = useState(false);
 const [evaluationResult, setEvaluationResult] = useState(null);
@@ -46,41 +49,40 @@ const { gameModeData, subject } = useGameModeData();
   const runCode =()=>{
           try {
         setHasRunQuery(true);
-        const res = dbRef.current.exec(query);
-        if (res.length === 0) {
-          setOutputHtmlsetOutputHtml(`
-  <div class="p-3 bg-green-100 border border-green-400 text-green-800 rounded-xl text-center font-semibold shadow-md">
-    Query executed successfully <span class="font-normal">(No results returned)</span>
+const res = dbRef.current.exec(query);
+
+if (res.length === 0) {
+  // Non-SELECT queries or SELECT with no results
+  setOutputHtml(`
+    <div class="p-3 bg-green-100 border border-green-400 text-green-800 rounded-xl text-center font-semibold shadow-md">
+      Query executed successfully <span class="font-normal">(No results returned)</span>
+    </div>
+  `);
+  renderAllTables(); // refresh tables
+  return; // exit early
+}
+
+// Only destructure if res[0] exists
+const { columns, values } = res[0];
+const table = `
+  <div class="overflow-auto">
+    <table class="table-auto border-collapse border border-gray-400 w-full text-sm">
+      <thead>
+        <tr class="bg-[#F8F3FF] p-3">
+          ${columns.map(col => `<th class="border px-4 py-2">${col}</th>`).join("")}
+        </tr>
+      </thead>
+      <tbody>
+        ${values.map(row => `
+          <tr>${row.map(cell => `<td class="border px-4 py-1">${cell}</td>`).join("")}</tr>
+        `).join("")}
+      </tbody>
+    </table>
   </div>
-`);
-;
-          renderAllTables();
-        }
-        const { columns, values } = res[0];
-        const table = `
-        <div class="overflow-auto ">
-        <table class="table-auto border-collapse border border-gray-400 w-full text-sm ">
-            <thead>
-            <tr class="bg-[#F8F3FF] p-3">   
-                ${columns
-                  .map((col) => `<th class="border px-4 py-2">${col}</th>`)
-                  .join("")}
-            </tr>
-            </thead>
-            <tbody>
-            ${values
-              .map(
-                (row) => `
-                <tr>${row
-                  .map((cell) => `<td class="border px-4 py-1">${cell}</td>`)
-                  .join("")}</tr>`
-              )
-              .join("")}
-            </tbody>
-        </table>
-        </div>`;
-        setOutputHtml(table);
-        renderAllTables();
+`;
+setOutputHtml(table);
+renderAllTables();
+
     if (gamemodeId === "Lesson"){
       }else{
           // --- TAG USAGE ACHIEVEMENT ---
@@ -104,64 +106,99 @@ const { gameModeData, subject } = useGameModeData();
       }).then((SQL) => {
         const db = new SQL.Database();
         db.run(`
-        CREATE TABLE users (id INTEGER, name TEXT);
-        CREATE TABLE orders (id INTEGER, user_id INTEGER, item TEXT);
 
-        INSERT INTO users VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie')
-                                ,(4, 'Jhon'), (5, 'Sahur'), (6, 'Dongskie')
-                                ,(7, 'Barlo'), (8, 'Mirana'), (9, 'Meeps');
-        INSERT INTO orders VALUES (1, 1, 'Laptop'), (2, 2, 'Phone'), (3, 1, 'Tablet')
-                                , (4, 1, 'Shabu'), (5, 2, 'Dildo'), (6, 1, 'Mouse')
-                                , (7, 1, 'Laptop'), (8, 2, 'Phone'), (9, 1, 'Tablet');`);
+CREATE TABLE students (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  age INTEGER,
+  course TEXT
+);
+
+CREATE TABLE enrollments (
+  id INTEGER PRIMARY KEY,
+  student_id INTEGER,
+  subject TEXT,
+  grade INTEGER
+);
+
+
+INSERT INTO students VALUES
+  (1, 'Anna', 20, 'Computer Science'),
+  (2, 'Ben', 22, 'Information Technology'),
+  (3, 'Clara', 21, 'Software Engineering'),
+  (4, 'David', 23, 'Information Systems'),
+  (5, 'Ella', 20, 'Computer Science');
+
+INSERT INTO enrollments VALUES
+  (1, 1, 'Database Systems', 95),
+  (2, 2, 'Web Development', 88),
+  (3, 3, 'Operating Systems', 92),
+  (4, 1, 'Web Development', 89),
+  (5, 5, 'Database Systems', 85),
+  (6, 4, 'Data Structures', 91),
+  (7, 2, 'Networking', 90),
+  (8, 3, 'Database Systems', 87),
+  (9, 5, 'Programming 101', 93);
+`);
         dbRef.current = db;
         renderAllTables();
       });
   }, []);
-
 // Display Table for Database Subj
-  const renderAllTables = () => {
-    if (!dbRef.current) return;
-    try {
-      const tables = dbRef.current.exec(
-        "SELECT name FROM sqlite_master WHERE type='table';"
-      );
-      if (!tables.length) return;
-      let html = "";
-      for (const table of tables[0].values) {
-        const tableName = table[0];
-        const result = dbRef.current.exec(`SELECT * FROM ${tableName}`);
-        if (result.length) {
-          const { columns, values } = result[0];
-          html += `<div class='mb-6 '><h3 class='text-lg font-semibold mb-2 '>${tableName}</h3>`;
-          html += `<div class="overflow-auto ">
-            <table class="table-auto border-collapse border border-gray-400 bg-[#F8F3FF] w-full text-sm">
+const renderAllTables = () => {
+  if (!dbRef.current) return;
+
+  try {
+    const tables = dbRef.current.exec(
+      "SELECT name FROM sqlite_master WHERE type='table';"
+    );
+    if (!tables.length) return;
+
+    let html = "";
+
+    for (const table of tables[0].values) {
+      const tableName = table[0];
+      const result = dbRef.current.exec(`SELECT * FROM ${tableName}`);
+      
+      html += `<div class='mb-6'>
+        <h3 class='text-lg font-semibold mb-2'>${tableName}</h3>`;
+
+      if (result.length) {
+        const { columns, values } = result[0];
+        html += `<div class="overflow-auto">
+          <table class="table-auto border-collapse border border-gray-400 bg-[#F8F3FF] w-full text-sm">
             <thead>
-                <tr class="bg-[#F8F3FF]">
-                ${columns
-                  .map((col) => `<th class="border px-4 py-2">${col}</th>`)
-                  .join("")}
-                </tr>
+              <tr class="bg-[#F8F3FF]">
+                ${columns.map(col => `<th class="border px-4 py-2">${col}</th>`).join("")}
+              </tr>
             </thead>
             <tbody>
-                ${values
-                  .map(
-                    (row) => `
-                <tr>${row
-                  .map((cell) => `<td class="border px-4 py-1">${cell}</td>`)
-                  .join("")}</tr>
-                `
-                  )
-                  .join("")}
+              ${values.map(row => `
+                <tr>${row.map(cell => `<td class="border px-4 py-1">${cell}</td>`).join("")}</tr>
+              `).join("")}
             </tbody>
-            </table>
-        </div></div>`;
-        }
+          </table>
+        </div>`;
+      } else {
+        // <-- show empty table if no rows yet
+        html += `<div class="overflow-auto">
+          <table class="table-auto border-collapse border border-gray-400 bg-[#F8F3FF] w-full text-sm">
+            <thead>
+              <tr><th class="border px-4 py-2 text-gray-400">Empty table</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>`;
       }
-      setTablesHtml(html);
-    } catch (err) {
-      console.error("Error displaying tables:", err);
+
+      html += `</div>`;
     }
-  };
+
+    setTablesHtml(html);
+  } catch (err) {
+    console.error("Error displaying tables:", err);
+  }
+};
 
 
   // Evaluate Button (for Lesson mode only)
@@ -173,7 +210,6 @@ const handleEvaluate = async () => {
       .join("\n") || "";
     setDescription(paragraphs);
   }
-
   setIsEvaluating(true);
   try {
     const result = await lessonPromptDb({
@@ -182,7 +218,6 @@ const handleEvaluate = async () => {
       description,
       subject,
     });
-
     console.log("Database Evaluation Result:", result);
     setEvaluationResult(result);
     setShowPopup(true);
@@ -204,7 +239,11 @@ const handleEvaluate = async () => {
       width="100%"
       extensions={[sql(),EditorView.lineWrapping]}
       theme={tokyoNight}
-      onChange={(value) => setQuery(value)}/>
+      onChange={(value) => {
+        setQuery(value);
+        setSubmittedCode({ SQL: value }); //  Save SQL to Zustand
+        }}
+      />
     </div>
     <div className="w-full flex justify-around">
       <motion.button
@@ -215,18 +254,21 @@ const handleEvaluate = async () => {
         className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ">
         RUN
       </motion.button>
-<motion.button
-  whileTap={{ scale: 0.95 }}
-  whileHover={{ scale: 1.05 }}
-  transition={{ bounceDamping: 100 }}
-  onClick={handleEvaluate}
-  disabled={isEvaluating}
-  className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
-    isEvaluating ? "opacity-50 cursor-not-allowed" : ""
-  }`}
->
-  {isEvaluating ? "Evaluating..." : "EVALUATE"}
-</motion.button>
+  {/* EVALUATE BUTTON — only for Lesson mode */}
+  {gamemodeId === "Lesson" && (
+    <motion.button
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.05, background: "#7e22ce" }}
+      transition={{ bounceDamping: 100 }}
+      onClick={handleEvaluate}
+      disabled={isEvaluating}
+      className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
+        isEvaluating ? "opacity-50 cursor-not-allowed" : ""
+      }`}
+    >
+      {isEvaluating ? "Evaluating..." : "EVALUATE"}
+    </motion.button>
+  )}
 
     </div>
   </div>

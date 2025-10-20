@@ -22,6 +22,7 @@ import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
+import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 // Items
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
@@ -41,6 +42,8 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
+  const { userData, refetch } = useFetchUserData();
+  const userId = userData?.uid;
 
 
   // Dynamically render editor based on subject
@@ -147,7 +150,7 @@ Take your time — accuracy matters more than speed!`
                 <motion.button
                   onClick={() => {
                     setShowIsCorrect(false);
-                    goToNextStage({subject,lessonId,levelId,stageId,navigate,setLevelComplete});
+                    goToNextStage({subject,lessonId,levelId,stageId,navigate,setLevelComplete,userId});
                   }}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.05 }}

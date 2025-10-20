@@ -10,11 +10,13 @@ export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, 
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const { removeBuff } = useInventoryStore.getState();
   // Initialize the timer
-  useEffect(() => {
-    if (gamemodeId === "CodeRush" && initialTime) {
-      setTimer(initialTime);
-    }
-  }, [gameModeData, gamemodeId, initialTime]);
+useEffect(() => {
+  if (!gamemodeId || gamemodeId !== "CodeRush") return;
+  if (initialTime == null || initialTime <= 0) return;
+
+  setTimer(initialTime);
+}, [gamemodeId, initialTime]);
+
 //   // Debugging: log timer updates
 // useEffect(() => {
 //   if (gamemodeId === "CodeRush") {
@@ -23,15 +25,18 @@ export default function useCodeRushTimer(initialTime, gamemodeId, gameModeData, 
 // }, [timer, gamemodeId]);
 
   // Countdown logic
-  useEffect(() => {
-    if (gamemodeId === "CodeRush" && !showPopup && !isFrozen && !pauseTimer ) {
-      const countdown = setInterval(() => {
-        setTimer((prev) => Math.max(prev - 1, 0));
-      }, 1000);
-      return () => clearInterval(countdown);
+  console.log(showPopup,isFrozen,pauseTimer);
+useEffect(() => {
+  if (gamemodeId !== "CodeRush") return;
+  if (timer <= 0 || showPopup || isFrozen || pauseTimer) return;
 
-    }
-  }, [gamemodeId, showPopup, isFrozen,pauseTimer]);
+  const countdown = setInterval(() => {
+    setTimer((prev) => Math.max(prev - 1, 0));
+  }, 1000);
+
+  return () => clearInterval(countdown);
+}, [gamemodeId, showPopup, isFrozen, pauseTimer, timer]);
+
   // Buffs
 // Buffs
 useEffect(() => {

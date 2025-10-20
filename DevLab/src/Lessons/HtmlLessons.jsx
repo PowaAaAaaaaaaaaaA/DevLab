@@ -26,6 +26,7 @@ function HtmlLessons() {
     userProgress,
     userStageCompleted,
     isLoading: progressLoading,
+    completedLevels
   } = useFetchUserProgress("Html");
   // Subject Levels Progress Bar
   const { animatedBar } = useSubjProgressBar("Html");

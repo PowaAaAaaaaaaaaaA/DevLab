@@ -17,7 +17,7 @@ export default function FullscreenLoader() {
           className="w-48 h-48"
         />
         <p className="mt-4 text-white text-lg font-medium animate-pulse">
-          Devlab is Thinking...
+          Devlab is thinking...
         </p>
       </div>
     </div>

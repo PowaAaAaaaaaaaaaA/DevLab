@@ -13,6 +13,9 @@ const codeCrafterPrompt = async ({
   if (!submittedCode) return null;
 
   const setLoading = useGameStore.getState().setLoading;
+  const { setSubmittedCode } = useGameStore.getState();
+  const { setIsCorrect } = useGameStore.getState();
+
   setLoading(true);
   try {
     const currentUser = auth.currentUser;
@@ -54,6 +57,13 @@ const codeCrafterPrompt = async ({
     return null;
   }finally {
     setLoading(false); // HIDE loader
+      setSubmittedCode({
+      HTML: "",
+      CSS: "",
+      JS: "",
+      SQL: "",
+    });
+    setIsCorrect(null);
   }
 };
 

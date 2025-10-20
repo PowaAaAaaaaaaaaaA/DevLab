@@ -58,7 +58,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         isHidden: stageData?.isHidden ?? activeTab !== "Lesson",
         type: stageData?.type || "",
         instruction: stageData?.instruction || "",
-        codingInterface: stageData?.codingInterface || { html: "", css: "", js: "" },
+        codingInterface: stageData?.codingInterface || { html: "", css: "", js: "",sql:"" },
         hint: stageData?.hint || "",
         timer: stageData?.timer || "",
         choices: stageData?.choices || [],

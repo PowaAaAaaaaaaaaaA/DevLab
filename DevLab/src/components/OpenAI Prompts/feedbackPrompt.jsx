@@ -3,8 +3,8 @@ import { auth } from "../../Firebase/Firebase";
 import { useGameStore } from "./useBugBustStore";
 
 export const fetchLevelSummary = async () => {
-  const feedbackList = useGameStore.getState().stageFeedbacks;
-  const feedbackArray = Object.values(feedbackList).flat();
+  const { stageFeedbacks, clearAllFeedbacks } = useGameStore.getState();
+  const feedbackArray = Object.values(stageFeedbacks).flat();
 
   if (!feedbackArray || feedbackArray.length === 0) {
     console.log("No stage feedback to summarize.");
@@ -17,6 +17,7 @@ export const fetchLevelSummary = async () => {
       console.error("No authenticated user found.");
       return null;
     }
+
     const token = await currentUser.getIdToken(true);
 
     console.log("stageFeedbacks before sending:", feedbackArray);
@@ -33,6 +34,7 @@ export const fetchLevelSummary = async () => {
 
     console.log("Level Summary:", response.data.response);
     return response.data.response;
+
   } catch (error) {
     if (error.response) {
       console.error("Backend responded with error:", error.response.data);
@@ -42,5 +44,10 @@ export const fetchLevelSummary = async () => {
       console.error("Error setting up request:", error.message);
     }
     return null;
+
+  } finally {
+    //  Always clear feedbacks (success or fail)
+    clearAllFeedbacks();
+    console.log("stageFeedbacks cleared (finally block).");
   }
 };

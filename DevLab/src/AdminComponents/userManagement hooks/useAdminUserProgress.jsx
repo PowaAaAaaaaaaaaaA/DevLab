@@ -1,11 +1,10 @@
 import { db } from "../../Firebase/Firebase";
 import { collection, getDocs } from "firebase/firestore";
-import useLevelsData from "../../components/Custom Hooks/useLevelsData";
+
 import { useQuery } from "@tanstack/react-query";
 import useFetchLevelsData from "../../components/BackEnd_Data/useFetchLevelsData";
 
 export default function useAdminUserProgress(subject, userId) {
-  // const { levelsData, isLoading: levelsLoading } = useLevelsData(subject);
   const { levelsData, isLoading: levelsLoading, isError, refetch } = useFetchLevelsData(subject);
 
   const fetchAdminProgress = async () => {
@@ -27,7 +26,7 @@ export default function useAdminUserProgress(subject, userId) {
 
       for (const levelDoc of levelsSnap.docs) {
         const levelId = levelDoc.id;
-        const status = levelDoc.data().status;
+        const status = levelDoc.data().isCompleted;
         allProgress[`${lessonId}-${levelId}`] = status;
 
         if (status === true) completedLevels += 1;
@@ -37,7 +36,7 @@ export default function useAdminUserProgress(subject, userId) {
         const stagesSnap = await getDocs(stagesRef);
 
         stagesSnap.forEach((stageDoc) => {
-          const stageStatus = stageDoc.data().status;
+          const stageStatus = stageDoc.data().isCompleted;
           allStages[`${lessonId}-${levelId}-${stageDoc.id}`] = stageStatus;
 
           if (stageStatus === true) completedStages += 1;

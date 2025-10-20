@@ -275,37 +275,46 @@ if (loadingDashboard) {
         </div>
       </div>
       {/*Inventory*/}
-<div className='bg-[#111827] border-2 w-[30%] h-[95%] rounded-3xl p-3 flex flex-col gap-3  '>
-  <h1 className='text-white font-exo text-[2.5em] font-bold p-3'>Inventory</h1>
-  <div className='overflow-scroll overflow-x-hidden h-[90%] p-2 flex flex-col gap-4 scrollbar-custom'>
-{inventory && inventory.length > 0 ? (
-  inventory.map(item => (
-    <div 
-      key={item.id}
-      className="border rounded-2xl border-gray-600 min-h-[25%] max-h-[25%] bg-[#0D1117] flex items-center p-1 justify-around gap-8"
-    >
-      <div className="rounded-2xl bg-gray-700 min-w-[20%] h-[95%] p-2">
-        <img 
-          src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default} 
-          alt={item.title} 
-          className="w-full h-full"
-        />
-      </div>
-      <h2 className="text-2xl font-exo text-gray-300 min-w-[45%] mediuText-laptop">
-        {item.title}
-      </h2>
-      <p className="rounded-lg bg-gray-700 p-2 text-[0.9rem] font-exo text-white">
-        {item.quantity}
+<div className="bg-[#0B0F16] border border-gray-700/60 w-[30%] h-[95%] rounded-3xl p-5 flex flex-col">
+  <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">
+    Inventory
+  </h1>
+
+  <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom pr-1">
+    {inventory && inventory.length > 0 ? (
+      inventory.map((item) => (
+        <div
+          key={item.id}
+          className="group border border-gray-700/50 rounded-2xl bg-gradient-to-br from-[#111827] to-[#0D1117] hover:from-[#1A2333] hover:to-[#121826] transition-all duration-300 flex items-center justify-between p-3 shadow-md hover:shadow-lg"
+        >
+          {/* Item Icon */}
+          <div className="rounded-2xl bg-gray-800/70 p-3 flex justify-center items-center w-[25%] aspect-square overflow-hidden shadow-inner">
+            <img
+              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
+              alt={item.title}
+              className="w-full h-full object-contain scale-90 group-hover:scale-100 transition-transform duration-300"
+            />
+          </div>
+
+          {/* Item Title */}
+          <h2 className="text-lg font-exo text-gray-200 flex-1 text-center px-3 leading-tight">
+            {item.title}
+          </h2>
+
+          {/* Item Quantity */}
+          <p className="rounded-xl bg-gray-800/60 px-4 py-2 text-sm font-exo text-white shadow-inner border border-gray-700/40">
+            x{item.quantity}
+          </p>
+        </div>
+      ))
+    ) : (
+      <p className="text-gray-400 text-center text-lg font-exo mt-8">
+        No Items
       </p>
-    </div>
-  ))
-) : (
-  <p className="text-gray-400 text-lg font-exo p-3">No Items</p>
-)}
-
+    )}
   </div>
-
 </div>
+
 
     </div>
 {/*END DASHBOARD*/}

@@ -7,6 +7,7 @@ import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
 
 export const gameModeSubmitHandlers = {
   BugBust: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject, stageId}) => {
+    setIsCorrect(false);
     try {
       const result = await bugBustPrompt({
         submittedCode,
@@ -32,8 +33,9 @@ export const gameModeSubmitHandlers = {
     }
   },
   CodeCrafter: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject, stageId}) => {
+    setIsCorrect(false);
     try {
-      console.log("na cacall ba ako?")
+      console.log("This is:", subject)
       const result = await codeCrafterPrompt({
         submittedCode,
         instruction,
@@ -59,6 +61,7 @@ export const gameModeSubmitHandlers = {
   },
 
   CodeRush: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject, stageId}) => {
+    setIsCorrect(false);
     const { setIsEvaluating } = useGameStore.getState();
     try {
       setIsEvaluating(true);

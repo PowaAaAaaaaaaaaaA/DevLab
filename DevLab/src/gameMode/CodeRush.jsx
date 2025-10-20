@@ -22,6 +22,7 @@ import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
 import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
 import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
+import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 // Items
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
 
@@ -40,19 +41,26 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
 
   const [pauseTimer, setPauseTimer] = useState(false);
 
+  const { userData } = useFetchUserData();
+  const userId = userData?.uid;
+
     //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
+  const { loading } = useGameStore();
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
   const isEvaluating = useGameStore((state) => state.isEvaluating);
-console.log("this IS ",isEvaluating)
-  useEffect(()=>{
-    if(showIsCorrect ||isCorrect || isEvaluating){
+
+
+useEffect(()=>{
+    if(showIsCorrect || isCorrect || isEvaluating||loading){
       setPauseTimer(true);
-    }else{
+    } else {
       setPauseTimer(false);
     }
-  },[showIsCorrect,isEvaluating]);
+}, [showIsCorrect, isCorrect, isEvaluating]);
+
+console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
 
   // Dynamically render editor based on subject
   const renderEditor = () => {
@@ -171,7 +179,7 @@ console.log("this IS ",isEvaluating)
         onClick={()=>{
           submitAttempt(true)
           setShowIsCorrect(false)
-          goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete})
+          goToNextStage({subject,lessonId,levelId,stageId,gamemodeId,navigate,setLevelComplete, userId})
         }}
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}

@@ -23,8 +23,8 @@ function AdminNavbar() {
     return <Outlet />;
     }
     return (
-        <div className='w-[15%] flex flex-col p-5 font-exo text-white justify-center '>
-            <h1 className='text-[3.5rem] text-center font-bold mb-5 large-heading'>DevLab</h1>
+        <div className='w-[15%] flex flex-col p-5 font-exo text-white justify-center'>
+            <h1 className='text-[3.2rem] text-center font-bold mb-5 large-heading'>DevLab</h1>
             <div className='flex-1 flex flex-col gap-7 p-2'>
                 <NavLink to={'/Admin/ContentManagement'} className='flex items-center gap-3 font-inter text-[1.3rem] relative rounded px-5 py-2.5 hover:bg-[#9333EA] transition-all ease-out duration-300 NavBarText-laptop'><span><HiFolder /></span> Content Management
                 </NavLink>

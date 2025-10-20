@@ -19,6 +19,7 @@ import Loading from '../../assets/Lottie/LoadingDots.json';
 import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 import { BrainFilter } from "../../ItemsLogics/BrainFilter";
+import codeWhisperPrompt from "../../components/OpenAI Prompts/codeWhisperPrompt";
 
 function InstructionPanel({
   setIsCorrect,
@@ -30,6 +31,7 @@ function InstructionPanel({
   setTimesUp,
   pauseTimer
 }) {
+    const [aiHint, setAiHint] = useState("");
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject } = useGameModeData();
@@ -113,6 +115,25 @@ function InstructionPanel({
     }
   }, [gameModeData, activeBuffs]);
 
+  useEffect(() => {
+  if (showCodeWhisper && gameModeData) {
+    const fetchAiHint = async () => {
+      const result = await codeWhisperPrompt({
+        description: gameModeData.description,
+        instruction: gameModeData.instruction,
+        receivedCode: gameModeData?.codingInterface || {}, // directly pass codingInterface
+      });
+
+      if (result?.whisper) {
+        setAiHint(result.whisper);
+      } else {
+        setAiHint("No hint available.");
+      }
+    };
+
+    fetchAiHint();
+  }
+}, [showCodeWhisper, gameModeData]);
   if (!levelData || !gameModeData) {
     return (
       <div className='fixed inset-0 z-50 flex items-center justify-center  bg-black/98'>
@@ -120,6 +141,8 @@ function InstructionPanel({
       </div>
     );
   }
+
+
 
   const hasAnyCode = formattedCode.html || formattedCode.css || formattedCode.js;
 
@@ -263,14 +286,15 @@ function InstructionPanel({
       )}
 
       {/* Code Whisper */}
-      <AnimatePresence>
-        {showCodeWhisper && (
-          <CodeWhisper
-            hint={gameModeData?.hint}
-            onClose={async () => setShowCodeWhisper(false)}
-          />
-        )}
-      </AnimatePresence>
+<AnimatePresence>
+  {showCodeWhisper && (
+    <CodeWhisper
+      hint={aiHint}
+      onClose={async () => setShowCodeWhisper(false)}
+    />
+  )}
+</AnimatePresence>
+
     </div>
   );
 }

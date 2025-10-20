@@ -68,18 +68,16 @@ const getLanguageExtension = () => {
 // Handle editor changes
 const onChange = useCallback(
   (val) => {
-    setCode((prev) => ({
-      ...prev,
-      [activeTab]: val,
-    }));
-
-    // Only store JavaScript code in zustand
-    if (activeTab === "JavaScript") {
-      setSubmittedCode(val);
-    }
+    setCode((prev) => {
+      const newCode = { ...prev, [activeTab]: val };
+      setSubmittedCode({ [activeTab]: val }); //  Only updates that one field
+      return newCode;
+    });
   },
   [activeTab, setSubmittedCode]
 );
+
+
 
 
 // Run Button
