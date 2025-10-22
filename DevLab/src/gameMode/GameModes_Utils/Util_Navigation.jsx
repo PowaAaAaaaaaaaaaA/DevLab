@@ -52,24 +52,14 @@ const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
     await addExp(userId, expReward, coinsReward);
 
     // Mark reward as claimed
-    const userLevelRef = doc(
-      db,
-      "Users",
-      userId,
-      "Progress",
-      subject,
-      "Lessons",
-      lessonId,
-      "Levels",
-      levelId
-    );
+    const userLevelRef = doc(db,"Users",userId,"Progress",subject,"Lessons",lessonId,"Levels",levelId);
     await updateDoc(userLevelRef, { isRewardClaimed: true });
   } catch (err) {
     console.error("Error in handleRewardGrant:", err.message);
   }
 };
 
-// 🔹 Main Function
+//  Main Function
 export const goToNextStage = async ({
   subject,
   lessonId,

@@ -4,15 +4,18 @@ import {
   css as beautifyCSS,
   js as beautifyJS,
 } from "js-beautify";
-import useGameModeData from "../../components/Custom Hooks/useGameModeData";
+import useFetchGameModeData from "../../components/BackEnd_Data/useFetchGameModeData";
 import Lottie from "lottie-react";
 import Loading from "../../assets/Lottie/LoadingDots.json";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
 
 function LessonInstructionPanel() {
-  const { gameModeData, levelData, subject } = useGameModeData();
+  const { gameModeData, levelData, subject } = useFetchGameModeData();
+
+
 
   const [formattedCode, setFormattedCode] = useState({
     html: "",
@@ -25,9 +28,7 @@ function LessonInstructionPanel() {
     if (!gameModeData || !subject) return;
 
     const codingInterface = gameModeData?.codingInterface || {};
-
-    const fixNewlines = (code) =>
-      code?.replace(/\\n/g, "\n").trim() || "";
+    const fixNewlines = (code) => code?.replace(/\\n/g, "\n").trim() || "";
 
     setFormattedCode({
       html: codingInterface.html?.trim()
@@ -160,7 +161,6 @@ function LessonInstructionPanel() {
             <>
               <p className="text-1xl mb-2 font-bold mt-3">Code Example</p>
 
-              {/* HTML */}
               {formattedCode.html && (
                 <CodeBlock
                   code={formattedCode.html}
@@ -169,8 +169,6 @@ function LessonInstructionPanel() {
                   handleCopy={handleCopy}
                 />
               )}
-
-              {/* CSS */}
               {formattedCode.css && (
                 <CodeBlock
                   code={formattedCode.css}
@@ -179,8 +177,6 @@ function LessonInstructionPanel() {
                   handleCopy={handleCopy}
                 />
               )}
-
-              {/* JavaScript */}
               {formattedCode.js && (
                 <CodeBlock
                   code={formattedCode.js}
@@ -189,8 +185,6 @@ function LessonInstructionPanel() {
                   handleCopy={handleCopy}
                 />
               )}
-
-              {/* SQL */}
               {formattedCode.sql && (
                 <CodeBlock
                   code={formattedCode.sql}
@@ -219,22 +213,55 @@ function LessonInstructionPanel() {
   );
 }
 
-// Reusable code block component
-const CodeBlock = ({ code, language, color, handleCopy }) => (
-  <div className="relative my-4 bg-[#1E1E2E] rounded-xl overflow-hidden border border-[#2A2A3C] shadow-md">
-    <div className="flex justify-between items-center bg-[#25293B] px-4 py-2 border-b border-[#2A2A3C]">
-      <p className="font-bold text-sm" style={{ color }}>{language.toUpperCase()}</p>
-      <button
-        onClick={() => handleCopy(code)}
-        className="text-gray-300 hover:text-white text-xs bg-[#3A3F55] px-2 py-1 rounded transition-all hover:bg-[#4A5068]"
+// Reusable Code Block Component with “Copied!” Popup
+const CodeBlock = ({ code, language, color, handleCopy }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyClick = () => {
+    handleCopy(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1000);
+  };
+
+  return (
+    <div className="relative my-4 bg-[#1E1E2E] rounded-xl overflow-hidden border border-[#2A2A3C] shadow-md">
+      <div className="flex justify-between items-center bg-[#25293B] px-4 py-2 border-b border-[#2A2A3C] relative">
+        <p className="font-bold text-sm" style={{ color }}>
+          {language.toUpperCase()}
+        </p>
+
+        <div className="relative">
+          <button
+            onClick={handleCopyClick}
+            className="text-gray-300 hover:text-white text-xs bg-[#3A3F55] px-2 py-1 rounded transition-all hover:bg-[#4A5068]"
+          >
+            Copy
+          </button>
+
+          {/* Animated “Copied!” popup */}
+          <AnimatePresence>
+            {copied && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="absolute top-0 right-0 bg-[#4A5068] text-white text-xs px-2 py-1 rounded-md shadow-md"
+              >
+                Copied!
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <pre
+        className={`language-${language} m-0 p-4 whitespace-pre-wrap break-words overflow-x-hidden text-sm leading-relaxed scrollbar-custom`}
       >
-        Copy
-      </button>
+        <code className={`language-${language}`}>{code}</code>
+      </pre>
     </div>
-    <pre className={`language-${language} m-0 p-4 whitespace-pre-wrap break-words overflow-x-hidden text-sm leading-relaxed scrollbar-custom`}>
-      <code className={`language-${language}`}>{code}</code>
-    </pre>
-  </div>
-);
+  );
+};
 
 export default LessonInstructionPanel;

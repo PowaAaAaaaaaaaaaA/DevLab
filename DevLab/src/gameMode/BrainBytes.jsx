@@ -16,10 +16,6 @@ import Wrong from '../assets/Lottie/wrongAnsLottie.json';
 import GameHeader from "./GameModes_Components/GameHeader";
 import InstructionPanel from "./GameModes_Components/InstructionPanel";
 import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
-import Html_TE from "./GameModes_Components/CodeEditor and Output Panel/Html_TE";
-import Css_TE from "./GameModes_Components/CodeEditor and Output Panel/Css_TE";
-import JavaScript_TE from "./GameModes_Components/CodeEditor and Output Panel/JavaScript_TE";
-import Database_TE from "./GameModes_Components/CodeEditor and Output Panel/Database_TE";
 import GameFooter from "./GameModes_Components/GameFooter";
 
 import { useErrorShield } from "../ItemsLogics/ErrorShield";
@@ -40,23 +36,10 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const [isCorrect, setIsCorrect] = useState(false);
   const [showisCorrect, setShowisCorrect] = useState(false);
 
-  const { userData, refetch } = useFetchUserData();
+  const { userData, } = useFetchUserData();
   const userId = userData?.uid;
   // Dynamic editor rendering
-  const renderEditor = () => {
-    switch (subject) {
-      case "Html":
-        return <Html_TE/>;
-      case "Css":
-        return <Css_TE/>;
-      case "JavaScript":
-        return <JavaScript_TE/>;
-      case "Database":
-        return <Database_TE/>;
-      default:
-        return <div className="text-white">Invalid subject</div>;
-    }
-  };
+
 
   return (
     <>
@@ -66,19 +49,15 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         <GameHeader heart={heart} />
 
         {/* Content */}
-        <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5">
+        <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5 justify-center">
           {/* Instruction Panel */}
-          <div className="h-[40%] md:w-[35%] md:h-full w-full">
+          <div className="h-[40%] md:w-[40%] md:h-full w-full">
             <InstructionPanel
               setIsCorrect={setIsCorrect} 
               setShowisCorrect={setShowisCorrect}
               showCodeWhisper={showCodeWhisper}
               setShowCodeWhisper={setShowCodeWhisper}
             />
-          </div>
-          {/* Code Editor */}
-          <div className="h-[60%] md:w-[80%] md:h-full w-full flex">
-            {renderEditor()}
           </div>
         </div>
         {/* Footer */}

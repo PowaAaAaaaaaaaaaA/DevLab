@@ -8,6 +8,7 @@ import { EditorView } from "@codemirror/view";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
+import toast from "react-hot-toast"; 
 // Utils
 import { motion,AnimatePresence } from "framer-motion";
 import { extractSqlKeywords } from "../../../components/Achievements Utils/Db_KeyExtract";
@@ -16,7 +17,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
-import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
 import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 //
 import lessonPromptDb from "../../../components/OpenAI Prompts/lessonPromptDb";
@@ -43,10 +44,17 @@ function Database_TE() {
 const [evaluationResult, setEvaluationResult] = useState(null);
 const [showPopup, setShowPopup] = useState(false);
 const [description, setDescription] = useState("");
-const { gameModeData, subject } = useGameModeData();
+const { gameModeData, subject } = useFetchGameModeData();
 
   // Run Button
   const runCode =()=>{
+
+      if (!query.trim()) {
+    toast.error("Please enter your code before running.", {
+      position: "top-right",
+    });
+    return;
+  }
           try {
         setHasRunQuery(true);
 const res = dbRef.current.exec(query);
@@ -203,6 +211,12 @@ const renderAllTables = () => {
 
   // Evaluate Button (for Lesson mode only)
 const handleEvaluate = async () => {
+    if (!query.trim()) {
+    toast.error("Please enter your code before evaluating.", {
+      position: "top-right",
+    });
+    return;
+  }
   if (gameModeData?.blocks) {
     const paragraphs = gameModeData.blocks
       .filter((block) => block.type === "Paragraph")

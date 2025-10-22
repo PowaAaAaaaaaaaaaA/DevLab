@@ -1,8 +1,8 @@
 // Assets
-import HtmlIcons from '../assets/Images/html-Icon.png'
-import CssIcons from '../assets/Images/css-Icon.png'
-import DataIcons from '../assets/Images/Data-Icon.png'
-import JsIcons from '../assets/Images/js-Icon.png'
+import HtmlIcons from '../assets/navbarIcons/HTML.png'
+import CssIcons from '../assets/navbarIcons/css.png'
+import DataIcons from '../assets/navbarIcons/database.png'
+import JsIcons from '../assets/navbarIcons/JavaScript.png'
 import Coins from '../assets/Images/DevCoins.png'
 import defaultAvatar from './../assets/Images/profile_handler.png'
 import Loading from './Loading'
@@ -43,10 +43,6 @@ function Dashboard() {
   useEffect(() => {
     queryClient.prefetchQuery(["ShopItems"], fetchShopItems);
   }, [queryClient]);
-  const { data: HtmlData, } = useAchievementsData("Html");
-  const { data:CssData,  } = useAchievementsData("Css");
-  const { data:JsData,  } = useAchievementsData("JavaScript");
-  const { data:DatabaseData, } = useAchievementsData("Database");
 
 
 // Intial Loading
@@ -101,62 +97,139 @@ if (loadingDashboard) {
 
   return (
 // Dashboard Wrapper
-  <div className='h-[100%] w-[100%] flex flex-col gap-2'>
+  <div className='h-[100%] w-[100%] flex flex-col gap-2 '>
     { !isLoading ? 
-    (<div
-  className="shadow-black shadow-md w-[100%] min-h-[40%] rounded-3xl flex items-center gap-5 p-5 bg-cover bg-center"
+    (
+<div className='flex min-h-[40%] gap-2'>
+    <div
+  className="shadow-black shadow-md w-[60%] min-h-[40%] rounded-3xl flex items-center gap-5 p-2 bg-cover bg-center"
   style={{
     backgroundImage: `url(${userData?.backgroundImage})`,
     backgroundColor: "#111827", // fallback if no image
   }}>
-  <div className="w-[40%] h-[90%] flex items-center flex-col gap-5 p-2">
-    <div className="w-[55%] h-[80%] rounded-full overflow-hidden">
+  <div className="w-[40%] h-[90%] flex items-center flex-col gap-5 p-2  ">
+    <div className="w-[90%] h-[80%] rounded-full overflow-hidden">
       <img
         src={userData?.profileImage || defaultAvatar}
         alt="Profile"
         className="w-full h-full object-cover"/>
     </div>
 
-    <div className="text-white font-inter text-[0.85rem] break-words w-[60%] rounded-2xl backdrop-blur-[10px] text-shadow-lg/60">
+    <div className="text-white font-inter text-[0.8rem] break-words w-[100%] rounded-2xl backdrop-blur-[10px] text-shadow-lg/60 ">
       <p className="text-center">{userData?.bio}</p>
     </div>
   </div>
 
-  <div className="h-auto w-[100%] flex flex-col p-2 gap-2 backdrop-blur-[2px] rounded-3xl">
+  <div className="h-auto w-[100%] flex flex-col p-2 gap-2 backdrop-blur-[2px] rounded-3xl ">
     <p className="text-white font-inter font-bold text-shadow-lg/60">Good to see you!</p>
-    <h1 className="sm:text-[3rem] md:text-[4rem] lg:text-[5rem] text-white font-inter font-bold break-words leading-tight text-shadow-lg/60">
+    <h1 className="sm:text-[1.5rem] md:text-[2.5rem] lg:text-[3.5rem] text-white font-inter font-bold break-words leading-tight text-shadow-lg/60 ">
       {userData?.username}
     </h1>
-    <p className="text-white font-inter font-bold mb-0.5 text-shadow-lg/60">
+    <p className="text-white font-inter font-bold text-shadow-lg/60">
       Level {userData?.userLevel}
     </p>
     {/* Progress Bar */}
-    <div className="w-[70%] h-4 mb-4 bg-gray-200 rounded-full dark:bg-gray-700">
+    <div className="w-[100%] h-4 mb-3 mt-3 bg-gray-200 rounded-full dark:bg-gray-700 ">
       <div
         className="h-4 rounded-full dark:bg-[#2CB67D]"
         style={{ width: `${(animatedExp / 100) * 100}%` }}
       ></div>
     </div>
     {/* Progress Bar */}  
-    <div className="flex w-[40%] justify-around mt-[10px]">
+    <div className="flex w-[100%] justify-around ">
       <p className="text-white font-inter font-bold text-shadow-lg/60">
         User Xp: {userData?.exp} / 100
       </p>
-      <div className="text-white font-inter font-bold text-shadow-lg/60">
+      <div className="text-white font-inter font-bold text-shadow-lg/60 ">
         <div className="flex items-center gap-2 sm:gap-3 text-white font-inter font-bold text-shadow-lg/60">
   <img 
     src={Coins} 
     alt="Coins" 
-    className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" 
+    className="w-4 h-4 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain" 
   />
   <span className="text-sm sm:text-base md:text-lg lg:text-xl truncate">
     {userData?.coins}
   </span>
 </div>
-
       </div>
     </div>
   </div>
+</div>
+{/* Subject Progress Section */}
+<div className="w-[40%] bg-[#111827] rounded-3xl p-5 flex flex-col justify-center gap-4 shadow-black shadow-md">
+  <h2 className="text-white font-exo text-[1.5rem] font-bold text-center tracking-wide">
+    Your Progress
+  </h2>
+
+  {/* HTML */}
+  <div className="flex items-center gap-4">
+    <img src={HtmlIcons} alt="HTML" className="w-6 h-6" />
+    <div className="flex-1">
+      <div className="flex justify-between mb-1">
+        <span className="text-white font-exo text-sm sm:text-base">HTML Development</span>
+        <span className="text-gray-400 font-exo text-sm">{Math.round(htmlProgress)}%</span>
+      </div>
+      <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-700 ease-in-out"
+          style={{ width: `${htmlProgress}%` }}
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  {/* CSS */}
+  <div className="flex items-center gap-4">
+    <img src={CssIcons} alt="CSS" className="w-6 h-6" />
+    <div className="flex-1">
+      <div className="flex justify-between mb-1">
+        <span className="text-white font-exo text-sm sm:text-base">CSS Development</span>
+        <span className="text-gray-400 font-exo text-sm">{Math.round(CssProgress)}%</span>
+      </div>
+      <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-cyan-400 to-blue-600 transition-all duration-700 ease-in-out"
+          style={{ width: `${CssProgress}%` }}
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  {/* JavaScript */}
+  <div className="flex items-center gap-4">
+    <img src={JsIcons} alt="JavaScript" className="w-6 h-6" />
+    <div className="flex-1">
+      <div className="flex justify-between mb-1">
+        <span className="text-white font-exo text-sm sm:text-base">JavaScript Development</span>
+        <span className="text-gray-400 font-exo text-sm">{Math.round(JsProgress)}%</span>
+      </div>
+      <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-yellow-300 to-orange-500 transition-all duration-700 ease-in-out"
+          style={{ width: `${JsProgress}%` }}
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  {/* Database */}
+  <div className="flex items-center gap-4">
+    <img src={DataIcons} alt="Database" className="w-6 h-6" />
+    <div className="flex-1">
+      <div className="flex justify-between mb-1">
+        <span className="text-white font-exo text-sm sm:text-base">Database Querying</span>
+        <span className="text-gray-400 font-exo text-sm">{Math.round(DbProgress)}%</span>
+      </div>
+      <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-green-400 to-emerald-700 transition-all duration-700 ease-in-out"
+          style={{ width: `${DbProgress}%` }}
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 ): 
     /*LOADING*/
@@ -180,11 +253,11 @@ if (loadingDashboard) {
     
 
     {/*Bottom Part*/}
-    <div className='flex gap-2 h-[60%]'>
+    <div className='flex gap-2 h-[60%] '>
 
-      <div className='w-[70%] h-[100%] flex flex-col'>
+      <div className='w-[75%] h-[100%] flex flex-col'>
         <div className='h-[35%] p-1 flex flex-col gap-4 '>
-          <h2 className='text-white font-exo font-bold text-[2rem] text-shadow-lg/60'>Jump Back In</h2>
+          <h2 className='text-white font-exo font-bold text-[1.5rem] text-shadow-lg/60'>Jump Back In</h2>
           {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
           {levelInfo ? (<Link to={`/Main/Lessons/${userData.lastOpenedLevel.subject}/${userData.lastOpenedLevel.lessonId}/${userData.lastOpenedLevel.levelId}/Stage1/Lesson`} className='h-[100%]'>
           <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[100px]'>
@@ -205,77 +278,9 @@ if (loadingDashboard) {
           </div>)}      
         </div>
 
-        <div className='flex flex-col p-3 gap-5 flex-grow mt-3'>
-          <h2 className='text-white font-exo font-bold text-[2rem] text-shadow-lg/60'>View Your Progress</h2>
-          <div className='w-[100%] h-[80%] flex items-center justify-around'>
-            
-            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-4'>
-              <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#FFD700_0%,_#FF4500_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
-                <img src={HtmlIcons} alt="" />
-              </div>
-              <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white textSmall-laptop max-w-[65%]'>HTML Development</p>
-                <div className="relative w-13 h-12">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
-                    <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (htmlProgress / 100) * 282.6}`} strokeLinecap="round"/>
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-[0.7rem] font-bold text-gray-700 dark:text-white">{Math.round(htmlProgress)}%</div>
-                </div>
-              </div>
-            </div>
-
-            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-4'>
-              <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#00CFFF_0%,_#1E90FF_100%)]  m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
-                <img src={CssIcons} alt="" />
-              </div>
-              <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem] textSmall-laptop max-w-[65%]'>Css Development</p>
-                <div className="relative w-13 h-12">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
-                    <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (CssProgress / 100) * 282.6}`} strokeLinecap="round"/>
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-[0.7rem] font-bold text-gray-700 dark:text-white">{Math.round(CssProgress)}%</div>
-                </div>
-              </div>
-            </div>
-
-            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-4'>
-              <div className='w-[95%] h-[60%] bg-[radial-gradient(circle,_#fef102_0%,_#ff8000_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
-                <img src={JsIcons} alt="" />
-              </div>
-              <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white text-[1rem] textSmall-laptop max-w-[65%]  '>JavaScript Development</p>
-                <div className="relative w-13 h-12">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
-                    <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (JsProgress / 100) * 282.6}`} strokeLinecap="round"/>
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-[0.7rem] font-bold text-gray-700 dark:text-white">{Math.round(JsProgress)}%</div>
-                </div>
-              </div>
-            </div>
-            <div className='bg-[#111827] border-2 w-[20%] h-[100%] flex rounded-2xl p-2 flex-col items-center gap-4'>
-              <div className='w-[95%] h-[60%]  bg-[radial-gradient(circle,_#4cd137_0%,_#218c74_100%)] m-auto mt-0 mb-0 rounded-2xl flex items-center justify-center'>
-                <img src={DataIcons} alt="" />
-              </div>
-              <div className='flex items-center p-2 gap-2'>
-                <p className='font-exo text-white textSmall-laptop max-w-[65%]'>Database Querying</p>
-                <div className="relative w-13 h-12">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" stroke="#e5e7eb" strokeWidth="10" fill="none"/>
-                    <circle cx="50" cy="50" r="45" stroke="#2CB67D" strokeWidth="10" fill="none" strokeDasharray="282.6" strokeDashoffset={`${282.6 - (DbProgress / 100) * 282.6}`} strokeLinecap="round"/>
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-[0.7rem] font-bold text-gray-700 dark:text-white">{Math.round(DbProgress)}%</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       {/*Inventory*/}
-<div className="bg-[#0B0F16] border border-gray-700/60 w-[30%] h-[95%] rounded-3xl p-5 flex flex-col">
+<div className="bg-[#0B0F16] border border-gray-700/60 w-[25%] h-[95%] rounded-3xl p-3 flex flex-col">
   <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">
     Inventory
   </h1>

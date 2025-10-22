@@ -1,12 +1,15 @@
 import { LuAlignJustify } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast as toastify } from "react-toastify";
+import { toast } from "react-hot-toast";
+
 import { useState } from "react";
 import useUserInventory from "../components/Custom Hooks/useUserInventory";
 import { useInventoryStore } from "./Items-Store/useInventoryStore";
 import { unlockAchievement } from "../components/Custom Hooks/UnlockAchievement";
 import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 import { useParams } from "react-router-dom";
+import Lottie from "lottie-react"; // optional for future animations
 
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const { subject } = useParams();
@@ -16,8 +19,44 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const { inventory: userInventory } = useUserInventory();
   const useItem = useInventoryStore((state) => state.useItem);
 
+  // NEW: Custom neon toast
+  const showItemUsedToast = (item) => {
+    toast.custom(
+      (t) => (
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.85 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 50, scale: 0.85 }}
+          transition={{ type: "spring", stiffness: 150, damping: 15 }}
+          className="bg-[#1A0B2E]/90 border border-purple-500 rounded-2xl shadow-[0_0_20px_rgba(128,0,255,0.7)] px-6 py-4 flex items-center gap-4 max-w-sm w-full mx-auto"
+        >
+          {/* Item Icon */}
+          <div className="w-12 h-12 rounded-full bg-purple-800 flex justify-center items-center shadow-inner">
+            <img
+              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
+              alt={item.title}
+              className="w-8 h-8 object-contain"
+            />
+          </div>
+
+          {/* Message */}
+          <div className="flex flex-col text-left">
+            <h1 className="font-exo text-purple-400 font-bold text-lg">
+              ⚡ {item.title} activated!
+            </h1>
+            <p className="text-gray-300 text-sm">Item used successfully</p>
+          </div>
+        </motion.div>
+      ),
+      { duration: 2500, position: "top-center" }
+    );
+  };
+
   const itemActions = {
-    "Coin Surge": (item) => useItem(item.id, "doubleCoins"),
+    "Coin Surge": (item) => {
+      useItem(item.id, "doubleCoins");
+      showItemUsedToast(item);
+    },
     "Code Whisper": async (item) => {
       if (gamemodeId === "BrainBytes") {
         toast.error("Code Whisper cannot be used in BrainBytes mode", {
@@ -26,6 +65,7 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
         });
         return;
       }
+      showItemUsedToast(item);
       await useItem(item.id, "revealHint");
       setShowCodeWhisper(true);
     },
@@ -37,6 +77,7 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
         });
         return;
       }
+      showItemUsedToast(item);
       useItem(item.id, "extraTime");
     },
     "Time Freeze": (item) => {
@@ -47,12 +88,15 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
         });
         return;
       }
+      showItemUsedToast(item);
       useItem(item.id, "timeFreeze");
     },
     "Error Shield": async (item) => {
+      showItemUsedToast(item);
       await useItem(item.id, "errorShield");
     },
     "Brain Filter": (item) => {
+      
       if (gamemodeId !== "BrainBytes") {
         toast.error("Cannot use Item in this Game mode", {
           position: "top-right",
@@ -60,7 +104,9 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
         });
         return;
       }
+      showItemUsedToast(item);
       useItem(item.id, "brainFilter");
+      
     },
   };
 
@@ -93,10 +139,10 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
                       key={item.id}
                       onClick={() => {
                         if (gamemodeId === "Lesson") {
-                          toast.error("Items cannot be used in Lesson mode", {
-                            position: "top-right",
-                            theme: "colored",
-                          });
+                          toast.error(
+                            "Items cannot be used in Lesson mode",
+                            { position: "top-right", theme: "colored" }
+                          );
                           return;
                         }
                         itemActions[item.title]?.(item);

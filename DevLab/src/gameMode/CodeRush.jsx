@@ -80,7 +80,7 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
 
   return (
     <>
-      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
+      <div className="h-screen bg-[#0D1117] flex flex-col">
         {/* Header */}
         <GameHeader heart={heart} />
 

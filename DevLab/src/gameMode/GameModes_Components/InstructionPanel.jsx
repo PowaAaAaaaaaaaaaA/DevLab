@@ -7,7 +7,8 @@ import {
   js as beautifyJS,
 } from "js-beautify";
 // Hooks
-import useGameModeData from "../../components/Custom Hooks/useGameModeData";
+
+import useFetchGameModeData from "../../components/BackEnd_Data/useFetchGameModeData";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 // Animation
@@ -34,7 +35,7 @@ function InstructionPanel({
     const [aiHint, setAiHint] = useState("");
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const { gamemodeId } = useParams();
-  const { gameModeData, levelData, subject } = useGameModeData();
+  const { gameModeData, levelData, subject } = useFetchGameModeData();
   const [timer, buffApplied, buffType] = useCodeRushTimer(
     gameModeData?.timer,
     gamemodeId,
