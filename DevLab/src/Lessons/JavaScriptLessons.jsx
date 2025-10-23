@@ -134,19 +134,6 @@ function JavaScriptLessons() {
                                 setShowLockedModal(true);
                                 return;
                               }
-                              if (isUnlocked) {
-                                const user = auth.currentUser;
-                                if (user) {
-                                  const userRef = doc(db, "Users", user.uid);
-                                  await updateDoc(userRef, {
-                                    lastOpenedLevel: {
-                                      subject: "JavaScript", // since nasa Js lesson Panalang
-                                      lessonId: lesson.id,
-                                      levelId: level.id,
-                                    },
-                                  });
-                                }
-                              }
                               toggleLevel(lesson.id, level.id);
                             }}>
                             {!isUnlocked && (

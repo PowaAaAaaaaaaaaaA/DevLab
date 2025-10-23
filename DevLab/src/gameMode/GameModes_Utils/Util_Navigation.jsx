@@ -29,7 +29,7 @@ const addExp = async (userId, expGain, coinsGain) => {
   });
 };
 
-// 🔹 Reward Granting Function
+//  Reward Granting Function
 const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
   try {
     const { activeBuffs, removeBuff } = useInventoryStore.getState();
@@ -39,14 +39,14 @@ const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
     if (!levelSnap.exists()) return;
 
     let { expReward = 0, coinsReward = 0 } = levelSnap.data();
-    console.log("Granting rewards:", expReward, coinsReward);
 
     //  Apply buff (Double Coins)
     if (activeBuffs.includes("doubleCoins")) {
       const { DoubleCoins } = CoinSurge(coinsReward);
       coinsReward = DoubleCoins();
-      removeBuff("doubleCoins");
+      removeBuff("doubleCoins")
     }
+    console.log("Granting rewards:", expReward, coinsReward);
 
     // Add EXP & Coins
     await addExp(userId, expReward, coinsReward);

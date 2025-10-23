@@ -21,6 +21,9 @@ import useCodeRushTimer from "../../ItemsLogics/useCodeRushTimer";
 import CodeWhisper from "../../ItemsLogics/CodeWhisper";
 import { BrainFilter } from "../../ItemsLogics/BrainFilter";
 import codeWhisperPrompt from "../../components/OpenAI Prompts/codeWhisperPrompt";
+// 
+import useStoreLastOpenedLevel from "../../components/Custom Hooks/useStoreLastOpenedLevel";
+
 
 function InstructionPanel({
   setIsCorrect,
@@ -32,10 +35,13 @@ function InstructionPanel({
   setTimesUp,
   pauseTimer
 }) {
+  
     const [aiHint, setAiHint] = useState("");
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
+
+  console.log("Current active buffs:", activeBuffs);
   const { gamemodeId } = useParams();
-  const { gameModeData, levelData, subject } = useFetchGameModeData();
+  const { gameModeData, levelData, subject,lessonId,levelId, stageId } = useFetchGameModeData();
   const [timer, buffApplied, buffType] = useCodeRushTimer(
     gameModeData?.timer,
     gamemodeId,
@@ -44,13 +50,28 @@ function InstructionPanel({
     pauseTimer
   );
   const { animatedValue } = useAnimatedNumber(buffApplied ? 30 : 0);
-
   // Format the Code to Display
   const [formattedCode, setFormattedCode] = useState({
     html: "",
     css: "",
     js: "",
+    sql:""
   });
+    const storeLastOpenedLevel = useStoreLastOpenedLevel();
+//  Store last opened level in Firestore on first render
+useEffect(() => {
+  if (levelData && gameModeData && subject) {
+    storeLastOpenedLevel.mutate({
+      subject,
+      gameModeData,
+      lessonId,
+      levelId,
+      stageId,
+    });
+  }
+}, [levelData, gameModeData, subject]);
+
+ // Runs once when data becomes available
 
   useEffect(() => {
     if (!gameModeData || !subject) return;
@@ -65,6 +86,7 @@ function InstructionPanel({
       js: codingInterface.js
         ? beautifyJS(codingInterface.js, { indent_size: 2 })
         : "",
+      sql: codingInterface.sql
     });
   }, [gameModeData, subject]);
 
@@ -144,8 +166,9 @@ function InstructionPanel({
   }
 
 
+const hasAnyCode =
+  formattedCode.html || formattedCode.css || formattedCode.js || formattedCode.sql;
 
-  const hasAnyCode = formattedCode.html || formattedCode.css || formattedCode.js;
 
   return (
     <div className="h-[100%] w-full bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5 scrollbar-custom">
@@ -230,6 +253,15 @@ function InstructionPanel({
                   </pre>
                 </>
               )}
+{formattedCode.sql && (
+  <>
+    <p className="font-bold mb-1 text-[#33cc66]">SQL</p>
+    <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
+      {formattedCode.sql}
+    </pre>
+  </>
+)}
+
             </div>
           )}
         </div>

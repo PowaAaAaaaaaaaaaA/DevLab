@@ -11,7 +11,6 @@ import { doc, getDoc, updateDoc, writeBatch } from "firebase/firestore";
 import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
-import CoinSurge from "../../ItemsLogics/CoinSurge";
 import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
 import { useSubjectCheckComplete } from "../../components/Custom Hooks/useSubjectCheckComplete";
 import { fetchLevelSummary } from "../../components/OpenAI Prompts/feedbackPrompt";
@@ -57,7 +56,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
   const finalCoinReward = useMemo(() => {
     if (!LevelData) return 0;
     return activeBuffs.includes("doubleCoins")
-      ? LevelData.coinsReward * 2
+      ? LevelData.coinsReward * 2 
       : LevelData.coinsReward;
   }, [activeBuffs, LevelData]);
 

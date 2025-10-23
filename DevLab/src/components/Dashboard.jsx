@@ -5,29 +5,29 @@ import DataIcons from '../assets/navbarIcons/database.png'
 import JsIcons from '../assets/navbarIcons/JavaScript.png'
 import Coins from '../assets/Images/DevCoins.png'
 import defaultAvatar from './../assets/Images/profile_handler.png'
+import LoadingSmall from '../assets/Lottie/loadingSmall.json'
 import Loading from './Loading'
 // Utils
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
+import Lottie from 'lottie-react'
 import '../index.css'
 // Components
 import useLevelBar from './Custom Hooks/useLevelBar'
 import useSubjProgressBar from './Custom Hooks/useSubjProgressBar'
 import useUserInventory from './Custom Hooks/useUserInventory'
-import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
 import useFetchUserData from './BackEnd_Data/useFetchUserData.jsx'
 import { fetchShopItems } from './BackEnd_Data/useFethShopItems.jsx'
-// Firebase
-import { db} from "../Firebase/Firebase"
-import {doc, getDoc } from 'firebase/firestore';
+
 
 
 
 function Dashboard() {
+
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
   // User Details (Custom Hook)
-  const { userData, isLoading } = useFetchUserData();
+  const { userData, isLoading,isFetching } = useFetchUserData();
   const {animatedExp} = useLevelBar();
   const {inventory, loading} = useUserInventory();
   // Subject ProgressbAr
@@ -62,28 +62,6 @@ useEffect(() => {
     setLoading(false);
   }
 }, []);
-
-
-// THis will get the last open lesson 
-  const [levelInfo, setLevelInfo] =useState();
-useEffect(() => {
-  const fetchLevelInfo = async () => {
-    if (userData?.lastOpenedLevel) {
-      const { subject, lessonId, levelId } = userData.lastOpenedLevel;
-console.log(subject)
-      // Full dynamic path
-      const getUser = doc(db, subject, lessonId, "Levels", levelId);
-      const userDocs = await getDoc(getUser);
-
-      if (userDocs.exists()) {
-        setLevelInfo(userDocs.data());
-      } else {
-        console.log("Level document not found");
-      }
-    }
-  };
-  fetchLevelInfo();
-}, [userData]);
 
   // Show Loading Screen first
   // Show Loading Screen
@@ -253,32 +231,63 @@ if (loadingDashboard) {
     
 
     {/*Bottom Part*/}
-    <div className='flex gap-2 h-[60%] '>
+<div className='flex gap-2 h-[60%] '>
+<div className="h-[95%] w-[75%] p-1 flex flex-col gap-4">
+  <h2 className="text-white font-exo font-bold text-[1.5rem] text-shadow-lg/60">
+    Jump Back In
+  </h2>
 
-      <div className='w-[75%] h-[100%] flex flex-col'>
-        <div className='h-[35%] p-1 flex flex-col gap-4 '>
-          <h2 className='text-white font-exo font-bold text-[1.5rem] text-shadow-lg/60'>Jump Back In</h2>
-          {/*Jump back in Button (JUST ADD LINK TAG MYKE)*/}
-          {levelInfo ? (<Link to={`/Main/Lessons/${userData.lastOpenedLevel.subject}/${userData.lastOpenedLevel.lessonId}/${userData.lastOpenedLevel.levelId}/Stage1/Lesson`} className='h-[100%]'>
-          <div className='w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-102 cursor-pointer duration-300 min-h-[100px]'>
-            <div className='bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1'> <span className='pb-4'>{levelInfo.symbol}</span></div>
-            <div className='p-2 flex-col flex gap-2'>
-              <p className='font-exo text-[1.4rem] text-white font-bold'>{levelInfo.title}</p>
-              <p className='font-exo text-gray-500 text-[0.8rem] line-clamp-2'> {levelInfo.description}</p>
+  {/*  Check loading state first */}
+  {isLoading ? (
+    <div className="flex justify-center items-center h-[70%]">
+      <Lottie animationData={LoadingSmall} loop className="w-[50%] h-[50%]" />
+    </div>
+  ) : userData?.lastOpenedLevel && Object.keys(userData.lastOpenedLevel).length > 0 ? (
+    <div className="flex flex-col gap-3 overflow-auto p-2 scrollbar-custom">
+      {Object.entries(userData.lastOpenedLevel)
+        //  Sort by your preferred subject order
+        .sort(([a], [b]) => {
+          const order = ["Html", "Css", "JavaScript", "Database"];
+          return order.indexOf(a) - order.indexOf(b);
+        })
+        .map(([subject, info]) => (
+          <Link
+            key={subject}
+            to={`/Main/Lessons/${info.subject}/${info.lessonId}/${info.levelId}/${info.stageId}/${info.gameMode}`}
+            className="h-[100%]">
+            <div className="w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-101 cursor-pointer duration-300 min-h-[100px]">
+              <div className="bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1">
+                <span className="pb-3">
+                  {subject === "Html"
+                    ? "< >"
+                    : subject === "Css"
+                    ? "#"
+                    : subject === "JavaScript"
+                    ? "{ }"
+                    : subject === "Database"
+                    ? "|||"
+                    : "|||" }
+                </span>
+              </div>
+              <div className="p-2 flex-col flex gap-2">
+                <p className="font-exo text-[1.2rem] text-white font-bold">{info.title}</p>
+                <p className="font-exo text-gray-500 text-[0.7rem] line-clamp-2">{info.description}</p>
+              </div>
             </div>
-          </div>
-          </Link>):(<div className='w-[100%] bg-[#111827] rounded-3xl border-black border-2 p-5 '>
-            
-<div role="status" className="max-w-sm animate-pulse min-h-[100%]">
-    <div className ="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-    <div className ="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-    <span className ="sr-only">Loading...</span>
+          </Link>
+        ))}
+    </div>
+  ) : (
+    //  When user has no saved levels
+    <div className="w-[100%] bg-[#111827] rounded-3xl border-black border-2 flex items-center justify-center p-5">
+      <p className="text-gray-400 font-exo text-lg text-center">
+        No recent levels yet. Start learning to unlock this tab!
+      </p>
+    </div>
+  )}
 </div>
-          </div>)}      
-        </div>
 
-      </div>
+
       {/*Inventory*/}
 <div className="bg-[#0B0F16] border border-gray-700/60 w-[25%] h-[95%] rounded-3xl p-3 flex flex-col">
   <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">

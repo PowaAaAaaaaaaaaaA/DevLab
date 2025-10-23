@@ -12,9 +12,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
 
-function LessonInstructionPanel() {
-  const { gameModeData, levelData, subject } = useFetchGameModeData();
+import useStoreLastOpenedLevel from "../../components/Custom Hooks/useStoreLastOpenedLevel";
 
+function LessonInstructionPanel() {
+  const { gameModeData, levelData, subject,lessonId,levelId, stageId } = useFetchGameModeData();
+  const storeLastOpenedLevel = useStoreLastOpenedLevel();
 
 
   const [formattedCode, setFormattedCode] = useState({
@@ -23,6 +25,22 @@ function LessonInstructionPanel() {
     js: "",
     sql: "",
   });
+
+
+    //  Store last opened level in Firestore on first render
+useEffect(() => {
+  if (levelData && gameModeData && subject) {
+    storeLastOpenedLevel.mutate({
+      subject,
+      gameModeData,
+      lessonId,
+      levelId,
+      stageId,
+    });
+  }
+}, [levelData, gameModeData, subject]);
+
+ // Runs once when data becomes available
 
   useEffect(() => {
     if (!gameModeData || !subject) return;

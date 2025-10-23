@@ -2,7 +2,7 @@ import { auth } from "../../Firebase/Firebase";
 import { useQuery } from "@tanstack/react-query";
 
 const useFetchUserData = () => {
-  const {data: userData,refetch,isLoading,isError,} = useQuery({
+  const {data: userData,refetch,isLoading,isError,isFetching} = useQuery({
     queryKey: ["userData"],
     queryFn: async () => {
       const currentUser = auth.currentUser;
@@ -26,6 +26,6 @@ const useFetchUserData = () => {
       return { ...data, uid };
     },
   });
-  return { userData, refetch, isLoading, isError };
+  return { userData, refetch, isLoading, isError ,isFetching};
 };
 export default useFetchUserData;
