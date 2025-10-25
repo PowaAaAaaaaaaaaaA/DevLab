@@ -2,9 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
-// Firebase
-import { doc, updateDoc } from "firebase/firestore";
-import { db, auth } from "../Firebase/Firebase";
+
 // Assets
 import HtmlImage from "../assets/Images/html-Icon-Big.png";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
@@ -29,6 +27,7 @@ function HtmlLessons() {
     isLoading: progressLoading,
     completedLevels,
   } = useFetchUserProgress("Html");
+  console.log(userProgress);
   // Subject Levels Progress Bar
   const { animatedBar } = useSubjProgressBar("Html");
   const navigate = useNavigate();
@@ -107,8 +106,8 @@ function HtmlLessons() {
                   >
                     {lesson.levels.map((level) => {
                       // Level Locked or Unlocked
-                      const isUnlocked =
-                        userProgress[`${lesson.id}-${level.id}`];
+const progress = userProgress[`${lesson.id}-${level.id}`] || {};
+const isUnlocked = progress.isActive;
                       // unique identifier
                       const isExpanded =
                         expandedLevel === `${lesson.id}-${level.id}`;

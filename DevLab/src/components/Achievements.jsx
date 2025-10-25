@@ -185,7 +185,7 @@ const showClaimToast = (item) => {
   ) : (
     HtmlData?.map((item) => {
       const isUnlocked = !!userAchievements?.[item.id];
-      const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
+      const isClaimed = isUnlocked && userAchievements[item.id]?.isClaimed;
       return (
         <div
           key={item.id}
@@ -223,7 +223,7 @@ const showClaimToast = (item) => {
   ) : (
 CssData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
-  const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
+  const isClaimed = isUnlocked && userAchievements[item.id]?.isClaimed;
   console.log(`${item.id} - ${isClaimed}`)
   return (
     <div
@@ -263,7 +263,7 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
   ) : (
 JsData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
-  const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
+  const isClaimed = isUnlocked && userAchievements[item.id]?.isClaimed;
   console.log(`${item.id} - ${isClaimed}`)
   return (
     <div
@@ -303,7 +303,7 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
   ) : (
 DatabaseData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
-  const isClaimed = isUnlocked && userAchievements[item.id]?.claimed;
+  const isClaimed = isUnlocked && userAchievements[item.id]?.isClaimed;
   console.log(`${item.id} - ${isClaimed}`)
   return (
     <div
