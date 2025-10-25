@@ -5,8 +5,7 @@ import confetti from "../../assets/Lottie/Confetti.json";
 import smallLoading from "../../assets/Lottie/loadingSmall.json";
 import loadingDots from "../../assets/Lottie/LoadingDots.json"
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { db,  } from "../../Firebase/Firebase";
-import { doc, getDoc, } from "firebase/firestore";
+
 
 import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";

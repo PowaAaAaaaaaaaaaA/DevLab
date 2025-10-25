@@ -17,7 +17,7 @@ function UserManagement() {
     queryKey: ["allUser"],
     queryFn: fetchUsers,
   });
-
+  console.log(users)
   // Optimistic suspend/activate mutation
   const mutation = useMutation({
     mutationFn: ({ id, toggleDisable }) => suspendAccount(id, toggleDisable),

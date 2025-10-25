@@ -31,7 +31,7 @@ function GameFooter({ setLevelComplete, setShowCodeWhisper }) {
     stageId,
     gamemodeId,
   } = useFetchGameModeData();
-  const { userStageCompleted } = useFetchUserProgress(subject);
+  const { userStageCompleted,completedLevels } = useFetchUserProgress(subject);
 
   const submittedCode = useGameStore((state) => state.submittedCode);
   const setIsCorrect = useGameStore((state) => state.setIsCorrect);

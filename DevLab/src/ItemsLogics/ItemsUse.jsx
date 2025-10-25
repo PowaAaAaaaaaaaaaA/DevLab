@@ -9,7 +9,7 @@ import { useInventoryStore } from "./Items-Store/useInventoryStore";
 import { unlockAchievement } from "../components/Custom Hooks/UnlockAchievement";
 import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 import { useParams } from "react-router-dom";
-import Lottie from "lottie-react"; // optional for future animations
+
 
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const { subject } = useParams();
@@ -53,11 +53,11 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   };
 
   const itemActions = {
-    "Coin Surge": (item) => {
+    "CoinSurge": (item) => {
       useItem(item.id, "doubleCoins");
       showItemUsedToast(item);
     },
-    "Code Whisper": async (item) => {
+    "CodeWhisper": async (item) => {
       if (gamemodeId === "BrainBytes") {
         toast.error("Code Whisper cannot be used in BrainBytes mode", {
           position: "top-right",
@@ -69,7 +69,7 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
       await useItem(item.id, "revealHint");
       setShowCodeWhisper(true);
     },
-    "Code Patch++": (item) => {
+    "CodePatch++": (item) => {
       if (gamemodeId !== "CodeRush") {
         toast.error("Cannot use Item in this Game mode", {
           position: "top-right",
@@ -80,7 +80,7 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
       showItemUsedToast(item);
       useItem(item.id, "extraTime");
     },
-    "Time Freeze": (item) => {
+    "TimeFreeze": (item) => {
       if (gamemodeId !== "CodeRush") {
         toast.error("Cannot use Item in this Game mode", {
           position: "top-right",
@@ -91,12 +91,11 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
       showItemUsedToast(item);
       useItem(item.id, "timeFreeze");
     },
-    "Error Shield": async (item) => {
+    "ErrorShield": async (item) => {
       showItemUsedToast(item);
       await useItem(item.id, "errorShield");
     },
-    "Brain Filter": (item) => {
-      
+    "BrainFilter": (item) => {
       if (gamemodeId !== "BrainBytes") {
         toast.error("Cannot use Item in this Game mode", {
           position: "top-right",

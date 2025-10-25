@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { doc, updateDoc, setDoc, getDoc, increment } from "firebase/firestore";
-import { db, auth } from '../Firebase/Firebase';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 
 import MoneyIcon from '../assets/Images/DevCoins.png';
 import Loading from '../assets/Lottie/LoadingDots.json';
 import Lottie from 'lottie-react';
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
+
 
 import useFetchUserData from './BackEnd_Data/useFetchUserData';
 import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
@@ -19,29 +20,99 @@ function Shop() {
   const { shopItems, isLoading } = useFetchShopItems(); //  include loading state
   const icons = import.meta.glob('../assets/ItemsIcon/*', { eager: true });
 
-  const { userData, refetch } = useFetchUserData();
+  const { userData } = useFetchUserData();
   const { animatedValue } = useAnimatedNumber(userData?.coins);
 
   const [isBuying, setIsBuying] = useState(false);
 
-const buyItem = async (item) => {
-  try {
-    setIsBuying(true);
+const queryClient = useQueryClient();
 
-    const data = await purchaseItem(item.id, item.cost, item.Icon);
+const buyMutation = useMutation({
+  mutationFn: async (item) => {
+    // Run the actual purchase logic (your existing backend function)
+    return await purchaseItem(item.id, item.cost, item.Icon);
+  },
 
-    toast.success(`You bought ${item.title}!`, { position: "top-center", theme: "colored" });
+onMutate: async (item) => {
+  await queryClient.cancelQueries(["userData"]);
 
-    // Optional: refresh user coins via your existing hook
-    refetch();
+  const previousUserData =
+    queryClient.getQueryData(["userData"]) || userData;
 
-  } catch (error) {
-    const errMsg = error.response?.data?.message || "Purchase failed";
-    toast.error(errMsg, { position: "top-center", theme: "colored" });
-  } finally {
-    setIsBuying(false);
+  // Check coin balance
+  if (!previousUserData || previousUserData.coins < item.cost) {
+    toast.error("Not enough DevCoins!", {
+      position: "top-center",
+      theme: "colored",
+    });
+    throw new Error("Insufficient coins");
   }
+
+  // Optimistic UI update
+  queryClient.setQueryData(["userData"], (oldData) => ({
+    ...oldData,
+    coins: (oldData?.coins || 0) - item.cost,
+  }));
+
+  showPurchaseToast(item)
+
+  return { previousUserData };
+},
+
+
+  onSuccess: () => {
+    // Optionally refresh shop or user data
+    queryClient.invalidateQueries(["userData", userData.uid]);
+    queryClient.invalidateQueries(["shopItems"]);
+    setIsBuying(false);
+  },
+  onError: (context) => {
+    // Rollback on error
+    if (context?.previousUserData) {
+      queryClient.setQueryData(["userData", userData.uid], context.previousUserData);
+    }
+    toast.error("Purchase failed. Try again!", {
+      position: "top-center",
+      theme: "colored",
+    });
+    setIsBuying(false);
+  },
+});
+const showPurchaseToast = (item) => {
+  toast.custom(
+    (t) => (
+      <motion.div
+        initial={{ opacity: 0, y: 50, scale: 0.85 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 50, scale: 0.85 }}
+        transition={{ type: "spring", stiffness: 150, damping: 15 }}
+        className="bg-white rounded-2xl shadow-2xl px-8 py-6 flex items-center gap-4 text-center max-w-sm w-full mx-auto"
+      >
+
+        <div className="flex flex-col">
+          <h1 className="font-exo text-green-700 font-extrabold text-2xl drop-shadow-sm">
+            🛒 Purchase Successful!
+          </h1>
+
+          <p className="text-gray-700 text-base">
+            You bought <span className="font-bold text-purple-700">{item.title}</span>!
+          </p>
+
+          <div className="flex justify-center gap-4 mt-3">
+            <div className="bg-yellow-100 px-4 py-2 rounded-xl shadow-sm">
+              <p className="text-sm text-yellow-700 font-bold">
+                Cost: <span className="text-yellow-600">-{item.cost}</span> 🪙
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    ),
+    { duration: 3000, position: "top-center" }
+  );
 };
+
+
 
   return (
     <>
@@ -88,9 +159,7 @@ const buyItem = async (item) => {
                     whileTap={{ scale: 0.95 }}
                     whileHover={{ scale: 1.05 }}
                     transition={{ bounceDamping: 100 }}
-                    onClick={() => {
-                      setTimeout(() => buyItem(item), 300);
-                    }}
+                    onClick={() => buyMutation.mutate(item)}
                     className="bg-green-400 text-black font-bold py-2 px-6 rounded-full text-lg hover:cursor-pointer mt-5 mb-5"
                   >
                     $ {item.cost}

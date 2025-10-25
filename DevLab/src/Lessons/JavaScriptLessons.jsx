@@ -105,8 +105,8 @@ function JavaScriptLessons() {
                     className="flex flex-col gap-4">
                     {lesson.levels.map((level) => {
                       // Level Locked or Unlocked
-                      const isUnlocked =
-                        userProgress[`${lesson.id}-${level.id}`];
+const progress = userProgress[`${lesson.id}-${level.id}`] || {};
+const isUnlocked = progress.isActive;
                       // unique identifier
                       const isExpanded =
                         expandedLevel === `${lesson.id}-${level.id}`;

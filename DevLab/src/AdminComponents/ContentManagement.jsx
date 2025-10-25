@@ -182,7 +182,7 @@ const handleDragEnd = async (event, lessonId, levelId) => {
                 {lesson.levels.map((level) => (
                   <div
                     key={level.id}
-                    className="relative border-[#56EBFF] border w-full sm:w-[48%] lg:w-[42%] p-4 flex flex-col gap-4 min-h-[180px] rounded-2xl bg-[#111827] transition-all duration-400">
+                    className="relative border-[#56EBFF] border w-[90%] p-4 flex flex-col gap-4 min-h-[180px] rounded-2xl bg-[#111827] transition-all duration-400">
                     <div className="flex justify-between items-center">
                     <h2 className="text-xl md:text-3xl font-exo font-bold w-[73%] text-white mediuText-laptop">
                       {level.title}

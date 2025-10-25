@@ -26,7 +26,6 @@ function Achievements() {
   // Achievements DATA
   const { achievements: HtmlData, isLoading: htmlLoading } = useFetchAchievements("Html");
   const { achievements: CssData, isLoading: cssLoading } = useFetchAchievements("Css");
-  console.log(CssData)
   const { achievements: JsData, isLoading: jsLoading } = useFetchAchievements("JavaScript");
   const { achievements: DatabaseData, isLoading: dbLoading } = useFetchAchievements("Database");
   // User Achievement ProgressBar
@@ -55,11 +54,13 @@ const claimMutation = useMutation({
     let newExp = (userData.exp || 0) + (achievement.expReward || 0);
     let newLevel = userData.userLevel || 1;
     let newCoins = (userData.coins || 0) + (achievement.coinsReward || 0);
+
     if (newExp >= 100) {
       const levelsGained = Math.floor(newExp / 100);
       newLevel += levelsGained;
       newExp = newExp % 100;
     }
+
     await updateDoc(userRef, {
       exp: newExp,
       userLevel: newLevel,
@@ -68,37 +69,42 @@ const claimMutation = useMutation({
 
     return achievement.id;
   },
+
   onMutate: async (achievement) => {
-    // Optimistically update the cache
+
+    // Immediately show the claimed item (optimistic UI)
+    const claimedItem =
+      HtmlData.find(a => a.id === achievement.id) ||
+      CssData.find(a => a.id === achievement.id) ||
+      JsData.find(a => a.id === achievement.id) ||
+      DatabaseData.find(a => a.id === achievement.id);
+
+    if (claimedItem) showClaimToast(claimedItem);
+
+    // Optimistically update cache
     queryClient.setQueryData(["userAchievements", userData.uid], (oldData) => ({
       ...oldData,
       [achievement.id]: { ...oldData?.[achievement.id], isClaimed: true },
     }));
+
     queryClient.setQueryData(["User_Details", userData.uid], (oldData) => ({
       ...oldData,
       exp: (oldData?.exp || 0) + (achievement.expReward || 0),
-      userLevel: (oldData?.userLevel || 1) + Math.floor(((oldData?.exp || 0) + (achievement.expReward || 0)) / 100),
+      userLevel:
+        (oldData?.userLevel || 1) +
+        Math.floor(((oldData?.exp || 0) + (achievement.expReward || 0)) / 100),
       coins: (oldData?.coins || 0) + (achievement.coinsReward || 0),
     }));
   },
-onSuccess: (achievementId) => {
-  const claimedItem = HtmlData.find(a => a.id === achievementId) 
-                  || CssData.find(a => a.id === achievementId)
-                  || JsData.find(a => a.id === achievementId)
-                  || DatabaseData.find(a => a.id === achievementId);
-  showClaimToast(claimedItem);
-  setLoadingClaim(false);
-},
 
   onError: () => {
-    // rollback if needed
     queryClient.invalidateQueries(["userAchievements", userData.uid]);
     queryClient.invalidateQueries(["User_Details", userData.uid]);
   },
 });
 
+
 const handleClaim = (item) => {
-  setLoadingClaim(true);
   claimMutation.mutate(item, {
     onSuccess: () => {
       setLoadingClaim(false);

@@ -113,7 +113,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         // JSON save
         const filteredState = filterStateByGameMode(updatedState, activeTab);
         response = await axios.post(
-          `${import.meta.env.SERVER}/fireBaseAdmin/editStage`,
+          `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/editStage`,
           {
             category: subject,
             lessonId,
@@ -156,7 +156,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         formData.append("state", JSON.stringify(filteredState));
 
         response = await axios.post(
-          `${import.meta.env.SERVER}/fireBaseAdmin/editStage`,
+          `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/editStage`,
           formData,
           {
             headers: {

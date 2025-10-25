@@ -25,6 +25,7 @@ import { BrainFilter } from "../../ItemsLogics/BrainFilter";
 import codeWhisperPrompt from "../../components/OpenAI Prompts/codeWhisperPrompt";
 // 
 import useStoreLastOpenedLevel from "../../components/Custom Hooks/useStoreLastOpenedLevel";
+import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
 
 
 function InstructionPanel({
@@ -40,7 +41,8 @@ function InstructionPanel({
   
     const [aiHint, setAiHint] = useState("");
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
-
+  const submittedCode = useGameStore((state) => state.submittedCode);
+console.log(submittedCode);
   console.log("Current active buffs:", activeBuffs);
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject,lessonId,levelId, stageId } = useFetchGameModeData();
@@ -168,6 +170,7 @@ useEffect(() => {
         description: gameModeData.description,
         instruction: gameModeData.instruction,
         receivedCode: gameModeData?.codingInterface || {}, // directly pass codingInterface
+        submittedCode: submittedCode,
       });
 
       if (result?.whisper) {

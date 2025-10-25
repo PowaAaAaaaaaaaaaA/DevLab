@@ -6,6 +6,7 @@ const codeWhisperPrompt = async ({
   description,
   instruction,
   receivedCode,
+  submittedCode
 }) => {
   if (!receivedCode) return null;
   const setLoadingHint = useGameStore.getState().setLoadingHint;
@@ -16,8 +17,8 @@ const codeWhisperPrompt = async ({
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `https://api-soyulx5clq-uc.a.run.app/openAI/codeWhisper`,
-      { description, instruction, receivedCode },
+      `http://localhost:8082/openAI/codeWhisper`,
+      { description, instruction, receivedCode,submittedCode},
       {
         headers: {
           Authorization: `Bearer ${token}`,
