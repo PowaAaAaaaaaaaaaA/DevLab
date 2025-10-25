@@ -5,14 +5,13 @@ function GameMode_Instruction_PopUp({ title, message, onClose, buttonText}) {
     const { setIsCorrect } = useGameStore.getState();
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-lg">
             <motion.div 
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0 }}
                 transition={{ type: "spring", stiffness: 150, damping: 20 }}
-                className="bg-[#1A0B2E]/90 border border-purple-500 rounded-2xl p-8 w-[90%] max-w-md text-center shadow-[0_0_20px_rgba(128,0,255,0.7)]"
-            >
+                className="bg-[#1A0B2E]/90 border border-purple-500 rounded-2xl p-8 w-[90%] max-w-md text-center shadow-[0_0_20px_rgba(128,0,255,0.7)]">
                 <h2 className="text-4xl font-bold text-purple-400 mb-4 font-exo drop-shadow-[0_0_6px_rgba(128,0,255,0.8)]">
                     {title}
                 </h2>

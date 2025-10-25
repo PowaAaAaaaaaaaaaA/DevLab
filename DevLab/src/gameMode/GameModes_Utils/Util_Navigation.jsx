@@ -5,6 +5,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import CoinSurge from "../../ItemsLogics/CoinSurge";
 import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 import { useRewardStore } from "../../ItemsLogics/Items-Store/useRewardStore";
+import useFetchLevelsData from "../../components/BackEnd_Data/useFetchLevelsData";
 
 // Helper: Add EXP and Coins
 const addExp = async (userId, expGain, coinsGain) => {
@@ -33,22 +34,29 @@ const addExp = async (userId, expGain, coinsGain) => {
 //  Reward Granting Function
 const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
   
+  
   try {
     const { setLastReward } = useRewardStore.getState();
     const { activeBuffs, removeBuff } = useInventoryStore.getState();
 
-    const levelRef = doc(db, subject, lessonId, "Levels", levelId);
-    const levelSnap = await getDoc(levelRef);
-    if (!levelSnap.exists()) return;
+const { levelsData } = useFetchLevelsData(subject);
 
-    let { expReward = 0, coinsReward = 0 } = levelSnap.data();
+const LevelData = useMemo(() => {
+  const lesson = levelsData.find(l => l.id === lessonId);
+  return lesson?.Levels?.find(lv => lv.id === levelId) || null;
+}, [levelsData, lessonId, levelId]);
+
+if (!LevelData) return;
+
+let { expReward = 0, coinsReward = 0 } = LevelData;
 
     //  Apply buff (Double Coins)
-    if (activeBuffs.includes("doubleCoins")) {
-      const { DoubleCoins } = CoinSurge(coinsReward);
-      coinsReward = DoubleCoins();
-      removeBuff("doubleCoins")
-    }
+if (activeBuffs.includes("doubleCoins")) {
+  const { DoubleCoins } = CoinSurge(coinsReward);
+  coinsReward = DoubleCoins();
+  removeBuff("doubleCoins");
+}
+
     console.log("Granting rewards:", expReward, coinsReward);
   setLastReward(expReward, coinsReward);
     // Add EXP & Coins

@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword,sendEmailVerification,signOut } from 'fi
 import { useNavigate } from 'react-router-dom';
 import { setDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+import Lottie from 'lottie-react';
 
 import Loading from "../assets/Lottie/LoadingDots.json";
 

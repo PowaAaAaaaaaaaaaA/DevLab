@@ -5,28 +5,27 @@ import confetti from "../../assets/Lottie/Confetti.json";
 import smallLoading from "../../assets/Lottie/loadingSmall.json";
 import loadingDots from "../../assets/Lottie/LoadingDots.json"
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { db, auth } from "../../Firebase/Firebase";
-import { doc, getDoc, updateDoc, writeBatch } from "firebase/firestore";
+import { db,  } from "../../Firebase/Firebase";
+import { doc, getDoc, } from "firebase/firestore";
 
 import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
-import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
-import { useSubjectCheckComplete } from "../../components/Custom Hooks/useSubjectCheckComplete";
 import { fetchLevelSummary } from "../../components/OpenAI Prompts/feedbackPrompt";
 import { unlockStage } from "../../components/BackEnd_Functions/unlockStage";
 import { useRewardStore } from "../../ItemsLogics/Items-Store/useRewardStore";
 
+import useFetchLevelsData from "../../components/BackEnd_Data/useFetchLevelsData";
+
 function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLevelComplete, resetHearts }) {
   const navigate = useNavigate();
   const { stageId } = useParams();
-
+  const { levelsData} = useFetchLevelsData(subj);
   const { lastReward } = useRewardStore();
   const { clearReward } = useRewardStore.getState();
   const { userData, refetch } = useFetchUserData();
 
   const [levelSummary, setLevelSummary] = useState(null);
-  const [LevelData, setLevelData] = useState(null);
 
   const hearts = heartsRemaining;
   const [isLoading, setIsLoading] = useState(false);
@@ -46,13 +45,10 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
   
 
   //  Fetch Level Data
-  useEffect(() => {
-    (async () => {
-      const levelRef = doc(db, subj, lessonId, "Levels", LevelId);
-      const snapshot = await getDoc(levelRef);
-      if (snapshot.exists()) setLevelData(snapshot.data());
-    })();
-  }, [subj, lessonId, LevelId]);
+const LevelData = useMemo(() => {
+  const lesson = levelsData.find(l => l.id === lessonId);
+  return lesson?.Levels?.find(lv => lv.id === LevelId) || null;
+}, [levelsData, lessonId, LevelId]);
 
   //  Derived rewards (memoized)
 const finalCoinReward = useMemo(() => {

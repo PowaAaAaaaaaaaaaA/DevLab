@@ -72,6 +72,12 @@ if (loadingDashboard) {
     </div>
   );
 }
+const subjectIcons = {
+  Html: HtmlIcons,
+  Css: CssIcons,
+  JavaScript: JsIcons,
+  Database: DataIcons,
+};
 
   return (
 // Dashboard Wrapper
@@ -256,19 +262,15 @@ if (loadingDashboard) {
             to={`/Main/Lessons/${info.subject}/${info.lessonId}/${info.levelId}/${info.stageId}/${info.gameMode}`}
             className="h-[100%]">
             <div className="w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-101 cursor-pointer duration-300 min-h-[100px]">
-              <div className="bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[2.5rem] p-1">
-                <span className="pb-3">
-                  {subject === "Html"
-                    ? "< >"
-                    : subject === "Css"
-                    ? "#"
-                    : subject === "JavaScript"
-                    ? "{ }"
-                    : subject === "Database"
-                    ? "|||"
-                    : "|||" }
-                </span>
-              </div>
+<div className="min-w-[15%] rounded-3xl flex items-center justify-center p-2
+                bg-[#0B0F16] shadow-md">
+  <img
+    src={subjectIcons[subject]}
+    alt={subject}
+    className="w-10 h-10 sm:w-15 sm:h-15 object-contain"
+  />
+</div>
+
               <div className="p-2 flex-col flex gap-2">
                 <p className="font-exo text-[1.2rem] text-white font-bold">{info.title}</p>
                 <p className="font-exo text-gray-500 text-[0.7rem] line-clamp-2">{info.description}</p>

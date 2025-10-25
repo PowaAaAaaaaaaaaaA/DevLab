@@ -9,9 +9,9 @@ import Loading from '../assets/Lottie/LoadingDots.json'
 import defaultAvatar from './../assets/Images/profile_handler.png';
 // DaTa
 import useFetchUserData from "./BackEnd_Data/useFetchUserData.jsx";
-import useAchievementsData from './Custom Hooks/useAchievementsData.jsx'
 import useUserAchievements from './Custom Hooks/useUserAchievements.jsx'
 import useAchievementsProgressBar from './Custom Hooks/useAchievementProgressBar.jsx';
+import useFetchAchievements from "./BackEnd_Data/useFetchAchievements.jsx";
 // Utils
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react'  
@@ -24,10 +24,11 @@ function Achievements() {
 
   const { userData } = useFetchUserData();
   // Achievements DATA
-  const { data: HtmlData, isLoading: htmlLoading } = useAchievementsData("Html");
-  const { data: CssData, isLoading: cssLoading } = useAchievementsData("Css");
-  const { data: JsData, isLoading: jsLoading } = useAchievementsData("JavaScript");
-  const { data: DatabaseData, isLoading: dbLoading } = useAchievementsData("Database");
+  const { achievements: HtmlData, isLoading: htmlLoading } = useFetchAchievements("Html");
+  const { achievements: CssData, isLoading: cssLoading } = useFetchAchievements("Css");
+  console.log(CssData)
+  const { achievements: JsData, isLoading: jsLoading } = useFetchAchievements("JavaScript");
+  const { achievements: DatabaseData, isLoading: dbLoading } = useFetchAchievements("Database");
   // User Achievement ProgressBar
   const {animatedBar:HtmlBar} = useAchievementsProgressBar(userData?.uid, "Html");
   const {animatedBar:CssBar} = useAchievementsProgressBar(userData?.uid, "Css");
@@ -42,46 +43,64 @@ const queryClient = useQueryClient();
 
 // Claime Reward
 const claimMutation = useMutation({
-mutationFn: async (achievement) => {
-  const userId = userData.uid;
-  const userRef = doc(db, "Users", userId);
-  const userAchRef = doc(db, "Users", userId, "Achievements", achievement.id);
-  //Mark achievement as claimed
-  await updateDoc(userAchRef, { isClaimed: true });
-  //  Calculate EXP, Level, and Coins
-  let newExp = (userData.exp || 0) + (achievement.expReward || 0);
-  let newLevel = userData.userLevel || 1;
-  let newCoins = (userData.coins || 0) + (achievement.coinsReward || 0);
-  if (newExp >= 100) {
-    const levelsGained = Math.floor(newExp / 100);
-    newLevel += levelsGained;
-    newExp = newExp % 100;
-  }
-  // Update user document
-  await updateDoc(userRef, {
-    exp: newExp,
-    userLevel: newLevel,
-    coins: newCoins,
-  });
-  return achievement.id;
+  mutationFn: async (achievement) => {
+    const userId = userData.uid;
+    const userRef = doc(db, "Users", userId);
+    const userAchRef = doc(db, "Users", userId, "Achievements", achievement.id);
+
+    // Mark achievement as claimed in Firestore
+    await updateDoc(userAchRef, { isClaimed: true });
+
+    // Update user stats
+    let newExp = (userData.exp || 0) + (achievement.expReward || 0);
+    let newLevel = userData.userLevel || 1;
+    let newCoins = (userData.coins || 0) + (achievement.coinsReward || 0);
+    if (newExp >= 100) {
+      const levelsGained = Math.floor(newExp / 100);
+      newLevel += levelsGained;
+      newExp = newExp % 100;
+    }
+    await updateDoc(userRef, {
+      exp: newExp,
+      userLevel: newLevel,
+      coins: newCoins,
+    });
+
+    return achievement.id;
+  },
+  onMutate: async (achievement) => {
+    // Optimistically update the cache
+    queryClient.setQueryData(["userAchievements", userData.uid], (oldData) => ({
+      ...oldData,
+      [achievement.id]: { ...oldData?.[achievement.id], isClaimed: true },
+    }));
+    queryClient.setQueryData(["User_Details", userData.uid], (oldData) => ({
+      ...oldData,
+      exp: (oldData?.exp || 0) + (achievement.expReward || 0),
+      userLevel: (oldData?.userLevel || 1) + Math.floor(((oldData?.exp || 0) + (achievement.expReward || 0)) / 100),
+      coins: (oldData?.coins || 0) + (achievement.coinsReward || 0),
+    }));
+  },
+onSuccess: (achievementId) => {
+  const claimedItem = HtmlData.find(a => a.id === achievementId) 
+                  || CssData.find(a => a.id === achievementId)
+                  || JsData.find(a => a.id === achievementId)
+                  || DatabaseData.find(a => a.id === achievementId);
+  showClaimToast(claimedItem);
+  setLoadingClaim(false);
 },
-  onSuccess: () => {
-    queryClient.invalidateQueries(["userAchievements", userData?.uid]);
-    queryClient.invalidateQueries(["User_Details", userData?.uid]); // refetch coins/exp too
+
+  onError: () => {
+    // rollback if needed
+    queryClient.invalidateQueries(["userAchievements", userData.uid]);
+    queryClient.invalidateQueries(["User_Details", userData.uid]);
   },
-  onError: (error) => {
-    console.error("Error claiming achievement:", error);
-  },
-  onSettled: ()=>{
-    setLoadingClaim(false);
-  }
 });
 
 const handleClaim = (item) => {
   setLoadingClaim(true);
   claimMutation.mutate(item, {
     onSuccess: () => {
-      showClaimToast(item); // 
       setLoadingClaim(false);
     },
     onError: () => setLoadingClaim(false),
@@ -224,7 +243,6 @@ const showClaimToast = (item) => {
 CssData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
   const isClaimed = isUnlocked && userAchievements[item.id]?.isClaimed;
-  console.log(`${item.id} - ${isClaimed}`)
   return (
     <div
       key={item.id}
@@ -264,7 +282,6 @@ className={`px-4 py-1 rounded-full font-semibold cursor-pointer
 JsData?.map((item) => {
   const isUnlocked = !!userAchievements?.[item.id];
   const isClaimed = isUnlocked && userAchievements[item.id]?.isClaimed;
-  console.log(`${item.id} - ${isClaimed}`)
   return (
     <div
       key={item.id}
