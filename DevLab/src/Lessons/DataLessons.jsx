@@ -176,16 +176,27 @@ function DataLessons() {
                                     },
                                   }}>
                                   {level.stages
-                                    ?.filter((stage) => stage.type === "Lesson")
+                                    ?.filter((stage) => {
+                                      // Always show Lessons
+                                      if (stage.type === "Lesson") return true;
+
+                                      // For other types, show only if completed
+                                      const isStageCompleted =
+                                        userStageCompleted[
+                                          `${lesson.id}-${level.id}-${stage.id}`
+                                        ];
+                                      return isStageCompleted;
+                                    })
                                     .sort((a, b) => a.order - b.order)
                                     .map((stage) => {
-                                      // Check if stage is unlocked
                                       const isStageUnlocked =
                                         userStageCompleted[
                                           `${lesson.id}-${level.id}-${stage.id}`
                                         ];
+
                                       return (
                                         <motion.div
+                                          key={stage.id}
                                           variants={{
                                             hidden: { opacity: 0, scale: 0.2 },
                                             visible: { opacity: 1, scale: 1 },
@@ -194,28 +205,34 @@ function DataLessons() {
                                             duration: 0.1,
                                             ease: "easeOut",
                                           }}
-                                          key={stage.id}
-                                          className={`p-3 rounded-xl min-h-[100px] text-white transition cursor-pointer relative
-                                          ${
-                                            isStageUnlocked
-                                              ? "bg-[#1E1E2E] hover:bg-[#4CAF50]/90"
-                                              : "bg-gray-800 pacity-50"
-                                          }`}
+                                          className={`p-3 rounded-xl min-h-[100px] text-white transition cursor-pointer relative ${
+                                              isStageUnlocked
+                                                ? "bg-[#1E1E2E] hover:bg-[#FF5733]/80"
+                                                : "bg-gray-800 opacity-50"
+                                            }`}
                                           onClick={() => {
                                             if (isStageUnlocked) {
                                               navigate(
-                                                `/Main/Lessons/Database/${lesson.id}/${level.id}/${stage.id}/${stage.type}`
+                                                `/Main/Lessons/Html/${lesson.id}/${level.id}/${stage.id}/${stage.type}`
                                               );
                                             }
                                           }}>
-                                          <p className="font-exo">
+                                          {/*  Title color changes based on type */}
+                                          <p
+                                            className={`font-exo ${
+                                              stage.type !== "Lesson"
+                                                ? "text-red-400"
+                                                : "text-white"
+                                            }`}>
                                             {stage.title}
                                           </p>
-                                          <p className="text-gray-600 text-sm line-clamp-3">
+
+                                          <p className="text-gray-400 text-sm line-clamp-3">
                                             {stage.description}
                                           </p>
+
                                           {!isStageUnlocked && (
-                                            <div className="absolute inset-0 flex items-center justify-center text-white">
+                                            <div className="absolute inset-0 flex items-center justify-center text-white ">
                                               <FaLock className="text-[3rem] text-white" />
                                             </div>
                                           )}

@@ -15,7 +15,7 @@ const codeRushPrompt = async ({submittedCode,instruction,providedCode,descriptio
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/codeRushPrompts`,
+      `https://api-soyulx5clq-uc.a.run.app/openAI/codeRushPrompts`,
       {submittedCode,instruction,providedCode,description,subject},
       {
         headers: {

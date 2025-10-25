@@ -16,7 +16,7 @@ const bugBustPrompt = async ({submittedCode,instruction,providedCode,description
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/bugBustPrompt`,
+      `https://api-soyulx5clq-uc.a.run.app/openAI/bugBustPrompt`,
       {
         submittedCode,
         instruction,

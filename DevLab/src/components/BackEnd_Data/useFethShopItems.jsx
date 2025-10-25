@@ -9,7 +9,7 @@ export const fetchShopItems = async () => {
   const token = await currentUser.getIdToken(true);
 
   try {
-    const res = await fetch("http://localhost:8082/fireBase/Shop", {
+    const res = await fetch(`https://api-soyulx5clq-uc.a.run.app/fireBase/Shop`, {
       method: "GET",
       headers: {
         authorization: `Bearer ${token}`,

@@ -11,7 +11,7 @@ const useFetchUserData = () => {
       const token = await currentUser.getIdToken(true);
       const uid = currentUser.uid;
 
-        const res = await fetch(`http://localhost:8082/fireBase/getSpecificUser/${uid}`, {
+        const res = await fetch(`https://api-soyulx5clq-uc.a.run.app/fireBase/getSpecificUser/${uid}`, {
         method: "GET",
         headers: {
           authorization: `Bearer ${token}`,

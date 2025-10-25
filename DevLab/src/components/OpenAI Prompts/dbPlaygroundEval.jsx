@@ -14,7 +14,7 @@ const dbPlaygroundEval = async ({ sql }) => {
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/dbPlayGroundEval`,
+      `https://api-soyulx5clq-uc.a.run.app/openAI/dbPlayGroundEval`,
       { sql },
       {
         headers: {

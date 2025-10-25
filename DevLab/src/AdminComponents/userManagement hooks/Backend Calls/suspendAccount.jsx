@@ -5,7 +5,7 @@ export const suspendAccount = async (id, toggleDisable) => {
   const token = await auth.currentUser?.getIdToken(true);
 
   const response = await axios.post(
-    "http://localhost:8082/fireBaseAdmin/suspendAccount",
+    `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/suspendAccount`,
     { uid: id, toggleDisable },
     { headers: { Authorization: `Bearer ${token}` } }
   );

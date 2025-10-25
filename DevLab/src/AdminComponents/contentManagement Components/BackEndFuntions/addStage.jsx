@@ -6,7 +6,7 @@ const addStage = async ({ category, lessonId, levelId }) => {
 
     try{
     const res = await axios.post(
-    "http://localhost:8082/fireBaseAdmin/addStage",
+    `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/addStage`,
     { category, lessonId, levelId },
     {
         headers: {

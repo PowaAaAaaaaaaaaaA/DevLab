@@ -7,7 +7,7 @@ const deleteStage = async ({ category, lessonId, levelId, stageId }) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:8082/fireBaseAdmin/deleteStage",
+      `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/deleteStage`,
       { category, lessonId, levelId, stageId },
       {
         headers: {

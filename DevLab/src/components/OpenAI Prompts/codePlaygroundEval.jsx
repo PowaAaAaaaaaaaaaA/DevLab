@@ -13,7 +13,7 @@ const codePlaygroundEval = async ({ html, css, js }) => {
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/codePlaygroundEval`,
+      `https://api-soyulx5clq-uc.a.run.app/openAI/codePlaygroundEval`,
       { html, css, js },
       {
         headers: {

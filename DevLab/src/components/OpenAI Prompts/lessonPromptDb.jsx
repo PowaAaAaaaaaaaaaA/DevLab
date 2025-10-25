@@ -17,7 +17,7 @@ const lessonPromptDb = async ({
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/lessonPromptDb`,
+      `https://api-soyulx5clq-uc.a.run.app/openAI/lessonPromptDb`,
       {
         instructions: instruction,
         description,

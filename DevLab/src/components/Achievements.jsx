@@ -47,7 +47,7 @@ mutationFn: async (achievement) => {
   const userRef = doc(db, "Users", userId);
   const userAchRef = doc(db, "Users", userId, "Achievements", achievement.id);
   //Mark achievement as claimed
-  await updateDoc(userAchRef, { claimed: true });
+  await updateDoc(userAchRef, { isClaimed: true });
   //  Calculate EXP, Level, and Coins
   let newExp = (userData.exp || 0) + (achievement.expReward || 0);
   let newLevel = userData.userLevel || 1;

@@ -34,7 +34,7 @@ function UserManagement() {
 
       return { previousUsers };
     },
-    onError: (err, variables, context) => {
+    onError: (context) => {
       queryClient.setQueryData(["allUser"], context.previousUsers);
     },
     onSettled: () => {

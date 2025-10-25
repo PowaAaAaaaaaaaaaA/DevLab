@@ -95,6 +95,7 @@ useEffect(() => {
           navigate(`/Main/Lessons/${subj}/${data.nextLessonId}/Level1/Stage1/Lesson`);
         } else if (data.isWholeTopicFinished && goContinue) {
           navigate("/Main");
+          await unlockAchievement(userId, subj, "subjectComplete");
         }
       } catch (err) {
         console.error("Error unlocking next level:", err);
@@ -102,9 +103,6 @@ useEffect(() => {
     },
     [userData.uid, subj, lessonId, LevelId, stageId, navigate]
   );
-
-  useSubjectCheckComplete(userData.uid, subj);
-
   return (
     <div className="fixed inset-0 bg-black/95 z-0 flex items-center justify-center">
       <Lottie animationData={confetti} loop={false} className="w-full h-full fixed z-1" />

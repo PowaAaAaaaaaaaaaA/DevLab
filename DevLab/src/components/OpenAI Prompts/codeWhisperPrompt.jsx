@@ -16,7 +16,7 @@ const codeWhisperPrompt = async ({
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/codeWhisper`,
+      `https://api-soyulx5clq-uc.a.run.app/openAI/codeWhisper`,
       { description, instruction, receivedCode },
       {
         headers: {

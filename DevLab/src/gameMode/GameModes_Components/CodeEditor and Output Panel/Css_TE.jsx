@@ -178,7 +178,7 @@ const onChange = useCallback(
       <div className=" bg-[#191a26] h-[88%] w-[100%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
         <div className="flex-1 min-h-0 overflow-auto w-full scrollbar-custom">     
         <CodeMirror
-          className="text-[1rem]"
+          className="text-[1rem]" 
           value={code[activeTab]}
           onChange={onChange}
           height="100%"

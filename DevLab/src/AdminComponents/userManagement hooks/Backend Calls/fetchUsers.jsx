@@ -5,7 +5,7 @@ const fetchUsers = async () => {
   const token = await auth.currentUser?.getIdToken(true);
 
   try {
-    const res = await axios.get("http://localhost:8082/fireBaseAdmin/getUsers", {
+    const res = await axios.get(`https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/getUsers`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

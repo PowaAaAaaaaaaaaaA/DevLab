@@ -24,11 +24,11 @@ function AdminNavbar() {
     }
     return (
         <div className='w-[15%] flex flex-col p-5 font-exo text-white justify-center'>
-            <h1 className='text-[3.2rem] text-center font-bold mb-5 large-heading'>DevLab</h1>
+            <h1 className='text-[3rem] text-center font-bold mb-5 bigText-laptop'>DevLab</h1>
             <div className='flex-1 flex flex-col gap-7 p-2'>
-                <NavLink to={'/Admin/ContentManagement'} className='flex items-center gap-3 font-inter text-[1.3rem] relative rounded px-5 py-2.5 hover:bg-[#9333EA] transition-all ease-out duration-300 NavBarText-laptop'><span><HiFolder /></span> Content Management
+                <NavLink to={'/Admin/ContentManagement'} className='flex items-center gap-3 font-inter text-[1.3rem] relative rounded  py-2.5 hover:bg-[#9333EA] transition-all ease-out duration-300 NavBarText-laptop'><span><HiFolder /></span> Content Management
                 </NavLink>
-                <NavLink to={'/Admin/UserManagement'} className='flex items-center gap-3 font-inter text-[1.3rem] relative rounded px-5 py-2.5 hover:bg-[#9333EA] transition-all ease-out duration-300 NavBarText-laptop '><span><HiUserCircle /></span> User Management</NavLink>
+                <NavLink to={'/Admin/UserManagement'} className='flex items-center gap-3 font-inter text-[1.3rem] relative rounded  py-2.5 hover:bg-[#9333EA] transition-all ease-out duration-300 NavBarText-laptop '><span><HiUserCircle /></span> User Management</NavLink>
             </div>
         <button className='text-[1.5rem] flex justify-center items-center gap-5 hover:cursor-pointer NavBarText-laptop' onClick={Logout}> <span><HiOutlineArrowLeftOnRectangle /></span>Log Out</button>
         </div>

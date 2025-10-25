@@ -10,7 +10,7 @@ export default function useFetchUserProgress(subject) {
 
     const token = await currentUser.getIdToken(true);
 
-    const res = await fetch(`http://localhost:8082/fireBase/userProgres/${subject}`, {
+    const res = await fetch(`https://api-soyulx5clq-uc.a.run.app/fireBase/userProgres/${subject}`, {
       method: "GET",
       headers: {
         authorization: `Bearer ${token}`,
