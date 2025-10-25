@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import useUserAchievements from "./useUserAchievements";
-import useAchievementsData from "./useAchievementsData";
+import useFetchAchievements from "../BackEnd_Data/useFetchAchievements";
 
 export default function useAchievementsProgressBar(userId, subject) {
-  const { data: allAchievements, isLoading: loadingAll } = useAchievementsData(subject);
+  const { achievements: allAchievements, isLoading: loadingAll } = useFetchAchievements(subject);
   const { data: userAchievements, isLoading: loadingUser } = useUserAchievements(userId);
-
   const [animatedBar, setAnimatedBar] = useState(0);
 
   useEffect(() => {
