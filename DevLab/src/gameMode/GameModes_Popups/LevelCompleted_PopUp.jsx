@@ -15,13 +15,14 @@ import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchieveme
 import { useSubjectCheckComplete } from "../../components/Custom Hooks/useSubjectCheckComplete";
 import { fetchLevelSummary } from "../../components/OpenAI Prompts/feedbackPrompt";
 import { unlockStage } from "../../components/BackEnd_Functions/unlockStage";
+import { useRewardStore } from "../../ItemsLogics/Items-Store/useRewardStore";
 
 function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLevelComplete, resetHearts }) {
   const navigate = useNavigate();
   const { stageId } = useParams();
 
-  const { removeBuff } = useInventoryStore.getState();
-  const activeBuffs = useInventoryStore((state) => state.activeBuffs);
+  const { lastReward } = useRewardStore();
+  const { clearReward } = useRewardStore.getState();
   const { userData, refetch } = useFetchUserData();
 
   const [levelSummary, setLevelSummary] = useState(null);
@@ -42,6 +43,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
       isMounted = false;
     };
   }, []);
+  
 
   //  Fetch Level Data
   useEffect(() => {
@@ -53,15 +55,27 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
   }, [subj, lessonId, LevelId]);
 
   //  Derived rewards (memoized)
-  const finalCoinReward = useMemo(() => {
-    if (!LevelData) return 0;
-    return activeBuffs.includes("doubleCoins")
-      ? LevelData.coinsReward * 2 
-      : LevelData.coinsReward;
-  }, [activeBuffs, LevelData]);
+const finalCoinReward = useMemo(() => {
+  if (lastReward.coins > 0) return lastReward.coins;
+  if (LevelData?.coinsReward) return LevelData.coinsReward;
+  return 0;
+}, [lastReward, LevelData]);
 
-  const { animatedValue: Coins } = useAnimatedNumber(finalCoinReward || 0);
-  const { animatedValue: Exp } = useAnimatedNumber(LevelData?.expReward || 0);
+const finalExpReward = useMemo(() => {
+  if (lastReward.exp > 0) return lastReward.exp;
+  if (LevelData?.expReward) return LevelData.expReward;
+  return 0;
+}, [lastReward, LevelData]);
+
+const { animatedValue: Coins } = useAnimatedNumber(finalCoinReward);
+const { animatedValue: Exp } = useAnimatedNumber(finalExpReward);
+
+useEffect(() => {
+  // Cleanup: reset hearts only when popup is closed/unmounted
+  return () => {
+    resetHearts();
+  };
+}, []);
 
 
 
@@ -151,50 +165,45 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
 
 <div className="w-[80%] flex items-center justify-around p-4">
   {/* Back to Main */}
-  <motion.button
-    whileTap={{ scale: 0.95 }}
-    whileHover={{ scale: 1.05 }}
-    transition={{ bounceDamping: 100 }}
-    onClick={() => {
-      // Close popup and navigate immediately
-      setIsLoading(false);
-      navigate("/Main", { replace: true });
+<motion.button
+  whileTap={{ scale: 0.95 }}
+  whileHover={{ scale: 1.05 }}
+  transition={{ bounceDamping: 100 }}
+  onClick={() => {
+    // Close popup and navigate immediately
+    setIsLoading(false);
+    navigate("/Main", { replace: true });
+    clearReward();
+    // Run async tasks in background
+    (async () => {
+      await Promise.all([unlockNextLevel(false), refetch()]);
+    })();
+  }}
+  className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"
+>
+  Back to Main
+</motion.button>
 
-      // Run async tasks in background
-      (async () => {
-        await Promise.all([unlockNextLevel(false), refetch()]);
-        resetHearts(); // reset hearts after tasks
-      })();
-    }}
-    className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"
-  >
-    Back to Main
-  </motion.button>
 
   {/* Continue */}
-  <motion.button
-    whileTap={{ scale: 0.95 }}
-    whileHover={{ scale: 1.05 }}
-    transition={{ bounceDamping: 100 }}
-    onClick={() => {
-      // Close popup immediately
-      setIsLoading(false);
+<motion.button
+  whileTap={{ scale: 0.95 }}
+  whileHover={{ scale: 1.05 }}
+  transition={{ bounceDamping: 100 }}
+  onClick={() => {
+    // Close popup immediately
+    setIsLoading(true);
+    clearReward();
+    unlockNextLevel(true);
+    // Run async tasks in background
+    (async () => {
+      await refetch();
+    })();
+  }}
+  className="bg-[#36DB4F] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] cursor-pointer">
+  Continue
+</motion.button>
 
-      // Navigate after a small delay if you want animation to play
-      setTimeout(() => {
-        unlockNextLevel(true); // optionally, you can handle navigation here
-      }, 100);
-
-      // Run async tasks in background
-      (async () => {
-        await Promise.all([refetch()]);
-        resetHearts();
-      })();
-    }}
-    className="bg-[#36DB4F] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] cursor-pointer"
-  >
-    Continue
-  </motion.button>
 </div>
 
         </div>
@@ -203,7 +212,7 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
 
 {isLoading && (
   <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-    <Lottie animationData={loadingDots} loop className="w-[15%] h-[15%]" />
+    <Lottie animationData={loadingDots} loop className="w-[50%] h-[50%]" />
   </div>
 )}
 

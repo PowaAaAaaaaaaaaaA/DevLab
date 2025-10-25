@@ -256,7 +256,7 @@ if (loadingDashboard) {
             to={`/Main/Lessons/${info.subject}/${info.lessonId}/${info.levelId}/${info.stageId}/${info.gameMode}`}
             className="h-[100%]">
             <div className="w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-101 cursor-pointer duration-300 min-h-[100px]">
-              <div className="bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[3rem] p-1">
+              <div className="bg-black min-w-[15%] text-white rounded-3xl flex items-center justify-center text-[2.5rem] p-1">
                 <span className="pb-3">
                   {subject === "Html"
                     ? "< >"
@@ -289,7 +289,7 @@ if (loadingDashboard) {
 
 
       {/*Inventory*/}
-<div className="bg-[#0B0F16] border border-gray-700/60 w-[25%] h-[95%] rounded-3xl p-3 flex flex-col">
+<div className="bg-[#0B0F16] border border-gray-700/60 w-[25%] h-[90%] rounded-3xl p-3 flex flex-col mt-4">
   <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">
     Inventory
   </h1>

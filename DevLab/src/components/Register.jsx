@@ -52,9 +52,6 @@ const handleRegister = async (e) => {
         suspend: false,
         healthPoints: 3,
         lastOpenedLevel: {
-          subject: "Html",
-          lessonId: "Lesson1",
-          levelId: "Level1",
         },
       });
 

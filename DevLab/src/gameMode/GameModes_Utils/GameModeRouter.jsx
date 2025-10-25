@@ -5,24 +5,19 @@ import LessonPage from "../../Lessons/LessonPage";
 import BugBust from "../BugBust";
 import CodeCrafter from "../CodeCrafter";
 import { useEffect, useState } from "react";
-import { useAttemptStore } from "../GameModes_Utils/useAttemptStore"
+import { useAttemptStore } from "../GameModes_Utils/useAttemptStore";
 import Gameover_PopUp from "../GameModes_Popups/Gameover_PopUp";
 
 const GameModeRouter = () => {
   const { subject, lessonId, levelId, stageId, gamemodeId } = useParams();
   const [back, setBack] = useState(null);
 
-  const {heart,roundKey,gameOver,submitAttempt,resetHearts,loadHearts, } = useAttemptStore();
+  const { heart, roundKey, gameOver, submitAttempt, resetHearts, loadHearts } =
+    useAttemptStore();
 
-  // Load hearts from Firestore when component mounts
+  // Load hearts on mount (local version)
   useEffect(() => {
-    let unsub;
-    (async () => {
-      unsub = await loadHearts(); // start listening to Firestore
-    })();
-    return () => {
-      if (unsub) unsub();
-    };
+    loadHearts();
   }, [loadHearts]);
 
   // Prepare back route when game over

@@ -4,6 +4,7 @@ import { db } from "../../Firebase/Firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import CoinSurge from "../../ItemsLogics/CoinSurge";
 import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
+import { useRewardStore } from "../../ItemsLogics/Items-Store/useRewardStore";
 
 // Helper: Add EXP and Coins
 const addExp = async (userId, expGain, coinsGain) => {
@@ -31,7 +32,9 @@ const addExp = async (userId, expGain, coinsGain) => {
 
 //  Reward Granting Function
 const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
+  
   try {
+    const { setLastReward } = useRewardStore.getState();
     const { activeBuffs, removeBuff } = useInventoryStore.getState();
 
     const levelRef = doc(db, subject, lessonId, "Levels", levelId);
@@ -47,7 +50,7 @@ const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
       removeBuff("doubleCoins")
     }
     console.log("Granting rewards:", expReward, coinsReward);
-
+  setLastReward(expReward, coinsReward);
     // Add EXP & Coins
     await addExp(userId, expReward, coinsReward);
 
@@ -78,15 +81,15 @@ export const goToNextStage = async ({
         `/Main/Lessons/${subject}/${lessonId}/${levelId}/${data.nextStageId}/${data.nextStageType}`
       );
     } else if (data.isNextLevelUnlocked) {
-      await handleRewardGrant(userId, subject, lessonId, levelId);
       setLevelComplete(true);
+      await handleRewardGrant(userId, subject, lessonId, levelId);
     } else if (data.isNextLessonUnlocked) {
+      setLevelComplete(true);
       await unlockAchievement(userId, subject, "lessonComplete", { lessonId });
       await handleRewardGrant(userId, subject, lessonId, levelId);
-      setLevelComplete(true);
     } else if (data.isWholeTopicFinished) {
-      await handleRewardGrant(userId, subject, lessonId, levelId);
       setLevelComplete(true);
+      await handleRewardGrant(userId, subject, lessonId, levelId); 
     }
   } catch (error) {
     console.error("Error in goToNextStage:", error.message);

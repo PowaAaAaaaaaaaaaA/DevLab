@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import useFetchUserData from './BackEnd_Data/useFetchUserData';
 import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
 import useFetchShopItems from './BackEnd_Data/useFethShopItems';
+import { purchaseItem } from './BackEnd_Functions/purchaseItem';
 
 import '../index.css';
 
@@ -23,38 +24,24 @@ function Shop() {
 
   const [isBuying, setIsBuying] = useState(false);
 
-  const buyItem = async (item) => {
-    const user = auth.currentUser;
-    if (userData.coins < item.cost) {
-      toast.error("Not Enough Coins", {
-      position: "top-center",
-      theme: "colored",
-    });
-      return;
-    }
-    try {
-      setIsBuying(true);
+const buyItem = async (item) => {
+  try {
+    setIsBuying(true);
 
-      const userRef = doc(db, "Users", user.uid);
-      await updateDoc(userRef, {
-        coins: userData.coins - item.cost,
-      });
-      refetch();
+    const data = await purchaseItem(item.id, item.cost, item.Icon);
 
-      const inventoryRef = doc(db, "Users", user.uid, "Inventory", item.id);
-      const inventorySnap = await getDoc(inventoryRef);
+    toast.success(`You bought ${item.title}!`, { position: "top-center", theme: "colored" });
 
-      if (inventorySnap.exists()) {
-        await updateDoc(inventoryRef, { quantity: increment(1) });
-      } else {
-        await setDoc(inventoryRef, { ...item, quantity: 1 });
-      }
-    } catch (error) {
-      console.error("Purchase failed:", error);
-    } finally {
-      setIsBuying(false);
-    }
-  };
+    // Optional: refresh user coins via your existing hook
+    refetch();
+
+  } catch (error) {
+    const errMsg = error.response?.data?.message || "Purchase failed";
+    toast.error(errMsg, { position: "top-center", theme: "colored" });
+  } finally {
+    setIsBuying(false);
+  }
+};
 
   return (
     <>

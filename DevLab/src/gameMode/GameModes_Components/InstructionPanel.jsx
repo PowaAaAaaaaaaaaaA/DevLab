@@ -6,6 +6,8 @@ import {
   css as beautifyCSS,
   js as beautifyJS,
 } from "js-beautify";
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
 // Hooks
 
 import useFetchGameModeData from "../../components/BackEnd_Data/useFetchGameModeData";
@@ -71,24 +73,45 @@ useEffect(() => {
   }
 }, [levelData, gameModeData, subject]);
 
+ // This is for the Code Interface display
  // Runs once when data becomes available
-
+const fixNewlines = (code) => code?.replace(/\\n/g, "\n").trim() || "";
   useEffect(() => {
     if (!gameModeData || !subject) return;
     const codingInterface = gameModeData?.codingInterface || {};
-    setFormattedCode({
-      html: codingInterface.html
-        ? beautifyHTML(codingInterface.html, { indent_size: 2 })
-        : "",
-      css: codingInterface.css
-        ? beautifyCSS(codingInterface.css, { indent_size: 2 })
-        : "",
-      js: codingInterface.js
-        ? beautifyJS(codingInterface.js, { indent_size: 2 })
-        : "",
-      sql: codingInterface.sql
-    });
+setFormattedCode({
+  html: codingInterface.html?.trim()
+    ? beautifyHTML(fixNewlines(codingInterface.html), {
+        indent_size: 2,
+        preserve_newlines: true,
+        wrap_line_length: 60,
+      })
+    : "",
+  css: codingInterface.css?.trim()
+    ? beautifyCSS(fixNewlines(codingInterface.css), {
+        indent_size: 2,
+        preserve_newlines: true,
+        wrap_line_length: 60,
+      })
+    : "",
+  js: codingInterface.js?.trim()
+    ? beautifyJS(fixNewlines(codingInterface.js), {
+        indent_size: 2,
+        preserve_newlines: true,
+        wrap_line_length: 60,
+      })
+    : "",
+  sql: codingInterface.sql?.trim()
+    ? fixNewlines(codingInterface.sql)
+    : "",
+});
+
   }, [gameModeData, subject]);
+  // Highlight code after formatting
+useEffect(() => {
+  Prism.highlightAll();
+}, [formattedCode]);
+
 
   // BrainBytes Options
   const [selectedOption, setSelectedOption] = useState(null);
@@ -153,10 +176,11 @@ useEffect(() => {
         setAiHint("No hint available.");
       }
     };
-
     fetchAiHint();
   }
 }, [showCodeWhisper, gameModeData]);
+
+
   if (!levelData || !gameModeData) {
     return (
       <div className='fixed inset-0 z-50 flex items-center justify-center  bg-black/98'>
@@ -227,43 +251,41 @@ const hasAnyCode =
           <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">Instruction</h3>
           <p className="mb-2 font-exo whitespace-pre-line leading-relaxed">{gameModeData.instruction}</p>
 
-          {hasAnyCode && (
-            <div>
-              {formattedCode.html && (
-                <>
-                  <p className="font-bold mb-1 text-[#FF5733]">HTML</p>
-                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {formattedCode.html}
-                  </pre>
-                </>
-              )}
-              {formattedCode.css && (
-                <>
-                  <p className="font-bold mb-1 text-[#1E90FF]">CSS</p>
-                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {formattedCode.css}
-                  </pre>
-                </>
-              )}
-              {formattedCode.js && (
-                <>
-                  <p className="font-bold mb-1 text-[#F7DF1E]">JavaScript</p>
-                  <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                    {formattedCode.js}
-                  </pre>
-                </>
-              )}
-{formattedCode.sql && (
+{hasAnyCode && (
   <>
-    <p className="font-bold mb-1 text-[#33cc66]">SQL</p>
-    <pre className="bg-[#191C2B] p-4 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed">
-      {formattedCode.sql}
-    </pre>
+    <p className="text-1xl mb-2 font-bold mt-3 font-exo">Code Example</p>
+
+    {formattedCode.html && (
+      <CodeBlock
+        code={formattedCode.html}
+        language="html"
+        color="#FF5733"
+      />
+    )}
+    {formattedCode.css && (
+      <CodeBlock
+        code={formattedCode.css}
+        language="css"
+        color="#1E90FF"
+      />
+    )}
+    {formattedCode.js && (
+      <CodeBlock
+        code={formattedCode.js}
+        language="js"
+        color="#F7DF1E"
+      />
+    )}
+    {formattedCode.sql && (
+      <CodeBlock
+        code={formattedCode.sql}
+        language="sql"
+        color="#33cc66"
+      />
+    )}
   </>
 )}
 
-            </div>
-          )}
         </div>
       )}
 
@@ -331,5 +353,57 @@ const hasAnyCode =
     </div>
   );
 }
+const CodeBlock = ({ code, language, color }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyClick = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1000);
+  };
+
+  return (
+    <div className="relative my-4 bg-[#1E1E2E] rounded-xl overflow-hidden border border-[#2A2A3C] shadow-md">
+      {/* Header */}
+      <div className="flex justify-between items-center bg-[#25293B] px-4 py-2 border-b border-[#2A2A3C] relative">
+        <p className="font-bold text-sm" style={{ color }}>
+          {language.toUpperCase()}
+        </p>
+
+        <div className="relative">
+          <button
+            onClick={handleCopyClick}
+            className="text-gray-300 hover:text-white text-xs bg-[#3A3F55] px-2 py-1 rounded transition-all hover:bg-[#4A5068]"
+          >
+            Copy
+          </button>
+
+          {/* Animated “Copied!” popup */}
+          <AnimatePresence>
+            {copied && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="absolute top-0 right-0 bg-[#4A5068] text-white text-xs px-2 py-1 rounded-md shadow-md"
+              >
+                Copied!
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Code body */}
+      <pre
+        className={`language-${language} m-0 p-4 whitespace-pre-wrap break-words overflow-x-hidden text-sm leading-relaxed scrollbar-custom`}
+      >
+        <code className={`language-${language}`}>{code}</code>
+      </pre>
+    </div>
+  );
+};
+
 
 export default InstructionPanel;
