@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
 import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
+import LevelAlreadyCompleted from "./GameModes_Popups/LevelAlreadyComplete_PopUp";
 // for Animation / Icons
 import { AnimatePresence, motion } from "framer-motion";
 import Lottie from "lottie-react";
@@ -36,6 +37,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   // Popups
   const [isNavigating, setIsNavigating] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
+  const [alreadyComplete, setAlreadyComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
   const [timesUp, setTimesUp] = useState(false);
@@ -109,6 +111,7 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
         <GameFooter
           setLevelComplete={setLevelComplete}
           setShowCodeWhisper={setShowCodeWhisper}
+          setAlreadyComplete={setAlreadyComplete}
         />
       </div>
 
@@ -137,6 +140,15 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
             heartsRemaining={heart}
             setLevelComplete={setLevelComplete}
             resetHearts={resetHearts}/>
+        )}
+      </AnimatePresence>
+            <AnimatePresence>
+        {alreadyComplete && (
+          <LevelAlreadyCompleted
+            subj={subject}
+            lessonId={lessonId}
+            LevelId={levelId}
+          />
         )}
       </AnimatePresence>
 
@@ -182,7 +194,7 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
     if (isNavigating) return;
     setIsNavigating(true);
     setShowIsCorrect(false);
-    await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId });
+    await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId,setAlreadyComplete });
     setIsNavigating(false);
   }}
   whileTap={{ scale: 0.95 }}

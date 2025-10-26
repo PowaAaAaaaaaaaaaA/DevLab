@@ -19,7 +19,7 @@ import { gameModeSubmitHandlers } from "../GameModes_Utils/gameModeSubmitHandler
 import Lottie from "lottie-react";
 import Loading from "../../assets/Lottie/LoadingDots.json";
 
-function GameFooter({ setLevelComplete, setShowCodeWhisper }) {
+function GameFooter({ setLevelComplete, setShowCodeWhisper ,setAlreadyComplete}) {
   const navigate = useNavigate();
   const { userData } = useFetchUserData();
   const {
@@ -50,7 +50,7 @@ console.log(submittedCode);
     const isStageLocked = userStageCompleted?.[stageKey] ?? false;
 
     if (isStageLocked || gamemodeId === "Lesson") {
-      await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete });
+      await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete,setAlreadyComplete });
       if (showLoading) setIsLoading(false);
       return;
     }

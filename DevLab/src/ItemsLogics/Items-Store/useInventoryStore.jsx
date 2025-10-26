@@ -8,32 +8,32 @@ export const useInventoryStore = create((set, get) => ({
   activeBuffs: [],
 
   setInventory: (items) => set({ inventory: items }),
+
 useItem: async (itemId, buffName) => {
-  const { inventory, activeBuffs } = get();
-  const updatedBuffs = buffName ? [...activeBuffs, buffName] : activeBuffs;
+  // Update Zustand immediately 
+  set((state) => {
+    let updatedBuffs = state.activeBuffs;
 
-  // Immediately update local inventory
-  const updatedInventory = inventory
-    .map((item) =>
-      item.id === itemId
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    )
-    .filter((item) => item.quantity > 0);
+    if (buffName && !state.activeBuffs.includes(buffName)) {
+      // Only add if it doesn't already exist
+      updatedBuffs = [...state.activeBuffs, buffName];
+    }
 
-  set({ inventory: updatedInventory, activeBuffs: updatedBuffs });
+    return { activeBuffs: updatedBuffs };
+  });
 
-  // Update Firestore
+  // Update Firestore in background
   const userId = auth.currentUser.uid;
   const itemRef = doc(db, "Users", userId, "Inventory", itemId);
-  await updateDoc(itemRef, { quantity: increment(-1) });
 
+  await updateDoc(itemRef, { quantity: increment(-1) });
   const snap = await getDoc(itemRef);
+
   if (!snap.exists() || snap.data().quantity <= 0) {
     await deleteDoc(itemRef);
   }
-}
-,
+},
+
   removeBuff: (buffName) => set((state) => ({
   activeBuffs: state.activeBuffs.filter((buff) => buff !== buffName)
 }))

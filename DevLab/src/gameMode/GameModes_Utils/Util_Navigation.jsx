@@ -6,8 +6,10 @@ import CoinSurge from "../../ItemsLogics/CoinSurge";
 import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 import { useRewardStore } from "../../ItemsLogics/Items-Store/useRewardStore";
 import useFetchLevelsData from "../../components/BackEnd_Data/useFetchLevelsData";
+import { useUserProgressStore } from "./CompletedLevelStore";
 
 // Helper: Add EXP and Coins
+
 const addExp = async (userId, expGain, coinsGain) => {
   const userRef = doc(db, "Users", userId);
   const userSnap = await getDoc(userRef);
@@ -33,6 +35,8 @@ const addExp = async (userId, expGain, coinsGain) => {
 
 //  Reward Granting Function
 const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
+
+
   
   
   try {
@@ -77,7 +81,6 @@ if (activeBuffs.includes("doubleCoins")) {
     console.error("Error in handleRewardGrant:", err.message);
   }
 };
-
 //  Main Function
 export const goToNextStage = async ({
   subject,
@@ -87,6 +90,7 @@ export const goToNextStage = async ({
   navigate,
   setLevelComplete,
   userId,
+  setAlreadyComplete
 }) => {
   try {
     const data = await unlockStage(subject, lessonId, levelId, stageId);
@@ -97,6 +101,19 @@ export const goToNextStage = async ({
         `/Main/Lessons/${subject}/${lessonId}/${levelId}/${data.nextStageId}/${data.nextStageType}`
       );
     } else if (data.isNextLevelUnlocked) {
+      const { userProgress } = useUserProgressStore.getState();
+      const levelKey = `${lessonId}-${levelId}`;
+      const levelData = userProgress[levelKey];
+      const alreadyCompleted = levelData?.isCompleted === true;
+
+   if (alreadyCompleted) {
+    setAlreadyComplete(true)
+  } else {
+    //  Normal flow: mark as complete and grant rewards
+    setLevelComplete(true);
+    await handleRewardGrant(userId, subject, lessonId, levelId);
+  }
+
       setLevelComplete(true);
       await handleRewardGrant(userId, subject, lessonId, levelId);
     } else if (data.isNextLessonUnlocked) {
