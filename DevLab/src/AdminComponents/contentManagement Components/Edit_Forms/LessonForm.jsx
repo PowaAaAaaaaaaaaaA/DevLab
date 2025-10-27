@@ -58,7 +58,8 @@ const addBlocks = () => {
       formData.append("stageId", stageId);
 
       const res = await axios.post(
-        `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/uploadVideo`,
+        `
+https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVideo`,
         formData,
         {
           headers: {

@@ -17,7 +17,8 @@ const lessonPromptDb = async ({
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `https://api-soyulx5clq-uc.a.run.app/openAI/lessonPromptDb`,
+      `
+https://devlab-server-railway-production.up.railway.app/openAI/lessonPromptDb`,
       {
         instructions: instruction,
         description,

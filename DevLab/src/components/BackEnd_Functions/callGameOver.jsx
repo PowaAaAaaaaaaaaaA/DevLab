@@ -9,7 +9,8 @@ export const callGameOver = async (subject, lessonId, levelId, stageId) => {
     const token = await user.getIdToken();
 
     const response = await axios.post(
-      `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/gameOver`,
+      `
+https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/gameOver`,
       {
         id: user.uid,
         category: subject,

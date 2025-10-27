@@ -8,7 +8,8 @@ export const deleteSpecificProgress = async (uid, subject) => {
   if (!token) throw new Error("User not authenticated");
 
   const response = await axios.post(
-    `http://localhost:8082/fireBaseAdmin/progress/reset`,
+    `
+http://localhost:8082/fireBaseAdmin/progress/reset`,
     { uid, subject },
     {
       headers: {

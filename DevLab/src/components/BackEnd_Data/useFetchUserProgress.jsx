@@ -14,7 +14,8 @@ export default function useFetchUserProgress(subject) {
     const token = await currentUser.getIdToken(true);
 
     const res = await fetch(
-      `https://api-soyulx5clq-uc.a.run.app/fireBase/userProgres/${subject}`,
+      `
+https://devlab-server-railway-production.up.railway.app/fireBase/userProgres/${subject}`,
       {
         method: "GET",
         headers: {

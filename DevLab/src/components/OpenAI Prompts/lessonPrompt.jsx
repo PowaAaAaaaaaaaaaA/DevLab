@@ -11,7 +11,8 @@ const lessonPrompt = async ({ receivedCode, instruction, description,subject }) 
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `https://api-soyulx5clq-uc.a.run.app/openAI/lessonPrompt`,
+      `
+https://devlab-server-railway-production.up.railway.app/openAI/lessonPrompt`,
       {
         instructions: instruction,
         description,

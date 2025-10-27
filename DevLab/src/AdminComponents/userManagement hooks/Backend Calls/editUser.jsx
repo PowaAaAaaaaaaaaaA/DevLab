@@ -7,7 +7,8 @@ export const editUser = async ({ uid, state }) => {
   if (!token) throw new Error("User not authenticated");
 
   const response = await axios.post(
-    `http://localhost:8082/fireBaseAdmin/editUser`,
+    `
+https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editUser`,
     {
       uid,
       username: state.username,

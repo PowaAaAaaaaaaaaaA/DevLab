@@ -35,10 +35,6 @@ const addExp = async (userId, expGain, coinsGain) => {
 
 //  Reward Granting Function
 const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
-
-
-  
-  
   try {
     const { setLastReward } = useRewardStore.getState();
     const { activeBuffs, removeBuff } = useInventoryStore.getState();
@@ -106,14 +102,13 @@ export const goToNextStage = async ({
       const levelData = userProgress[levelKey];
       const alreadyCompleted = levelData?.isCompleted === true;
 
-   if (alreadyCompleted) {
+  if (alreadyCompleted) {
     setAlreadyComplete(true)
   } else {
     //  Normal flow: mark as complete and grant rewards
     setLevelComplete(true);
     await handleRewardGrant(userId, subject, lessonId, levelId);
   }
-
       setLevelComplete(true);
       await handleRewardGrant(userId, subject, lessonId, levelId);
     } else if (data.isNextLessonUnlocked) {

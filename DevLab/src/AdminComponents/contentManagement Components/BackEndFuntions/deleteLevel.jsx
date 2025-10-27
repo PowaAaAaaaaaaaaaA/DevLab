@@ -7,7 +7,8 @@ const deleteLevel = async ({ category, lessonId, levelId }) => {
 
   try {
     const res = await axios.post(
-      `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/deleteLevel`,
+      `
+https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/deleteLevel`,
       { category, lessonId, levelId },
       {
         headers: {

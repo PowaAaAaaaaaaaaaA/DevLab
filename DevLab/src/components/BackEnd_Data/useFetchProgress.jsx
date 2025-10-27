@@ -15,7 +15,8 @@ const useFetchProgress = () => {
 
       const token = await currentUser.getIdToken(true);
 
-      const res = await fetch(`https://api-soyulx5clq-uc.a.run.app/fireBase/userProgress`, {
+      const res = await fetch(`
+https://devlab-server-railway-production.up.railway.app/fireBase/userProgress`, {
         method: "GET",
         headers: {
           authorization: `Bearer ${token}`,

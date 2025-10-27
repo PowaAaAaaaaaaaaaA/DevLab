@@ -6,7 +6,8 @@ export const deleteAllProgress = async (uid) => {
   if (!token) throw new Error("User not authenticated");
 
   const response = await axios.post(
-    `http://localhost:8082/fireBaseAdmin/reset`,
+    `
+http://localhost:8082/fireBaseAdmin/reset`,
     { uid },
     {
       headers: {

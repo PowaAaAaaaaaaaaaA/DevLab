@@ -46,32 +46,20 @@ function Dashboard() {
 
 
 // Intial Loading
-useEffect(() => {
-  const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
+if (loadingDashboard) {
+  return <Loading onComplete={() => setLoading(false)} />;
+}
 
-  if (!hasLoadedBefore) {
-    // First time in this session → show loader
-    const timer = setTimeout(() => {
-      setLoading(false);
-      sessionStorage.setItem('dashboardLoaded', 'true');
-    }, 7000);
-
-    return () => clearTimeout(timer);
-  } else {
-    // Already loaded before → skip loader
-    setLoading(false);
-  }
-}, []);
 
   // Show Loading Screen first
-  // Show Loading Screen
-if (loadingDashboard) {
-  return (
-    <div className="fixed top-0 left-0 w-screen h-screen z-50">
-      <Loading />
-    </div>
-  );
-}
+//   // Show Loading Screen
+// if (loadingDashboard) {
+//   return (
+//     <div className="fixed top-0 left-0 w-screen h-screen z-50">
+//       <Loading />
+//     </div>
+//   );
+// }
 const subjectIcons = {
   Html: HtmlIcons,
   Css: CssIcons,

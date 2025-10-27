@@ -23,7 +23,8 @@ export const fetchLevelSummary = async () => {
     console.log("stageFeedbacks before sending:", feedbackArray);
 
     const response = await axios.post(
-      `https://api-soyulx5clq-uc.a.run.app/openAI/feedbackPrompts`,
+      `
+https://devlab-server-railway-production.up.railway.app/openAI/feedbackPrompts`,
       { stageFeedbacks: feedbackArray },
       {
         headers: {

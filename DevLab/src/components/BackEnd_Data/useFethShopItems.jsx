@@ -9,7 +9,8 @@ export const fetchShopItems = async () => {
   const token = await currentUser.getIdToken(true);
 
   try {
-    const res = await fetch(`https://api-soyulx5clq-uc.a.run.app/fireBase/Shop`, {
+    const res = await fetch(`
+https://devlab-server-railway-production.up.railway.app/fireBase/Shop`, {
       method: "GET",
       headers: {
         authorization: `Bearer ${token}`,

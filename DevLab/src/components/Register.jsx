@@ -58,8 +58,6 @@ setLoading(true);
         coins: 0,
         bio: "",
         isAdmin: false,
-        isSuspend: false,
-        healthPoints: 3,
         lastOpenedLevel: {
         },
       });

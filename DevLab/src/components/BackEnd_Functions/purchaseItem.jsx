@@ -9,7 +9,8 @@ export const purchaseItem = async (itemId, itemCost, itemName) => {
     const token = await user.getIdToken();
 
     const response = await axios.post(
-      `https://api-soyulx5clq-uc.a.run.app/fireBase/purchaseItem`,
+      `
+https://devlab-server-railway-production.up.railway.app/fireBase/purchaseItem`,
       { itemId, itemCost, itemName },
       {
         headers: {
