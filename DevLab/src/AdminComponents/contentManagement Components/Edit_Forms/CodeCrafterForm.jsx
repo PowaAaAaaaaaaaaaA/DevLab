@@ -24,7 +24,7 @@ import axios from "axios";
       formData.append("levelId", levelId);
       formData.append("stageId", stageId);
 
-      const res = await axios.post(`${import.meta.env.SERVER}/fireBaseAdmin/uploadFile`, formData, {
+      const res = await axios.post(`https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/uploadFile`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,

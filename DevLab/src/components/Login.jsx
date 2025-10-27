@@ -73,7 +73,7 @@ function Login() {
       if (userSnap.exists()) {
         const userData = userSnap.data();
 
-        if (userData.suspend) {
+        if (userData.isSuspend) {
           await signOut(auth);
           toast.error(
             "Your account has been suspended. Please contact support.",

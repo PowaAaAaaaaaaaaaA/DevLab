@@ -125,7 +125,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "x-source": "web",
               "Content-Type": "application/json",
             },
           }
@@ -155,17 +154,16 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         );
         formData.append("state", JSON.stringify(filteredState));
 
-        response = await axios.post(
-          `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/editStage`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "x-source": "web",
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+response = await axios.post(
+  `https://api-soyulx5clq-uc.a.run.app/fireBaseAdmin/editStage`,
+  formData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ only this
+    },
+  }
+);
+
       }
 
       toast.success("Stage updated successfully!", { position: "top-center", theme: "colored" });

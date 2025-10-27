@@ -4,21 +4,31 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import fetchUsers from "./userManagement hooks/Backend Calls/fetchUsers";
 import { suspendAccount } from "./userManagement hooks/Backend Calls/suspendAccount";
-import useAdminSubjProgressBar from "./userManagement hooks/useAdminSubjProgressBar";
+import { useDeleteUser } from "./userManagement hooks/Functions/useDeleteUser";
+import EditUserModal from "./userManagement hooks/userManagement Components/EditUserModal";
+import preProfile from "../assets/Images/profile_handler.png"
+
 
 function UserManagement() {
   const [openUserId, setOpenUserId] = useState(null);
   const queryClient = useQueryClient();
+  const [openModalId, setOpenModalId] = useState(null);
+  const deleteUserMutation = useDeleteUser();
+
 
   const subjects = ["Html", "Css", "JavaScript", "Database"];
 
   // Fetch users
-  const { data: users = [], isLoading, isError } = useQuery({
-    queryKey: ["allUser"],
-    queryFn: fetchUsers,
-  });
-  console.log(users)
-  // Optimistic suspend/activate mutation
+const { data: users = [], isLoading, isError } = useQuery({
+  queryKey: ["allUser"],
+  queryFn: async () => {
+    const result = await fetchUsers();
+    console.log("FetchUsers result:", result); // check what comes from backend
+    return result;
+  },
+});
+
+  // Suspend/Activate mutation
   const mutation = useMutation({
     mutationFn: ({ id, toggleDisable }) => suspendAccount(id, toggleDisable),
     onMutate: async ({ id, toggleDisable }) => {
@@ -43,15 +53,6 @@ function UserManagement() {
   });
 
   const currentUser = users.find((u) => u.id === openUserId);
-  const currentUserId = currentUser ? currentUser.id : null;
-
-  // Progress hooks called statically to avoid conditional loop
-  const progressData = {
-    Html: useAdminSubjProgressBar("Html", currentUserId),
-    Css: useAdminSubjProgressBar("Css", currentUserId),
-    JavaScript: useAdminSubjProgressBar("JavaScript", currentUserId),
-    Database: useAdminSubjProgressBar("Database", currentUserId),
-  };
 
   if (isLoading)
     return (
@@ -86,14 +87,13 @@ function UserManagement() {
                 className="bg-gray-800 text-white p-4 rounded-xl shadow-md hover:shadow-lg transition flex gap-8"
               >
                 {/* Avatar */}
-                <div className="flex-shrink-0 w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full overflow-hidden border border-white">
-                  <img
-                    src={user.profileImage || "/defaultAvatar.png"}
-                    alt={`${user.username || "User"}'s profile`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
+              <div className="flex-shrink-0 w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full overflow-hidden border border-white">
+                <img
+                  src={user.profileImage || preProfile} 
+                  alt={`${user.username || "User"}'s profile`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
                 {/* User Info */}
                 <div>
                   <p className="font-bold text-lg">
@@ -113,7 +113,7 @@ function UserManagement() {
                     </span>
                   </p>
                 </div>
-
+                
                 {/* Progress Button */}
                 <motion.button
                   onClick={() =>
@@ -142,6 +142,29 @@ function UserManagement() {
                 >
                   {user.isAccountSuspended ? "Activate" : "Suspend"}
                 </motion.button>
+                {/* More Button */}
+<motion.button
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  className="px-5 py-2 mt-auto mb-auto ml-2 cursor-pointer rounded-md text-sm font-semibold bg-blue-600 hover:bg-blue-700"
+  onClick={() => setOpenModalId(user.id)}  >
+  More
+</motion.button>
+{/*Delete User*/}
+<motion.button
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  className="px-5 py-2 mt-auto mb-auto ml-2 cursor-pointer rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700"
+  onClick={() => {
+    if (window.confirm(`Are you sure you want to delete ${user.username}?`)) {
+      deleteUserMutation.mutate(user.id);
+    }
+  }}
+>
+  Delete
+</motion.button>
+
+ 
               </div>
             ))}
           </div>
@@ -177,9 +200,9 @@ function UserManagement() {
 
             {/* Progress Content */}
             {subjects.map((subject) => {
-              const { animatedBar, total } = progressData[subject];
-              const percent = Math.round(animatedBar);
-              const completed = Math.round((animatedBar / 100) * total);
+              const total = 100; // max 100%
+              const completedLevels = currentUser.levelCount[subject] || 0;
+              const percent = Math.min(completedLevels, total);
 
               return (
                 <div key={subject} className="mb-4">
@@ -193,7 +216,7 @@ function UserManagement() {
                     />
                   </div>
                   <p className="mt-1 text-sm">
-                    Completed {percent}% ({completed}/{total} levels)
+                    Completed {percent} levels
                   </p>
                 </div>
               );
@@ -201,6 +224,25 @@ function UserManagement() {
           </motion.div>
         )}
       </AnimatePresence>
+<AnimatePresence>
+  {openModalId && (
+    <EditUserModal
+      visibility={!!openModalId}                // use openModalId
+      closeModal={() => setOpenModalId(null)}   // use openModalId
+      uid={openModalId}                         // pass the selected user ID
+      activeLevel={
+        users.reduce((acc, u) => {
+          if (u.id === openModalId) return u.levelCount;
+          return acc;
+        }, {})
+      }
+      deleteProgress={{ mutate: ({ uid, subject }) => console.log("Delete progress", uid, subject) }}
+      deleteAllProgress={{ mutate: ({ uid }) => console.log("Delete all progress", uid) }}
+      editUser={{ mutate: ({ uid, state }) => console.log("Edit user", uid, state) }}
+    />
+  )}
+</AnimatePresence>
+
     </div>
   );
 }
