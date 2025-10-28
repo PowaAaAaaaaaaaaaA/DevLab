@@ -142,7 +142,6 @@ Step into the world of Front-End Development with HTML and CSS as your weapons o
         ?.filter((stage) => {
           // Always show Lesson
           if (stage.type === "Lesson") return true;
-
           // For other types, show only if completed
           const isStageCompleted =
             userStageCompleted[`${lesson.id}-${level.id}-${stage.id}`];
@@ -152,7 +151,6 @@ Step into the world of Front-End Development with HTML and CSS as your weapons o
         .map((stage) => {
           const isStageUnlocked =
             userStageCompleted[`${lesson.id}-${level.id}-${stage.id}`];
-
           return (
             <motion.div
               key={stage.id}
@@ -161,7 +159,7 @@ Step into the world of Front-End Development with HTML and CSS as your weapons o
                 visible: { opacity: 1, scale: 1 },
               }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all ${
+              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all min-h-[100px] ${
                 isStageUnlocked
                   ? "bg-[#1E1E2E] hover:bg-[#FF5733]/80"
                   : "bg-gray-800 opacity-50"

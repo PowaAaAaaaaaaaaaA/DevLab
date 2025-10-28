@@ -91,7 +91,7 @@ function Shop() {
       <div className='flex flex-col sm:flex-row border rounded-3xl bg-[#111827] p-5 gap-5'>
         <div className='flex-1 flex flex-col gap-3'>
           <h1 className='font-exo font-bold text-white text-[3rem] sm:text-[5rem]'>DEVSHOP</h1>
-          <p className='font-exo text-white text-sm sm:text-base'>
+          <p className='font-exo text-white text-sm sm:text-base w-[90%]'>
             Welcome to the DevLab Shop, where learning meets gamification! Earn rewards as you code, learn, and complete challenges, then spend them on awesome upgrades to enhance your experience.
           </p>
         </div>

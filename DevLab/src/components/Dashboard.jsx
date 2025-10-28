@@ -182,33 +182,36 @@ function Dashboard() {
         </div>
 
         {/* Inventory */}
-        <div className="bg-[#0B0F16] border border-gray-700/60 w-full lg:w-[25%] h-[88%] rounded-3xl p-3 flex flex-col mt-4">
-          <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">Inventory</h1>
-          <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom">
-            {inventory && inventory.length > 0 ? (
-              inventory.map((item) => (
-                <div
-                  key={item.id}
-                  className="group border border-gray-700/50 rounded-2xl bg-gradient-to-br from-[#111827] to-[#0D1117] hover:from-[#1A2333] hover:to-[#121826] transition-all duration-300 flex items-center justify-between p-3 shadow-md hover:shadow-lg"
-                >
-                  <div className="rounded-2xl bg-gray-800/70 p-3 flex justify-center items-center w-[25%] aspect-square overflow-hidden shadow-inner">
-                    <img
-                      src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
-                      alt={item.title}
-                      className="w-full h-full object-contain scale-90 group-hover:scale-100 transition-transform duration-300"
-                    />
-                  </div>
-                  <h2 className="text-lg font-exo text-gray-200 flex-1 text-center px-3 leading-tight">{item.title}</h2>
-                  <p className="rounded-xl bg-gray-800/60 px-4 py-2 text-sm font-exo text-white shadow-inner border border-gray-700/40">
-                    x{item.quantity}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-400 text-center text-lg font-exo mt-8">No Items</p>
-            )}
+<div className="bg-[#0B0F16] border border-gray-700/60 w-full lg:w-[25%] h-[88%] rounded-3xl p-3 flex flex-col mt-4">
+  <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">Inventory</h1>
+  <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom">
+    {inventory && inventory.length > 0 ? (
+      inventory.map((item) => (
+        <div
+          key={item.id}
+          className="group border border-gray-700/50 rounded-2xl bg-gradient-to-br from-[#111827] to-[#0D1117] hover:from-[#1A2333] hover:to-[#121826] transition-all duration-300 flex items-center justify-between p-3 shadow-md hover:shadow-lg h-[90px] min-h-[90px] max-h-[90px]"
+        >
+          <div className="rounded-2xl bg-gray-800/70 p-2 flex justify-center items-center w-[70px] h-[70px] overflow-hidden shadow-inner">
+            <img
+              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
+              alt={item.title}
+              className="w-full h-full object-contain scale-90 group-hover:scale-100 transition-transform duration-300"
+            />
           </div>
+          <h2 className="text-base font-exo text-gray-200 flex-1 text-center px-3 leading-tight truncate">
+            {item.title}
+          </h2>
+          <p className="rounded-xl bg-gray-800/60 px-3 py-2 text-sm font-exo text-white shadow-inner border border-gray-700/40 whitespace-nowrap">
+            x{item.quantity}
+          </p>
         </div>
+      ))
+    ) : (
+      <p className="text-gray-400 text-center text-lg font-exo mt-8">No Items</p>
+    )}
+  </div>
+</div>
+
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+// Utils
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
@@ -15,119 +16,124 @@ import { FaLock } from "react-icons/fa";
 // Components
 import useFetchUserProgress from "../components/BackEnd_Data/useFetchUserProgress";
 import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
-import useSubjProgressBar from "../components/Custom Hooks/useSubjProgressBar";
 
 function JavaScriptLessons() {
   const { levelsData, isLoading } = useFetchLevelsData("JavaScript");
-  const { userProgress, userStageCompleted, isLoading: progressLoading } =
-    useFetchUserProgress("JavaScript");
+  const {
+    userProgress,
+    userStageCompleted,
+    isLoading: progressLoading,
+  } = useFetchUserProgress("JavaScript");
   const navigate = useNavigate();
   const [showLockedModal, setShowLockedModal] = useState(false);
   const [expandedLevel, setExpandedLevel] = useState(null);
 
   return (
-    <div className="h-full flex flex-col gap-3">
-      {/* Upper Panel */}
-      <div className="flex flex-col lg:flex-row h-auto lg:h-[40%] rounded-3xl p-5 bg-gradient-to-r from-[#F7DF1E] to-[#FF8C00] gap-6">
-        {/* Text Content */}
-        <div className="w-full lg:w-3/4 flex flex-col justify-center gap-5">
-          <h1 className="font-exo text-white text-[2rem] md:text-[2.8rem] lg:text-[3rem] font-bold text-shadow-lg text-shadow-black bigText-laptop leading-tight">
-            {"{ }"} JavaScript: The Magic Behind Interactive Web Realms
-          </h1>
-          <p className="text-white textSmall-laptop font-exo text-sm md:text-base lg:text-lg leading-relaxed text-shadow-sm text-shadow-black">
-            Step into the enchanted realm of code, where you’ll wield the powerful magic of JavaScript! As a budding sorcerer, you’ll learn to cast spells that bring your web pages to life—turning static sites into interactive, dynamic worlds. From summoning buttons that respond to clicks to conjuring animations and real-time interactions, your journey will unlock the secrets of crafting engaging, magical web experiences. Ready to harness the power of the web? The realm of interactivity awaits!
-          </p>
+    <>
+      <div className="h-full flex flex-col gap-3">
+        {/* Upper Panel */}
+        <div className="flex flex-col h-auto lg:flex-row lg:h-[40%] rounded-3xl p-5 bg-gradient-to-r from-[#F7DF1E] to-[#FF8C00] gap-4">
+          {/* Text Content */}
+          <div className="w-full lg:w-3/4 flex flex-col justify-center gap-4">
+            <h1 className="font-exo text-white text-[2rem] md:text-[2.8rem] lg:text-[3rem] font-bold text-shadow-lg text-shadow-black bigText-laptop leading-tight">
+              {"{ }"} JavaScript: The Magic Behind Interactive Web Realms
+            </h1>
+            <p className="text-white textSmall-laptop font-exo text-sm md:text-base lg:text-lg leading-relaxed text-shadow-sm text-shadow-black">
+              Step into the enchanted realm of code, where you’ll wield the powerful magic of JavaScript! 
+              As a budding sorcerer, you’ll learn to cast spells that bring your web pages to life—turning 
+              static sites into interactive, dynamic worlds. From summoning buttons that respond to clicks 
+              to conjuring animations and real-time interactions, your journey will unlock the secrets of 
+              crafting engaging, magical web experiences. Ready to harness the power of the web? The realm 
+              of interactivity awaits!
+            </p>
+          </div>
+
+          {/* Image */}
+          <div className="w-full lg:w-1/4 flex justify-center items-center">
+            <img
+              src={JsImage}
+              alt="JavaScript Icon"
+              className="lg:w-[55%] md:w-[25%] h-[60%] object-contain"
+            />
+          </div>
         </div>
 
-        {/* Image */}
-        <div className="w-full lg:w-1/4 flex justify-center items-center">
-          <img
-            src={JsImage}
-            alt="JavaScript Icon"
-            className="w-[80%] md:w-[65%] lg:w-[70%] h-auto object-contain"
-          />
-        </div>
-      </div>
+        {/* Lower Panel */}
+        <div className="flex flex-col lg:flex-row h-[60%] gap-4 p-3">
+          {/* Left Panel - Lessons */}
+          {isLoading || progressLoading ? (
+            <Lottie
+              animationData={Animation}
+              loop
+              className="w-full lg:w-3/5 h-[300px] lg:h-full mx-auto"
+            />
+          ) : (
+            <div className="w-full lg:w-3/5 p-2 h-[400px] lg:h-full overflow-auto scrollbar-custom flex flex-col gap-4">
+              {levelsData.map((lesson) => (
+                <div key={lesson.id} className="flex flex-col gap-4">
+                  <h2 className="font-exo text-[2rem] md:text-[3rem] font-bold text-white">
+                    Lesson {lesson.Lesson}
+                  </h2>
+                  <motion.div
+                    variants={{
+                      hidden: { opacity: 0 },
+                      show: { opacity: 1, transition: { staggerChildren: 0.3 } },
+                    }}
+                    initial="hidden"
+                    animate="show"
+                    className="flex flex-col overflow-y-hidden"
+                  >
+                    {lesson.levels.map((level) => {
+                      const progress =
+                        userProgress[`${lesson.id}-${level.id}`] || {};
+                      const isUnlocked = progress.isActive;
+                      const isExpanded =
+                        expandedLevel === `${lesson.id}-${level.id}`;
+                      const toggleLevel = (lessonId, levelId) => {
+                        const key = `${lessonId}-${levelId}`;
+                        setExpandedLevel((prev) => (prev === key ? null : key));
+                      };
 
-      {/* Lower Panel */}
-      <div className="flex flex-col lg:flex-row gap-5 p-5">
-        {/* Left Panel - Lessons */}
-        {isLoading || progressLoading ? (
-          <Lottie
-            animationData={Animation}
-            loop
-            className="w-full lg:w-3/5 h-[300px] lg:h-full mx-auto"
-          />
-        ) : (
-          <div className="w-full lg:w-3/5 p-3 h-[400px] lg:h-full overflow-auto scrollbar-custom flex flex-col gap-5">
-            {levelsData.map((lesson) => (
-              <div key={lesson.id} className="flex flex-col gap-4">
-                <h2 className="font-exo text-[2rem] md:text-[2.8rem] font-bold text-white">
-                  Lesson {lesson.Lesson}
-                </h2>
-                <motion.div
-                  variants={{
-                    hidden: { opacity: 0 },
-                    show: { opacity: 1, transition: { staggerChildren: 0.3 } },
-                  }}
-                  initial="hidden"
-                  animate="show"
-                  className="flex flex-col gap-4"
-                >
-                  {lesson.levels.map((level) => {
-                    const progress =
-                      userProgress[`${lesson.id}-${level.id}`] || {};
-                    const isUnlocked = progress.isActive;
-                    const isExpanded =
-                      expandedLevel === `${lesson.id}-${level.id}`;
-                    const toggleLevel = (lessonId, levelId) => {
-                      const key = `${lessonId}-${levelId}`;
-                      setExpandedLevel((prev) => (prev === key ? null : key));
-                    };
-
-                    return (
-                      <motion.div
-                        key={`${lesson.id}-${level.id}`}
-                        className="flex flex-col gap-3"
-                      >
-                        {/* Level Card */}
+                      return (
                         <motion.div
-                          variants={{
-                            hidden: { opacity: 0, y: 100 },
-                            show: { opacity: isUnlocked ? 1 : 0.4, y: 0 },
-                          }}
-                          whileHover={{ scale: 1.02 }}
-                          transition={{ duration: 0.3 }}
-                          className={`group w-full border border-gray-800 flex flex-col sm:flex-row gap-4 sm:gap-6 rounded-3xl h-auto sm:h-[120px] relative ${
-                            isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
-                          } cursor-pointer transition duration-300 ease-in-out`}
-                          onClick={() => {
-                            if (!isUnlocked) setShowLockedModal(true);
-                            else toggleLevel(lesson.id, level.id);
-                          }}
+                          key={`${lesson.id}-${level.id}`}
+                          className="flex flex-col p-3 overflow-y-hidden"
                         >
-                          {!isUnlocked && (
-                            <div className="absolute inset-0 flex items-center justify-center text-white z-10">
-                              <FaLock className="text-3xl sm:text-[3rem]" />
+                          {/* Level Card */}
+                          <motion.div
+                            variants={{
+                              hidden: { opacity: 0, y: 100 },
+                              show: { opacity: isUnlocked ? 1 : 0.4, y: 0 },
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                            className={`group border w-full flex flex-col sm:flex-row gap-3 sm:gap-5 rounded-4xl h-auto sm:h-[120px] relative ${
+                              isUnlocked ? "bg-[#111827]" : "bg-[#060505]"
+                            } cursor-pointer`}
+                            onClick={() => {
+                              if (!isUnlocked) setShowLockedModal(true);
+                              else toggleLevel(lesson.id, level.id);
+                            }}
+                          >
+                            {!isUnlocked && (
+                              <div className="absolute inset-0 flex items-center justify-center text-white z-10">
+                                <FaLock className="text-3xl sm:text-[3rem]" />
+                              </div>
+                            )}
+                            <div className="bg-black text-white min-w-[60px] sm:min-w-[20%] h-[60px] sm:h-full flex justify-center items-center rounded-4xl font-bold text-xl sm:text-3xl">
+                              {level.symbol}
                             </div>
-                          )}
+                            <div className="flex flex-col justify-center gap-1 text-white font-exo flex-1 p-4 lg:p-0">
+                              <p className="text-base sm:text-[1.2rem]">
+                                {level.title}
+                              </p>
+                              <p className="text-xs sm:text-[0.7rem] line-clamp-3 text-gray-400">
+                                {level.description}
+                              </p>
+                            </div>
+                          </motion.div>
 
-                          <div className="bg-black text-white min-w-[60px] sm:min-w-[20%] h-[60px] sm:h-full flex justify-center items-center rounded-3xl font-bold text-xl sm:text-3xl">
-                            {level.symbol}
-                          </div>
-
-                          <div className="flex flex-col justify-center gap-1 text-white font-exo flex-1 p-4 lg:p-0">
-                            <p className="text-base sm:text-[1.2rem] font-semibold">
-                              {level.title}
-                            </p>
-                            <p className="text-xs sm:text-sm text-gray-400 line-clamp-3">
-                              {level.description}
-                            </p>
-                          </div>
-                        </motion.div>
-
-                        {/* Stage Dropdown */}
-                        <AnimatePresence>
+                          {/* Stages Dropdown */}
+                          <AnimatePresence>
 {isExpanded && (
   <motion.div
     initial={{ opacity: 0, height: 0 }}
@@ -151,7 +157,6 @@ function JavaScriptLessons() {
         ?.filter((stage) => {
           // Always show Lesson
           if (stage.type === "Lesson") return true;
-
           // For other types, show only if completed
           const isStageCompleted =
             userStageCompleted[`${lesson.id}-${level.id}-${stage.id}`];
@@ -161,7 +166,6 @@ function JavaScriptLessons() {
         .map((stage) => {
           const isStageUnlocked =
             userStageCompleted[`${lesson.id}-${level.id}-${stage.id}`];
-
           return (
             <motion.div
               key={stage.id}
@@ -170,9 +174,9 @@ function JavaScriptLessons() {
                 visible: { opacity: 1, scale: 1 },
               }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all ${
+              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all min-h-[100px] ${
                 isStageUnlocked
-                  ? "bg-[#1E1E2E] hover:bg-[#FF5733]/80"
+                  ? "bg-[#1E1E2E] hover:bg-[#F7DF1E]/80"
                   : "bg-gray-800 opacity-50"
               }`}
               onClick={() => {
@@ -214,46 +218,51 @@ function JavaScriptLessons() {
     </motion.div>
   </motion.div>
 )}
-                        </AnimatePresence>
-                      </motion.div>
-                    );
-                  })}
-                </motion.div>
-              </div>
-            ))}
+                          </AnimatePresence>
+                        </motion.div>
+                      );
+                    })}
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Right Panel - About */}
+          <div className="w-full lg:w-2/5 flex flex-col gap-4 p-3 lg:p-5">
+            <h2 className="text-[1.8rem] md:text-[2.5rem] font-exo font-bold text-white text-shadow-sm text-shadow-black">
+              About <span className="text-[#F7DF1E]">JavaScript</span>
+            </h2>
+            <p className="text-white text-sm md:text-base textSmall-laptop">
+              Enter the world of dynamic, interactive web experiences! As a JavaScript mage, 
+              you'll learn to cast powerful spells that bring your web pages to life. From 
+              creating interactive buttons to controlling animations and data, you’ll master 
+              the art of making websites responsive to users' every action. Your mission: unlock 
+              the magic that makes the web not just a place to visit, but a realm to interact with!
+            </p>
+          </div>
+        </div>
+
+        {/* Locked Modal */}
+        {showLockedModal && (
+          <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
+            <div className="bg-[#1E1E2E] text-white p-6 md:p-8 rounded-2xl w-[90%] max-w-md text-center shadow-lg border border-gray-600 flex flex-col items-center">
+              <Lottie animationData={LockAnimation} className="w-1/2 h-1/2" />
+              <h2 className="text-2xl font-bold mb-2">Level Locked</h2>
+              <p className="mb-4 text-sm md:text-base">
+                You must complete the previous levels to unlock this stage.
+              </p>
+              <button
+                className="bg-[#F7DF1E] text-black font-bold px-6 py-2 rounded-2xl hover:bg-[#FFD700] transition w-full cursor-pointer"
+                onClick={() => setShowLockedModal(false)}
+              >
+                Okay
+              </button>
+            </div>
           </div>
         )}
-
-        {/* Right Panel - About */}
-        <div className="w-full lg:w-2/5 flex flex-col gap-5 p-5">
-          <h2 className="text-[1.8rem] md:text-[2.5rem] font-exo font-bold text-white text-shadow-sm text-shadow-black">
-            About <span className="text-[#F7DF1E]">JavaScript</span>
-          </h2>
-          <p className="text-white text-sm md:text-base textSmall-laptop">
-            Enter the world of dynamic, interactive web experiences! As a JavaScript mage, you'll learn to cast powerful spells that bring your web pages to life. From creating interactive buttons to controlling animations and data, you’ll master the art of making websites responsive to users' every action. Your mission: unlock the magic that makes the web not just a place to visit, but a realm to interact with!
-          </p>
-        </div>
       </div>
-
-      {/* Locked Modal */}
-      {showLockedModal && (
-        <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50">
-          <div className="bg-[#1E1E2E] text-white p-6 md:p-8 rounded-2xl w-[90%] max-w-md text-center shadow-lg border border-gray-600 flex flex-col items-center">
-            <Lottie animationData={LockAnimation} className="w-1/2 h-1/2" />
-            <h2 className="text-2xl font-bold mb-2">Level Locked</h2>
-            <p className="mb-4 text-sm md:text-base">
-              You must complete the previous levels to unlock this stage.
-            </p>
-            <button
-              className="bg-[#F7DF1E] text-black font-bold px-6 py-2 rounded-2xl hover:bg-[#FFD700] transition w-full cursor-pointer"
-              onClick={() => setShowLockedModal(false)}
-            >
-              Okay
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 

@@ -35,7 +35,6 @@ export const gameModeSubmitHandlers = {
   CodeCrafter: async ({submittedCode,setIsCorrect,setShowIsCorrect,instruction,providedCode,description,subject, stageId}) => {
     setIsCorrect(false);
     try {
-      console.log("This is:", subject)
       const result = await codeCrafterPrompt({
         submittedCode,
         instruction,
