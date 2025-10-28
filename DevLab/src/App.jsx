@@ -51,12 +51,12 @@ function App() {
   const [isAdmin, setAdmin] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   //  Detect if screen is mobile-sized
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  // useEffect(() => {
+  //   const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+  //   checkMobile();
+  //   window.addEventListener("resize", checkMobile);
+  //   return () => window.removeEventListener("resize", checkMobile);
+  // }, []);
 
 useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged(async (user) => {

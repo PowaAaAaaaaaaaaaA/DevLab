@@ -38,20 +38,13 @@ const handleRewardGrant = async (userId, subject, lessonId, levelId) => {
   try {
     const { setLastReward } = useRewardStore.getState();
     const { activeBuffs, removeBuff } = useInventoryStore.getState();
-
 // const { levelsData } = useFetchLevelsData(subject);
-
 // const LevelData = useMemo(() => {
 //   const lesson = levelsData.find(l => l.id === lessonId);
 //   return lesson?.Levels?.find(lv => lv.id === levelId) || null;
 // }, [levelsData, lessonId, levelId]);
-
-
-
 // if (!LevelData) return;
-
 // let { expReward = 0, coinsReward = 0 } = LevelData;
-
     const levelRef = doc(db, subject, lessonId, "Levels", levelId);
     const levelSnap = await getDoc(levelRef);
     if (!levelSnap.exists()) return;
