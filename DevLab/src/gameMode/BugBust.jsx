@@ -67,12 +67,12 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
 
   return (
     <>
-      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
+      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col overflow-hidden">
         {/* Header */}
         <GameHeader heart={heart} />
 
         {/* Content */}
-        <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5">
+        <div className="relative h-[100%] flex flex-col gap-5 md:flex-row p-10 transition-all duration-500 overflow-x-hidden">
           {/* Instruction */}
           <div className="h-[40%] md:w-[35%] md:h-full w-full">
             <InstructionPanel

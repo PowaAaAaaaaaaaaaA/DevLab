@@ -19,7 +19,11 @@ import { gameModeSubmitHandlers } from "../GameModes_Utils/gameModeSubmitHandler
 import Lottie from "lottie-react";
 import Loading from "../../assets/Lottie/LoadingDots.json";
 
-function GameFooter({ setLevelComplete, setShowCodeWhisper ,setAlreadyComplete}) {
+function GameFooter({
+  setLevelComplete,
+  setShowCodeWhisper,
+  setAlreadyComplete,
+}) {
   const navigate = useNavigate();
   const { userData } = useFetchUserData();
   const {
@@ -31,16 +35,16 @@ function GameFooter({ setLevelComplete, setShowCodeWhisper ,setAlreadyComplete})
     stageId,
     gamemodeId,
   } = useFetchGameModeData();
-  const { userStageCompleted,completedLevels } = useFetchUserProgress(subject);
+  const { userStageCompleted, completedLevels } = useFetchUserProgress(subject);
 
   const submittedCode = useGameStore((state) => state.submittedCode);
   const setIsCorrect = useGameStore((state) => state.setIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
-  
-console.log(submittedCode);
+  console.log(submittedCode);
   const [isLoading, setIsLoading] = useState(false);
 
-  const buttonText = gamemodeId === "Lesson" || gamemodeId === "BrainBytes" ? "Next" : "Submit";
+  const buttonText =
+    gamemodeId === "Lesson" || gamemodeId === "BrainBytes" ? "Next" : "Submit";
   const showLoading = buttonText === "Next";
 
   const handleClick = async () => {
@@ -50,12 +54,19 @@ console.log(submittedCode);
     const isStageLocked = userStageCompleted?.[stageKey] ?? false;
 
     if (isStageLocked || gamemodeId === "Lesson") {
-      await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete,setAlreadyComplete });
+      await goToNextStage({
+        subject,
+        lessonId,
+        levelId,
+        stageId,
+        navigate,
+        setLevelComplete,
+        setAlreadyComplete,
+      });
       if (showLoading) setIsLoading(false);
       return;
-    }
+    } // Submit flow
 
-    // Submit flow
     if (buttonText === "Submit") {
       const handler = gameModeSubmitHandlers[gamemodeId];
       if (handler) {
@@ -86,47 +97,70 @@ console.log(submittedCode);
 
   return (
     <>
-      {/* Loading Overlay (only for Next) */}
+      {/* Loading Overlay (only for Next) */}{" "}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/98">
-          <Lottie animationData={Loading} loop={true} className="w-[50%] h-[50%]" />
+          {" "}
+          <Lottie
+            animationData={Loading}
+            loop={true}
+            className="w-[50%] h-[50%]"
+          />{" "}
         </div>
       )}
-
-      {/* Footer */}
-      <div className="h-[7%] border-t-white border-t-2 px-6 flex justify-between items-center text-white">
-        {/* Left Section */}
-        <div className="flex items-center gap-3 min-w-[20%]">
-          <ItemsUse setShowCodeWhisper={setShowCodeWhisper} gamemodeId={gamemodeId} />
-          <div className="min-w-[80%] font-exo">
-            <p>{levelData ? `${levelData.levelOrder}. ${levelData.title}` : "Loading..."}</p>
-            <p className="text-[#58D28F]">{levelData ? `${levelData.expReward}xp` : ""}</p>
-          </div>
+      {/* Footer */}{" "}
+      <div
+        // Applying responsive, thematic styles and the UPWARD GLOW
+        className="min-h-16 border-t-1 bg-[#11001f] border-t-purple-700 px-4 md:px-6 flex justify-between items-center text-white sticky bottom-0 z-10 
+        shadow-[0_-5px_20px_0_rgba(200,100,255,0.2)]"
+      >
+        {/* Left Section */}{" "}
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink min-w-0">
+          {" "}
+          <ItemsUse
+            setShowCodeWhisper={setShowCodeWhisper}
+            gamemodeId={gamemodeId}
+          />{" "}
+          <div className="font-exo overflow-hidden flex-shrink">
+            {" "}
+            <p className="text-sm sm:text-base font-semibold truncate">
+              {levelData
+                ? `${levelData.levelOrder}. ${levelData.title}`
+                : "Loading..."}
+            </p>{" "}
+            <p className="text-xs sm:text-sm text-[#58D28F]">
+              {levelData ? `${levelData.expReward}xp` : ""}
+            </p>{" "}
+          </div>{" "}
         </div>
-
-        {/* Button Section */}
-        <div className="w-[10%]">
+        {/* Button Section */}{" "}
+        <div className="w-1/3 sm:w-1/4 md:w-[15%] lg:w-[10%]">
+          {" "}
           <motion.button
             whileTap={{ scale: 0.95 }}
-            whileHover={!isDisabled ? { scale: 1.05, background: "#7e22ce" } : {}}
+            whileHover={
+              !isDisabled ? { scale: 1.05, background: "#7e22ce" } : {}
+            }
             transition={{ bounceDamping: 100 }}
             onClick={!isDisabled ? handleClick : undefined}
             disabled={isDisabled || isLoading} // disable if loading
-            className={`font-bold rounded-xl w-full py-2 ${
+            className={`font-bold rounded-xl w-full py-2 text-sm sm:text-base ${
               isDisabled || isLoading
-                ? "bg-gray-600 cursor-not-allowed"
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                 : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
             }`}
           >
-            {buttonText}
-          </motion.button>
+            {buttonText}{" "}
+          </motion.button>{" "}
         </div>
-
-        {/* Right Section */}
-        <div>
-          <p className="text-xl">{userData ? `${userData.coins} Coins` : "Loading..."}</p>
-        </div>
-      </div>
+        {/* Right Section */}{" "}
+        <div className="flex-shrink-0">
+          {" "}
+          <p className="text-base sm:text-lg font-bold">
+            {userData ? `${userData.coins} Coins` : "Loading..."}
+          </p>{" "}
+        </div>{" "}
+      </div>{" "}
     </>
   );
 }

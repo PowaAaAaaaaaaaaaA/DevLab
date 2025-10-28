@@ -16,44 +16,71 @@ function GameHeader({heart}) {
     const { userData, isLoading, isError, refetch } = useFetchUserData();
 
   return (
-    <div className="flex justify-between h-[10%] p-3 items-center">
-      <div className="flex items-center p-3">
-        <Link to="/Main" className="text-[3rem] text-white">
+    // Full-width, flexible height (min-h-[10%]), dark purple background, improved padding.
+    <div className="flex justify-between items-center w-full min-h-[10%] bg-[#11001f] text-white p-3 shadow-lg shadow-purple-950/50">
+      
+      {/* Back Button and Logo */}
+      <div className="flex items-center gap-1 md:gap-3">
+        <Link to="/Main" 
+              // Responsive text size for Back Button
+              className="text-2xl md:text-3xl text-purple-400 hover:text-white transition-colors">
           <MdArrowBackIos />
         </Link>
-        <h1 className="text-[2.5rem] font-exo font-bold text-white">DEVLAB</h1>
+        {/* Responsive text size for DEVLAB title. Hide on extra-small screens. */}
+        <h1 className="text-xl sm:text-2xl lg:text-[2.5rem] font-exo font-bold text-white hidden sm:block">
+            DEVLAB
+        </h1>
       </div>
+
+      {/* CENTER SECTION: Heart Counter (Conditional) */}
       {gamemodeId !== "Lesson" && (
-          <div className="flex gap-2 mb-4 w-auto justify-center">
+          // CHANGE 4: Centered hearts, reduced margin/gap for space efficiency on small screens.
+          <div className="flex gap-1 sm:gap-2 w-auto justify-center">
             {[...Array(3)].map((_, i) => (
-              <span key={i} className={i < heart ? 'text-red-500 text-4xl' : 'text-gray-500 text-4xl'}>
+              <span 
+                key={i} 
+                // CHANGE 5: Responsive heart icon size
+                className={i < heart ? 'text-red-500 text-2xl sm:text-3xl' : 'text-gray-500 text-2xl sm:text-3xl'}>
                 <LuHeart />
               </span>
               ))}
           </div>
       )}
 
-      <div className="w-auto h-[90%] flex items-center gap-2 mr-[10px]">
-        <div className="border rounded-full bg-gray-600 overflow-hidden w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16">
+      {/* RIGHT SECTION: User Profile and Level Bar */}
+      {/* Removed fixed height and margin. Used 'gap-2' for internal spacing. */}
+      <div className="flex items-center gap-2">
+        {/* Profile Avatar */}
+        <div 
+            // CHANGE 6: Responsive size for Avatar
+            className="border rounded-full overflow-hidden w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
           <img
             src={userData?.profileImage || defaultAvatar}
             alt="Profile"
             className="w-full h-full object-cover"/>
         </div>
 
-        <div className=" w-auto self-end h-[70%]">
-          {/*Progress Bar*/}
-          <div className="w-[150px] h-4 mb-2 bg-gray-200 rounded-full  dark:bg-gray-700">
+        {/* Level and Progress Bar */}
+        {/* CHANGE 7: Wrapper to manage vertical alignment and responsive width for the bar. */}
+        <div className="flex flex-col justify-center">
+          
+          {/* Progress Bar Container */}
+          <div 
+            // CHANGE 8: Responsive width for Progress Bar (narrower on mobile)
+            className="w-[100px] sm:w-[120px] lg:w-[150px] h-3 sm:h-4 mb-1 bg-gray-700 rounded-full">
             <div
-              className="h-4 rounded-full dark:bg-[#2CB67D]"
+              // The bar color is set to a purple-friendly green/cyan (from a previous file)
+              className="h-full rounded-full bg-[#2CB67D]"
               style={{ width: `${(animatedExp / 100) * 100}%` }}>
             </div>
           </div>
-          <div className=" flex justify-between">
+          
+          {/* Level and XP Text */}
+          <div className="flex justify-between text-xs sm:text-sm">
             <p className="text-white font-inter font-bold">
               Lvl {userData?.userLevel}
             </p>
-            <p className="text-white font-inter font-bold">
+            <p className="text-white font-inter font-bold ml-2">
               {userData?.exp} / 100xp
             </p>
           </div>

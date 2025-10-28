@@ -118,8 +118,13 @@ function Html_TE() {
   };
 
   return (
-    <>
-      <div className="bg-[#191a26] h-[95%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] w-[47%] ml-auto">
+    <div className="flex flex-col md:flex-row gap-3 w-full lg:h-full md:h-full h-[100vh]">
+      
+      {/* Code Editor Panel */}
+      <div 
+        className="bg-[#191a26] h-[55%] md:h-full w-full md:w-1/2 rounded-2xl flex flex-col gap-3 items-center p-3 
+                  border-[#2a3141] border-[1px]"
+      >
         <div className="flex-1 min-h-0 overflow-auto w-full scrollbar-custom">
           <CodeMirror
             className="text-[1rem] h-full"
@@ -138,6 +143,7 @@ function Html_TE() {
           />
         </div>
 
+        {/* Action Buttons */}
         <div className="flex justify-around w-full">
           {/* RUN BUTTON */}
           <motion.button
@@ -145,29 +151,34 @@ function Html_TE() {
             whileHover={{ scale: 1.05, background: "#7e22ce" }}
             transition={{ bounceDamping: 100 }}
             onClick={runCode}
-            className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
+            // RESPONSIVE PADDING/FONT SIZE
+            className="bg-[#9333EA] text-white font-bold rounded-xl p-2 sm:p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] text-sm sm:text-base">
             RUN
           </motion.button>
-  {/* EVALUATE BUTTON — only for Lesson mode */}
-  {gamemodeId === "Lesson" && (
-    <motion.button
-      whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.05, background: "#7e22ce" }}
-      transition={{ bounceDamping: 100 }}
-      onClick={handleEvaluate}
-      disabled={isEvaluating}
-      className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
-        isEvaluating ? "opacity-50 cursor-not-allowed" : ""
-      }`}
-    >
-      {isEvaluating ? "Evaluating..." : "EVALUATE"}
-    </motion.button>
-  )}
+    {/* EVALUATE BUTTON — only for Lesson mode */}
+    {gamemodeId === "Lesson" && (
+      <motion.button
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05, background: "#7e22ce" }}
+        transition={{ bounceDamping: 100 }}
+        onClick={handleEvaluate}
+        disabled={isEvaluating}
+        // RESPONSIVE PADDING/FONT SIZE
+        className={`font-bold rounded-xl text-white p-2 sm:p-3 w-[45%] text-sm sm:text-base ${
+          isEvaluating 
+            ? "bg-gray-600 opacity-50 cursor-not-allowed" 
+            : "bg-[#9333EA] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+        }`}
+      >
+        {isEvaluating ? "Evaluating..." : "EVALUATE"}
+      </motion.button>
+    )}
         </div>
       </div>
 
-      {/* Output */}
-      <div className="h-[95%] rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] w-[47%] ml-auto ">
+      {/* Output Panel */}
+      <div 
+        className="h-[45%] mb-2 md:h-full w-full md:w-1/2 rounded-2xl p-2 bg-[#F8F3FF] border-[#2a3141] border-[1px]">
         {hasRunCode ? (
           <iframe
             ref={iFrame}
@@ -176,9 +187,11 @@ function Html_TE() {
             sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
           />
         ) : (
-          <div className="w-full h-full flex items-center flex-col">
-            <Lottie animationData={Animation} loop={true} className="w-[70%] h-[70%]" />
-            <p className="text-[0.8rem] text-center">
+          <div className="w-full h-full flex items-center flex-col justify-center">
+            {/* Reduced Lottie size for mobile */}
+            <Lottie animationData={Animation} loop={true} className="w-[50%] h-[50%] sm:w-[70%] sm:h-[70%]" />
+            {/* Responsive text size */}
+            <p className="text-sm text-center p-2">
               YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
             </p>
           </div>
@@ -197,7 +210,7 @@ function Html_TE() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
 

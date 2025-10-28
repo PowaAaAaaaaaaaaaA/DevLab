@@ -28,6 +28,67 @@ import useStoreLastOpenedLevel from "../../components/Custom Hooks/useStoreLastO
 import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
 
 
+// =================================================================
+// FIX: MOVED CODEBLOCK DEFINITION ABOVE MAIN COMPONENT
+// =================================================================
+
+const CodeBlock = ({ code, language, color }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyClick = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1000);
+  };
+
+  return (
+    // Thematic background, purple border, matching LessonInstructionPanel
+    <div className="relative my-4 bg-gray-900 rounded-xl overflow-hidden border border-purple-800 shadow-md">
+      {/* Header */}
+      <div className="flex justify-between items-center bg-gray-800 px-4 py-2 border-b border-purple-800 relative">
+        <p className="font-bold text-sm" style={{ color }}>
+          {language.toUpperCase()}
+        </p>
+
+        <div className="relative">
+          <button
+            onClick={handleCopyClick}
+            // Thematic purple button
+            className="text-white hover:text-white text-xs bg-purple-900/50 px-2 py-1 rounded transition-all hover:bg-purple-700"
+          >
+            Copy
+          </button>
+
+          {/* Animated “Copied!” popup */}
+          <AnimatePresence>
+            {copied && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                // Thematic purple background for popup
+                className="absolute top-0 right-0 bg-purple-600 text-white text-xs px-2 py-1 rounded-md shadow-md z-10"
+              >
+                Copied!
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Code body */}
+      <pre
+        // Ensures horizontal scrolling for long lines
+        className={`language-${language} m-0 p-4 whitespace-pre-wrap break-words overflow-x-auto text-sm leading-relaxed scrollbar-custom`}
+      >
+        <code className={`language-${language}`}>{code}</code>
+      </pre>
+    </div>
+  );
+};
+
+
 function InstructionPanel({
   setIsCorrect,
   setShowisCorrect,
@@ -155,7 +216,7 @@ useEffect(() => {
 
     if (activeBuffs.includes("brainFilter")) {
       setUsed(true);
-      BrainFilter(filtteredOpttions, gameModeData.choices.correctAnswer)
+      BrainFilter(optionsArray, gameModeData.choices.correctAnswer)
         .then((filtered) => setFilteredOptions(filtered))
         .catch(console.error);
     } else if (!used) {
@@ -198,22 +259,27 @@ const hasAnyCode =
 
 
   return (
-    <div className="h-[100%] w-full bg-[#393F59] rounded-2xl text-white overflow-y-scroll p-6 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] flex flex-col gap-5 scrollbar-custom">
-      <h2 className="text-[2rem] font-bold text-shadow-lg text-shadow-black text-[#E35460]">
+    // Thematic background, shadow, and responsive padding/font sizes
+    <div className="h-full w-full border-[#2a3141] border-[1px] bg-gray-800/70 backdrop-blur-sm rounded-2xl text-white overflow-y-scroll p-4 md:p-6 flex flex-col gap-5 scrollbar-custom">
+      {/* Responsive Title */}
+      <h2 className="text-2xl md:text-[2rem] font-bold text-shadow-lg text-shadow-black text-[#E35460]">
         {levelData.levelOrder}. {gameModeData.title}
       </h2>
-      <p className="whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] font-exo">
+      {/* Responsive Paragraph */}
+      <p className="whitespace-pre-line text-justify leading-relaxed text-sm sm:text-[0.9rem] font-exo">
         {gameModeData.description}
       </p>
 
-      {/* BrainBytes */}
+      {/* BrainBytes Section */}
       {gameModeData?.type === "BrainBytes" ? (
-        <div className="mt-4 p-4 bg-[#25293B] rounded-2xl flex flex-col gap-3">
-          <h3 className="font-bold text-xl mb-2 font-exo text-shadow-lg text-shadow-black">Instruction</h3>
-          <p className="mb-2 whitespace-pre-line text-justify leading-relaxed  text-[0.9rem] font-exo">
+        // Thematic container
+        <div className="mt-4 p-4 bg-gray-900 rounded-2xl flex flex-col gap-3">
+          <h3 className="font-bold text-lg sm:text-xl mb-2 font-exo text-shadow-lg text-shadow-black">Instruction</h3>
+          <p className="mb-2 whitespace-pre-line text-justify leading-relaxed text-sm sm:text-[0.9rem] font-exo">
             {gameModeData.instruction}
           </p>
-          <div className="bg-[#191C2B] p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
+          {/* Thematic options container */}
+          <div className="bg-gray-900 p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
             <AnimatePresence>
               {filtteredOpttions.map(([key, value]) => (
                 <motion.label
@@ -222,8 +288,8 @@ const hasAnyCode =
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.5, opacity: 0 }}
                   transition={{ duration: 0.3, type: "pop", stiffness: 300 }}
-                  className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl hover:bg-gray-500 transition-all duration-500 ${
-                    selectedOption === key ? "bg-gray-500" : "bg-gray-700"
+                  className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl transition-all duration-300 ${
+                    selectedOption === key ? "bg-purple-700 shadow-lg" : "bg-gray-800 hover:bg-purple-900/50"
                   }`}
                 >
                   <input
@@ -232,31 +298,32 @@ const hasAnyCode =
                     value={key}
                     checked={selectedOption === key}
                     onChange={() => setSelectedOption(key)}
-                    className="accent-purple-600 mt-1"
+                    className="accent-purple-500 mt-1"
                   />
                   <span className="font-mono text-sm break-all">{key}: {value}</span>
                 </motion.label>
               ))}
             </AnimatePresence>
           </div>
+          {/* Thematic and responsive submit button */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05, background: "#7e22ce" }}
             transition={{ bounceDamping: 100 }}
             onClick={answerCheck}
-            className="w-[30%] min-h-[8%] self-end rounded-[10px] font-exo font-bold bg-[#7F5AF0] hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-101 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]"
+            className="w-1/2 sm:w-1/3 md:w-[30%] py-2 self-end rounded-xl font-exo font-bold bg-[#9333EA] hover:cursor-pointer hover:bg-[#7e22ce] transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]"
           >
             Submit
           </motion.button>
         </div>
       ) : (
-        <div className="mt-4 p-4 bg-[#25293B] rounded-2xl">
-          <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">Instruction</h3>
-          <p className="mb-2 font-exo whitespace-pre-line leading-relaxed">{gameModeData.instruction}</p>
+        <div className="mt-4 p-4 bg-gray-900 rounded-2xl">
+          <h3 className="font-bold text-lg sm:text-xl mb-2 text-shadow-lg text-shadow-black">Instruction</h3>
+          <p className="mb-2 font-exo whitespace-pre-line leading-relaxed text-sm sm:text-[0.9rem]">{gameModeData.instruction}</p>
 
 {hasAnyCode && (
   <>
-    <p className="text-1xl mb-2 font-bold mt-3 font-exo">Code Example</p>
+    <p className="text-lg mb-2 font-bold mt-3 font-exo">Code Example</p>
 
     {formattedCode.html && (
       <CodeBlock
@@ -294,8 +361,9 @@ const hasAnyCode =
 
       {/* CodeRush Timer */}
       {gameModeData?.type === "CodeRush" && (
-        <div className="font-bold text-[3.2rem] w-[60%] m-auto p-2 flex flex-col justify-center items-center bg-[#25293B] rounded-2xl relative">
-          <p className="font-exo text-shadow-lg text-shadow-black text-[1.5rem]">Time:</p>
+        // Thematic and responsive timer box
+        <div className="text-4xl sm:text-[3.2rem] w-full max-w-xs m-auto p-4 flex flex-col justify-center items-center bg-gray-900 rounded-2xl relative">
+          <p className="font-exo text-shadow-lg text-shadow-black text-lg sm:text-[1.5rem]">Time:</p>
           <p className="text-[#E35460]">{FormatTimer(timer)}</p>
           <AnimatePresence>
             {buffApplied && (
@@ -332,12 +400,14 @@ const hasAnyCode =
 
       {/* CodeCrafter Replication */}
       {gameModeData?.type === "CodeCrafter" && gameModeData?.replicationFile && (
-        <div className="mt-6 p-4 bg-[#25293B] rounded-2xl flex flex-col gap-3">
-          <h3 className="font-bold text-xl mb-2 text-shadow-lg text-shadow-black">Replication Target</h3>
+        // Thematic container
+        <div className="mt-6 p-4 bg-gray-900 rounded-2xl flex flex-col gap-3">
+          <h3 className="font-bold text-lg sm:text-xl mb-2 text-shadow-lg text-shadow-black">Replication Target</h3>
+          {/* Responsive iframe height */}
           <iframe
             src={gameModeData.replicationFile}
             title="Replication Preview"
-            className="w-full h-[400px] bg-white rounded-xl shadow-md"
+            className="w-full h-[300px] sm:h-[400px] bg-white rounded-xl shadow-md"
             sandbox="allow-scripts allow-same-origin"
           />
         </div>
@@ -356,57 +426,6 @@ const hasAnyCode =
     </div>
   );
 }
-const CodeBlock = ({ code, language, color }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyClick = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  };
-
-  return (
-    <div className="relative my-4 bg-[#1E1E2E] rounded-xl overflow-hidden border border-[#2A2A3C] shadow-md">
-      {/* Header */}
-      <div className="flex justify-between items-center bg-[#25293B] px-4 py-2 border-b border-[#2A2A3C] relative">
-        <p className="font-bold text-sm" style={{ color }}>
-          {language.toUpperCase()}
-        </p>
-
-        <div className="relative">
-          <button
-            onClick={handleCopyClick}
-            className="text-gray-300 hover:text-white text-xs bg-[#3A3F55] px-2 py-1 rounded transition-all hover:bg-[#4A5068]"
-          >
-            Copy
-          </button>
-
-          {/* Animated “Copied!” popup */}
-          <AnimatePresence>
-            {copied && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="absolute top-0 right-0 bg-[#4A5068] text-white text-xs px-2 py-1 rounded-md shadow-md"
-              >
-                Copied!
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Code body */}
-      <pre
-        className={`language-${language} m-0 p-4 whitespace-pre-wrap break-words overflow-x-hidden text-sm leading-relaxed scrollbar-custom`}
-      >
-        <code className={`language-${language}`}>{code}</code>
-      </pre>
-    </div>
-  );
-};
 
 
 export default InstructionPanel;

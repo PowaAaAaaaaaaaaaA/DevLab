@@ -54,7 +54,7 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         {/* Content */}
         <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5 justify-center">
           {/* Instruction Panel */}
-          <div className="h-[40%] md:w-[40%] md:h-full w-full">
+          <div className="h-[90%] md:w-[40%] md:h-full w-full">
             <InstructionPanel
               setIsCorrect={setIsCorrect} 
               setShowisCorrect={setShowisCorrect}

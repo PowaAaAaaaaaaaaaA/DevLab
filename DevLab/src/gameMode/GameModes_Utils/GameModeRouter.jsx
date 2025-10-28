@@ -122,21 +122,31 @@ useEffect(() => {
   </div>
     );
 
-  //  If not allowed
-  if (!isAllowed) {
+//  If not allowed
+if (!isAllowed) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
-        <h2 className="text-3xl font-bold mb-4">🔒 Access Denied</h2>
-        <p className="text-gray-600 mb-6">{errorMessage}</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
-        >
-          Go Back
-        </button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-950 text-center px-4">
+        <div className="bg-gray-800 p-12 rounded-xl border-4 border-purple-600 shadow-2xl max-w-lg w-full">
+          {/* Headline color changed to a bright purple for accent */}
+          <h2 className="text-5xl font-extrabold mb-4 text-purple-400">
+            [ ERROR: 403 ]
+          </h2>
+          <p className="text-xl font-medium mb-2 text-gray-200">
+            Access to Stage Denied
+          </p>
+          {/* Detailed error message color remains subtle */}
+          <p className="text-gray-400 mb-8">{errorMessage}</p>
+          <button
+            onClick={() => navigate(-1)}
+            // Button changed to purple and shadow updated
+            className="w-full bg-purple-700 text-white font-semibold py-3 rounded-lg hover:bg-purple-600 transition-colors duration-200 shadow-lg shadow-purple-500/50 cursor-pointer"
+          >
+            Go Back to Lessons
+          </button>
+        </div>
       </div>
     );
-  }
+}
 
   //  If allowed, render the correct game mode
   return (

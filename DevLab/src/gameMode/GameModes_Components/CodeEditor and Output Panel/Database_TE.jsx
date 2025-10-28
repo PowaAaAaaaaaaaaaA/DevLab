@@ -245,96 +245,109 @@ const handleEvaluate = async () => {
 };
 
 
-  return (
-<>
-  <div className="bg-[#191a26] w-[47%] ml-auto h-[95%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-    <div className="flex-1 min-h-0 overflow-auto w-full rounded-3xl p-2 scrollbar-custom">
-    <CodeMirror
-      className="text-[1rem] "
-      height="100%"
-      width="100%"
-      extensions={[sql(),EditorView.lineWrapping]}
-      theme={tokyoNight}
-      onChange={(value) => {
-        setQuery(value);
-        setSubmittedCode({ SQL: value }); //  Save SQL to Zustand
-        }}
-      />
-    </div>
-    <div className="w-full flex justify-around">
-      <motion.button
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.05 }}
-        transition={{ bounceDamping: 100 }}
-        onClick={runCode}
-        className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ">
-        RUN
-      </motion.button>
-  {/* EVALUATE BUTTON — only for Lesson mode */}
-  {gamemodeId === "Lesson" && (
-    <motion.button
-      whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.05, background: "#7e22ce" }}
-      transition={{ bounceDamping: 100 }}
-      onClick={handleEvaluate}
-      disabled={isEvaluating}
-      className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
-        isEvaluating ? "opacity-50 cursor-not-allowed" : ""
-      }`}
-    >
-      {isEvaluating ? "Evaluating..." : "EVALUATE"}
-    </motion.button>
-  )}
-
-    </div>
-  </div>
-        <div className="h-[100%] w-[47%] ml-auto p-4 flex flex-col justify-center gap-7">
-          {/*Table*/}
-          <div className="border-amber-50 w-[100%] h-[45%] border overflow-scroll overflow-x-hidden rounded-l-3xl rounded-bl-3xl rounded-xl p-3 bg-[#F8F3FF] scrollbar-custom">
-            <div
-              dangerouslySetInnerHTML={{ __html: tablesHtml }}
-              className="text-black font-exo"
-            ></div>
-          </div>
-          {/*OUTPUT TABLEE!!!*/}
-          <div className="w-[100%] h-[45%]">
-            {hasRunQuery ? (
-              <div
-                className="text-2xl font-exo w-full h-full overflow-auto text-black  bg-[#F8F3FF] rounded-3xl p-3 "
-                dangerouslySetInnerHTML={{ __html: outputHtml }}
-              ></div>
-            ) : (
-              <div className="w-full h-full flex items-center flex-col justify-center bg-[#F8F3FF] rounded-l-3xl rounded-bl-3xl scrollbar-custom">
-                <Lottie
-                  animationData={Animation}
-                  loop={true}
-                  className="w-[70%] h-[70%]"
-                />
-                <p className="text-[0.8rem] text-center ">
-                  YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-                </p>
-              </div>
-            )}
-          </div>
+return (
+  <>
+    {/* MAIN CONTAINER */}
+    <div className="flex flex-col lg:flex-row items-center justify-center w-full h-full gap-5 p-3">
+      
+      {/* LEFT: SQL EDITOR PANEL */}
+      <div className="bg-[#191a26] w-full lg:w-[47%] h-[50vh] lg:h-[95%] rounded-2xl flex items-center justify-center p-3 flex-col gap-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="flex-1 min-h-0 overflow-auto w-full rounded-3xl p-2 scrollbar-custom">
+          <CodeMirror
+            className="text-[0.9rem] sm:text-[1rem]"
+            height="100%"
+            width="100%"
+            extensions={[sql(), EditorView.lineWrapping]}
+            theme={tokyoNight}
+            onChange={(value) => {
+              setQuery(value);
+              setSubmittedCode({ SQL: value });
+            }}
+          />
         </div>
 
-        <AnimatePresence>
-  {showPopup && evaluationResult && (
-    <motion.div
-      className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <Evaluation_Popup
-        evaluationResult={evaluationResult} setShowPopup={setShowPopup}
-      />
-    </motion.div>
-  )}
-</AnimatePresence>
+        {/* BUTTONS */}
+        <div className="w-full flex flex-wrap justify-around gap-3">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ bounceDamping: 100 }}
+            onClick={runCode}
+            className="bg-[#9333EA] text-white font-bold rounded-xl py-3 w-full sm:w-[45%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+          >
+            RUN
+          </motion.button>
 
-</>
-  )
+          {/* EVALUATE BUTTON — only for Lesson mode */}
+          {gamemodeId === "Lesson" && (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05, background: "#7e22ce" }}
+              transition={{ bounceDamping: 100 }}
+              onClick={handleEvaluate}
+              disabled={isEvaluating}
+              className={`bg-[#9333EA] text-white font-bold rounded-xl py-3 w-full sm:w-[45%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
+                isEvaluating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {isEvaluating ? "Evaluating..." : "EVALUATE"}
+            </motion.button>
+          )}
+        </div>
+      </div>
+
+      {/* RIGHT: DATABASE & OUTPUT PANEL */}
+      <div className="h-auto lg:h-[100%] w-full lg:w-[47%] p-4 flex flex-col justify-center gap-7">
+        {/* DATABASE TABLE VIEW */}
+        <div className="border-amber-50 w-full h-[40vh] lg:h-[45%] border overflow-scroll overflow-x-hidden rounded-3xl p-3 bg-[#F8F3FF] scrollbar-custom">
+          <div
+            dangerouslySetInnerHTML={{ __html: tablesHtml }}
+            className="text-black font-exo"
+          ></div>
+        </div>
+
+        {/* OUTPUT TABLE */}
+        <div className="w-full h-[40vh] lg:h-[45%]">
+          {hasRunQuery ? (
+            <div
+              className="text-lg sm:text-2xl font-exo w-full h-full overflow-auto text-black bg-[#F8F3FF] rounded-3xl p-3"
+              dangerouslySetInnerHTML={{ __html: outputHtml }}
+            ></div>
+          ) : (
+            <div className="w-full h-full flex items-center flex-col justify-center bg-[#F8F3FF] rounded-3xl scrollbar-custom">
+              <Lottie
+                animationData={Animation}
+                loop={true}
+                className="w-[60%] h-[60%] sm:w-[70%] sm:h-[70%]"
+              />
+              <p className="text-[0.8rem] text-center px-3">
+                YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    {/* EVALUATION POPUP */}
+    <AnimatePresence>
+      {showPopup && evaluationResult && (
+        <motion.div
+          className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <Evaluation_Popup
+            evaluationResult={evaluationResult}
+            setShowPopup={setShowPopup}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </>
+);
+
 }
 
 export default Database_TE

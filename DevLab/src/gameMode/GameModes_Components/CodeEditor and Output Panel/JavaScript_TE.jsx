@@ -197,120 +197,127 @@ const runCode = () => {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
-  return (
-    <>
-      {/* Code Editor */}
-      <div className="w-[47%] ml-auto h-full ">
-        <div className="flex p-4 text-2xl gap-10 h-[10%] w-full">
-          {tabs.map((tab) => (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`font-exo font-bold rounded-2xl w-[30%] h-auto text-[1rem] bg-[#191a26] cursor-pointer  ${
-                activeTab === tab
-                  ? "text-white"
-                  : "text-gray-500 hover:text-white"
-              }`}
-            >
-              {tab}
-            </motion.button>
-          ))}
-        </div>
-        <div className="bg-[#191a26] h-[88%] w-full rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          <div className="flex-1 min-h-0 overflow-auto w-full scrollbar-custom">
-            <CodeMirror
-              className="text-[1rem]"
-              value={code[activeTab]}
-              onChange={onChange}
-              height="100%"
-              width="100%"
-              extensions={[getLanguageExtension(), autocompletion({ override: [] }), EditorView.lineWrapping]}
-              theme={tokyoNight}
-            />
-          </div>
-          <div className="flex justify-around w-full">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              onClick={runCode}
-              className="bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            >
-              RUN
-            </motion.button>
-  {/* EVALUATE BUTTON — only for Lesson mode */}
-  {gamemodeId === "Lesson" && (
-    <motion.button
-      whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.05, background: "#7e22ce" }}
-      transition={{ bounceDamping: 100 }}
-      onClick={handleEvaluate}
-      disabled={isEvaluating}
-      className={`bg-[#9333EA] text-white font-bold rounded-xl p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
-        isEvaluating ? "opacity-50 cursor-not-allowed" : ""
-      }`}
+return (
+  <div className="flex flex-col md:flex-row gap-3 w-full lg:h-full md:h-full h-[100vh]">
+    {/* Code Editor Panel */}
+    <div 
+      className="bg-[#191a26] h-[55%] md:h-full w-full md:w-1/2 rounded-2xl flex flex-col gap-3 items-center p-3 
+                 border-[#2a3141] border-[1px]"
     >
-      {isEvaluating ? "Evaluating..." : "EVALUATE"}
-    </motion.button>
-  )}
-          </div>
-        </div>
+      {/* Tabs */}
+      <div className="flex justify-center items-center gap-4 w-full mb-2">
+        {tabs.map((tab) => (
+          <motion.button
+            key={tab}
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05, background: "#7e22ce" }}
+            transition={{ bounceDamping: 100 }}
+            onClick={() => setActiveTab(tab)}
+            className={`font-exo font-bold rounded-xl p-4 text-[0.7rem] md:text-[0.7rem] lg:text-[1rem] w-[30%] bg-[#191a26] border border-[#2a3141] cursor-pointer
+                        ${activeTab === tab ? "text-white" : "text-gray-500 hover:text-white"}`}
+          >
+            {tab}
+          </motion.button>
+        ))}
       </div>
 
-      {/* Output */}
-      <div className="h-full w-[47%] ml-auto flex flex-col gap-4">
-        {/* Visual Output */}
-        <div className="flex-1 rounded-2xl p-2 bg-[#F8F3FF] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          {hasRunCode ? (
-            <iframe
-              ref={iFrame}
-              title="output"
-              className="w-full h-full rounded-xl"
-              sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center flex-col">
-              <Lottie
-                animationData={Animation}
-                loop={true}
-                className="w-[70%] h-[70%]"
-              />
-              <p className="text-[0.8rem]">
-                YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-              </p>
-            </div>
-          )}
-        </div>
-<div className="h-32 p-2 bg-black text-gray-400 font-mono overflow-auto rounded-xl border shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] scrollbar-custom">
-  {!hasRunCode ? (
-    <div className="text-gray-500 ">Console output will appear here...</div>
-  ) : logs.length > 0 ? (
-    logs.map((log, i) => <div key={i}>{log}</div>)
-  ) : (
-    <div className="text-gray-500">No console output</div>
-  )}
-</div>
-
-
-
+      {/* CodeMirror Editor */}
+      <div className="flex-1 min-h-0 overflow-auto w-full scrollbar-custom">
+        <CodeMirror
+          className="text-[1rem] h-full"
+          value={code[activeTab]}
+          onChange={onChange}
+          height="100%"
+          width="100%"
+          extensions={[getLanguageExtension(), autocompletion({ override: [] }), EditorView.lineWrapping]}
+          theme={tokyoNight}
+        />
       </div>
-      {/* Evaluation Popup */}
-      <AnimatePresence>
-        {showPopup && evaluationResult && (
-          <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}>
-              <Evaluation_Popup evaluationResult={evaluationResult} setShowPopup={setShowPopup}/>
-          </motion.div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-around w-full mt-2">
+        {/* RUN BUTTON */}
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05, background: "#7e22ce" }}
+          transition={{ bounceDamping: 100 }}
+          onClick={runCode}
+          className="bg-[#9333EA] text-white font-bold rounded-xl p-2 sm:p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] text-sm sm:text-base"
+        >
+          RUN
+        </motion.button>
+
+        {/* EVALUATE BUTTON — only for Lesson mode */}
+        {gamemodeId === "Lesson" && (
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05, background: "#7e22ce" }}
+            transition={{ bounceDamping: 100 }}
+            onClick={handleEvaluate}
+            disabled={isEvaluating}
+            className={`font-bold rounded-xl text-white p-2 sm:p-3 w-[45%] text-sm sm:text-base ${
+              isEvaluating
+                ? "bg-gray-600 opacity-50 cursor-not-allowed"
+                : "bg-[#9333EA] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+            }`}
+          >
+            {isEvaluating ? "Evaluating..." : "EVALUATE"}
+          </motion.button>
         )}
-      </AnimatePresence>
-    </>
-  );
+      </div>
+    </div>
+
+    {/* Output + Console Panel */}
+    <div className="h-[50%] md:h-full w-full md:w-1/2 flex flex-col gap-3">
+      {/* Visual Output */}
+      <div 
+        className="flex-1 rounded-2xl p-2 bg-[#F8F3FF] border-[#2a3141] border-[1px] h-[65%]"
+      >
+        {hasRunCode ? (
+          <iframe
+            ref={iFrame}
+            title="output"
+            className="w-full h-full rounded-xl"
+            sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center flex-col justify-center">
+            <Lottie animationData={Animation} loop={true} className="w-[50%] h-[50%] sm:w-[70%] sm:h-[70%]" />
+            <p className="text-sm text-center p-2">
+              YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Console Output */}
+      <div className="h-[40%] p-2 bg-black text-gray-400 font-mono overflow-auto rounded-xl border border-[#2a3141] scrollbar-custom">
+        {!hasRunCode ? (
+          <div className="text-gray-500">Console output will appear here...</div>
+        ) : logs.length > 0 ? (
+          logs.map((log, i) => <div key={i}>{log}</div>)
+        ) : (
+          <div className="text-gray-500">No console output</div>
+        )}
+      </div>
+    </div>
+
+    {/* Evaluation Popup */}
+    <AnimatePresence>
+      {showPopup && evaluationResult && (
+        <motion.div
+          className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <Evaluation_Popup evaluationResult={evaluationResult} setShowPopup={setShowPopup} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
 }
 
 export default JavaScript_TE;

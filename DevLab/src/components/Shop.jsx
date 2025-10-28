@@ -129,7 +129,7 @@ function Shop() {
           onClick={() => buyMutation.mutate(item)}
           className="bg-green-400 text-black font-bold py-2 px-6 sm:px-8 rounded-full text-base sm:text-lg mt-4 sm:mt-5"
         >
-          $ {item.cost}
+          {item.cost}
         </motion.button>
       </div>
     </div>
