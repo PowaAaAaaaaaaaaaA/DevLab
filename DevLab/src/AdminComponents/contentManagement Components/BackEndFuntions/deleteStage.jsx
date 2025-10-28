@@ -7,7 +7,8 @@ const deleteStage = async ({ category, lessonId, levelId, stageId }) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:8082/fireBaseAdmin/deleteStage",
+      `
+https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/deleteStage`,
       { category, lessonId, levelId, stageId },
       {
         headers: {

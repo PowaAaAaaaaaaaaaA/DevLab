@@ -4,21 +4,35 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import fetchUsers from "./userManagement hooks/Backend Calls/fetchUsers";
 import { suspendAccount } from "./userManagement hooks/Backend Calls/suspendAccount";
-import useAdminSubjProgressBar from "./userManagement hooks/useAdminSubjProgressBar";
+import { useDeleteUser } from "./userManagement hooks/Functions/useDeleteUser";
+import EditUserModal from "./userManagement hooks/userManagement Components/EditUserModal";
+import preProfile from "../assets/Images/profile_handler.png";
+import ConfirmDeleteUserModal from "./userManagement hooks/Modals/ConfirmDeleteUserModal";
 
 function UserManagement() {
   const [openUserId, setOpenUserId] = useState(null);
   const queryClient = useQueryClient();
+  const [openModalId, setOpenModalId] = useState(null);
+  const deleteUserMutation = useDeleteUser();
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState(null);
 
   const subjects = ["Html", "Css", "JavaScript", "Database"];
 
   // Fetch users
-  const { data: users = [], isLoading, isError } = useQuery({
+  const {
+    data: users = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["allUser"],
-    queryFn: fetchUsers,
+    queryFn: async () => {
+      const result = await fetchUsers();
+      console.log("FetchUsers result:", result); // check what comes from backend
+      return result;
+    },
   });
 
-  // Optimistic suspend/activate mutation
+  // Suspend/Activate mutation
   const mutation = useMutation({
     mutationFn: ({ id, toggleDisable }) => suspendAccount(id, toggleDisable),
     onMutate: async ({ id, toggleDisable }) => {
@@ -28,13 +42,15 @@ function UserManagement() {
 
       queryClient.setQueryData(["allUser"], (old = []) =>
         old.map((user) =>
-          user.id === id ? { ...user, isAccountSuspended: !toggleDisable } : user
+          user.id === id
+            ? { ...user, isAccountSuspended: !toggleDisable }
+            : user
         )
       );
 
       return { previousUsers };
     },
-    onError: (err, variables, context) => {
+    onError: (context) => {
       queryClient.setQueryData(["allUser"], context.previousUsers);
     },
     onSettled: () => {
@@ -43,15 +59,6 @@ function UserManagement() {
   });
 
   const currentUser = users.find((u) => u.id === openUserId);
-  const currentUserId = currentUser ? currentUser.id : null;
-
-  // Progress hooks called statically to avoid conditional loop
-  const progressData = {
-    Html: useAdminSubjProgressBar("Html", currentUserId),
-    Css: useAdminSubjProgressBar("Css", currentUserId),
-    JavaScript: useAdminSubjProgressBar("JavaScript", currentUserId),
-    Database: useAdminSubjProgressBar("Database", currentUserId),
-  };
 
   if (isLoading)
     return (
@@ -88,12 +95,11 @@ function UserManagement() {
                 {/* Avatar */}
                 <div className="flex-shrink-0 w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full overflow-hidden border border-white">
                   <img
-                    src={user.profileImage || "/defaultAvatar.png"}
+                    src={user.profileImage || preProfile}
                     alt={`${user.username || "User"}'s profile`}
                     className="w-full h-full object-cover"
                   />
                 </div>
-
                 {/* User Info */}
                 <div>
                   <p className="font-bold text-lg">
@@ -106,7 +112,9 @@ function UserManagement() {
                     Status:{" "}
                     <span
                       className={`font-semibold ${
-                        user.isAccountSuspended ? "text-red-400" : "text-green-400"
+                        user.isAccountSuspended
+                          ? "text-red-400"
+                          : "text-green-400"
                       }`}
                     >
                       {user.isAccountSuspended ? "Suspended" : "Active"}
@@ -123,7 +131,15 @@ function UserManagement() {
                 >
                   Progress
                 </motion.button>
-
+                {/* More Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-5 py-2 mt-auto mb-auto ml-2 cursor-pointer rounded-md text-sm font-semibold bg-blue-600 hover:bg-blue-700"
+                  onClick={() => setOpenModalId(user.id)}
+                >
+                  More
+                </motion.button>
                 {/* Suspend/Activate Button */}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -131,7 +147,7 @@ function UserManagement() {
                   className={`px-5 py-2 mt-auto mb-auto cursor-pointer rounded-md text-sm font-semibold transition duration-200 ${
                     user.isAccountSuspended
                       ? "bg-green-600 hover:bg-green-700"
-                      : "bg-red-600 hover:bg-red-700"
+                      : "bg-orange-600 hover:bg-orange-800"
                   }`}
                   onClick={() =>
                     mutation.mutate({
@@ -141,6 +157,15 @@ function UserManagement() {
                   }
                 >
                   {user.isAccountSuspended ? "Activate" : "Suspend"}
+                </motion.button>
+                {/*Delete User*/}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-5 py-2 mt-auto mb-auto ml-2 cursor-pointer rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700"
+                  onClick={() => setConfirmDeleteUser(user)}
+                >
+                  Delete
                 </motion.button>
               </div>
             ))}
@@ -177,9 +202,9 @@ function UserManagement() {
 
             {/* Progress Content */}
             {subjects.map((subject) => {
-              const { animatedBar, total } = progressData[subject];
-              const percent = Math.round(animatedBar);
-              const completed = Math.round((animatedBar / 100) * total);
+              const total = 100; // max 100%
+              const completedLevels = currentUser.levelCount[subject] || 0;
+              const percent = Math.min(completedLevels, total);
 
               return (
                 <div key={subject} className="mb-4">
@@ -192,13 +217,48 @@ function UserManagement() {
                       transition={{ duration: 0.5, ease: "easeInOut" }}
                     />
                   </div>
-                  <p className="mt-1 text-sm">
-                    Completed {percent}% ({completed}/{total} levels)
-                  </p>
+                  <p className="mt-1 text-sm">Completed {percent} levels</p>
                 </div>
               );
             })}
           </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {openModalId && (
+          <EditUserModal
+            visibility={!!openModalId} // use openModalId
+            closeModal={() => setOpenModalId(null)} // use openModalId
+            uid={openModalId} // pass the selected user ID
+            activeLevel={users.reduce((acc, u) => {
+              if (u.id === openModalId) return u.levelCount;
+              return acc;
+            }, {})}
+            deleteProgress={{
+              mutate: ({ uid, subject }) =>
+                console.log("Delete progress", uid, subject),
+            }}
+            deleteAllProgress={{
+              mutate: ({ uid }) => console.log("Delete all progress", uid),
+            }}
+            editUser={{
+              mutate: ({ uid, state }) => console.log("Edit user", uid, state),
+            }}
+          />
+        )}
+      </AnimatePresence>
+      {/*Confirm Delete User*/}
+      <AnimatePresence>
+        {confirmDeleteUser && (
+          <ConfirmDeleteUserModal
+            isOpen={!!confirmDeleteUser}
+            username={confirmDeleteUser.username}
+            onCancel={() => setConfirmDeleteUser(null)}
+            onConfirm={() => {
+              deleteUserMutation.mutate(confirmDeleteUser.id);
+              setConfirmDeleteUser(null);
+            }}
+          />
         )}
       </AnimatePresence>
     </div>

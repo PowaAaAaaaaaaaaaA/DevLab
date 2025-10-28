@@ -1,4 +1,4 @@
-// useAttemptStore.jsx
+
 import { create } from "zustand";
 import { doc, increment, onSnapshot, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../Firebase/Firebase";

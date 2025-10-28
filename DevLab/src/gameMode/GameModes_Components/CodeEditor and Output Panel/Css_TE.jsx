@@ -9,6 +9,7 @@ import { autocompletion } from "@codemirror/autocomplete";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
+import toast from "react-hot-toast";
 // Utils
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useCallback } from "react";
@@ -18,7 +19,7 @@ import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchiev
 import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
-import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
@@ -27,7 +28,7 @@ function Css_TE() {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
-  const { gameModeData, subject } = useGameModeData();
+  const { gameModeData, subject } = useFetchGameModeData();
   const [description, setDescription] = useState("");
     // Utils
   const isCorrect = useGameStore((state) => state.isCorrect);
@@ -41,8 +42,8 @@ function Css_TE() {
     const [showPopup, setShowPopup] = useState(false);
   // For the Code Mirror Input/Output
   const [code, setCode] = useState({
-    HTML: "<!-- Write your HTML code here -->",
-    CSS: "/* Write your CSS code here */",
+    HTML: "",
+    CSS: "",
 });
 // Output Panel
   const iFrame = useRef(null);
@@ -76,6 +77,15 @@ const onChange = useCallback(
 
 // Run Button
   const runCode = () => {
+
+  const allEmpty = !code.HTML.trim() && !code.CSS.trim();
+  if (allEmpty) {
+    toast.error("Please enter your code before running.", {
+      position: "top-right",
+    });
+    return;
+  }
+
     setRunCode(true);
     setTimeout(() => {
     const fullCode = 
@@ -108,6 +118,14 @@ const onChange = useCallback(
   };
   // Eval Button (For Lesson mode Only)
   const handleEvaluate = async () => {
+  const allEmpty = !code.HTML.trim() && !code.CSS.trim();
+  if (allEmpty) {
+    toast.error("Please enter your code before evaluating.", {
+      position: "top-right",
+    });
+    return;
+  }
+
     if (gameModeData?.blocks) {
       const paragraphs = gameModeData.blocks
         .filter(block => block.type === "Paragraph")
@@ -160,7 +178,7 @@ const onChange = useCallback(
       <div className=" bg-[#191a26] h-[88%] w-[100%] rounded-2xl flex flex-col gap-3 items-center p-3 shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
         <div className="flex-1 min-h-0 overflow-auto w-full scrollbar-custom">     
         <CodeMirror
-          className="text-[1rem]"
+          className="text-[1rem]" 
           value={code[activeTab]}
           onChange={onChange}
           height="100%"

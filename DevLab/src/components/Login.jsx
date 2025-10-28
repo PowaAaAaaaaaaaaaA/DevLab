@@ -59,7 +59,7 @@ function Login() {
       if (!user.emailVerified) {
         await signOut(auth); // Force logout immediately
         toast.error("Your email has not been verified yet.", {
-          position: "bottom-center",
+          position: "top-center",
           theme: "colored",
         });
         setLoading(false);
@@ -73,12 +73,12 @@ function Login() {
       if (userSnap.exists()) {
         const userData = userSnap.data();
 
-        if (userData.suspend) {
+        if (userData.isSuspend) {
           await signOut(auth);
           toast.error(
             "Your account has been suspended. Please contact support.",
             {
-              position: "bottom-center",
+              position: "top-center",
               theme: "colored",
             }
           );
@@ -88,7 +88,7 @@ function Login() {
       }
 
       toast.success("Login successful!", {
-        position: "bottom-center",
+        position: "top-center",
         theme: "colored",
       });
 
@@ -96,7 +96,7 @@ function Login() {
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Invalid credentials.", {
-        position: "bottom-center",
+        position: "top-center",
         theme: "colored",
       });
     } finally {

@@ -10,6 +10,7 @@ import { autocompletion } from "@codemirror/autocomplete";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
+import toast from "react-hot-toast"
 // Utils
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useCallback, useEffect } from "react";
@@ -19,7 +20,8 @@ import { extractJsKeywords } from "../../../components/Achievements Utils/Js_Key
 import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
-import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
+
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
@@ -27,7 +29,7 @@ function JavaScript_TE() {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
-  const { gameModeData,subject } = useGameModeData();
+  const { gameModeData,subject } = useFetchGameModeData();
   const [description, setDescription] = useState("");
   // UTils
   const isCorrect = useGameStore((state) => state.isCorrect);
@@ -44,9 +46,9 @@ function JavaScript_TE() {
   const [showPopup, setShowPopup] = useState(false);
   // Code states
   const [code, setCode] = useState({
-    HTML: "<!-- Write your HTML code here -->",
-    CSS: "/* Write your CSS code here */",
-    JavaScript: "// Write your JavaScript code here"
+    HTML: "",
+    CSS: "",
+    JavaScript: ""
   });
   // Console log states
   const [logs, setLogs] = useState([]);
@@ -83,6 +85,18 @@ const onChange = useCallback(
 // Run Button
 
 const runCode = () => {
+  const allEmpty =
+    !code.HTML.trim() &&
+    !code.CSS.trim() &&
+    !code.JavaScript.trim();
+
+  if (allEmpty) {
+    toast.error("Please enter your code before running.", {
+      position: "top-right",
+    });
+    return;
+  }
+  
   consoleRef.current = [];
   setLogs([]);
   setRunCode(true);
@@ -130,6 +144,18 @@ const runCode = () => {
 
 // Eval Button (For Lesson mode Only)
   const handleEvaluate = async () => {
+
+      const allEmpty =
+    !code.HTML.trim() &&
+    !code.CSS.trim() &&
+    !code.JavaScript.trim();
+
+  if (allEmpty) {
+    toast.error("Please enter your code before evaluating.", {
+      position: "top-right",
+    });
+    return;
+  }
         if (gameModeData?.blocks) {
       const paragraphs = gameModeData.blocks
         .filter(block => block.type === "Paragraph")

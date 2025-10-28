@@ -192,89 +192,103 @@ VALUES
   };
 
   return (
-    <div className="flex bg-[#16161A] h-screen  flex-col gap-3 p-4 overflow-hidden">
-      <div className="text-5xl font-exo font-bold p-10 text-white">
-        <span className="cursor-pointer" onClick={() => navigate("/main")}>
-          DEVLAB
-        </span>
-      </div>
-      <div className="flex w-[100%] h-[100%] gap-10">
-        <div className="flex flex-col w-[60%] h-[80%] gap-4">
-          <div className=" h-[30%] overflow-scroll overflow-x-hidden p-4 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl scrollbar-custom">
-            <h2 className="text-[1.5rem] font-semibold mb-2 text-white font-exo">
-              Database Tables
-            </h2>
-            <div
-              dangerouslySetInnerHTML={{ __html: tablesHtml }}
-              className="text-white"/>
-          </div>
-          <div className="px-4 w-full flex flex-col flex-1 min-h-0 gap-3 rounded-3xl p-3 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-            <div className="flex-1 min-h-0 overflow-auto">
-              <CodeMirror
-                value={query}
-                height="100%"
-                theme={tokyoNight}
-                extensions={[sql()]}
-                onChange={(value) => setQuery(value)}/>
-            </div>
-            <motion.div className="flex justify-end gap-3">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05, background: "#7e22ce" }}
-                transition={{ bounceDamping: 100 }}
-                onClick={handleEvaluateSQL}
-                disabled={isEvaluating}
-                className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-                {isEvaluating ? "Evaluating..." : "EVALUATE"}
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.05, background: "#9333EA" }}
-                transition={{ bounceDamping: 100 }}
-                onClick={runQuery}
-                className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]">
-                Run Query
-              </motion.button>
-            </motion.div>
-          </div>
-        </div>
-        {/*Output Panel*/}
+<div className="flex flex-col bg-[#16161A] h-atuo p-4 gap-3 xl:overflow-hidden xl:h-screen lg:overflow-hidden lg:h-screen">
+  <div className="text-4xl sm:text-5xl font-exo font-bold p-4 sm:p-10 text-white">
+    <span className="cursor-pointer" onClick={() => navigate("/main")}>
+      DEVLAB
+    </span>
+  </div>
 
-        <div className="bg-[#F8F3FF] h-[80%] w-[37%] text-2xl p-4 text-white font-exo rounded-3xl  shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
-          {!hasRunQuery ? (
-            <div className=" flex items-center justify-center w-full h-full flex-col">
-              <Lottie
-                animationData={Animation}
-                loop={true}
-                className="w-[60%] h-[60%]"
-              />
-              <p className="text-gray-700 font-bold w-[75%] text-[0.95rem]">
-                YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-              </p>
-            </div>
-          ) : (
-            <div
-              className="text-2xl font-exo w-full h-full overflow-auto text-black "
-              dangerouslySetInnerHTML={{ __html: outputHtml }}
-            />
-          )}
-        </div>
+  <div className="flex flex-col lg:flex-row w-full h-full gap-6 lg:gap-10">
+    {/* Left Panel */}
+    <div className="flex flex-col lg:w-3/5 w-full h-[70vh] lg:h-[80%] gap-4">
+      {/* Tables */}
+      <div className="h-[30%] sm:h-[35%] overflow-scroll overflow-x-hidden p-4 bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] rounded-2xl scrollbar-custom">
+        <h2 className="text-[1.25rem] sm:text-[1.5rem] font-semibold mb-2 text-white font-exo">
+          Database Tables
+        </h2>
+        <div
+          dangerouslySetInnerHTML={{ __html: tablesHtml }}
+          className="text-white"
+        />
       </div>
-<AnimatePresence>
-  {showEvalPopup && evaluationResult && (
-    <motion.div
-      className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}>
-      <DBPlaygroundEval_Popup
-        evaluationResult={evaluationResult}
-        setShowEvalPopup={setShowEvalPopup}
-      />
-    </motion.div>
-  )}
-</AnimatePresence>
+
+      {/* SQL Editor */}
+      <div className="px-3 sm:px-4 w-full flex flex-col flex-1 min-h-0 gap-3 rounded-3xl bg-[#1A1B26] shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]">
+        <div className="flex-1 min-h-0 overflow-auto">
+          <CodeMirror
+            value={query}
+            height="100%"
+            theme={tokyoNight}
+            extensions={[sql()]}
+            onChange={(value) => setQuery(value)}
+          />
+        </div>
+
+        <motion.div className="flex flex-col sm:flex-row justify-end gap-3 p-4">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05, background: "#7e22ce" }}
+            transition={{ bounceDamping: 100 }}
+            onClick={handleEvaluateSQL}
+            disabled={isEvaluating}
+            className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-full sm:w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+          >
+            {isEvaluating ? "Evaluating..." : "EVALUATE"}
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05, background: "#9333EA" }}
+            transition={{ bounceDamping: 100 }}
+            onClick={runQuery}
+            className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-full sm:w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+          >
+            Run Query
+          </motion.button>
+        </motion.div>
+      </div>
+    </div>
+
+    {/* Output Panel */}
+    <div className="bg-[#F8F3FF] text-black h-[60vh] sm:h-[80%] w-full lg:w-[37%] text-lg sm:text-2xl p-4 sm:p-6 font-exo rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] overflow-auto">
+      {!hasRunQuery ? (
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <Lottie
+            animationData={Animation}
+            loop={true}
+            className="w-[60%] h-[60%] sm:w-[50%] sm:h-[50%]"
+          />
+          <p className="text-gray-700 font-bold w-[75%] text-[0.9rem] sm:text-[0.95rem] text-center mt-4">
+            YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
+          </p>
+        </div>
+      ) : (
+        <div
+          className="w-full h-full overflow-auto"
+          dangerouslySetInnerHTML={{ __html: outputHtml }}
+        />
+      )}
+    </div>
+  </div>
+
+  <AnimatePresence>
+    {showEvalPopup && evaluationResult && (
+      <motion.div
+        className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <DBPlaygroundEval_Popup
+          evaluationResult={evaluationResult}
+          setShowEvalPopup={setShowEvalPopup}
+        />
+      </motion.div>
+    )}
+  </AnimatePresence>
 </div>
+
   );
 }
 

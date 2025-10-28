@@ -6,7 +6,8 @@ const addStage = async ({ category, lessonId, levelId }) => {
 
     try{
     const res = await axios.post(
-    "http://localhost:8082/fireBaseAdmin/addStage",
+    `
+https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/addStage`,
     { category, lessonId, levelId },
     {
         headers: {

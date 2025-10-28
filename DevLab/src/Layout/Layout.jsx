@@ -1,34 +1,31 @@
-import { Outlet, useLocation  } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-
+import { Outlet, useLocation } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 function Layout() {
-    const location = useLocation();
-    const isLessonView =
-  location.pathname.startsWith("/Main/Lessons/Html/") ||
-  location.pathname.startsWith("/Main/Lessons/Css/") ||
-  location.pathname.startsWith("/Main/Lessons/JavaScript/");
+  const location = useLocation();
 
-     const shouldSkipLayout = isLessonView;
-     
-     if (shouldSkipLayout) {
+  const isLessonView =
+    location.pathname.startsWith('/Main/Lessons/Html/') ||
+    location.pathname.startsWith('/Main/Lessons/Css/') ||
+    location.pathname.startsWith('/Main/Lessons/JavaScript/');
+
+  const shouldSkipLayout = isLessonView;
+
+  if (shouldSkipLayout || location.pathname === '/codePlay' || location.pathname === '/dataPlayground') {
     return <Outlet />;
   }
 
- if (location.pathname === '/codePlay') {
-    return <Outlet />;
-  }else if (location.pathname ==='/dataPlayground') {
-    return <Outlet/>
-  } 
+  return (
+    <div className="flex flex-col lg:flex-row bg-[#0D1117] w-screen h-screen gap-5 p-4 overflow-auto lg:overflow-hidden">
+      {/* Navbar */}
+      <Navbar className="flex-shrink-0" />
 
-    return (
-    <div className='flex flex-row bg-[#0D1117] w-screen h-screen overflow-hidden gap-5 items-center p-4 '>
-        <Navbar />
-        <div className='h-[97vh] xl:w-[90%] lg:w-[100%] md:w-[100%] sm:w-[100%] bg-[#25293B] p-2 rounded-4xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)]'>
-            <Outlet />
-        </div>
+      {/* Main Content */}
+      <div className="h-auto w-full lg:w-[100%] xl:w-[90%] bg-[#25293B] p-2 rounded-4xl shadow-[0_5px_10px_rgba(147,51,234,0.7)]">
+        <Outlet />
+      </div>
     </div>
-    ) 
+  );
 }
 
 export default Layout;

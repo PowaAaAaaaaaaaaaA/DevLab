@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import useFetchLevelsData from "../../components/BackEnd_Data/useFetchLevelsData";
 
 export default function useAdminUserProgress(subject, userId) {
-  const { levelsData, isLoading: levelsLoading, isError, refetch } = useFetchLevelsData(subject);
+  const { levelsData, isLoading: levelsLoading, } = useFetchLevelsData(subject);
 
   const fetchAdminProgress = async () => {
     if (!userId || !levelsData) {

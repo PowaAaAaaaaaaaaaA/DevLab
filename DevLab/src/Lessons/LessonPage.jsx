@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useState } from "react";
 // Components
 import GameHeader from "../gameMode/GameModes_Components/GameHeader";
-import InstructionPanel from "../gameMode/GameModes_Components/InstructionPanel";
 import LessonInstructionPanel from "../gameMode/GameModes_Components/LessonInstructionPanel";
 import GameFooter from "../gameMode/GameModes_Components/GameFooter";
 import Html_TE from "../gameMode/GameModes_Components/CodeEditor and Output Panel/Html_TE";

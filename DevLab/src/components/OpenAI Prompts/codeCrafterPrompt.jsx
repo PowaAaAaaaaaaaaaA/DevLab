@@ -22,7 +22,8 @@ const codeCrafterPrompt = async ({
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `http://localhost:8082/openAI/codeCrafter`,
+      `
+https://devlab-server-railway-production.up.railway.app/openAI/codeCrafter`,
       {
         submittedCode,
         instruction,

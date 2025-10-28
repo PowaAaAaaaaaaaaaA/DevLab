@@ -1,50 +1,45 @@
-// useAttemptStore.jsx
+// useAttemptStore_LocalPersist.jsx
 import { create } from "zustand";
-import { doc, increment, onSnapshot, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../Firebase/Firebase";
+import { persist } from "zustand/middleware";
 
-const getRef = async () => {
-  const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error("User UID is undefined");
-  return doc(db, "Users", uid);
-};
-
-export const useAttemptStore = create((set, get) => ({
-  heart: 0,
-  roundKey: 0,
-  gameOver: false,
-
-  loadHearts: async () => {
-    const userRef = await getRef();
-    const unsub = onSnapshot(userRef, (snap) => {
-      const healthSnapShot = snap.data()?.healthPoints ?? 0;
-      set({
-        heart: healthSnapShot,
-        gameOver: healthSnapShot <= 0,
-      });
-    });
-    return unsub;
-  },
-
-  submitAttempt: async (isCorrect) => {
-    const { heart, gameOver } = get();
-    if (isCorrect || gameOver) return;
-
-    // Just decrement — shield logic will be handled outside
-    const userRef = await getRef();
-    await updateDoc(userRef, { healthPoints: increment(-1) });
-
-    set((state) => ({
-      roundKey: heart > 1 ? state.roundKey + 1 : state.roundKey,
-    }));
-  },
-
-  resetHearts: async () => {
-    const userRef = await getRef();
-    await updateDoc(userRef, { healthPoints: 3 });
-    set((state) => ({
-      roundKey: state.roundKey + 1,
+export const useAttemptStore = create(
+  persist(
+    (set, get) => ({
+      heart: 3,       // starting hearts
+      roundKey: 0,    // for forcing re-renders if needed
       gameOver: false,
-    }));
-  },
-}));
+
+      // mimic loadHearts
+      loadHearts: () => {
+        const { heart } = get();
+        set({ gameOver: heart <= 0 });
+      },
+
+      // submit an attempt (decrease heart if wrong)
+      submitAttempt: (isCorrect) => {
+        const { heart, gameOver } = get();
+        if (isCorrect || gameOver) return;
+
+        const newHearts = Math.max(heart - 1, 0);
+        set({
+          heart: newHearts,
+          gameOver: newHearts <= 0,
+          roundKey: heart > 1 ? get().roundKey + 1 : get().roundKey,
+        });
+      },
+
+      // reset hearts to full
+      resetHearts: () => {
+        set({
+          heart: 3,
+          roundKey: get().roundKey + 1,
+          gameOver: false,
+        });
+      },
+    }),
+    {
+      name: "attempt-storage",       // key in localStorage
+      getStorage: () => localStorage, // use localStorage for persistence
+    }
+  )
+);

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import GameMode_Instruction_PopUp from "./GameModes_Popups/GameMode_Instruction_PopUp";
 import LevelCompleted_PopUp from "./GameModes_Popups/LevelCompleted_PopUp";
 import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
+import LevelAlreadyCompleted from "./GameModes_Popups/LevelAlreadyComplete_PopUp";
 // for Animation / Icons
 import { AnimatePresence, motion } from "framer-motion";
 import Lottie from "lottie-react";
@@ -33,7 +34,9 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   // Route params
   const { subject, lessonId, levelId, stageId, gamemodeId } = useParams();
   // Popups
+  const [isNavigating, setIsNavigating] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
+  const [alreadyComplete, setAlreadyComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
@@ -87,6 +90,7 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
         <GameFooter
           setLevelComplete={setLevelComplete}
           setShowCodeWhisper={setShowCodeWhisper}
+          setAlreadyComplete={setAlreadyComplete}
         />
       </div>
 
@@ -122,6 +126,15 @@ Take your time — accuracy matters more than speed!`
             resetHearts={resetHearts}/>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {alreadyComplete && (
+          <LevelAlreadyCompleted
+            subj={subject}
+            lessonId={lessonId}
+            LevelId={levelId}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Game Over PopUp */}
       <AnimatePresence>
@@ -147,18 +160,23 @@ Take your time — accuracy matters more than speed!`
                 <h1 className="font-exo font-bold text-black text-3xl">
                   Correct Answer
                 </h1>
-                <motion.button
-                  onClick={() => {
-                    setShowIsCorrect(false);
-                    goToNextStage({subject,lessonId,levelId,stageId,navigate,setLevelComplete,userId});
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ bounceDamping: 100 }}
-                  className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer "
-                >
-                  Continue
-                </motion.button>
+<motion.button
+  disabled={isNavigating}
+  onClick={async () => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    setShowIsCorrect(false);
+    await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId,setAlreadyComplete });
+    setIsNavigating(false);
+  }}
+  whileTap={{ scale: 0.95 }}
+  whileHover={{ scale: 1.05 }}
+  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold 
+    ${isNavigating ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"}
+  `}
+>
+  {isNavigating ? "Loading..." : "Continue"}
+</motion.button>
               </div>
             </div>
           ) : (

@@ -10,6 +10,7 @@ import { autocompletion } from "@codemirror/autocomplete";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
+import toast from "react-hot-toast"
 // Utils
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -19,7 +20,8 @@ import { extractTags } from "../../../components/Achievements Utils/Html_KeyExtr
 import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
-import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
+
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
@@ -27,7 +29,7 @@ function Html_TE() {
   // Data
   const { userData } = useFetchUserData();
   const { gamemodeId } = useParams();
-  const { gameModeData, subject } = useGameModeData();
+  const { gameModeData, subject } = useFetchGameModeData();
   const [description, setDescription] = useState("");
 
   // Utils
@@ -46,6 +48,12 @@ function Html_TE() {
 
   // Run Button
   const runCode = () => {
+  if (!code.trim()) {
+    toast.error("Please enter your code before running.",{
+      position: "top-right"
+    });
+    return;
+  }
     setRunCode(true);
     setTimeout(() => {
       const fullCode = `
@@ -71,6 +79,14 @@ function Html_TE() {
 
 // Eval Button (For Lesson mode Only)
   const handleEvaluate = async () => {
+
+  if (!code.trim()) {
+    toast.error("Please enter your code before evaluating.",{
+      position: "top-right"
+    });
+    return;
+  }
+
         if (gameModeData?.blocks) {
       const paragraphs = gameModeData.blocks
         .filter(block => block.type === "Paragraph")

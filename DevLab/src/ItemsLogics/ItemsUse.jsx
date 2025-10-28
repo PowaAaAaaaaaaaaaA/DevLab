@@ -1,12 +1,14 @@
 import { LuAlignJustify } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
+
 import { useState } from "react";
 import useUserInventory from "../components/Custom Hooks/useUserInventory";
 import { useInventoryStore } from "./Items-Store/useInventoryStore";
 import { unlockAchievement } from "../components/Custom Hooks/UnlockAchievement";
 import useFetchUserData from "../components/BackEnd_Data/useFetchUserData";
 import { useParams } from "react-router-dom";
+
 
 function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const { subject } = useParams();
@@ -16,53 +18,121 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   const { inventory: userInventory } = useUserInventory();
   const useItem = useInventoryStore((state) => state.useItem);
 
-  const itemActions = {
-    "Coin Surge": (item) => useItem(item.id, "doubleCoins"),
-    "Code Whisper": async (item) => {
-      if (gamemodeId === "BrainBytes") {
-        toast.error("Code Whisper cannot be used in BrainBytes mode", {
-          position: "top-right",
-          theme: "colored",
-        });
-        return;
-      }
-      await useItem(item.id, "revealHint");
-      setShowCodeWhisper(true);
-    },
-    "Code Patch++": (item) => {
-      if (gamemodeId !== "CodeRush") {
-        toast.error("Cannot use Item in this Game mode", {
-          position: "top-right",
-          theme: "colored",
-        });
-        return;
-      }
-      useItem(item.id, "extraTime");
-    },
-    "Time Freeze": (item) => {
-      if (gamemodeId !== "CodeRush") {
-        toast.error("Cannot use Item in this Game mode", {
-          position: "top-right",
-          theme: "colored",
-        });
-        return;
-      }
-      useItem(item.id, "timeFreeze");
-    },
-    "Error Shield": async (item) => {
-      await useItem(item.id, "errorShield");
-    },
-    "Brain Filter": (item) => {
-      if (gamemodeId !== "BrainBytes") {
-        toast.error("Cannot use Item in this Game mode", {
-          position: "top-right",
-          theme: "colored",
-        });
-        return;
-      }
-      useItem(item.id, "brainFilter");
-    },
+  // NEW: Custom neon toast
+  const showItemUsedToast = (item) => {
+    toast.custom(
+      (t) => (
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.85 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 50, scale: 0.85 }}
+          transition={{ type: "spring", stiffness: 150, damping: 15 }}
+          className="bg-[#1A0B2E]/90 border border-purple-500 rounded-2xl shadow-[0_0_20px_rgba(128,0,255,0.7)] px-6 py-4 flex items-center gap-4 max-w-sm w-full mx-auto"
+        >
+          {/* Item Icon */}
+          <div className="w-12 h-12 rounded-full bg-purple-800 flex justify-center items-center shadow-inner">
+            <img
+              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
+              alt={item.title}
+              className="w-8 h-8 object-contain"
+            />
+          </div>
+
+          {/* Message */}
+          <div className="flex flex-col text-left">
+            <h1 className="font-exo text-purple-400 font-bold text-lg">
+              ⚡ {item.title} activated!
+            </h1>
+            <p className="text-gray-300 text-sm">Item used successfully</p>
+          </div>
+        </motion.div>
+      ),
+      { duration: 2500, position: "top-center" }
+    );
   };
+
+const activeBuffs = useInventoryStore((state) => state.activeBuffs); // get active buffs
+
+const itemActions = {
+  "CoinSurge": (item) => {
+    if (activeBuffs.includes("doubleCoins")) {
+      toast.error("Double Coins is already active!", { position: "top-right" });
+      return;
+    }
+    useItem(item.id, "doubleCoins");
+    showItemUsedToast(item);
+  },
+  "CodeWhisper": async (item) => {
+    if (activeBuffs.includes("revealHint")) {
+      toast.error("Code Whisper is already active!", { position: "top-right" });
+      return;
+    }
+    if (gamemodeId === "BrainBytes") {
+      toast.error("Code Whisper cannot be used in BrainBytes mode", {
+        position: "top-right",
+        theme: "colored",
+      });
+      return;
+    }
+    await useItem(item.id, "revealHint");
+    showItemUsedToast(item);
+    setShowCodeWhisper(true);
+  },
+  "CodePatch": (item) => {
+    if (activeBuffs.includes("extraTime")) {
+      toast.error("Code Patch is already active!", { position: "top-right" });
+      return;
+    }
+    if (gamemodeId !== "CodeRush") {
+      toast.error("Cannot use Item in this Game mode", {
+        position: "top-right",
+        theme: "colored",
+      });
+      return;
+    }
+    useItem(item.id, "extraTime");
+    showItemUsedToast(item);
+  },
+  "TimeFreeze": (item) => {
+    if (activeBuffs.includes("timeFreeze")) {
+      toast.error("Time Freeze is already active!", { position: "top-right" });
+      return;
+    }
+    if (gamemodeId !== "CodeRush") {
+      toast.error("Cannot use Item in this Game mode", {
+        position: "top-right",
+        theme: "colored",
+      });
+      return;
+    }
+    useItem(item.id, "timeFreeze");
+    showItemUsedToast(item);
+  },
+  "ErrorShield": async (item) => {
+    if (activeBuffs.includes("errorShield")) {
+      toast.error("Error Shield is already active!", { position: "top-right" });
+      return;
+    }
+    await useItem(item.id, "errorShield");
+    showItemUsedToast(item);
+  },
+  "BrainFilter": (item) => {
+    if (activeBuffs.includes("brainFilter")) {
+      toast.error("Brain Filter is already active!", { position: "top-right" });
+      return;
+    }
+    if (gamemodeId !== "BrainBytes") {
+      toast.error("Cannot use Item in this Game mode", {
+        position: "top-right",
+        theme: "colored",
+      });
+      return;
+    }
+    useItem(item.id, "brainFilter");
+    showItemUsedToast(item);
+  },
+};
+
 
   return (
     <>
@@ -93,10 +163,10 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
                       key={item.id}
                       onClick={() => {
                         if (gamemodeId === "Lesson") {
-                          toast.error("Items cannot be used in Lesson mode", {
-                            position: "top-right",
-                            theme: "colored",
-                          });
+                          toast.error(
+                            "Items cannot be used in Lesson mode",
+                            { position: "top-right", theme: "colored" }
+                          );
                           return;
                         }
                         itemActions[item.title]?.(item);

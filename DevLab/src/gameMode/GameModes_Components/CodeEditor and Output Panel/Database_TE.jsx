@@ -8,6 +8,7 @@ import { EditorView } from "@codemirror/view";
 import Animation from "../../../assets/Lottie/OutputLottie.json";
 import Lottie from "lottie-react";
 import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
+import toast from "react-hot-toast"; 
 // Utils
 import { motion,AnimatePresence } from "framer-motion";
 import { extractSqlKeywords } from "../../../components/Achievements Utils/Db_KeyExtract";
@@ -16,7 +17,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
-import useGameModeData from "../../../components/Custom Hooks/useGameModeData";
+import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
 import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
 //
 import lessonPromptDb from "../../../components/OpenAI Prompts/lessonPromptDb";
@@ -43,61 +44,70 @@ function Database_TE() {
 const [evaluationResult, setEvaluationResult] = useState(null);
 const [showPopup, setShowPopup] = useState(false);
 const [description, setDescription] = useState("");
-const { gameModeData, subject } = useGameModeData();
+const { gameModeData, subject } = useFetchGameModeData();
 
   // Run Button
-  const runCode =()=>{
-          try {
-        setHasRunQuery(true);
-const res = dbRef.current.exec(query);
-
-if (res.length === 0) {
-  // Non-SELECT queries or SELECT with no results
-  setOutputHtml(`
-    <div class="p-3 bg-green-100 border border-green-400 text-green-800 rounded-xl text-center font-semibold shadow-md">
-      Query executed successfully <span class="font-normal">(No results returned)</span>
-    </div>
-  `);
-  renderAllTables(); // refresh tables
-  return; // exit early
-}
-
-// Only destructure if res[0] exists
-const { columns, values } = res[0];
-const table = `
-  <div class="overflow-auto">
-    <table class="table-auto border-collapse border border-gray-400 w-full text-sm">
-      <thead>
-        <tr class="bg-[#F8F3FF] p-3">
-          ${columns.map(col => `<th class="border px-4 py-2">${col}</th>`).join("")}
-        </tr>
-      </thead>
-      <tbody>
-        ${values.map(row => `
-          <tr>${row.map(cell => `<td class="border px-4 py-1">${cell}</td>`).join("")}</tr>
-        `).join("")}
-      </tbody>
-    </table>
-  </div>
-`;
-setOutputHtml(table);
-renderAllTables();
-
-    if (gamemodeId === "Lesson"){
-      }else{
-          // --- TAG USAGE ACHIEVEMENT ---
-  const usedTags = extractSqlKeywords(query); 
-  if (usedTags.length > 0) {
-    unlockAchievement(userData?.uid, "Database", "tagUsed", { usedTags, isCorrect});
+const runCode = () => {
+  if (!query.trim()) {
+    toast.error("Please enter your code before running.", { position: "top-right" });
+    return;
   }
-  console.log(usedTags)
-}
-      } catch (err) {
-        setOutputHtml(
-          `<span class="text-red-500 font-medium">${err.message}</span>`
-        );
+
+  try {
+    setHasRunQuery(true);
+
+    // ---- PREPROCESS QUERY: remove AUTOINCREMENT / auto_increment ----
+    const sanitizedQuery = query
+      .replace(/\bAUTOINCREMENT\b/gi, "")
+      .replace(/\bauto_increment\b/gi, "");
+
+    const res = dbRef.current.exec(sanitizedQuery);
+
+    if (res.length === 0) {
+      setOutputHtml(`
+        <div class="p-3 bg-green-100 border border-green-400 text-green-800 rounded-xl text-center font-semibold shadow-md">
+          Query executed successfully <span class="font-normal">(No results returned)</span>
+        </div>
+      `);
+      renderAllTables();
+      return;
+    }
+
+    // Render results
+    const { columns, values } = res[0];
+    const table = `
+      <div class="overflow-auto">
+        <table class="table-auto border-collapse border border-gray-400 w-full text-sm">
+          <thead>
+            <tr class="bg-[#F8F3FF] p-3">
+              ${columns.map(col => `<th class="border px-4 py-2">${col}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${values.map(row => `
+              <tr>${row.map(cell => `<td class="border px-4 py-1">${cell}</td>`).join("")}</tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+    setOutputHtml(table);
+    renderAllTables();
+
+    // Achievements / tracking
+    if (gamemodeId !== "Lesson") {
+      const usedTags = extractSqlKeywords(query); 
+      if (usedTags.length > 0) {
+        unlockAchievement(userData?.uid, "Database", "tagUsed", { usedTags, isCorrect });
       }
+      console.log(usedTags)
+    }
+
+  } catch (err) {
+    setOutputHtml(`<span class="text-red-500 font-medium">${err.message}</span>`);
   }
+};
+
 // Data Base (Data sa Table)
   useEffect(() => {
       initSqlJs({
@@ -203,6 +213,12 @@ const renderAllTables = () => {
 
   // Evaluate Button (for Lesson mode only)
 const handleEvaluate = async () => {
+    if (!query.trim()) {
+    toast.error("Please enter your code before evaluating.", {
+      position: "top-right",
+    });
+    return;
+  }
   if (gameModeData?.blocks) {
     const paragraphs = gameModeData.blocks
       .filter((block) => block.type === "Paragraph")

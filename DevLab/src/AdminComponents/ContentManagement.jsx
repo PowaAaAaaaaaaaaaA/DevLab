@@ -182,10 +182,42 @@ const handleDragEnd = async (event, lessonId, levelId) => {
                 {lesson.levels.map((level) => (
                   <div
                     key={level.id}
-                    className="relative border-[#56EBFF] border w-full sm:w-[48%] lg:w-[42%] p-4 flex flex-col gap-4 min-h-[180px] rounded-2xl bg-[#111827] transition-all duration-400">
+                    className="relative border-[#56EBFF] border w-[90%] p-4 flex flex-col gap-4 min-h-[180px] rounded-2xl bg-[#111827] transition-all duration-400">
+                    <div className="flex justify-between items-center">
                     <h2 className="text-xl md:text-3xl font-exo font-bold w-[73%] text-white mediuText-laptop">
                       {level.title}
                     </h2>
+                    <div className="flex justify-end gap-3 ">
+                      <div className="text-white text-2xl">
+                        <button
+                          className="hover:cursor-pointer hover:bg-green-500 rounded p-2 border-gray-500 border "
+                          onClick={() =>
+                            addStageMutation.mutate({
+                              category: activeTab,   
+                              lessonId: `Lesson${lesson.Lesson}`,     
+                              levelId: level.id,           
+                            })
+                          }>
+                          <GoPlus />
+                        </button>
+                      </div>
+                      <div className="text-white text-2xl">
+                        <button
+                          className="hover:cursor-pointer hover:bg-red-600 rounded p-2 border-gray-500 border "
+                          onClick={() =>
+                            deleteLevelMutation.mutate({
+                              category: activeTab,
+                              lessonId: `Lesson${lesson.Lesson}`,
+                              levelId: level.id,
+                            })
+                          }
+                        >
+                          <GoTrash />
+                        </button>
+                      </div>
+                    </div>
+                    </div>
+                    
                     <div className="flex flex-wrap gap-3 mt-3">
                       <div className="border flex flex-wrap p-2 rounded-lg border-gray-500 gap-3 w-full justify-center">
                         <DndContext
@@ -218,35 +250,7 @@ const handleDragEnd = async (event, lessonId, levelId) => {
                         </DndContext>
                       </div>
                     </div>
-                    <div className="flex justify-end gap-3 absolute top-3 right-5">
-                      <div className="text-white text-2xl">
-                        <button
-                          className="hover:cursor-pointer hover:bg-green-500 rounded p-2 border-gray-500 border "
-                          onClick={() =>
-                            addStageMutation.mutate({
-                              category: activeTab,   
-                              lessonId: `Lesson${lesson.Lesson}`,     
-                              levelId: level.id,           
-                            })
-                          }>
-                          <GoPlus />
-                        </button>
-                      </div>
-                      <div className="text-white text-2xl">
-                        <button
-                          className="hover:cursor-pointer hover:bg-red-600 rounded p-2 border-gray-500 border "
-                          onClick={() =>
-                            deleteLevelMutation.mutate({
-                              category: activeTab,
-                              lessonId: `Lesson${lesson.Lesson}`,
-                              levelId: level.id,
-                            })
-                          }
-                        >
-                          <GoTrash />
-                        </button>
-                      </div>
-                    </div>
+
                   </div>
                 ))}
               </div>

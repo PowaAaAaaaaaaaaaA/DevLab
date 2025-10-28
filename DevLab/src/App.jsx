@@ -38,22 +38,25 @@ import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import FullscreenLoader from "./components/FullScreenLoader";
-
+import { useInventoryStore } from "./ItemsLogics/Items-Store/useInventoryStore";
 const queryClient = new QueryClient();
 
 
 function App() {
+    const activeBuffs = useInventoryStore((state) => state.activeBuffs);
+
+  console.log("Current active buffs:", activeBuffs);
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setAdmin] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   //  Detect if screen is mobile-sized
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  // useEffect(() => {
+  //   const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+  //   checkMobile();
+  //   window.addEventListener("resize", checkMobile);
+  //   return () => window.removeEventListener("resize", checkMobile);
+  // }, []);
 
 useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged(async (user) => {

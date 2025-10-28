@@ -9,7 +9,8 @@ export const unlockStage = async (subject, lessonId, levelId, stageId) => {
     const token = await user.getIdToken();
 
     const response = await axios.post(
-      "http://localhost:8082/fireBase/unlockStage", 
+      `
+https://devlab-server-railway-production.up.railway.app/fireBase/unlockStage`, 
       { subject, lessonId, levelId, stageId },
       {
         headers: {
