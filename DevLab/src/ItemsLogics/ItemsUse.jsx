@@ -152,70 +152,70 @@ return (
           transition={{ duration: 0.2 }}
           className="
             fixed z-50
-            bottom-24 left-6
-            w-[90%] sm:w-[70%] md:w-[45%] lg:w-[30%] xl:w-[22%]
+            bottom-24 
+            w-[90%] sm:w-[70%] md:w-[40%] lg:w-[35%] xl:w-[30%]
             h-[65%] sm:h-[60%] md:h-[55%]
-            sm:left-1/2 sm:-translate-x-1/2
-            p-safe
-          "
+           "
         >
           <div className="h-full w-full border border-gray-700/60 rounded-3xl bg-[#0B0F16] p-4 sm:p-5 flex flex-col shadow-xl shadow-black/30">
             <h1 className="text-white font-exo text-[1.5em] sm:text-[1.8em] font-bold mb-4 text-center tracking-wide">
               Inventory
             </h1>
 
-            <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom pr-1">
-              {userInventory && userInventory.length > 0 ? (
-                userInventory.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      if (gamemodeId === "Lesson") {
-                        toast.error("Items cannot be used in Lesson mode", {
-                          position: "top-right",
-                          theme: "colored",
-                        });
-                        return;
-                      }
-                      itemActions[item.title]?.(item);
-                      unlockAchievement(userData.uid, subject, "itemUse", {
-                        itemName: item.title,
-                      });
-                    }}
-                    className="
-                      group cursor-pointer border border-gray-700/50 rounded-2xl
-                      bg-gradient-to-br from-[#111827] to-[#0D1117]
-                      hover:from-[#1A2333] hover:to-[#121826]
-                      transition-all duration-300 flex items-center justify-between
-                      p-3 sm:p-4 shadow-md hover:shadow-lg
-                    "
-                  >
-                    {/* Item Icon */}
-                    <div className="rounded-2xl bg-gray-800/70 p-3 flex justify-center items-center w-[25%] aspect-square overflow-hidden shadow-inner">
-                      <img
-                        src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
-                        alt={item.title}
-                        className="w-full h-full object-contain scale-90 group-hover:scale-100 transition-transform duration-300"
-                      />
-                    </div>
+<div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom pr-1">
+  {userInventory && userInventory.length > 0 ? (
+    userInventory.map((item) => (
+      <button
+        key={item.id}
+        onClick={() => {
+          if (gamemodeId === "Lesson") {
+            toast.error("Items cannot be used in Lesson mode", {
+              position: "top-right",
+              theme: "colored",
+            });
+            return;
+          }
+          itemActions[item.title]?.(item);
+          unlockAchievement(userData.uid, subject, "itemUse", {
+            itemName: item.title,
+          });
+        }}
+        className="
+          group cursor-pointer border border-gray-700/50 rounded-2xl
+          bg-gradient-to-br from-[#111827] to-[#0D1117]
+          hover:from-[#1A2333] hover:to-[#121826]
+          transition-all duration-300 flex items-center justify-between
+          p-3 shadow-md hover:shadow-lg
+          h-[90px] min-h-[90px] max-h-[90px]
+        "
+      >
+        {/* Item Icon */}
+        <div className="rounded-2xl bg-gray-800/70 p-2 flex justify-center items-center w-[70px] h-[70px] overflow-hidden shadow-inner">
+          <img
+            src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
+            alt={item.title}
+            className="w-full h-full object-contain scale-90 group-hover:scale-100 transition-transform duration-300"
+          />
+        </div>
 
-                    {/* Item Title */}
-                    <h2 className="text-base sm:text-lg font-exo text-gray-200 flex-1 text-center px-2 sm:px-3 leading-tight">
-                      {item.title}
-                    </h2>
+        {/* Item Title */}
+        <h2 className="text-base font-exo text-gray-200 flex-1 text-center px-3 leading-tight truncate">
+          {item.title}
+        </h2>
 
-                    {/* Item Quantity */}
-                    <p className="rounded-xl bg-gray-800/60 px-3 sm:px-4 py-1 sm:py-2 text-sm font-exo text-white shadow-inner border border-gray-700/40">
-                      x{item.quantity}
-                    </p>
-                  </button>
-                ))
-              ) : (
-                <p className="text-gray-400 text-center text-lg font-exo mt-8">
-                  No items in inventory
-                </p>
-              )}
-            </div>
+        {/* Item Quantity */}
+        <p className="rounded-xl bg-gray-800/60 px-3 py-2 text-sm font-exo text-white shadow-inner border border-gray-700/40 whitespace-nowrap">
+          x{item.quantity}
+        </p>
+      </button>
+    ))
+  ) : (
+    <p className="text-gray-400 text-center text-lg font-exo mt-8">
+      No items in inventory
+    </p>
+  )}
+</div>
+
           </div>
         </motion.div>
       )}

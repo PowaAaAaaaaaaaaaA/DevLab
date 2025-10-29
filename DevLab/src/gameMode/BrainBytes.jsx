@@ -1,5 +1,6 @@
 // Utils / Custom Hooks
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 // Navigation
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -11,6 +12,7 @@ import LevelAlreadyCompleted from "./GameModes_Popups/LevelAlreadyComplete_PopUp
 // Animation
 import { AnimatePresence, motion } from "framer-motion";
 import Lottie from "lottie-react";
+import laodingDots from "../assets/Lottie/LoadingDots.json"
 import Correct from '../assets/Lottie/correctAnsLottie.json';
 import Wrong from '../assets/Lottie/wrongAnsLottie.json';
 // Components
@@ -124,21 +126,14 @@ Your mission:
                 <Lottie animationData={Correct} loop={false} className="w-[70%] h-[70%]"/>
                 <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
 <motion.button
-  disabled={isNavigating}
   onClick={async () => {
-    if (isNavigating) return;
-    setIsNavigating(true);
     setShowisCorrect(false);
     await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId,setAlreadyComplete });
-    setIsNavigating(false);
   }}
   whileTap={{ scale: 0.95 }}
   whileHover={{ scale: 1.05 }}
-  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold 
-    ${isNavigating ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"}
-  `}
->
-  {isNavigating ? "Loading..." : "Continue"}
+  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer`}
+>"Continue"
 </motion.button>
 
               </div>
@@ -169,6 +164,11 @@ Your mission:
           )}
         </AnimatePresence>
       )}
+      {/* {isNavigating && (
+  <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+    <Lottie animationData={laodingDots} loop className="w-[50%] h-[50%]" />
+  </div>
+)} */}
     </>
   );
 }

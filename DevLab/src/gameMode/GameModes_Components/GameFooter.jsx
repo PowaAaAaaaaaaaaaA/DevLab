@@ -97,43 +97,43 @@ function GameFooter({
 
   return (
     <>
-      {/* Loading Overlay (only for Next) */}{" "}
+      {/* Loading Overlay (only for Next) */}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/98">
-          {" "}
+          
           <Lottie
             animationData={Loading}
             loop={true}
             className="w-[50%] h-[50%]"
-          />{" "}
+          />
         </div>
       )}
-      {/* Footer */}{" "}
+      {/* Footer */}
       <div
         // Applying responsive, thematic styles and the UPWARD GLOW
         className="min-h-16 border-t-1 bg-[#11001f] border-t-purple-700 px-4 md:px-6 flex justify-between items-center text-white sticky bottom-0 z-10 
         shadow-[0_-5px_20px_0_rgba(200,100,255,0.2)]"
       >
-        {/* Left Section */}{" "}
+        {/* Left Section */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink min-w-0">
-          {" "}
+
           <ItemsUse
             setShowCodeWhisper={setShowCodeWhisper}
             gamemodeId={gamemodeId}
-          />{" "}
+          />
           <div className="font-exo overflow-hidden flex-shrink">
-            {" "}
+
             <p className="text-sm sm:text-base font-semibold truncate">
               {levelData
                 ? `${levelData.levelOrder}. ${levelData.title}`
                 : "Loading..."}
-            </p>{" "}
+            </p>
             <p className="text-xs sm:text-sm text-[#58D28F]">
               {levelData ? `${levelData.expReward}xp` : ""}
-            </p>{" "}
-          </div>{" "}
+            </p>
+          </div>
         </div>
-        {/* Button Section */}{" "}
+        {/* Button Section */}
         <div className="w-1/3 sm:w-1/4 md:w-[15%] lg:w-[10%]">
           {" "}
           <motion.button
@@ -150,17 +150,17 @@ function GameFooter({
                 : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
             }`}
           >
-            {buttonText}{" "}
-          </motion.button>{" "}
+            {buttonText}
+          </motion.button>
         </div>
-        {/* Right Section */}{" "}
+        {/* Right Section */}
         <div className="flex-shrink-0">
-          {" "}
+          
           <p className="text-base sm:text-lg font-bold">
             {userData ? `${userData.coins} Coins` : "Loading..."}
-          </p>{" "}
-        </div>{" "}
-      </div>{" "}
+          </p>
+        </div>
+      </div>
     </>
   );
 }

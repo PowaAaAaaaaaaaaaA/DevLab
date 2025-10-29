@@ -137,7 +137,7 @@ function Dashboard() {
       </div>
 
       {/* Bottom Section: Jump Back In + Inventory */}
-      <div className="flex flex-col lg:flex-row gap-2 h-[60%]">
+      <div className="flex flex-col lg:flex-row gap-2 lg:h-[55%] xl:h-[70%]">
         {/* Jump Back In */}
         <div className="flex-1 h-full w-full lg:w-[75%] p-1 flex flex-col gap-4">
           <h2 className="text-white font-exo font-bold text-[1.5rem] text-shadow-lg/60">Jump Back In</h2>
@@ -154,7 +154,7 @@ function Dashboard() {
                   <Link
                     key={subject}
                     to={`/Main/Lessons/${info.subject}/${info.lessonId}/${info.levelId}/${info.stageId}/${info.gameMode}`}
-                    className="h-[100%]"
+                    className="h-auto"
                   >
                     <div className="w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-101 cursor-pointer duration-300 min-h-[100px]">
                       <div className="min-w-[15%] rounded-3xl flex items-center justify-center p-2 bg-[#0B0F16] shadow-md">

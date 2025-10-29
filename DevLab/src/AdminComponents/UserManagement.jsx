@@ -6,30 +6,23 @@ import fetchUsers from "./userManagement hooks/Backend Calls/fetchUsers";
 import { suspendAccount } from "./userManagement hooks/Backend Calls/suspendAccount";
 import { useDeleteUser } from "./userManagement hooks/Functions/useDeleteUser";
 import EditUserModal from "./userManagement hooks/userManagement Components/EditUserModal";
-import preProfile from "../assets/Images/profile_handler.png";
 import ConfirmDeleteUserModal from "./userManagement hooks/Modals/ConfirmDeleteUserModal";
+import preProfile from "../assets/Images/profile_handler.png";
+import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
 
 function UserManagement() {
   const [openUserId, setOpenUserId] = useState(null);
-  const queryClient = useQueryClient();
   const [openModalId, setOpenModalId] = useState(null);
-  const deleteUserMutation = useDeleteUser();
   const [confirmDeleteUser, setConfirmDeleteUser] = useState(null);
 
+  const queryClient = useQueryClient();
+  const deleteUserMutation = useDeleteUser();
   const subjects = ["Html", "Css", "JavaScript", "Database"];
 
-  // Fetch users
-  const {
-    data: users = [],
-    isLoading,
-    isError,
-  } = useQuery({
+  // Fetch all users
+  const { data: users = [], isLoading, isError } = useQuery({
     queryKey: ["allUser"],
-    queryFn: async () => {
-      const result = await fetchUsers();
-      console.log("FetchUsers result:", result); // check what comes from backend
-      return result;
-    },
+    queryFn: fetchUsers,
   });
 
   // Suspend/Activate mutation
@@ -37,7 +30,6 @@ function UserManagement() {
     mutationFn: ({ id, toggleDisable }) => suspendAccount(id, toggleDisable),
     onMutate: async ({ id, toggleDisable }) => {
       await queryClient.cancelQueries({ queryKey: ["allUser"] });
-
       const previousUsers = queryClient.getQueryData(["allUser"]);
 
       queryClient.setQueryData(["allUser"], (old = []) =>
@@ -93,13 +85,14 @@ function UserManagement() {
                 className="bg-gray-800 text-white p-4 rounded-xl shadow-md hover:shadow-lg transition flex gap-8"
               >
                 {/* Avatar */}
-                <div className="flex-shrink-0 w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full overflow-hidden border border-white">
+                <div className="flex-shrink-0 w-[60px] h-[60px] rounded-full overflow-hidden border border-white">
                   <img
                     src={user.profileImage || preProfile}
                     alt={`${user.username || "User"}'s profile`}
                     className="w-full h-full object-cover"
                   />
                 </div>
+
                 {/* User Info */}
                 <div>
                   <p className="font-bold text-lg">
@@ -122,7 +115,7 @@ function UserManagement() {
                   </p>
                 </div>
 
-                {/* Progress Button */}
+                {/* Buttons */}
                 <motion.button
                   onClick={() =>
                     setOpenUserId((prev) => (prev === user.id ? null : user.id))
@@ -131,7 +124,7 @@ function UserManagement() {
                 >
                   Progress
                 </motion.button>
-                {/* More Button */}
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -140,7 +133,7 @@ function UserManagement() {
                 >
                   More
                 </motion.button>
-                {/* Suspend/Activate Button */}
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -158,7 +151,7 @@ function UserManagement() {
                 >
                   {user.isAccountSuspended ? "Activate" : "Suspend"}
                 </motion.button>
-                {/*Delete User*/}
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -186,68 +179,38 @@ function UserManagement() {
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-[90%] h-[50%] bg-gray-900 text-white z-50 p-6 shadow-xl rounded-t-2xl overflow-y-auto scrollbar-custom"
           >
-            {/* Popup Header */}
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
                 {currentUser.username || "User"}'s Progress
               </h2>
-              <button
-                onClick={() => setOpenUserId(null)}
-                className="text-white text-lg font-bold"
-                aria-label="Close progress popup"
-              >
+              <button onClick={() => setOpenUserId(null)} className="text-white text-lg font-bold">
                 ✕
               </button>
             </div>
 
-            {/* Progress Content */}
-            {subjects.map((subject) => {
-              const total = 100; // max 100%
-              const completedLevels = currentUser.levelCount[subject] || 0;
-              const percent = Math.min(completedLevels, total);
-
-              return (
-                <div key={subject} className="mb-4">
-                  <h3 className="capitalize mb-1">{subject}</h3>
-                  <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
-                    <motion.div
-                      className="bg-green-500 h-4"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${percent}%` }}
-                      transition={{ duration: 0.5, ease: "easeInOut" }}
-                    />
-                  </div>
-                  <p className="mt-1 text-sm">Completed {percent} levels</p>
-                </div>
-              );
-            })}
+            {subjects.map((subject) => (
+              <SubjectProgress key={subject} subject={subject} currentUser={currentUser} />
+            ))}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Edit User Modal */}
       <AnimatePresence>
         {openModalId && (
           <EditUserModal
-            visibility={!!openModalId} // use openModalId
-            closeModal={() => setOpenModalId(null)} // use openModalId
-            uid={openModalId} // pass the selected user ID
-            activeLevel={users.reduce((acc, u) => {
-              if (u.id === openModalId) return u.levelCount;
-              return acc;
-            }, {})}
-            deleteProgress={{
-              mutate: ({ uid, subject }) =>
-                console.log("Delete progress", uid, subject),
-            }}
-            deleteAllProgress={{
-              mutate: ({ uid }) => console.log("Delete all progress", uid),
-            }}
-            editUser={{
-              mutate: ({ uid, state }) => console.log("Edit user", uid, state),
-            }}
+            visibility={!!openModalId}
+            closeModal={() => setOpenModalId(null)}
+            uid={openModalId}
+            activeLevel={users.reduce((acc, u) => (u.id === openModalId ? u.levelCount : acc), {})}
+            deleteProgress={{ mutate: ({ uid, subject }) => console.log("Delete progress", uid, subject) }}
+            deleteAllProgress={{ mutate: ({ uid }) => console.log("Delete all progress", uid) }}
+            editUser={{ mutate: ({ uid, state }) => console.log("Edit user", uid, state) }}
           />
         )}
       </AnimatePresence>
-      {/*Confirm Delete User*/}
+
+      {/* Confirm Delete User */}
       <AnimatePresence>
         {confirmDeleteUser && (
           <ConfirmDeleteUserModal
@@ -266,3 +229,45 @@ function UserManagement() {
 }
 
 export default UserManagement;
+
+/* ------------------------ PROGRESS SUBCOMPONENT ------------------------ */
+function SubjectProgress({ subject, currentUser }) {
+  const { levelsData, isLoading } = useFetchLevelsData(subject);
+
+  if (isLoading)
+    return (
+      <p className="text-sm text-gray-400 animate-pulse">
+        Loading {subject} progress...
+      </p>
+    );
+
+  // Count total levels dynamically
+  const totalLevels = Array.isArray(levelsData)
+    ? levelsData.reduce((acc, lesson) => {
+        return acc + (lesson.levels?.length || 0);
+      }, 0)
+    : 0;
+
+  const completedLevels = currentUser?.levelCount?.[subject] || 0;
+  const percent =
+    totalLevels > 0
+      ? Math.min(Math.round((completedLevels / totalLevels) * 100), 100)
+      : 0;
+
+  return (
+    <div className="mb-4">
+      <h3 className="capitalize mb-1">{subject}</h3>
+      <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+        <motion.div
+          className="bg-green-500 h-4"
+          initial={{ width: 0 }}
+          animate={{ width: `${percent}%` }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        />
+      </div>
+      <p className="mt-1 text-sm">
+        {completedLevels} / {totalLevels} levels ({percent}%)
+      </p>
+    </div>
+  );
+}
