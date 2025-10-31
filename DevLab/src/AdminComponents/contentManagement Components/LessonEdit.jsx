@@ -13,6 +13,9 @@ import CodeCrafterForm from "./Edit_Forms/CodeCrafterForm";
 import BugBustForm from "./Edit_Forms/BugbustForm";
 import BrainBytesForm from "./Edit_Forms/BrainBytesForm";
 import LessonForm from "./Edit_Forms/LessonForm";
+// Lottie
+import Lottie from "lottie-react";
+import LoadingAnim from "../../assets/Lottie/LoadingDots.json";
 
 function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
   const gameModes = ["Lesson", "BugBust", "CodeRush", "CodeCrafter", "BrainBytes"];
@@ -20,6 +23,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
 
   const [stageData, setStageData] = useState(null);
   const [activeTab, setActiveTab] = useState("Lesson");
+  const [loading, setLoading] = useState(true);
 
   // Fetch stage
   useEffect(() => {
@@ -37,6 +41,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
 
   const fetchStage = async () => {
     try {
+      setLoading(true);
       const stageRef = doc(db, subject, lessonId, "Levels", levelId, "Stages", stageId);
       const stageSnap = await getDoc(stageRef);
       if (stageSnap.exists()) {
@@ -46,6 +51,9 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
       }
     } catch (error) {
       console.error("Failed to fetch stage:", error);
+      toast.error("Failed to load stage.");
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -161,7 +169,7 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
   formData,
   {
     headers: {
-      Authorization: `Bearer ${token}`, // ✅ only this
+      Authorization: `Bearer ${token}`, 
     },
   }
 );
@@ -176,89 +184,129 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
     }
   };
 
-  return (
-    <div className="bg-[#25293B]">
-      <div className="h-auto p-5 flex flex-col gap-s">
-        <div>
-          <h1 className="font-exo text-white text-[1.5rem]">Select Stage Type</h1>
-          <div className="flex justify-around mt-5 mb-5">
-            {gameModes.map((gm) => (
-              <button
-                key={gm}
-                className={`font-exo text-white text-[0.8rem] font-bold p-2 w-[17%] rounded-3xl bg-[#7F5AF0] hover:cursor-pointer transition duration-500 ${
-                  activeTab === gm ? "bg-[#563f99]" : "hover:scale-110"
-                }`}
-                onClick={() => {
-                  setActiveTab(gm);
-                  dispatch({ type: "UPDATE_FIELD", field: "type", value: gm });
-                }}
-              >
-                {gm}
-              </button>
-            ))}
-          </div>
+ return (
+    <div className="bg-[#25293B] rounded-2xl p-4 sm:p-6 relative min-h-[400px] flex items-center justify-center">
+      {/* Close Button */}
+      <button
+        onClick={() => setShowForm(false)}
+        className="absolute top-3 right-3 text-white text-2xl bg-[#ff4d4d] hover:bg-[#e04444] 
+          w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all duration-300 shadow-md cursor-pointer"
+      >
+        ✕
+      </button>
+
+      {/*  Loading State */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center gap-3">
+          <Lottie animationData={LoadingAnim} loop={true} className="w-24 h-24" />
+          <p className="text-white font-exo text-sm">Loading stage data...</p>
         </div>
+      ) : (
+        <div className="flex flex-col gap-6 w-full">
+          <div>
+            <h1 className="font-exo text-white text-xl sm:text-2xl font-bold">
+              Select Stage Type
+            </h1>
 
-        <form className="h-[100%] flex flex-col p-4 gap-5 justify-center">
-          {activeTab === "Lesson" && (
-            <LessonForm
-              state={state}
-              dispatch={dispatch}
-              stageData={stageData}
-              activeTab={activeTab}
-              subject={subject}
-              lessonId={lessonId}
-              levelId={levelId}
-              stageId={stageId}
-            />
-          )}
-          {activeTab === "BugBust" && (
-            <BugBustForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
-          )}
-          {activeTab === "CodeRush" && (
-            <CodeRushForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
-          )}
-          {activeTab === "CodeCrafter" && (
-            <CodeCrafterForm
-              state={state}
-              dispatch={dispatch}
-              stageData={stageData}
-              activeTab={activeTab}
-              subject={subject}
-              lessonId={lessonId}
-              levelId={levelId}
-              stageId={stageId}
-            />
-          )}
-          {activeTab === "BrainBytes" && (
-            <BrainBytesForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
-          )}
+            <div className="flex flex-wrap sm:flex-nowrap justify-center sm:justify-between gap-3 mt-5 mb-5">
+{gameModes.map((gm) => {
+  const isLocked = stageId === "Stage1"; // only Lesson allowed
 
-          <div className="w-[95%] flex justify-between p-5 items-center">
-            <button
-              type="button"
-              onClick={() =>
-                deleteStageMutation.mutate(stageId, {
-                  onSuccess: () => {
-                    setShowForm(false);
-                  },
-                })
-              }
-              className="font-exo font-bold text-1xl text-white w-[30%] p-2 rounded-4xl bg-[#E35460] hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]"
-            >
-              {deleteStageMutation.isLoading ? "Deleting..." : "Delete"}
-            </button>
+  return (
+    <button
+      key={gm}
+      disabled={isLocked && gm !== "Lesson"}
+      className={`font-exo text-white text-xs sm:text-sm font-bold cursor-pointer
+        px-3 py-2 rounded-3xl min-w-[28%] sm:min-w-[18%]
+        transition-all duration-500 
+        ${
+          activeTab === gm
+            ? "bg-[#563f99] scale-105"
+            : isLocked && gm !== "Lesson"
+            ? "bg-gray-500 opacity-60 cursor-not-allowed"
+            : "bg-[#7F5AF0] hover:scale-110"
+        }`}
+      onClick={() => {
+        if (isLocked && gm !== "Lesson") return; // block mode change
+        setActiveTab(gm);
+        dispatch({ type: "UPDATE_FIELD", field: "type", value: gm });
+      }}
+    >
+      {gm}
+    </button>
+  );
+})}
+
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleSave}
-            className="w-[30%] h-[3%] p-1 self-center rounded-2xl bg-[#5FDC70] text-white font-exo font-bold hover:cursor-pointer hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]"
-          >
-            Save Changes
-          </button>
-        </form>
-      </div>
+          {/* Forms */}
+          <form className="flex flex-col gap-6 p-4 sm:p-6 rounded-xl bg-[#1b1f2f] shadow-md">
+            {activeTab === "Lesson" && (
+              <LessonForm
+                state={state}
+                dispatch={dispatch}
+                stageData={stageData}
+                activeTab={activeTab}
+                subject={subject}
+                lessonId={lessonId}
+                levelId={levelId}
+                stageId={stageId}
+              />
+            )}
+            {activeTab === "BugBust" && (
+              <BugBustForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
+            )}
+            {activeTab === "CodeRush" && (
+              <CodeRushForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
+            )}
+            {activeTab === "CodeCrafter" && (
+              <CodeCrafterForm
+                state={state}
+                dispatch={dispatch}
+                stageData={stageData}
+                activeTab={activeTab}
+                subject={subject}
+                lessonId={lessonId}
+                levelId={levelId}
+                stageId={stageId}
+              />
+            )}
+            {activeTab === "BrainBytes" && (
+              <BrainBytesForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
+            )}
+
+            {/* Buttons */}
+            <div className="flex justify-between mt-6">
+              <button
+                type="button"
+                onClick={() =>
+                  deleteStageMutation.mutate(stageId, {
+                    onSuccess: () => setShowForm(false),
+                  })
+                }
+                className="font-exo font-bold text-white text-sm cursor-pointer
+                  w-[40%] sm:w-[30%] py-2 rounded-3xl bg-[#E35460] 
+                  hover:scale-105 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]
+                  transition duration-300 ease-in-out"
+              >
+                {deleteStageMutation.isLoading ? "Deleting..." : "Delete"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSave}
+                className="font-exo font-bold text-white text-sm cursor-pointer
+                  w-[40%] sm:w-[30%] py-2 rounded-3xl bg-[#5FDC70] 
+                  hover:scale-105 hover:drop-shadow-[0_0_6px_rgba(95,220,112,0.8)]
+                  transition duration-300 ease-in-out"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

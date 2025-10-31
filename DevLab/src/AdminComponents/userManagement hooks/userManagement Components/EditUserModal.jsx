@@ -113,57 +113,34 @@ const EditUserModal = ({ visibility, closeModal, uid }) => {
               <div className="relative h-[400px] overflow-y-auto scrollbar-custom px-1">
                 <AnimatePresence mode="wait">
                   {/* INFO TAB */}
-                  {activeTab === "info" && (
-                    <motion.div
-                      key="info"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.25 }}
-                      className="space-y-4 p-5"
-                    >
-                      <h3 className="text-lg font-semibold text-cyan-400 mb-2 border-b border-gray-700 pb-2">
-                        User Information
-                      </h3>
+{activeTab === "info" && (
+  <motion.div
+    key="info"
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+    transition={{ duration: 0.25 }}
+    className="space-y-4 p-5"
+  >
+    <h3 className="text-lg font-semibold text-cyan-400 mb-2 border-b border-gray-700 pb-2">
+      User Information
+    </h3>
 
-                      {["username", "bio", "coins", "exp", "userLevel"].map(
-                        (field) => (
-                          <div key={field}>
-                            <label className="text-xs text-gray-400 uppercase">
-                              {field}
-                            </label>
-                            <input
-                              type={
-                                field === "username" || field === "bio"
-                                  ? "text"
-                                  : "number"
-                              }
-                              value={state[field]}
-                              onChange={(e) =>
-                                setState({
-                                  ...state,
-                                  [field]:
-                                    field === "username" || field === "bio"
-                                      ? e.target.value
-                                      : Number(e.target.value),
-                                })
-                              }
-                              className="w-full p-2.5 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 outline-none transition"
-                            />
-                          </div>
-                        )
-                      )}
+    {["username", "bio", "coins", "exp", "userLevel"].map((field) => (
+      <div key={field}>
+        <label className="text-xs text-gray-400 uppercase">
+          {field}
+        </label>
+        <div className="w-full p-2.5 rounded-lg bg-gray-800 text-white border border-gray-700">
+          {state[field] !== "" && state[field] !== null
+            ? state[field]
+            : "N/A"}
+        </div>
+      </div>
+    ))}
+  </motion.div>
+)}
 
-                      <button
-                        onClick={() =>
-                          editUserMutation.mutate({ uid, state })
-                        }
-                        className="mt-6 w-full bg-green-600 hover:bg-green-700 transition py-2 rounded-lg font-semibold shadow-md"
-                      >
-                        Save Changes
-                      </button>
-                    </motion.div>
-                  )}
 
                   {/* PROGRESS TAB */}
                   {activeTab === "progress" && (
@@ -215,7 +192,7 @@ const EditUserModal = ({ visibility, closeModal, uid }) => {
                                     message: `Are you sure you want to reset ${category} progress?`,
                                   })
                                 }
-                                className="mt-2 text-xs text-red-400 hover:text-red-300 underline transition"
+                                className="mt-2 text-xs text-red-400 hover:text-red-300 underline transition cursor-pointer"
                               >
                                 Reset {category} Progress
                               </button>
@@ -224,12 +201,18 @@ const EditUserModal = ({ visibility, closeModal, uid }) => {
                         })}
                       </div>
 
-                      <button
-                        onClick={() => deleteAllProgress.mutate({ uid })}
-                        className="mt-4 w-full bg-red-600 hover:bg-red-700 transition py-2 rounded-lg font-semibold shadow-md"
-                      >
-                        Reset All Progress
-                      </button>
+<button
+  onClick={() =>
+    setDeleteTarget({
+      type: "all-progress",
+      message: "Are you sure you want to reset ALL progress for this user?",
+    })
+  }
+  className="mt-4 w-full bg-red-600 hover:bg-red-700 transition py-2 rounded-lg font-semibold shadow-md cursor-pointer"
+>
+  Reset All Progress
+</button>
+
                     </motion.div>
                   )}
 
@@ -311,14 +294,16 @@ const EditUserModal = ({ visibility, closeModal, uid }) => {
             onCancel={() => setDeleteTarget(null)}
             onConfirm={() => {
               if (!deleteTarget) return;
-              if (deleteTarget.type === "progress") {
-                deleteProgress.mutate({ uid, subject: deleteTarget.category });
-              } else if (deleteTarget.type === "achievement") {
-                deleteSpecificAchievement.mutate({
-                  uid,
-                  category: deleteTarget.category,
-                });
-              }
+if (deleteTarget.type === "progress") {
+  deleteProgress.mutate({ uid, subject: deleteTarget.category });
+} else if (deleteTarget.type === "achievement") {
+  deleteSpecificAchievement.mutate({
+    uid,
+    category: deleteTarget.category,
+  });
+} else if (deleteTarget.type === "all-progress") {
+  deleteAllProgress.mutate({ uid });
+}
               setDeleteTarget(null);
             }}
           />

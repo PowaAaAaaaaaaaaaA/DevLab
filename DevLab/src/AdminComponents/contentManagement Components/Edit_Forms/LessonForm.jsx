@@ -203,13 +203,13 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
         type="file"
         accept="video/*"
         onChange={(e) => setVideoFile(e.target.files[0])}
-        className="text-white"
+        className="text-white border border-gray-600 rounded-2xl p-5 cursor-pointer"
       />
       <button
         type="button"
         onClick={handleUpload}
         disabled={uploading}
-        className="bg-[#7F5AF0] text-white rounded-lg p-2 w-max hover:scale-105 transition"
+        className="bg-[#7F5AF0] text-white rounded-lg p-2 w-max hover:scale-105 transition cursor-pointer"
       >
         {uploading ? "Uploading..." : "Upload Video"}
       </button>
