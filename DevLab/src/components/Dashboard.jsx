@@ -31,14 +31,38 @@ function Dashboard() {
 
   const [loadingDashboard, setLoading] = useState(true);
 
+
+// Intial Loading
+useEffect(() => {
+  const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
+
+  if (!hasLoadedBefore) {
+    // First time in this session → show loader
+    const timer = setTimeout(() => {
+      setLoading(false);
+      sessionStorage.setItem('dashboardLoaded', 'true');
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  } else {
+    // Already loaded before → skip loader
+    setLoading(false);
+  }
+}, []);
+
+
   const queryClient = useQueryClient();
   useEffect(() => {
     queryClient.prefetchQuery(['ShopItems'], fetchShopItems);
   }, [queryClient]);
 
-  if (loadingDashboard) {
-    return <Loading onComplete={() => setLoading(false)} />;
-  }
+if (loadingDashboard) {
+  return (
+    <div className="fixed top-0 left-0 w-screen h-screen z-50">
+      <Loading />
+    </div>
+  );
+}
 
   const subjectIcons = {
     Html: HtmlIcons,

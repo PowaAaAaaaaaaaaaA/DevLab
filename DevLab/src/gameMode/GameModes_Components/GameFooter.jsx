@@ -111,7 +111,7 @@ function GameFooter({
       {/* Footer */}
       <div
         // Applying responsive, thematic styles and the UPWARD GLOW
-        className="min-h-16 border-t-1 bg-[#11001f] border-t-purple-700 px-4 md:px-6 flex justify-between items-center text-white sticky bottom-0 z-10 
+        className="min-h-16 border-t-1 bg-[#11001f] border-t-purple-700 px-4 md:px-6 flex justify-between items-center text-white sticky bottom-0
         shadow-[0_-5px_20px_0_rgba(200,100,255,0.2)]"
       >
         {/* Left Section */}

@@ -11,6 +11,7 @@ import useFetchUserData from './BackEnd_Data/useFetchUserData';
 import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
 import useFetchShopItems from './BackEnd_Data/useFethShopItems';
 import { purchaseItem } from './BackEnd_Functions/purchaseItem';
+import { playSound } from './Custom Hooks/DevlabSoundHandler';
 
 import '../index.css';
 
@@ -27,6 +28,7 @@ function Shop() {
   const buyMutation = useMutation({
     mutationFn: async (item) => purchaseItem(item.id, item.cost, item.Icon),
     onMutate: async (item) => {
+      playSound("purchase"); 
       await queryClient.cancelQueries(["userData"]);
       const previousUserData = queryClient.getQueryData(["userData"]) || userData;
       if (!previousUserData || previousUserData.coins < item.cost) {

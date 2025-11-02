@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import Lottie from "lottie-react";
 import Throphy from "../../assets/Lottie/AchievementUnlock.json"
+import { playSound } from "./DevlabSoundHandler";
 
 export const unlockAchievement = async (userId, subject, actionType, payload = {}) => {
   try {
@@ -59,6 +60,7 @@ case "tagUsed": {
           achievementName: achievement.title,
           dateUnlocked: new Date(),
           });
+          playSound("achievementUnlock");
           // Show Tailwind styled toast
 toast.custom((t) => (
 <AnimatePresence mode="popLayout">

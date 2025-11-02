@@ -1,6 +1,7 @@
 // Utils / Custom Hooks
 import { useState, useEffect } from "react";
 import { useGameStore } from "../components/OpenAI Prompts/useBugBustStore";
+import { playSound } from "../components/Custom Hooks/DevlabSoundHandler";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -33,7 +34,7 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const navigate = useNavigate();
   const { consumeErrorShield } = useErrorShield();
   // Route params
-  const { subject, lessonId, levelId, stageId, gamemodeId } = useParams();
+  const { subject, lessonId, levelId, stageId} = useParams();
   // Popups
   const [isNavigating, setIsNavigating] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
@@ -46,8 +47,18 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
-  const { userData, refetch } = useFetchUserData();
+  const { userData} = useFetchUserData();
   const userId = userData?.uid;
+
+    useEffect(() => {
+    if (showIsCorrect) {
+      if (isCorrect) {
+        playSound("correct");
+      } else {
+        playSound("inCorrect");
+      }
+    }
+  }, [showIsCorrect, isCorrect]);
 
 
   // Dynamically render editor based on subject

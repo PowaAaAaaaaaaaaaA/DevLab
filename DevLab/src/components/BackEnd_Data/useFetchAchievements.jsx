@@ -1,3 +1,4 @@
+// useFetchAchievements.jsx
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { auth } from "../../Firebase/Firebase";
@@ -21,7 +22,6 @@ export default function useFetchAchievements(category) {
       }
     );
 
-    // Convert object from backend into array and sort by 'order' if exists
     return Object.keys(data || {})
       .map((key) => ({ id: key, ...data[key] }))
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -36,6 +36,8 @@ export default function useFetchAchievements(category) {
     queryKey: ["achievementsData", category],
     queryFn: fetchAchievements,
     enabled: !!category,
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 
   return { achievements: data, isLoading, isError, refetch };

@@ -1,6 +1,6 @@
 // Utils / Custom Hooks
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { playSound } from "../components/Custom Hooks/DevlabSoundHandler";
 // Navigation
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -30,7 +30,7 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const {  consumeErrorShield } = useErrorShield();
   const navigate = useNavigate();
   // Route params
-  const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
+  const { subject, lessonId, levelId ,stageId } = useParams();
 
   // Popups
   const [isNavigating, setIsNavigating] = useState(false);
@@ -45,6 +45,15 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const userId = userData?.uid;
   // Dynamic editor rendering
 
+    useEffect(() => {
+    if (showisCorrect) {
+      if (isCorrect) {
+        playSound("correct");
+      } else {
+        playSound("inCorrect");
+      }
+    }
+  }, [showisCorrect, isCorrect]);
 
   return (
     <>

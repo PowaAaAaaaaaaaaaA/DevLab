@@ -1,6 +1,7 @@
 // Utils / Custom Hooks
 import { useState, useEffect } from "react";
 import { useGameStore } from "../components/OpenAI Prompts/useBugBustStore";
+import { playSound } from "../components/Custom Hooks/DevlabSoundHandler";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -12,7 +13,7 @@ import Gameover_PopUp from "./GameModes_Popups/Gameover_PopUp";
 import LevelAlreadyCompleted from "./GameModes_Popups/LevelAlreadyComplete_PopUp";
 // for Animation / Icons
 import { AnimatePresence, motion } from "framer-motion";
-import laodingDots from "../assets/Lottie/LoadingDots.json"
+import laodingDots from "../assets/Lottie/LoadingDots.json";
 import Lottie from "lottie-react";
 import Correct from "../assets/Lottie/correctAnsLottie.json";
 import Wrong from "../assets/Lottie/wrongAnsLottie.json";
@@ -48,23 +49,30 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const { userData } = useFetchUserData();
   const userId = userData?.uid;
 
-    //for OpenAI
+  //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
   const { loading } = useGameStore();
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
   const isEvaluating = useGameStore((state) => state.isEvaluating);
 
-
-useEffect(()=>{
-    if(showIsCorrect || isCorrect || isEvaluating||loading){
+  useEffect(() => {
+    if (showIsCorrect || isCorrect || isEvaluating || loading) {
       setPauseTimer(true);
     } else {
       setPauseTimer(false);
     }
-}, [showIsCorrect, isCorrect, isEvaluating]);
+  }, [showIsCorrect, isCorrect, isEvaluating]);
 
-console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
+  useEffect(() => {
+  if (showIsCorrect) {
+    if (isCorrect) {
+      playSound("correct");
+    } else {
+      playSound("inCorrect");
+    }
+  }
+}, [showIsCorrect, isCorrect]);
 
   // Dynamically render editor based on subject
   const renderEditor = () => {
@@ -74,9 +82,9 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
       case "Css":
         return <Css_TE />;
       case "JavaScript":
-        return <JavaScript_TE  />;
+        return <JavaScript_TE />;
       case "Database":
-        return <Database_TE/>;
+        return <Database_TE />;
       default:
         return <div className="text-white">Invalid subject</div>;
     }
@@ -84,7 +92,10 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
 
   return (
     <>
-      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col overflow-hidden">
+      <div
+        key={roundKey}
+        className="h-screen bg-[#0D1117] flex flex-col overflow-hidden"
+      >
         {/* Header */}
         <GameHeader heart={heart} />
 
@@ -140,10 +151,11 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
             LevelId={levelId}
             heartsRemaining={heart}
             setLevelComplete={setLevelComplete}
-            resetHearts={resetHearts}/>
+            resetHearts={resetHearts}
+          />
         )}
       </AnimatePresence>
-            <AnimatePresence>
+      <AnimatePresence>
         {alreadyComplete && (
           <LevelAlreadyCompleted
             subj={subject}
@@ -171,68 +183,83 @@ console.log(showIsCorrect,isCorrect,isEvaluating,"From CodeRush Comp")
       {/* Game Over PopUp */}
       <AnimatePresence>
         {gameOver && (
-          <Gameover_PopUp
-            gameOver={gameOver}
-            resetHearts={resetHearts}/>
+          <Gameover_PopUp gameOver={gameOver} resetHearts={resetHearts} />
         )}
       </AnimatePresence>
 
       {/* Correct / Wrong Popup */}
       <AnimatePresence>
         {showIsCorrect && (
-        <AnimatePresence>
-          {isCorrect ? (
-            <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-              <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4"> 
-              <Lottie
-              animationData={Correct}
-              loop={false}
-              className="w-[70%] h-[70%]"/>
-              <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
-<motion.button
-  onClick={async () => {
-    setShowIsCorrect(false);
-    await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId,setAlreadyComplete });
-  }}
-  whileTap={{ scale: 0.95 }}
-  whileHover={{ scale: 1.05 }}
-  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer`}
->
-Continue
-</motion.button>
-
+          <AnimatePresence>
+            {isCorrect ? (
+              <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+                <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4">
+                  <Lottie
+                    animationData={Correct}
+                    loop={false}
+                    className="w-[70%] h-[70%]"
+                  />
+                  <h1 className="font-exo font-bold text-black text-3xl">
+                    Correct Answer
+                  </h1>
+                  <motion.button
+                    onClick={async () => {
+                      setShowIsCorrect(false);
+                      await goToNextStage({
+                        subject,
+                        lessonId,
+                        levelId,
+                        stageId,
+                        navigate,
+                        setLevelComplete,
+                        userId,
+                        setAlreadyComplete,
+                      });
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.05 }}
+                    className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer`}
+                  >
+                    Continue
+                  </motion.button>
+                </div>
               </div>
-            </div>
-          ):(
-            <AnimatePresence>
-          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-              <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4"> 
-              <Lottie
-              animationData={Wrong}
-              loop={false}
-              className="w-[100%] h-[100%]"/>
-              <h1 className="font-exo font-bold text-black text-3xl">Wrong Answer</h1> 
-        <motion.button
-        onClick={async () => {
-          setShowIsCorrect(false);
-          //  Check for Error Shield first
-          if (await consumeErrorShield()) {
-            console.log("ErrorShield consumed! Preventing heart loss.");
-            return; // Do NOT call submitAttempt(false)
-          }
-          submitAttempt(false);
-        }}
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ bounceDamping: 100 }}
-          className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ">
-          Retry
-        </motion.button>
-              </div>
-          </div>
+            ) : (
+              <AnimatePresence>
+                <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+                  <div className="bg-white rounded-2xl shadow-lg p-8 w-[80%] max-w-md text-center flex flex-col items-center gap-4">
+                    <Lottie
+                      animationData={Wrong}
+                      loop={false}
+                      className="w-[100%] h-[100%]"
+                    />
+                    <h1 className="font-exo font-bold text-black text-3xl">
+                      Wrong Answer
+                    </h1>
+                    <motion.button
+                      onClick={async () => {
+                        setShowIsCorrect(false);
+                        //  Check for Error Shield first
+                        if (await consumeErrorShield()) {
+                          console.log(
+                            "ErrorShield consumed! Preventing heart loss."
+                          );
+                          return; // Do NOT call submitAttempt(false)
+                        }
+                        submitAttempt(false);
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ bounceDamping: 100 }}
+                      className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer "
+                    >
+                      Retry
+                    </motion.button>
+                  </div>
+                </div>
+              </AnimatePresence>
+            )}
           </AnimatePresence>
-          )}
-        </AnimatePresence>
         )}
       </AnimatePresence>
       {/* {isNavigating && (

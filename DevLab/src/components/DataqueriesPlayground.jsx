@@ -19,7 +19,7 @@ function DataqueriesPlayground() {
   const navigate = useNavigate();
   const dbRef = useRef(null);
   const [query, setQuery] = useState(
-    "SELECT users.name, orders.item FROM users JOIN orders ON users.id = orders.user_id;"
+    "SELECT * FROM books;"
   );
   const [outputHtml, setOutputHtml] = useState();
   const [tablesHtml, setTablesHtml] = useState("");

@@ -1,6 +1,7 @@
 // React
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useGameStore } from "../components/OpenAI Prompts/useBugBustStore";
+import { playSound } from "../components/Custom Hooks/DevlabSoundHandler";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -33,7 +34,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
     const navigate = useNavigate();
   const { consumeErrorShield } = useErrorShield();
   // Route params
-  const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
+  const { subject, lessonId, levelId ,stageId } = useParams();
 
 
   // Popups
@@ -43,7 +44,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
-  const { userData, refetch } = useFetchUserData();
+  const { userData } = useFetchUserData();
   const userId = userData?.uid;
 
 
@@ -51,6 +52,16 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const isCorrect = useGameStore((state) => state.isCorrect);
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
+
+    useEffect(() => {
+    if (showIsCorrect) {
+      if (isCorrect) {
+        playSound("correct");
+      } else {
+        playSound("inCorrect");
+      }
+    }
+  }, [showIsCorrect, isCorrect]);
 
   // Dynamically render editor based on subject
   const renderEditor = () => {
