@@ -107,4 +107,4 @@ function LevelAlreadyCompleted({ subj, lessonId, LevelId }) {
   );
 }
 
-export default LevelAlreadyComple
+export default LevelAlreadyCompleted
