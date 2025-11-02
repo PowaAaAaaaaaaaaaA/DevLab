@@ -179,7 +179,11 @@ function Achievements() {
   return (
     <>
       {/* Profile Header */}
-      <div className='bg-[#111827] w-full rounded-3xl flex flex-col p-3'>
+      <div className='w-full rounded-3xl flex flex-col p-3 '
+      style={{
+            backgroundImage: `url(${userData?.backgroundImage})`,
+            backgroundColor: '#111827',
+      }}>
         <div className='flex flex-col items-center gap-3'>
           <div className='w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden'>
             <img src={userData?.profileImage || defaultAvatar} alt="Profile" className="w-full h-full object-cover"/>

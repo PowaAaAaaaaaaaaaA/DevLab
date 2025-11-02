@@ -1,6 +1,7 @@
 // React
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useGameStore } from "../components/OpenAI Prompts/useBugBustStore";
+import { playSound } from "../components/Custom Hooks/DevlabSoundHandler";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -13,6 +14,7 @@ import LevelAlreadyCompleted from "./GameModes_Popups/LevelAlreadyComplete_PopUp
 // for Animation / Icons
 import { AnimatePresence,motion } from "framer-motion";
 import Correct from '../assets/Lottie/correctAnsLottie.json'
+import laodingDots from "../assets/Lottie/LoadingDots.json"
 import Wrong from '../assets/Lottie/wrongAnsLottie.json'
 import Lottie from "lottie-react";
 // Components
@@ -32,7 +34,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
     const navigate = useNavigate();
   const { consumeErrorShield } = useErrorShield();
   // Route params
-  const { subject, lessonId, levelId ,stageId,gamemodeId } = useParams();
+  const { subject, lessonId, levelId ,stageId } = useParams();
 
 
   // Popups
@@ -42,7 +44,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const [showPopup, setShowPopup] = useState(true);
   const [showCodeWhisper, setShowCodeWhisper] = useState(false);
 
-  const { userData, refetch } = useFetchUserData();
+  const { userData } = useFetchUserData();
   const userId = userData?.uid;
 
 
@@ -50,6 +52,16 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
   const isCorrect = useGameStore((state) => state.isCorrect);
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
+
+    useEffect(() => {
+    if (showIsCorrect) {
+      if (isCorrect) {
+        playSound("correct");
+      } else {
+        playSound("inCorrect");
+      }
+    }
+  }, [showIsCorrect, isCorrect]);
 
   // Dynamically render editor based on subject
   const renderEditor = () => {
@@ -69,12 +81,12 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
 
   return (
     <>
-      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
+      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col overflow-hidden">
         {/* Header */}
         <GameHeader heart={heart} />
 
         {/* Content */}
-        <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5">
+        <div className="relative h-[100%] flex flex-col gap-5 md:flex-row p-10 transition-all duration-500 overflow-x-hidden">
           {/* Instruction Panel */}
           <div className="h-[40%] md:w-[35%] md:h-full w-full">
             <InstructionPanel
@@ -154,21 +166,14 @@ Your mission:
               className="w-[70%] h-[70%]"/>
               <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
 <motion.button
-  disabled={isNavigating}
   onClick={async () => {
-    if (isNavigating) return;
-    setIsNavigating(true);
     setShowIsCorrect(false);
     await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId,setAlreadyComplete });
-    setIsNavigating(false);
   }}
   whileTap={{ scale: 0.95 }}
   whileHover={{ scale: 1.05 }}
-  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold 
-    ${isNavigating ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"}
-  `}
->
-  {isNavigating ? "Loading..." : "Continue"}
+  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer`}
+>Continue
 </motion.button>
 
               </div>
@@ -205,6 +210,11 @@ Your mission:
           )}
         </AnimatePresence>
         )}
+              {/* {isNavigating && (
+  <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+    <Lottie animationData={laodingDots} loop className="w-[50%] h-[50%]" />
+  </div>
+)} */}
     </>
   );
 }

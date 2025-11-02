@@ -31,14 +31,38 @@ function Dashboard() {
 
   const [loadingDashboard, setLoading] = useState(true);
 
+
+// Intial Loading
+useEffect(() => {
+  const hasLoadedBefore = sessionStorage.getItem('dashboardLoaded');
+
+  if (!hasLoadedBefore) {
+    // First time in this session → show loader
+    const timer = setTimeout(() => {
+      setLoading(false);
+      sessionStorage.setItem('dashboardLoaded', 'true');
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  } else {
+    // Already loaded before → skip loader
+    setLoading(false);
+  }
+}, []);
+
+
   const queryClient = useQueryClient();
   useEffect(() => {
     queryClient.prefetchQuery(['ShopItems'], fetchShopItems);
   }, [queryClient]);
 
-  if (loadingDashboard) {
-    return <Loading onComplete={() => setLoading(false)} />;
-  }
+if (loadingDashboard) {
+  return (
+    <div className="fixed top-0 left-0 w-screen h-screen z-50">
+      <Loading />
+    </div>
+  );
+}
 
   const subjectIcons = {
     Html: HtmlIcons,
@@ -137,7 +161,7 @@ function Dashboard() {
       </div>
 
       {/* Bottom Section: Jump Back In + Inventory */}
-      <div className="flex flex-col lg:flex-row gap-2 h-[60%]">
+      <div className="flex flex-col lg:flex-row gap-2 lg:h-[55%] xl:h-[70%]">
         {/* Jump Back In */}
         <div className="flex-1 h-full w-full lg:w-[75%] p-1 flex flex-col gap-4">
           <h2 className="text-white font-exo font-bold text-[1.5rem] text-shadow-lg/60">Jump Back In</h2>
@@ -154,7 +178,7 @@ function Dashboard() {
                   <Link
                     key={subject}
                     to={`/Main/Lessons/${info.subject}/${info.lessonId}/${info.levelId}/${info.stageId}/${info.gameMode}`}
-                    className="h-[100%]"
+                    className="h-auto"
                   >
                     <div className="w-[100%] bg-[#111827] flex rounded-3xl border-black border-2 gap-4 hover:scale-101 cursor-pointer duration-300 min-h-[100px]">
                       <div className="min-w-[15%] rounded-3xl flex items-center justify-center p-2 bg-[#0B0F16] shadow-md">
@@ -182,33 +206,36 @@ function Dashboard() {
         </div>
 
         {/* Inventory */}
-        <div className="bg-[#0B0F16] border border-gray-700/60 w-full lg:w-[25%] h-[88%] rounded-3xl p-3 flex flex-col mt-4">
-          <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">Inventory</h1>
-          <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom">
-            {inventory && inventory.length > 0 ? (
-              inventory.map((item) => (
-                <div
-                  key={item.id}
-                  className="group border border-gray-700/50 rounded-2xl bg-gradient-to-br from-[#111827] to-[#0D1117] hover:from-[#1A2333] hover:to-[#121826] transition-all duration-300 flex items-center justify-between p-3 shadow-md hover:shadow-lg"
-                >
-                  <div className="rounded-2xl bg-gray-800/70 p-3 flex justify-center items-center w-[25%] aspect-square overflow-hidden shadow-inner">
-                    <img
-                      src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
-                      alt={item.title}
-                      className="w-full h-full object-contain scale-90 group-hover:scale-100 transition-transform duration-300"
-                    />
-                  </div>
-                  <h2 className="text-lg font-exo text-gray-200 flex-1 text-center px-3 leading-tight">{item.title}</h2>
-                  <p className="rounded-xl bg-gray-800/60 px-4 py-2 text-sm font-exo text-white shadow-inner border border-gray-700/40">
-                    x{item.quantity}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-400 text-center text-lg font-exo mt-8">No Items</p>
-            )}
+<div className="bg-[#0B0F16] border border-gray-700/60 w-full lg:w-[25%] h-[88%] rounded-3xl p-3 flex flex-col mt-4">
+  <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">Inventory</h1>
+  <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom">
+    {inventory && inventory.length > 0 ? (
+      inventory.map((item) => (
+        <div
+          key={item.id}
+          className="group border border-gray-700/50 rounded-2xl bg-gradient-to-br from-[#111827] to-[#0D1117] hover:from-[#1A2333] hover:to-[#121826] transition-all duration-300 flex items-center justify-between p-3 shadow-md hover:shadow-lg h-[90px] min-h-[90px] max-h-[90px]"
+        >
+          <div className="rounded-2xl bg-gray-800/70 p-2 flex justify-center items-center w-[70px] h-[70px] overflow-hidden shadow-inner">
+            <img
+              src={icons[`../assets/ItemsIcon/${item.Icon}`]?.default}
+              alt={item.title}
+              className="w-full h-full object-contain scale-90 group-hover:scale-100 transition-transform duration-300"
+            />
           </div>
+          <h2 className="text-base font-exo text-gray-200 flex-1 text-center px-3 leading-tight truncate">
+            {item.title}
+          </h2>
+          <p className="rounded-xl bg-gray-800/60 px-3 py-2 text-sm font-exo text-white shadow-inner border border-gray-700/40 whitespace-nowrap">
+            x{item.quantity}
+          </p>
         </div>
+      ))
+    ) : (
+      <p className="text-gray-400 text-center text-lg font-exo mt-8">No Items</p>
+    )}
+  </div>
+</div>
+
       </div>
     </div>
   );

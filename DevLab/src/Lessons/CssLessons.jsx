@@ -182,9 +182,9 @@ function CssLessons() {
                 visible: { opacity: 1, scale: 1 },
               }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all ${
+              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all min-h-[100px] ${
                 isStageUnlocked
-                  ? "bg-[#1E1E2E] hover:bg-[#FF5733]/80"
+                  ? "bg-[#1E1E2E] hover:bg-[#00509E]/80"
                   : "bg-gray-800 opacity-50"
               }`}
               onClick={() => {

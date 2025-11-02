@@ -133,20 +133,37 @@ function AddContent({ subject, closePopup }) {
     },
   });
 
-  return (
-    <div className="h-auto p-2 flex flex-col w-[100%]">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          addLevelMutation.mutate();
-        }}
-        className="border h-[100%] w-[100%] m-auto bg-[#111827] border-[#56EBFF] rounded-2xl p-5"
+return (
+  <div className="h-auto p-2 flex flex-col w-full">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        addLevelMutation.mutate();
+      }}
+      className="relative border w-full m-auto bg-[#111827] border-[#56EBFF] 
+                 rounded-2xl p-5 sm:p-8 shadow-lg"
+    >
+
+      {/* Close Button */}
+      <button
+        type="button"
+        onClick={closePopup}
+        className="absolute top-3 right-3 text-white text-xl 
+                   bg-red-500 hover:bg-red-600
+                   w-5 h-5 sm:w-10 sm:h-10 rounded-full 
+                   flex items-center justify-center
+                   hover:scale-110 transition-all duration-300 shadow-md cursor-pointer"
       >
-        {/* Lesson Selector */}
-        <div className="border h-[15%] flex items-center pl-10 rounded-2xl border-gray-700 bg-[#0d13207c] text-[1.3rem] font-exo">
-          <label className="text-white font-exo mr-3">Lesson: </label>
+        ✕
+      </button>
+
+      <div className="border h-auto py-4 px-5 sm:px-10 flex flex-col sm:flex-row 
+                      sm:items-center gap-4 sm:gap-6 rounded-2xl border-gray-700 
+                      bg-[#0d13207c] text-lg sm:text-xl font-exo">
+        <div className="flex items-center gap-3">
+          <label className="text-white">Lesson:</label>
           <select
-            className="bg-[#1f2937] text-white p-2 rounded-md focus:outline-0 hover: cursor-pointer"
+            className="bg-[#1f2937] text-white p-2 rounded-md focus:outline-0 cursor-pointer"
             value={selectedLesson}
             onChange={(e) => setSelectedLesson(e.target.value)}
           >
@@ -158,74 +175,97 @@ function AddContent({ subject, closePopup }) {
             ))}
             <option value="LessonAdd">Add Lesson</option>
           </select>
-
-          {subject === "JavaScript" && (
-            <div className="ml-5">
-              <label className="text-white font-exo mr-3">Type:</label>
-              <select
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="bg-[#1f2937] text-white p-2 rounded-md focus:outline-0 hover: cursor-pointer"
-              >
-                <option value="FrontEnd">Front End</option>
-                <option value="BackEnd">Back End</option>
-              </select>
-            </div>
-          )}
         </div>
 
-        {/* Level Form */}
-        <div
-          className={`mt-4 rounded-2xl bg-[#0d13207c] p-5 border-gray-700 border flex flex-col font-exo text-white h-[82%] ${
-            selectedLesson === "" ? "opacity-30 pointer-events-none" : ""
-          }`}
-        >
-          <label className="text-2xl">Enter the Following</label>
-          <input
-            required
-            onChange={(e) => setTitle(e.target.value)}
-            type="text"
-            placeholder="Title"
-            className="border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400"
-          />
-          <input
-            required
-            onChange={(e) => setDesc(e.target.value)}
-            type="text"
-            placeholder="Description"
-            className="border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400"
-          />
-          <input
-            required
-            onChange={(e) => setCoins(e.target.value)}
-            type="number"
-            placeholder="Coin Reward"
-            className="border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400"
-          />
-          <input
-            required
-            onChange={(e) => setExp(e.target.value)}
-            type="number"
-            placeholder="Exp Reward"
-            className="border-gray-700 border m-2 p-3 rounded focus:outline-1 focus:outline-gray-400"
-          />
-          <div className="flex mt-5 p-5 justify-around w-[60%] m-auto gap-10">
-            <button
-              type="submit"
-              className="p-2 text-[1.2rem] rounded-xl w-[45%] bg-[#4CAF50] hover:cursor-pointer"
+        {/*  Type Selector only for JS */}
+        {subject === "JavaScript" && (
+          <div className="flex items-center gap-3">
+            <label className="text-white">Type:</label>
+            <select
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="bg-[#1f2937] text-white p-2 rounded-md focus:outline-0 cursor-pointer"
             >
-              Add Level
-            </button>
-            <button
-              onClick={closePopup}
-              className="p-2 text-[1.2rem] rounded-xl w-[45%] bg-gray-700 hover:cursor-pointer"
-            >
-              Cancel
-            </button>
+              <option value="FrontEnd">Front End</option>
+              <option value="BackEnd">Back End</option>
+            </select>
           </div>
+        )}
+      </div>
+      <div
+        className={`mt-4 rounded-2xl bg-[#0d13207c] p-5 sm:p-7 border border-gray-700 
+                    flex flex-col font-exo text-white min-h-[300px] sm:min-h-[350px]
+                    ${
+                      selectedLesson === ""
+                        ? "opacity-30 pointer-events-none"
+                        : ""
+                    }`}
+      >
+        <label className="text-xl sm:text-2xl mb-2">Enter the Following</label>
+
+        <input
+          required
+          onChange={(e) => setTitle(e.target.value)}
+          type="text"
+          placeholder="Title"
+          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
+                     focus:outline-gray-400"
+        />
+
+        <input
+          required
+          onChange={(e) => setDesc(e.target.value)}
+          type="text"
+          placeholder="Description"
+          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
+                     focus:outline-gray-400"
+        />
+
+        <input
+          required
+          onChange={(e) => setCoins(e.target.value)}
+          type="number"
+          placeholder="Coin Reward"
+          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
+                     focus:outline-gray-400"
+        />
+
+        <input
+          required
+          onChange={(e) => setExp(e.target.value)}
+          type="number"
+          placeholder="Exp Reward"
+          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
+                     focus:outline-gray-400"
+        />
+
+        {/* ✅ Buttons Row */}
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 w-full sm:w-[70%] mx-auto">
+
+          <button
+            type="submit"
+            className="p-2 text-lg rounded-xl w-full sm:w-[45%] 
+                       bg-[#4CAF50] hover:bg-[#45a049] 
+                       hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
+            Add Level
+          </button>
+
+          <button
+            type="button"
+            onClick={closePopup}
+            className="p-2 text-lg rounded-xl w-full sm:w-[45%] 
+                       bg-gray-700 hover:bg-gray-600 
+                       hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
+            Cancel
+          </button>
+
         </div>
-      </form>
-    </div>
-  );
+      </div>
+    </form>
+  </div>
+);
+
 }
 
 export default AddContent;

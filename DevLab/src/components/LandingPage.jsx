@@ -9,15 +9,7 @@ function LandingPage() {
   const [show, setShow] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect screen size for mobile view
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    handleResize(); // initial check
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+
 
   // Fade-out transition
   useEffect(() => {
@@ -48,21 +40,6 @@ function LandingPage() {
       {/* Header */}
       <div className="h-[8%] font-exo flex items-center justify-between px-5 sm:px-10 lg:px-20">
         <h1 className="text-3xl sm:text-4xl text-white font-bold">DevLab</h1>
-
-        {/* Button — conditional render based on device */}
-        {isMobile ? (
-          <a
-            href="https://example.com/devlab-download" // ← replace with your actual Play Store / APK link
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <button className="relative h-10 sm:h-12 w-36 sm:w-40 overflow-hidden border border-green-500 text-green-400 shadow-2xl transition-all duration-200 before:absolute before:bottom-0 before:left-0 before:right-0 before:top-0 before:m-auto before:h-0 before:w-0 before:rounded-sm before:bg-green-500 before:duration-300 before:ease-out hover:text-white hover:shadow-green-600 hover:before:h-40 hover:before:w-40 hover:before:opacity-80 hover:cursor-pointer">
-              <span className="relative z-10 text-sm sm:text-base">
-                Download App
-              </span>
-            </button>
-          </a>
-        ) : (
           <Link to="/Login">
             <button className="relative h-10 sm:h-12 w-32 sm:w-40 overflow-hidden border border-indigo-600 text-indigo-600 shadow-2xl transition-all duration-200 before:absolute before:bottom-0 before:left-0 before:right-0 before:top-0 before:m-auto before:h-0 before:w-0 before:rounded-sm before:bg-indigo-600 before:duration-300 before:ease-out hover:text-white hover:shadow-indigo-600 hover:before:h-40 hover:before:w-40 hover:before:opacity-80 hover:cursor-pointer">
               <span className="relative z-10 text-sm sm:text-base">
@@ -70,7 +47,7 @@ function LandingPage() {
               </span>
             </button>
           </Link>
-        )}
+        
       </div>
 
       {/* Contents */}

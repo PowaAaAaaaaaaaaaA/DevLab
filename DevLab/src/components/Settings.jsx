@@ -7,7 +7,7 @@ import defaultAvatar from '../assets/Images/profile_handler.png';
 // Firebase
 import { auth, db, storage } from "../Firebase/Firebase";
 import { updateDoc, doc, setDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 // Utils
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -25,6 +25,10 @@ function Settings() {
   const [showAdminPopup, setAdminPopup] = useState(false);
   const [showResetPass, setShowResetPass] = useState(false);
   const navigate = useNavigate();
+
+  // Upload States
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Logout
   const logout = async () => {
@@ -75,25 +79,67 @@ function Settings() {
     }
   };
 
-  // Upload Image
+  // ✅ Upload Image WITH Progress
   const uploadImage = async (file, type = "profile") => {
     const user = auth.currentUser;
     if (!user) throw new Error("No user logged in.");
 
     const fileRef = ref(storage, `userProfiles/${user.uid}/${type}.jpg`);
-    await uploadBytes(fileRef, file);
-    const downloadURL = await getDownloadURL(fileRef);
-    await setDoc(
-      doc(db, "Users", user.uid),
-      { [`${type}Image`]: downloadURL },
-      { merge: true }
-    );
-    return downloadURL;
+    const uploadTask = uploadBytesResumable(fileRef, file);
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        },
+        (error) => {
+          setIsUploading(false);
+          reject(error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          await setDoc(
+            doc(db, "Users", user.uid),
+            { [`${type}Image`]: downloadURL },
+            { merge: true }
+          );
+
+          setIsUploading(false);
+          resolve(downloadURL);
+        }
+      );
+    });
   };
 
   return (
     <>
+      {/* ✅ Upload Progress Modal */}
+      {isUploading && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-[#1E212F] p-6 rounded-2xl w-[80%] sm:w-[40%] text-center">
+            <h1 className="text-white font-exo mb-4">Uploading...</h1>
+
+            <div className="w-full bg-gray-700 h-3 rounded-xl overflow-hidden">
+              <div
+                className="bg-[#7F5AF0] h-full transition-all duration-100"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+
+            <p className="text-white mt-3">{Math.round(uploadProgress)}%</p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-[#111827] flex flex-col h-[95%] items-center gap-5 p-5 mx-auto mt-5 rounded-3xl border-2 shadow-2xl shadow-black w-full max-w-[600px] sm:max-w-[700px] md:max-w-[900px]">
+        
         {/* Profile Image */}
         <motion.div
           className="w-[40%] sm:w-[30%] h-[25%] rounded-full overflow-hidden border border-gray-600 cursor-pointer relative"
@@ -175,7 +221,7 @@ function Settings() {
             whileHover={{ scale: 1.05 }}
             transition={{ bounceDamping: 100 }}
             type="submit"
-            className="bg-[#7F5AF0] w-full sm:w-[80%] md:w-[60%] font-exo p-2 m-auto rounded-4xl text-[1rem] font-bold text-white hover:bg-[#6A4CD4] hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.4)]"
+            className="bg-[#7F5AF0] w-full sm:w-[80%] md:w-[60%] font-exo p-2 m-auto rounded-4xl text-[1rem] font-bold text-white hover:bg-[#6A4CD4] hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.4)] cursor-pointer"
           >
             Save Changes
           </motion.button>
@@ -186,7 +232,7 @@ function Settings() {
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
-          className="bg-[#FF6166] p-3 w-full sm:w-[60%] md:w-[43%] rounded-3xl font-exo font-bold text-white mt-1.5 hover:bg-[#E04C52] hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)]"
+          className="bg-[#FF6166] p-3 w-full sm:w-[60%] md:w-[43%] rounded-3xl font-exo font-bold text-white mt-1.5 hover:bg-[#E04C52] hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)] cursor-pointer"
           onClick={() => setTimeout(() => setShowLogoutPopUp(true), 300)}
         >
           Logout
@@ -232,7 +278,7 @@ function Settings() {
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}
                   onClick={logout}
-                  className="bg-[#FF6166] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)]"
+                  className="bg-[#FF6166] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)] cursor-pointer"
                 >
                   Yes, Logout
                 </motion.button>
@@ -241,7 +287,7 @@ function Settings() {
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}
                   onClick={() => setTimeout(() => setShowLogoutPopUp(false), 200)}
-                  className="bg-gray-500 p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(128,128,128,0.4)]"
+                  className="bg-gray-500 p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(128,128,128,0.4)] cursor-pointer"
                 >
                   Cancel
                 </motion.button>
@@ -270,7 +316,7 @@ function Settings() {
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}
                   onClick={admin}
-                  className="bg-[#1EDB3E] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(30,219,62,0.4)]"
+                  className="bg-[#1EDB3E] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(30,219,62,0.4)] cursor-pointer"
                 >
                   Proceed
                 </motion.button>
@@ -279,7 +325,7 @@ function Settings() {
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}
                   onClick={() => setAdminPopup(false)}
-                  className="bg-[#FF6166] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)]"
+                  className="bg-[#FF6166] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)] cursor-pointer"
                 >
                   Cancel
                 </motion.button>

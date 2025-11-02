@@ -5,6 +5,7 @@ import confetti from "../../assets/Lottie/Confetti.json";
 import smallLoading from "../../assets/Lottie/loadingSmall.json";
 import loadingDots from "../../assets/Lottie/LoadingDots.json"
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { playSound } from "../../components/Custom Hooks/DevlabSoundHandler";
 
 
 import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
@@ -29,6 +30,9 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
   const hearts = heartsRemaining;
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+  playSound("success"); 
+}, []);
 
   //  Fetch feedback once
   useEffect(() => {
@@ -98,25 +102,64 @@ useEffect(() => {
     },
     [userData.uid, subj, lessonId, LevelId, stageId, navigate]
   );
-  return (
-    <div className="fixed inset-0 bg-black/95 z-0 flex items-center justify-center">
-      <Lottie animationData={confetti} loop={false} className="w-full h-full fixed z-1" />
+return (
+  <div className="fixed inset-0 bg-black/95 z-0 flex items-center justify-center">
+    <Lottie
+      animationData={confetti}
+      loop={false}
+      className="w-full h-full fixed z-1"
+    />
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0 }}
-        className="bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[1px] w-[60%] text-center z-2"
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0 }}
+      className="
+        bg-gradient-to-b from-cyan-400 to-purple-500 
+        rounded-2xl shadow-lg p-[1px] 
+        w-[92%] sm:w-[80%] md:w-[65%] lg:w-[55%] 
+        text-center z-2
+      "
+    >
+      <div
+        className="
+          bg-[#111827] w-full rounded-2xl 
+          p-4 sm:p-6 md:p-8 
+          flex flex-col gap-5 items-center
+        "
       >
-        <div className="bg-[#111827] w-full rounded-2xl p-5 flex flex-col gap-5 items-center">
-          <h1 className="font-exo font-bold text-[3rem] text-[#F2FF43]">LEVEL COMPLETED</h1>
+        <h1
+          className="
+            font-exo font-bold 
+            text-2xl sm:text-3xl md:text-4xl lg:text-[3rem] 
+            text-[#F2FF43] text-center
+          "
+        >
+          LEVEL COMPLETED
+        </h1>
 
-          <div className="bg-[#080C14] rounded-2xl border border-gray-700 p-4 font-exo w-[90%] min-h-[100px] flex flex-col items-center justify-center">
-            {levelSummary ? (
-              <div className="text-left text-white mx-auto p-3 w-[90%] leading-relaxed">
-                {["recap", "strengths", "improvements", "encouragement"].map((key, i) => (
-                  <p key={i}>
-                    <span className={`font-semibold ${
+        {/* SUMMARY BOX */}
+        <div
+          className="
+            bg-[#080C14] rounded-2xl border border-gray-700 
+            p-3 sm:p-4 
+            font-exo w-[95%] md:w-[90%] 
+            min-h-[100px] 
+            flex flex-col items-center justify-center
+          "
+        >
+          {levelSummary ? (
+            <div
+              className="
+                text-left text-white 
+                mx-auto p-2 sm:p-3 
+                w-[95%] leading-relaxed
+              "
+            >
+              {["recap", "strengths", "improvements", "encouragement"].map((key, i) => (
+                <p key={i} className="text-sm sm:text-base md:text-lg">
+                  <span
+                    className={`font-semibold ${
                       key === "recap"
                         ? "text-cyan-400"
                         : key === "strengths"
@@ -124,93 +167,127 @@ useEffect(() => {
                         : key === "improvements"
                         ? "text-yellow-400"
                         : "text-purple-400"
-                    }`}>
-                      {key.charAt(0).toUpperCase() + key.slice(1)}:
-                    </span>{" "}
-                    {levelSummary[key]}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center text-center text-white">
-                <p className="text-lg font-exo mb-2">Generating Feedback...</p>
-                <Lottie animationData={smallLoading} loop className="w-[10%] h-[10%]" />
-              </div>
-            )}
-          </div>
-
-          <hr className="text-white w-[95%]" />
-
-          <div>
-            <h2 className="font-exo text-white text-[2rem]">PERFORMANCE SUMMARY</h2>
-            <div className="flex flex-col gap-3 mt-5">
-              <p className="text-white font-exo font-semibold">
-                Lives Remaining: <span className="font-bold text-red-400">{hearts}x</span>
-              </p>
-              <p className="text-white font-exo font-semibold">
-                DevCoins: +<span className="font-bold text-yellow-400">{Coins}</span>
-              </p>
-              <p className="text-white font-exo font-semibold">
-                XP Gained: +<span className="font-bold text-cyan-400">{Exp}XP</span>
-              </p>
+                    }`}
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:
+                  </span>{" "}
+                  {levelSummary[key]}
+                </p>
+              ))}
             </div>
-          </div>
-
-<div className="w-[80%] flex items-center justify-around p-4">
-  {/* Back to Main */}
-<motion.button
-  whileTap={{ scale: 0.95 }}
-  whileHover={{ scale: 1.05 }}
-  transition={{ bounceDamping: 100 }}
-  onClick={() => {
-    // Close popup and navigate immediately
-    setIsLoading(false);
-    navigate("/Main", { replace: true });
-    clearReward();
-    // Run async tasks in background
-    (async () => {
-      await Promise.all([unlockNextLevel(false), refetch()]);
-    })();
-  }}
-  className="bg-[#9333EA] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"
->
-  Back to Main
-</motion.button>
-
-
-  {/* Continue */}
-<motion.button
-  whileTap={{ scale: 0.95 }}
-  whileHover={{ scale: 1.05 }}
-  transition={{ bounceDamping: 100 }}
-  onClick={() => {
-    // Close popup immediately
-    setIsLoading(true);
-    clearReward();
-    unlockNextLevel(true);
-    // Run async tasks in background
-    (async () => {
-      await refetch();
-    })();
-  }}
-  className="bg-[#36DB4F] min-w-[35%] max-w-[40%] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] cursor-pointer">
-  Continue
-</motion.button>
-
-</div>
-
+          ) : (
+            <div className="flex flex-col items-center justify-center text-center text-white">
+              <p className="text-base sm:text-lg font-exo mb-2">
+                Generating Feedback...
+              </p>
+              <Lottie
+                animationData={smallLoading}
+                loop
+                className="w-[20%] sm:w-[15%] md:w-[10%]"
+              />
+            </div>
+          )}
         </div>
-      </motion.div>
 
+        <hr className="text-white w-[95%]" />
 
-{isLoading && (
-  <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-    <Lottie animationData={loadingDots} loop className="w-[50%] h-[50%]" />
+        {/* PERFORMANCE SUMMARY */}
+        <div className="text-center">
+          <h2 className="font-exo text-white text-xl sm:text-2xl md:text-[2rem]">
+            PERFORMANCE SUMMARY
+          </h2>
+
+          <div className="flex flex-col gap-3 mt-5">
+            <p className="text-white font-exo font-semibold text-sm sm:text-base">
+              Lives Remaining:{" "}
+              <span className="font-bold text-red-400">{hearts}x</span>
+            </p>
+            <p className="text-white font-exo font-semibold text-sm sm:text-base">
+              DevCoins: +<span className="font-bold text-yellow-400">{Coins}</span>
+            </p>
+            <p className="text-white font-exo font-semibold text-sm sm:text-base">
+              XP Gained: +<span className="font-bold text-cyan-400">{Exp}XP</span>
+            </p>
+          </div>
+        </div>
+
+        {/* BUTTONS */}
+        <div
+          className="
+            w-full sm:w-[85%] 
+            flex flex-col sm:flex-row 
+            gap-4 sm:gap-0 
+            items-center justify-around 
+            p-4
+          "
+        >
+          {/* BACK TO MAIN */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ bounceDamping: 100 }}
+            onClick={() => {
+              setIsLoading(false);
+              navigate("/Main", { replace: true });
+              clearReward();
+              (async () => {
+                await Promise.all([unlockNextLevel(false), refetch()]);
+              })();
+            }}
+            className="
+              bg-[#9333EA] 
+              w-full sm:min-w-[40%] sm:max-w-[45%] 
+              text-white px-6 py-3 
+              rounded-xl font-semibold 
+              hover:bg-purple-700 
+              hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] 
+              cursor-pointer
+            "
+          >
+            Back to Main
+          </motion.button>
+
+          {/* CONTINUE */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ bounceDamping: 100 }}
+            onClick={() => {
+              setIsLoading(true);
+              clearReward();
+              unlockNextLevel(true);
+              (async () => {
+                await refetch();
+              })();
+            }}
+            className="
+              bg-[#36DB4F] 
+              w-full sm:min-w-[40%] sm:max-w-[45%] 
+              text-white px-6 py-3 
+              rounded-xl font-semibold 
+              hover:bg-[#2CBF45] 
+              hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] 
+              cursor-pointer
+            "
+          >
+            Continue
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+
+    {isLoading && (
+      <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+        <Lottie
+          animationData={loadingDots}
+          loop
+          className="w-[60%] sm:w-[40%] md:w-[30%] lg:w-[20%]"
+        />
+      </div>
+    )}
   </div>
-)}
+);
 
-    </div>
-  );
 }
 
 export default LevelCompleted_PopUp;

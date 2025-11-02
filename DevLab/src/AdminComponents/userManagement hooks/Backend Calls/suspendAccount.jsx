@@ -6,7 +6,7 @@ export const suspendAccount = async (id, toggleDisable) => {
 
   const response = await axios.post(
     `
-https://devlab-server-railway-production.up.railway.app/`,
+https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/suspendAccount`,
     { uid: id, toggleDisable },
     { headers: { Authorization: `Bearer ${token}` } }
   );

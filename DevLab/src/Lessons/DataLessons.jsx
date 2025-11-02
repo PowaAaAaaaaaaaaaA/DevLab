@@ -28,31 +28,31 @@ function DataLessons() {
   const [expandedLevel, setExpandedLevel] = useState(null);
 
   return (
-    <div className="h-full flex flex-col gap-4">
-      {/* Upper Panel */}
-      <div className="flex flex-col lg:flex-row h-auto lg:h-[40%] rounded-3xl p-5 bg-gradient-to-r from-[#4CAF50] to-[#124B15] gap-4">
-        {/* Text Content */}
-        <div className="w-full lg:w-3/4 flex flex-col justify-center gap-4">
-          <h1 className="font-exo text-white text-[2rem] md:text-[2.8rem] lg:text-[3rem] font-bold text-shadow-lg text-shadow-black bigText-laptop">
-            Database: The Vault of Digital Knowledge
-          </h1>
-          <p className="text-white textSmall-laptop font-exo text-sm md:text-base lg:text-lg leading-relaxed text-shadow-sm text-shadow-black">
-            Enter the fortress of data, where every piece of information is carefully guarded and stored! As a Database Guardian, you'll master the art of organizing and retrieving data with precision. Harness the power of SQL to query vast treasures of information and keep your vault secure.
-          </p>
-        </div>
+    <div className="h-full flex flex-col gap-3">
+        {/* Upper Panel */}
+        <div className="flex flex-col h-auto lg:flex-row lg:h-[40%] rounded-3xl p-5 bg-gradient-to-r from-[#4CAF50] to-[#124B15] gap-4">
+          {/* Text Content */}
+          <div className="w-full lg:w-3/4 flex flex-col justify-center gap-4">
+            <h1 className="font-exo text-white text-[2rem] md:text-[2.8rem] lg:text-[3rem] font-bold text-shadow-lg  text-shadow-black bigText-laptop">
+              {"||||"} Database: The Vault of Digital Knowledge
+            </h1>
+            <p className="text-white textSmall-laptop font-exo text-sm md:text-base lg:text-lg leading-relaxed text-shadow-sm text-shadow-black">
+Enter the fortress of data, where every piece of information is carefully guarded and stored! As a Database Guardian, you'll master the art of organizing and retrieving data with precision. Harness the power of SQL to query vast treasures of information and keep your vault secure.
+            </p>
+          </div>
 
-        {/* Image */}
-        <div className="w-full lg:w-1/4 flex justify-center items-center">
-          <img
-            src={DataImage}
-            alt="Database Icon"
-            className="w-[55%] md:w-[40%] lg:w-[60%] h-auto object-contain"
-          />
+          {/* Image */}
+          <div className="w-full lg:w-1/4 flex justify-center items-center">
+            <img
+              src={DataImage}
+              alt=""
+              className="lg:w-[55%] md:w-[25%] h-[60%] object-contain"
+            />
+          </div>
         </div>
-      </div>
 
       {/* Lower Panel */}
-      <div className="flex flex-col lg:flex-row gap-4 p-3">
+      <div className="flex flex-col lg:flex-row h-[60%] gap-4 p-3">
         {/* Left Panel - Lessons */}
         {isLoading || progressLoading ? (
           <Lottie
@@ -74,7 +74,7 @@ function DataLessons() {
                   }}
                   initial="hidden"
                   animate="show"
-                  className="flex flex-col gap-4"
+                  className="flex flex-col overflow-y-hidden"
                 >
                   {lesson.levels.map((level) => {
                     const progress = userProgress[`${lesson.id}-${level.id}`] || {};
@@ -86,7 +86,7 @@ function DataLessons() {
                     };
 
                     return (
-                      <motion.div key={`${lesson.id}-${level.id}`} className="flex flex-col gap-2">
+                      <motion.div key={`${lesson.id}-${level.id}`} className="flex flex-col p-3 overflow-y-hidden">
                         {/* Level Card */}
                         <motion.div
                           variants={{
@@ -141,7 +141,6 @@ function DataLessons() {
         ?.filter((stage) => {
           // Always show Lesson
           if (stage.type === "Lesson") return true;
-
           // For other types, show only if completed
           const isStageCompleted =
             userStageCompleted[`${lesson.id}-${level.id}-${stage.id}`];
@@ -151,7 +150,6 @@ function DataLessons() {
         .map((stage) => {
           const isStageUnlocked =
             userStageCompleted[`${lesson.id}-${level.id}-${stage.id}`];
-
           return (
             <motion.div
               key={stage.id}
@@ -160,9 +158,9 @@ function DataLessons() {
                 visible: { opacity: 1, scale: 1 },
               }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all ${
+              className={`p-2 sm:p-3 rounded-xl text-white cursor-pointer relative transition-all min-h-[100px] ${
                 isStageUnlocked
-                  ? "bg-[#1E1E2E] hover:bg-[#FF5733]/80"
+                  ? "bg-[#1E1E2E] hover:bg-[#4CAF50]/80"
                   : "bg-gray-800 opacity-50"
               }`}
               onClick={() => {

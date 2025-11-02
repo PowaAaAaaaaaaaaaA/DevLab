@@ -11,6 +11,7 @@ import useFetchUserData from './BackEnd_Data/useFetchUserData';
 import useAnimatedNumber from './Custom Hooks/useAnimatedNumber';
 import useFetchShopItems from './BackEnd_Data/useFethShopItems';
 import { purchaseItem } from './BackEnd_Functions/purchaseItem';
+import { playSound } from './Custom Hooks/DevlabSoundHandler';
 
 import '../index.css';
 
@@ -27,6 +28,7 @@ function Shop() {
   const buyMutation = useMutation({
     mutationFn: async (item) => purchaseItem(item.id, item.cost, item.Icon),
     onMutate: async (item) => {
+      playSound("purchase"); 
       await queryClient.cancelQueries(["userData"]);
       const previousUserData = queryClient.getQueryData(["userData"]) || userData;
       if (!previousUserData || previousUserData.coins < item.cost) {
@@ -91,7 +93,7 @@ function Shop() {
       <div className='flex flex-col sm:flex-row border rounded-3xl bg-[#111827] p-5 gap-5'>
         <div className='flex-1 flex flex-col gap-3'>
           <h1 className='font-exo font-bold text-white text-[3rem] sm:text-[5rem]'>DEVSHOP</h1>
-          <p className='font-exo text-white text-sm sm:text-base'>
+          <p className='font-exo text-white text-sm sm:text-base w-[90%]'>
             Welcome to the DevLab Shop, where learning meets gamification! Earn rewards as you code, learn, and complete challenges, then spend them on awesome upgrades to enhance your experience.
           </p>
         </div>
@@ -129,7 +131,7 @@ function Shop() {
           onClick={() => buyMutation.mutate(item)}
           className="bg-green-400 text-black font-bold py-2 px-6 sm:px-8 rounded-full text-base sm:text-lg mt-4 sm:mt-5"
         >
-          $ {item.cost}
+          {item.cost}
         </motion.button>
       </div>
     </div>

@@ -1,4 +1,5 @@
-// Assets
+
+
 import Image from "../assets/Images/Login-Image.jpg";
 import Loading from "../assets/Lottie/LoadingDots.json";
 // Utils
@@ -15,12 +16,11 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../Firebase/Firebase";
-// Ui
+// UI
 import { toast } from "react-toastify";
 import Lottie from "lottie-react";
-import { IoPerson } from "react-icons/io5";
-import { IoLockOpen } from "react-icons/io5";
-import { IoEye, IoEyeOff } from "react-icons/io5";
+import { IoPerson, IoLockOpen, IoEye, IoEyeOff } from "react-icons/io5";
+import { FaUserCircle } from "react-icons/fa";
 // Components
 import ForgotPassword from "./ForgotPassword";
 
@@ -38,53 +38,40 @@ function Login() {
     setLoading(true);
 
     try {
-      // Set persistence based on "Remember Me"
       const persistence = rememberMe
         ? browserLocalPersistence
         : browserSessionPersistence;
       await setPersistence(auth, persistence);
 
-      // Attempt sign in
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
       const user = userCredential.user;
-
-      // Refresh user info to make sure emailVerified is up-to-date
       await user.reload();
 
-      //  Block unverified accounts
       if (!user.emailVerified) {
-        await signOut(auth); // Force logout immediately
+        await signOut(auth);
         toast.error("Your email has not been verified yet.", {
           position: "top-center",
           theme: "colored",
         });
         setLoading(false);
-        return; //  Stop here completely — no navigation, no Firestore fetch
+        return;
       }
 
-      //  Check user document in Firestore
       const userRef = doc(db, "Users", user.uid);
       const userSnap = await getDoc(userRef);
 
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
-
-        if (userData.isSuspend) {
-          await signOut(auth);
-          toast.error(
-            "Your account has been suspended. Please contact support.",
-            {
-              position: "top-center",
-              theme: "colored",
-            }
-          );
-          setLoading(false);
-          return; //  Stop here too
-        }
+      if (userSnap.exists() && userSnap.data().isSuspend) {
+        await signOut(auth);
+        toast.error("Your account has been suspended.", {
+          position: "top-center",
+          theme: "colored",
+        });
+        setLoading(false);
+        return;
       }
 
       toast.success("Login successful!", {
@@ -92,7 +79,7 @@ function Login() {
         theme: "colored",
       });
 
-      navigate("/Main"); //  Only verified + active users reach here
+      navigate("/Main");
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Invalid credentials.", {
@@ -107,131 +94,98 @@ function Login() {
   return (
     <>
       {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center  bg-black/95">
-          <Lottie
-            animationData={Loading}
-            loop={true}
-            className="w-[50%] h-[50%]"
-          />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
+          <Lottie animationData={Loading} loop className="w-1/2 h-1/2" />
         </div>
       )}
 
-      <div className="min-h-screen bg-[#0D1117] flex justify-center items-center">
-        {/* Login Wrapper*/}
-        <div className="h-[70vh] w-[65%] bg-[#25293B] rounded-4xl shadow-lg shadow-cyan-500 flex">
-          {/*Left pannel*/}
+      <div className="min-h-screen bg-[#0D1117] flex justify-center items-center px-4 py-8">
+        {/* Wrapper */}
+        <div className="w-full max-w-5xl bg-[#25293B] rounded-3xl shadow-lg shadow-cyan-500 flex flex-col sm:flex-row overflow-hidden">
+          {/* Left Image */}
           <div
-            className=" bg-cover bg-no-repeat h-[100%] w-[50%] rounded-4xl hidden justify-center sm:flex 
-"
+            className="hidden sm:flex w-1/2 bg-cover bg-center p-4 items-center justify-center"
             style={{ backgroundImage: `url(${Image})` }}
           >
-            <h1 className="self-center font-exo text-[2.5rem] lg:text-[3.5rem] font-bold text-[#F5F5F5] block">
+            <h1 className="font-exo text-4xl lg:text-5xl font-bold text-[#F5F5F5] drop-shadow-xl ">
               DEVLAB
             </h1>
           </div>
 
-          {/*right pannel*/}
-          <div className="flex items-center w-full flex-col sm:w-[50%]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="text-[#314A70] h-[40%] w-[40%] mt-[3%] mb-1"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-
+          {/* Right Panel */}
+          <div className="flex flex-col items-center w-full sm:w-1/2 p-6">
+            <FaUserCircle className="text-[#314A70] text-[7rem] mb-10" />
             <form
-              className="w-[100%] flex flex-col items-center p-3.5"
+              className="w-full flex flex-col items-center gap-4"
               onSubmit={handleSubmit}
               autoComplete="off"
             >
-              {/*Email Input*/}
-              <div className="w-[70%] flex justify-center relative">
+              {/* Email */}
+              <div className="w-[85%] relative">
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  type="Email"
-                  name="email"
-                  id="Email"
+                  type="email"
                   placeholder="Email"
-                  className="relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl pl-[50px] border-2 border-gray-700 focus:border-cyan-500 focus:outline-none"
+                  className="bg-[#1E212F] text-white w-full h-12 rounded-2xl pl-12 pr-4 border-2 border-gray-700 focus:border-cyan-500 focus:outline-none"
                 />
-                <span className="absolute text-white left-3 self-center text-1xl md:text-2xl">
-                  <IoPerson />
-                </span>
+                <IoPerson className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white" />
               </div>
-              {/*Password Input*/}
-              <div className="w-[70%] flex justify-center relative m-[3%]">
+
+              {/* Password */}
+              <div className="w-[85%] relative">
                 <input
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  id="Password"
                   placeholder="Password"
-                  className="relative bg-[#1E212F] text-[#FFFFFE] w-[100%] h-[5vh] rounded-2xl  pl-[50px] border-2 border-gray-700 focus:border-cyan-500  focus:outline-none"
+                  className="bg-[#1E212F] text-white w-full h-12 rounded-2xl pl-12 pr-12 border-2 border-gray-700 focus:border-cyan-500 focus:outline-none"
                 />
-                <span className="absolute text-white left-3 self-center text-1xl md:text-2xl">
-                  <IoLockOpen />
-                </span>
-                {/* Toggle visibility button */}
+                <IoLockOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white" />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 self-center text-white text-1xl md:text-2xl hover:text-cyan-400 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-xl hover:text-cyan-400"
                 >
-                  {showPassword ? <IoEyeOff /> : <IoEye />} {/* toggle icons */}
+                  {showPassword ? <IoEyeOff /> : <IoEye />}
                 </button>
               </div>
+
               <button
                 type="button"
-                onClick={() => {
-                  setShowForgot(true);
-                }}
-                className="text-white text-sm hover:underline cursor-pointer"
-              >
+                onClick={() => setShowForgot(true)}
+                className="text-white text-sm hover:underline cursor-pointer">
                 Forgot Password
               </button>
-              {/*Remember Meeee*/}
-              <div className="m-[2%]">
+
+              {/* Remember Me */}
+              <div className="flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
-                  name="remember"
-                  id="remember"
-                  className="peer cursor-pointer"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
+                  className="cursor-pointer"
                 />
-                <label
-                  htmlFor="remember"
-                  className="text-white pl-2 cursor-pointer transition-all duration-300 peer-checked:text-green-400 hover:drop-shadow-[0_0_6px_rgba(147,197,253,0.8)]"
-                >
-                  Remember Me
-                </label>
+                <label className="text-white cursor-pointer">Remember Me</label>
               </div>
-              <div className="m-[2%] w-[35%]">
+
+              {/* Login Button */}
+              <div className="w-[60%] mt-4">
                 <button
                   type="submit"
-                  className="bg-[#7F5AF0] w-[100%] text-[0.8rem] md:text-[1.2rem] rounded-4xl text-white p-4 font-bold hover:cursor-pointer hover:bg-[#6A4CD4] hover:scale-105 transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.8)]"
-                >
+                  className="bg-[#7F5AF0] w-full text-lg rounded-3xl text-white p-3 font-bold hover:bg-[#6A4CD4] hover:scale-105 transition-all duration-300 drop-shadow-xl cursor-pointer">
                   Login
                 </button>
               </div>
             </form>
-            {/*Register Link*/}
-            <div className="text-white text-center">
+
+            <div className="text-white text-center mt-4">
               <p>
-                Dont have an account?{" "}
+                Don't have an account?{' '}
                 <Link
                   to="/Register"
-                  className="text-blue-200 hover:cursor-pointer hover:underline hover:drop-shadow-[0_0_6px_rgba(147,197,253,0.8)] transition-all duration-300"
+                  className="text-blue-300 hover:underline"
                 >
                   Register here
                 </Link>
@@ -240,10 +194,10 @@ function Login() {
           </div>
         </div>
       </div>
-      {showForgot && (
-        <ForgotPassword onClose={() => setShowForgot(false)}></ForgotPassword>
-      )}
+
+      {showForgot && <ForgotPassword onClose={() => setShowForgot(false)} />}
     </>
   );
 }
+
 export default Login;

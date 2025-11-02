@@ -1,6 +1,7 @@
 // Utils / Custom Hooks
 import { useState, useEffect } from "react";
 import { useGameStore } from "../components/OpenAI Prompts/useBugBustStore";
+import { playSound } from "../components/Custom Hooks/DevlabSoundHandler";
 // Navigation (React Router)
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -15,6 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Lottie from "lottie-react";
 import Correct from "../assets/Lottie/correctAnsLottie.json";
 import Wrong from "../assets/Lottie/wrongAnsLottie.json";
+import laodingDots from "../assets/Lottie/LoadingDots.json"
 // Components
 import GameHeader from "./GameModes_Components/GameHeader";
 import InstructionPanel from "./GameModes_Components/InstructionPanel";
@@ -32,7 +34,7 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const navigate = useNavigate();
   const { consumeErrorShield } = useErrorShield();
   // Route params
-  const { subject, lessonId, levelId, stageId, gamemodeId } = useParams();
+  const { subject, lessonId, levelId, stageId} = useParams();
   // Popups
   const [isNavigating, setIsNavigating] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
@@ -45,8 +47,18 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const showIsCorrect = useGameStore((state) => state.showIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
 
-  const { userData, refetch } = useFetchUserData();
+  const { userData} = useFetchUserData();
   const userId = userData?.uid;
+
+    useEffect(() => {
+    if (showIsCorrect) {
+      if (isCorrect) {
+        playSound("correct");
+      } else {
+        playSound("inCorrect");
+      }
+    }
+  }, [showIsCorrect, isCorrect]);
 
 
   // Dynamically render editor based on subject
@@ -67,12 +79,12 @@ function BugBust({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
 
   return (
     <>
-      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col">
+      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col overflow-hidden">
         {/* Header */}
         <GameHeader heart={heart} />
 
         {/* Content */}
-        <div className="h-[83%] flex flex-col md:flex-row p-10 gap-5">
+        <div className="relative h-[100%] flex flex-col gap-5 md:flex-row p-10 transition-all duration-500 overflow-x-hidden">
           {/* Instruction */}
           <div className="h-[40%] md:w-[35%] md:h-full w-full">
             <InstructionPanel
@@ -161,21 +173,15 @@ Take your time — accuracy matters more than speed!`
                   Correct Answer
                 </h1>
 <motion.button
-  disabled={isNavigating}
   onClick={async () => {
-    if (isNavigating) return;
-    setIsNavigating(true);
     setShowIsCorrect(false);
     await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId,setAlreadyComplete });
-    setIsNavigating(false);
   }}
   whileTap={{ scale: 0.95 }}
   whileHover={{ scale: 1.05 }}
-  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold 
-    ${isNavigating ? "opacity-50 cursor-not-allowed" : "hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"}
-  `}
+  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold  hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer`}
 >
-  {isNavigating ? "Loading..." : "Continue"}
+Continue
 </motion.button>
               </div>
             </div>
@@ -214,6 +220,11 @@ Take your time — accuracy matters more than speed!`
           )}
         </AnimatePresence>
       )}
+{/* {isNavigating && (
+  <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+    <Lottie animationData={laodingDots} loop className="w-[50%] h-[50%]" />
+  </div>
+)} */}
     </>
   );
 }

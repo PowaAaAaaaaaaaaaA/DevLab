@@ -6,10 +6,11 @@ import { useEditUser } from "../Functions/useEditUser";
 import { useDeleteAllProgress } from "../Functions/useDeleteAllProgress";
 import { useDeleteSpecificAchievement } from "../Functions/useDeleteSpecificAchievement";
 import DeleteConfirmationModal from "../Modals/DeleteConfirmModal";
+import useFetchLevelsData from "../../../components/BackEnd_Data/useFetchLevelsData";
 
 const categories = ["Html", "Css", "JavaScript", "Database"];
 
-const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
+const EditUserModal = ({ visibility, closeModal, uid }) => {
   const queryClient = useQueryClient();
   const deleteProgress = useDeleteProgress();
   const editUserMutation = useEditUser();
@@ -43,17 +44,22 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
   if (!userInfo) return null;
   const achievements = userInfo.achievements || {};
 
+  // Fetch levels data per category
+  const levelsQueries = categories.reduce((acc, category) => {
+    acc[category] = useFetchLevelsData(category);
+    return acc;
+  }, {});
+
   return (
     <AnimatePresence>
       {visibility && (
         <>
-          {/* Main EditUserModal */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50"
-            onClick={closeModal} // clicking outside closes main modal
+            onClick={closeModal}
           >
             <motion.div
               initial={{ scale: 0.85 }}
@@ -61,7 +67,7 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
               exit={{ scale: 0.85 }}
               transition={{ duration: 0.25 }}
               className="relative bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700 text-white w-[90%] max-w-2xl rounded-2xl p-6 shadow-2xl"
-              onClick={(e) => e.stopPropagation()} // stop clicks inside main modal
+              onClick={(e) => e.stopPropagation()}
             >
               {/* HEADER */}
               <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-3">
@@ -107,57 +113,34 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
               <div className="relative h-[400px] overflow-y-auto scrollbar-custom px-1">
                 <AnimatePresence mode="wait">
                   {/* INFO TAB */}
-                  {activeTab === "info" && (
-                    <motion.div
-                      key="info"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.25 }}
-                      className="space-y-4 p-5"
-                    >
-                      <h3 className="text-lg font-semibold text-cyan-400 mb-2 border-b border-gray-700 pb-2">
-                        User Information
-                      </h3>
+{activeTab === "info" && (
+  <motion.div
+    key="info"
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+    transition={{ duration: 0.25 }}
+    className="space-y-4 p-5"
+  >
+    <h3 className="text-lg font-semibold text-cyan-400 mb-2 border-b border-gray-700 pb-2">
+      User Information
+    </h3>
 
-                      {["username", "bio", "coins", "exp", "userLevel"].map(
-                        (field) => (
-                          <div key={field}>
-                            <label className="text-xs text-gray-400 uppercase">
-                              {field}
-                            </label>
-                            <input
-                              type={
-                                field === "username" || field === "bio"
-                                  ? "text"
-                                  : "number"
-                              }
-                              value={state[field]}
-                              onChange={(e) =>
-                                setState({
-                                  ...state,
-                                  [field]:
-                                    field === "username" || field === "bio"
-                                      ? e.target.value
-                                      : Number(e.target.value),
-                                })
-                              }
-                              className="w-full p-2.5 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 outline-none transition"
-                            />
-                          </div>
-                        )
-                      )}
+    {["username", "bio", "coins", "exp", "userLevel"].map((field) => (
+      <div key={field}>
+        <label className="text-xs text-gray-400 uppercase">
+          {field}
+        </label>
+        <div className="w-full p-2.5 rounded-lg bg-gray-800 text-white border border-gray-700">
+          {state[field] !== "" && state[field] !== null
+            ? state[field]
+            : "N/A"}
+        </div>
+      </div>
+    ))}
+  </motion.div>
+)}
 
-                      <button
-                        onClick={() =>
-                          editUserMutation.mutate({ uid, state })
-                        }
-                        className="mt-6 w-full bg-green-600 hover:bg-green-700 transition py-2 rounded-lg font-semibold shadow-md"
-                      >
-                        Save Changes
-                      </button>
-                    </motion.div>
-                  )}
 
                   {/* PROGRESS TAB */}
                   {activeTab === "progress" && (
@@ -174,13 +157,13 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
                       </h3>
                       <div className="space-y-4">
                         {categories.map((category) => {
+                          const { levelsData, isLoading } = levelsQueries[category];
+                          const totalLevels = !isLoading
+                            ? levelsData.reduce((acc, lesson) => acc + (lesson.levels?.length || 0), 0)
+                            : 100;
+
                           const completed = userInfo.levelCount[category] || 0;
-                          const total =
-                            activeLevel[category]?.levelCounter || 100;
-                          const percent = Math.min(
-                            (completed / total) * 100,
-                            100
-                          );
+                          const percent = Math.min((completed / totalLevels) * 100, 100);
 
                           return (
                             <div
@@ -188,11 +171,9 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
                               className="bg-gray-800/70 rounded-lg p-4 border border-gray-700"
                             >
                               <div className="flex justify-between mb-2">
-                                <p className="capitalize font-medium">
-                                  {category}
-                                </p>
+                                <p className="capitalize font-medium">{category}</p>
                                 <p className="text-sm text-gray-400">
-                                  {completed}/{total}
+                                  {completed}/{totalLevels}
                                 </p>
                               </div>
                               <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
@@ -211,7 +192,7 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
                                     message: `Are you sure you want to reset ${category} progress?`,
                                   })
                                 }
-                                className="mt-2 text-xs text-red-400 hover:text-red-300 underline transition"
+                                className="mt-2 text-xs text-red-400 hover:text-red-300 underline transition cursor-pointer"
                               >
                                 Reset {category} Progress
                               </button>
@@ -220,12 +201,18 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
                         })}
                       </div>
 
-                      <button
-                        onClick={() => deleteAllProgress.mutate({ uid })}
-                        className="mt-4 w-full bg-red-600 hover:bg-red-700 transition py-2 rounded-lg font-semibold shadow-md"
-                      >
-                        Reset All Progress
-                      </button>
+<button
+  onClick={() =>
+    setDeleteTarget({
+      type: "all-progress",
+      message: "Are you sure you want to reset ALL progress for this user?",
+    })
+  }
+  className="mt-4 w-full bg-red-600 hover:bg-red-700 transition py-2 rounded-lg font-semibold shadow-md cursor-pointer"
+>
+  Reset All Progress
+</button>
+
                     </motion.div>
                   )}
 
@@ -245,56 +232,48 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
 
                       {Object.keys(achievements).length > 0 ? (
                         <div className="space-y-4">
-                          {Object.entries(achievements).map(
-                            ([category, { quantity }]) => {
-                              const maxAchievement = 10;
-                              const percent = Math.min(
-                                (quantity / maxAchievement) * 100,
-                                100
-                              );
+                          {Object.entries(achievements).map(([category, { quantity }]) => {
+                            const maxAchievement = 10;
+                            const percent = Math.min((quantity / maxAchievement) * 100, 100);
 
-                              return (
-                                <div
-                                  key={category}
-                                  className="bg-gray-800/70 rounded-lg p-4 border border-gray-700"
-                                >
-                                  <div className="flex justify-between mb-2">
-                                    <p className="capitalize font-medium text-gray-200">
-                                      {category}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      {quantity}/{maxAchievement}
-                                    </p>
-                                  </div>
-
-                                  <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
-                                    <motion.div
-                                      className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-3"
-                                      initial={{ width: 0 }}
-                                      animate={{ width: `${percent}%` }}
-                                      transition={{
-                                        duration: 0.6,
-                                        ease: "easeOut",
-                                      }}
-                                    />
-                                  </div>
-
-                                  <button
-                                    onClick={() =>
-                                      setDeleteTarget({
-                                        type: "achievement",
-                                        category,
-                                        message: `Are you sure you want to reset ${category} achievement?`,
-                                      })
-                                    }
-                                    className="mt-2 text-xs text-red-400 hover:text-red-300 underline transition cursor-pointer"
-                                  >
-                                    Reset {category} Achievement
-                                  </button>
+                            return (
+                              <div
+                                key={category}
+                                className="bg-gray-800/70 rounded-lg p-4 border border-gray-700"
+                              >
+                                <div className="flex justify-between mb-2">
+                                  <p className="capitalize font-medium text-gray-200">
+                                    {category}
+                                  </p>
+                                  <p className="text-sm text-gray-400">
+                                    {quantity}/{maxAchievement}
+                                  </p>
                                 </div>
-                              );
-                            }
-                          )}
+
+                                <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                                  <motion.div
+                                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-3"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${percent}%` }}
+                                    transition={{ duration: 0.6, ease: "easeOut" }}
+                                  />
+                                </div>
+
+                                <button
+                                  onClick={() =>
+                                    setDeleteTarget({
+                                      type: "achievement",
+                                      category,
+                                      message: `Are you sure you want to reset ${category} achievement?`,
+                                    })
+                                  }
+                                  className="mt-2 text-xs text-red-400 hover:text-red-300 underline transition cursor-pointer"
+                                >
+                                  Reset {category} Achievement
+                                </button>
+                              </div>
+                            );
+                          })}
                         </div>
                       ) : (
                         <p className="text-gray-400 text-sm mt-2">
@@ -315,14 +294,16 @@ const EditUserModal = ({ visibility, closeModal, uid, activeLevel }) => {
             onCancel={() => setDeleteTarget(null)}
             onConfirm={() => {
               if (!deleteTarget) return;
-              if (deleteTarget.type === "progress") {
-                deleteProgress.mutate({ uid, subject: deleteTarget.category });
-              } else if (deleteTarget.type === "achievement") {
-                deleteSpecificAchievement.mutate({
-                  uid,
-                  category: deleteTarget.category,
-                });
-              }
+if (deleteTarget.type === "progress") {
+  deleteProgress.mutate({ uid, subject: deleteTarget.category });
+} else if (deleteTarget.type === "achievement") {
+  deleteSpecificAchievement.mutate({
+    uid,
+    category: deleteTarget.category,
+  });
+} else if (deleteTarget.type === "all-progress") {
+  deleteAllProgress.mutate({ uid });
+}
               setDeleteTarget(null);
             }}
           />

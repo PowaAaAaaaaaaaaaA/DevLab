@@ -39,7 +39,6 @@ function Loading({ onComplete }) {
       try {
         await Promise.all([
           queryClient.prefetchQuery(["userData"], fetchUser),
-          queryClient.prefetchQuery(["inventory"], fetchInventory),
           queryClient.prefetchQuery(["ShopItems"], fetchShopItems),
         ]);
       } catch (err) {

@@ -49,11 +49,11 @@ function ForgotPassword({ onClose }) {
         className="relative bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[2px] w-[90%] max-w-md text-white"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.8, opacity: 0 }}>
+        exit={{ scale: 0.8, opacity: 0 }}> 
         <div className="bg-[#1E212F] rounded-2xl p-6">
           <button
             onClick={onClose}
-            className="absolute top-3 right-4 text-white hover:text-gray-300 text-lg">
+            className="absolute top-3 right-4 text-white hover:text-gray-300 text-lg cursor-pointer">
             ✕
           </button>
           <h2 className="text-xl font-bold mb-4 text-center">
@@ -71,7 +71,7 @@ function ForgotPassword({ onClose }) {
           <button
             disabled={loading}
             onClick={handleForgotPassword}
-            className={`w-full py-2 rounded-md font-bold transition ${
+            className={`w-full py-2 rounded-md font-bold transition cursor-pointer ${
               loading
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-[#7F5AF0] hover:bg-[#6A4CD4]"
