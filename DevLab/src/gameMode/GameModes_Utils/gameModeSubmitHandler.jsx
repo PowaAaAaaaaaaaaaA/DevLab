@@ -44,7 +44,7 @@ export const gameModeSubmitHandlers = {
       });
       if (result?.correct && result?.feedback) {
           useGameStore.getState().addStageFeedback({
-    stageId: stageId || "UnknownStage", // or pass this in params
+    stageId: stageId || "UnknownStage", 
     evaluation: result.correct ? "Correct" : "Incorrect",
     feedback: result.feedback,
   });
@@ -73,7 +73,7 @@ export const gameModeSubmitHandlers = {
       });
       if (result?.correct && result?.feedback) {
           useGameStore.getState().addStageFeedback({
-    stageId: stageId || "UnknownStage", // or pass this in params
+    stageId: stageId || "UnknownStage", 
     evaluation: result.correct ? "Correct" : "Incorrect",
     feedback: result.feedback,
   });

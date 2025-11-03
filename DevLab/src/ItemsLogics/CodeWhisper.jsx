@@ -19,7 +19,7 @@ const CodeWhisper = ({ hint, onClose }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-sm flex items-center justify-center border z-50">
         <motion.div
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -63,7 +63,7 @@ const CodeWhisper = ({ hint, onClose }) => {
                 boxShadow: "0px 0px 15px rgba(139,92,246,0.6)",
               }}
               transition={{ bounceDamping: 100 }}
-              className="mt-6 px-6 py-3 text-white rounded-xl font-bold bg-purple-600 hover:cursor-pointer shadow-md hover:shadow-lg transition-all duration-300"
+              className="mt-6 px-6 py-3 text-white rounded-xl font-bold bg-purple-600 hover:cursor-pointer shadow-md "
               onClick={() => setTimeout(onClose, 300)}
             >
               Got it!

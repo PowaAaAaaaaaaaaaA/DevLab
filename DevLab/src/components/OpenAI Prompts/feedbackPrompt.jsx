@@ -17,11 +17,7 @@ export const fetchLevelSummary = async () => {
       console.error("No authenticated user found.");
       return null;
     }
-
     const token = await currentUser.getIdToken(true);
-
-    console.log("stageFeedbacks before sending:", feedbackArray);
-
     const response = await axios.post(
       `
 https://devlab-server-railway-production.up.railway.app/openAI/feedbackPrompts`,

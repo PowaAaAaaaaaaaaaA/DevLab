@@ -99,18 +99,15 @@ function GameFooter({
     <>
       {/* Loading Overlay (only for Next) */}
       {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/98">
-          
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
           <Lottie
             animationData={Loading}
             loop={true}
-            className="w-[50%] h-[50%]"
-          />
+            className="w-[50%] h-[50%]"/>
         </div>
       )}
       {/* Footer */}
       <div
-        // Applying responsive, thematic styles and the UPWARD GLOW
         className="min-h-16 border-t-1 bg-[#11001f] border-t-purple-700 px-4 md:px-6 flex justify-between items-center text-white sticky bottom-0
         shadow-[0_-5px_20px_0_rgba(200,100,255,0.2)]"
       >
@@ -155,7 +152,6 @@ function GameFooter({
         </div>
         {/* Right Section */}
         <div className="flex-shrink-0">
-          
           <p className="text-base sm:text-lg font-bold">
             {userData ? `${userData.coins} Coins` : "Loading..."}
           </p>

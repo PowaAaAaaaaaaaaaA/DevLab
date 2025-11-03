@@ -1,6 +1,7 @@
 // Utils / Custom Hooks
 import { useState, useEffect } from "react";
 import { playSound } from "../components/Custom Hooks/DevlabSoundHandler";
+import { useMutation } from "@tanstack/react-query";
 // Navigation
 import { useParams } from "react-router-dom";
 import { goToNextStage } from "./GameModes_Utils/Util_Navigation";
@@ -33,7 +34,6 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const { subject, lessonId, levelId ,stageId } = useParams();
 
   // Popups
-  const [isNavigating, setIsNavigating] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
   const [alreadyComplete, setAlreadyComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
@@ -54,6 +54,14 @@ function BrainBytes({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
       }
     }
   }, [showisCorrect, isCorrect]);
+
+  const nextStageMutation = useMutation({
+  mutationFn: async () => {
+    setShowisCorrect(false);
+    return await goToNextStage({subject,lessonId,levelId,stageId,navigate,setLevelComplete,userId,setAlreadyComplete});
+  },
+});
+
 
   return (
     <>
@@ -135,14 +143,11 @@ Your mission:
                 <Lottie animationData={Correct} loop={false} className="w-[70%] h-[70%]"/>
                 <h1 className="font-exo font-bold text-black text-3xl">Correct Answer</h1>
 <motion.button
-  onClick={async () => {
-    setShowisCorrect(false);
-    await goToNextStage({ subject, lessonId, levelId, stageId, navigate, setLevelComplete, userId,setAlreadyComplete });
-  }}
+  onClick={() => nextStageMutation.mutate()}
   whileTap={{ scale: 0.95 }}
   whileHover={{ scale: 1.05 }}
-  className={`bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer`}
->"Continue"
+  className="bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer">
+  Continue
 </motion.button>
 
               </div>
@@ -157,7 +162,7 @@ Your mission:
           setShowisCorrect(false);
           //  Check for Error Shield first
           if (await consumeErrorShield()) {
-            console.log("ErrorShield consumed! Preventing heart loss.");
+            
             return; // Do NOT call submitAttempt(false)
           }
           submitAttempt(false);
@@ -173,11 +178,16 @@ Your mission:
           )}
         </AnimatePresence>
       )}
-      {/* {isNavigating && (
-  <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-    <Lottie animationData={laodingDots} loop className="w-[50%] h-[50%]" />
+{nextStageMutation.isPending && (
+  <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+    <Lottie
+      animationData={laodingDots}
+      loop
+      className="w-[50%] h-[50%]"
+    />
   </div>
-)} */}
+)}
+
     </>
   );
 }

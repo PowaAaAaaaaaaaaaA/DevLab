@@ -17,7 +17,7 @@ export const unlockAchievement = async (userId, subject, actionType, payload = {
 
     for (const [achievementId, achievement] of Object.entries(achievementsMap)) {
       const condition = achievement?.unlockCondition;
-
+console.log(payload);
 let match = false;
 switch (actionType) {
   case "firstLevelComplete":

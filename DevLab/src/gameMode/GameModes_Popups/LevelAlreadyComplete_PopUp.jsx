@@ -61,7 +61,7 @@ function LevelAlreadyCompleted({ subj, lessonId, LevelId }) {
           </h1>
 
           <div
-            className="w-full sm:w-[80%] flex flex-col sm:flex-row gap-4 sm:gap-0 items-center justify-aroun"
+            className="w-full sm:w-[80%] flex flex-col sm:flex-row gap-4 sm:gap-0 items-center justify-around"
           >
             {/* Back to Main */}
             <motion.button
@@ -95,12 +95,11 @@ function LevelAlreadyCompleted({ subj, lessonId, LevelId }) {
       </motion.div>
 
       {isLoading && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
           <Lottie
             animationData={loadingDots}
-            loop
-            className="w-[60%] sm:w-[40%] md:w-[30%] lg:w-[20%]"
-          />
+            loop={true}
+            className="w-[50%] h-[50%]"/>
         </div>
       )}
     </div>

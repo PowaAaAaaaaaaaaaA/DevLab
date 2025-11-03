@@ -10,6 +10,8 @@ import { toast } from 'react-toastify';
 import Lottie from 'lottie-react';
 import Loading from "../assets/Lottie/LoadingDots.json";
 
+import { validateEmail, validatePassword } from './Custom Hooks/validations';
+
 // react-icons
 import { IoMail, IoLockClosed, IoPerson } from 'react-icons/io5';
 import { FaUserPlus } from 'react-icons/fa';
@@ -32,6 +34,20 @@ function Register() {
       });
       return;
     }
+
+      // === Email Validation ===
+  const [emailStatus, emailMsg] = validateEmail(email);
+  if (emailStatus === "error") {
+    toast.error(emailMsg, { position: "top-center", theme: "colored" });
+    return;
+  }
+
+  // === Password Validation ===
+  const [passwordStatus, passwordMsg] = validatePassword(password);
+  if (passwordStatus === "error") {
+    toast.error(passwordMsg, { position: "top-center", theme: "colored" });
+    return;
+  }
     setLoading(true);
 
     try {

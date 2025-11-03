@@ -23,7 +23,6 @@ function Loading({ onComplete }) {
   const [index, setIndex] = useState(0);
   const queryClient = useQueryClient();
   const { fetchUser } = useFetchUserData();
-  const { fetchInventory } = useUserInventory();
 
   // Cycle sentences every 3 seconds
   useEffect(() => {

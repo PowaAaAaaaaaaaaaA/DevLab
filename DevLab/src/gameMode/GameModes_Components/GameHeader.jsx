@@ -8,12 +8,15 @@ import { useParams } from "react-router-dom";
 import { MdArrowBackIos } from "react-icons/md";
 import { LuHeart } from "react-icons/lu";
 import defaultAvatar from '../../assets/Images/profile_handler.png'
+import { useAttemptStore } from "../GameModes_Utils/useAttemptStore";
 
 function GameHeader({heart}) {
 
     const { animatedExp } = useLevelBar();
     const {gamemodeId} = useParams();
-    const { userData, isLoading, isError, refetch } = useFetchUserData();
+    const { userData } = useFetchUserData();
+    const maxHearts = useAttemptStore((state) => state.maxHearts);
+
 
   return (
     // Full-width, flexible height (min-h-[10%]), dark purple background, improved padding.
@@ -36,7 +39,7 @@ function GameHeader({heart}) {
       {gamemodeId !== "Lesson" && (
           // CHANGE 4: Centered hearts, reduced margin/gap for space efficiency on small screens.
           <div className="flex gap-1 sm:gap-2 w-auto justify-center">
-            {[...Array(3)].map((_, i) => (
+            {[...Array(maxHearts)].map((_, i) => (
               <span 
                 key={i} 
                 // CHANGE 5: Responsive heart icon size
@@ -46,13 +49,9 @@ function GameHeader({heart}) {
               ))}
           </div>
       )}
-
-      {/* RIGHT SECTION: User Profile and Level Bar */}
-      {/* Removed fixed height and margin. Used 'gap-2' for internal spacing. */}
       <div className="flex items-center gap-2">
         {/* Profile Avatar */}
         <div 
-            // CHANGE 6: Responsive size for Avatar
             className="border rounded-full overflow-hidden w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
           <img
             src={userData?.profileImage || defaultAvatar}
@@ -61,12 +60,9 @@ function GameHeader({heart}) {
         </div>
 
         {/* Level and Progress Bar */}
-        {/* CHANGE 7: Wrapper to manage vertical alignment and responsive width for the bar. */}
         <div className="flex flex-col justify-center">
-          
           {/* Progress Bar Container */}
           <div 
-            // CHANGE 8: Responsive width for Progress Bar (narrower on mobile)
             className="w-[100px] sm:w-[120px] lg:w-[150px] h-3 sm:h-4 mb-1 bg-gray-700 rounded-full">
             <div
               // The bar color is set to a purple-friendly green/cyan (from a previous file)
@@ -74,7 +70,6 @@ function GameHeader({heart}) {
               style={{ width: `${(animatedExp / 100) * 100}%` }}>
             </div>
           </div>
-          
           {/* Level and XP Text */}
           <div className="flex justify-between text-xs sm:text-sm">
             <p className="text-white font-inter font-bold">
