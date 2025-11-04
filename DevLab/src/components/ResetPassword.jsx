@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { toast } from "react-toastify";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { validatePassword } from "./Custom Hooks/validations";
 
 export default function ResetPassword({ onClose }) {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -17,57 +18,36 @@ export default function ResetPassword({ onClose }) {
 
   const handleResetPassword = async () => {
     if (!currentPassword || !newPassword) {
-      toast.error("Please fill in all fields.", {
-        position: "bottom-center",
-        theme: "colored",
-      });
+      toast.error("Please fill in all fields.", { position: "top-center", theme: "colored" });
       return;
     }
 
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters.", {
-        position: "bottom-center",
-        theme: "colored",
-      });
+    const [status, msg] = validatePassword(newPassword);
+    if (status === "error") {
+      toast.error(msg, { position: "top-center", theme: "colored" });
       return;
     }
 
     const user = auth.currentUser;
     if (!user || !user.email) {
-      toast.error("No authenticated user found.", {
-        position: "bottom-center",
-        theme: "colored",
-      });
+      toast.error("No authenticated user found.", { position: "top-center", theme: "colored" });
       return;
     }
 
     setLoading(true);
 
     try {
-      const credential = EmailAuthProvider.credential(
-        user.email,
-        currentPassword
-      );
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword);
 
-      toast.success("Password has been reset!", {
-        position: "bottom-center",
-        theme: "colored",
-      });
+      toast.success("Password has been reset!", { position: "top-center", theme: "colored" });
       onClose();
     } catch (error) {
       console.error(error);
       let message = "Something went wrong. Please try again.";
-      if (error.code === "auth/wrong-password") {
-        message = "Current password is incorrect.";
-      } else if (error.code === "auth/weak-password") {
-        message = "Password must be at least 6 characters.";
-      }
-      toast.error(message, {
-        position: "bottom-center",
-        theme: "colored",
-      });
+      if (error.code === "auth/invalid-credential") message = "Current password is incorrect.";
+      toast.error(message, { position: "top-center", theme: "colored" });
     } finally {
       setLoading(false);
     }
@@ -88,12 +68,13 @@ export default function ResetPassword({ onClose }) {
           >
             ✕
           </button>
+
           <h2 className="text-xl font-bold mb-4 text-center">Reset Password</h2>
           <p className="text-sm mb-4 text-center text-gray-300">
             Enter your current password and a new password.
           </p>
 
-          {/* Current Password Field */}
+          {/* Current Password */}
           <div className="relative mb-4">
             <input
               type={showPassword ? "text" : "password"}
@@ -111,8 +92,8 @@ export default function ResetPassword({ onClose }) {
             </button>
           </div>
 
-          {/* New Password Field */}
-          <div className="relative mb-4">
+          {/* New Password with Hover Tooltip */}
+          <div className="relative mb-4 flex items-center">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="New password"
@@ -120,13 +101,29 @@ export default function ResetPassword({ onClose }) {
               onChange={(e) => setNewPassword(e.target.value)}
               className="w-full p-2 pr-10 rounded-md bg-[#2C2F3F] text-white outline-none border border-gray-600 focus:border-cyan-400"
             />
+
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-white text-xl hover:text-cyan-400"
+              className="absolute top-1/2 right-10 -translate-y-1/2 text-white text-xl hover:text-cyan-400"
             >
               {showPassword ? <IoEyeOff /> : <IoEye />}
             </button>
+
+            {/* Info Icon Tooltip */}
+            <div className="relative group cursor-pointer ml-2">
+              <span className="text-gray-300 text-lg">ℹ️</span>
+              <div className="absolute right-0 top-6 hidden group-hover:block 
+                              bg-[#1E212F] text-white text-xs p-3 rounded-md w-56 
+                              border border-gray-700 shadow-lg z-20 leading-tight">
+                <p className="font-semibold mb-1 text-cyan-300">Password must contain:</p>
+                • At least 8 characters<br />
+                • One uppercase letter (A–Z)<br />
+                • One lowercase letter (a–z)<br />
+                • One number (0–9)<br />
+                • One special character (!@#$...)
+              </div>
+            </div>
           </div>
 
           {/* Reset Password Button */}
@@ -134,9 +131,7 @@ export default function ResetPassword({ onClose }) {
             disabled={loading}
             onClick={handleResetPassword}
             className={`w-full py-2 rounded-md font-bold transition ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-[#7F5AF0] hover:bg-[#6A4CD4]"
+              loading ? "bg-gray-500 cursor-not-allowed" : "bg-[#7F5AF0] hover:bg-[#6A4CD4]"
             }`}
           >
             {loading ? "Updating..." : "Set New Password"}

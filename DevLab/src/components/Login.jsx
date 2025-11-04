@@ -81,11 +81,19 @@ function Login() {
 
       navigate("/Main");
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Invalid credentials.", {
-        position: "top-center",
-        theme: "colored",
-      });
+  const errorMap = {
+    "auth/invalid-credential":"Invalid User Credentials",
+    "auth/user-not-found": "No account found with this email.",
+    "auth/too-many-requests": "Too many attempts. Please try again later.",
+    "auth/user-disabled": "Your account has been suspended.",
+  };
+
+  const message = errorMap[error.code] || "Login failed. Please try again.";
+
+  toast.error(message, {
+    position: "top-center",
+    theme: "colored",
+  });
     } finally {
       setLoading(false);
     }

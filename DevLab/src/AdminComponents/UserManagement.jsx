@@ -188,9 +188,6 @@ return (
             mutate: ({ uid, subject }) =>
               console.log("Delete progress", uid, subject),
           }}
-          deleteAllProgress={{
-            mutate: ({ uid }) => console.log("Delete all progress", uid),
-          }}
           editUser={{
             mutate: ({ uid, state }) => console.log("Edit user", uid, state),
           }}

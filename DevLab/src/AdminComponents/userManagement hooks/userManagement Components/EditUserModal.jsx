@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDeleteProgress } from "../Functions/useDeleteProgress";
-import { useEditUser } from "../Functions/useEditUser";
-import { useDeleteAllProgress } from "../Functions/useDeleteAllProgress";
 import { useDeleteSpecificAchievement } from "../Functions/useDeleteSpecificAchievement";
 import DeleteConfirmationModal from "../Modals/DeleteConfirmModal";
 import useFetchLevelsData from "../../../components/BackEnd_Data/useFetchLevelsData";
@@ -13,8 +11,6 @@ const categories = ["Html", "Css", "JavaScript", "Database"];
 const EditUserModal = ({ visibility, closeModal, uid }) => {
   const queryClient = useQueryClient();
   const deleteProgress = useDeleteProgress();
-  const editUserMutation = useEditUser();
-  const deleteAllProgress = useDeleteAllProgress();
   const deleteSpecificAchievement = useDeleteSpecificAchievement();
   const [deleteTarget, setDeleteTarget] = useState(null);
 
@@ -140,8 +136,6 @@ const EditUserModal = ({ visibility, closeModal, uid }) => {
     ))}
   </motion.div>
 )}
-
-
                   {/* PROGRESS TAB */}
                   {activeTab === "progress" && (
                     <motion.div
@@ -200,18 +194,6 @@ const EditUserModal = ({ visibility, closeModal, uid }) => {
                           );
                         })}
                       </div>
-
-<button
-  onClick={() =>
-    setDeleteTarget({
-      type: "all-progress",
-      message: "Are you sure you want to reset ALL progress for this user?",
-    })
-  }
-  className="mt-4 w-full bg-red-600 hover:bg-red-700 transition py-2 rounded-lg font-semibold shadow-md cursor-pointer"
->
-  Reset All Progress
-</button>
 
                     </motion.div>
                   )}
@@ -301,8 +283,6 @@ if (deleteTarget.type === "progress") {
     uid,
     category: deleteTarget.category,
   });
-} else if (deleteTarget.type === "all-progress") {
-  deleteAllProgress.mutate({ uid });
 }
               setDeleteTarget(null);
             }}

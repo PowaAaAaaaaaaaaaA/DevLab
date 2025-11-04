@@ -38,6 +38,8 @@ import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FullscreenLoader from "./components/FullScreenLoader";
 import { loadSounds } from "./components/Custom Hooks/DevlabSoundHandler";
+
+import NotFound from "./components/NotFound";
 const queryClient = new QueryClient();
 
 
@@ -183,6 +185,7 @@ useEffect(() => {
             path="/Admin/ContentManagement/:subject/AddContent"
             element={isLoggedIn && isAdmin ? <AddContent /> : <Login />}
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <ToastContainer />
         <Toaster position="top-center" reverseOrder={false} />
