@@ -10,6 +10,9 @@ import axios from "axios";
 function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, levelId, stageId }) {
 
 
+  const [localPreview, setLocalPreview] = useState("");
+
+
   const lastBlockId = state.blocks?.length
     ? state.blocks[state.blocks.length - 1].id
     : 0;
@@ -199,12 +202,20 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
 {/* Video Upload Section */}
     <div className="border-cyan-400 border rounded-2xl w-full p-4 bg-[#111827] flex flex-col gap-3">
       <h1 className="font-exo text-white text-[1.5rem]">Upload Video (Optional):</h1>
-      <input
-        type="file"
-        accept="video/*"
-        onChange={(e) => setVideoFile(e.target.files[0])}
-        className="text-white border border-gray-600 rounded-2xl p-5 cursor-pointer"
-      />
+<input
+  type="file"
+  accept="video/*"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    setVideoFile(file);
+
+    if (file) {
+      const previewURL = URL.createObjectURL(file);
+      setLocalPreview(previewURL);
+    }
+  }}
+  className="text-white border border-gray-600 rounded-2xl p-5 cursor-pointer"
+/>
       <button
         type="button"
         onClick={handleUpload}
@@ -213,6 +224,20 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
       >
         {uploading ? "Uploading..." : "Upload Video"}
       </button>
+      {/* VIDEO PREVIEW */}
+{(localPreview || videoUrl || stageData?.videoPresentation) && (
+  <video
+    controls
+    className="w-full max-h-[300px] rounded-xl mt-4 border border-gray-700"
+  >
+    <source
+      src={localPreview || videoUrl || stageData.videoPresentation}
+      type="video/mp4"
+    />
+    Your browser does not support the video tag.
+  </video>
+)}
+
 
       {videoUrl && (
         <a

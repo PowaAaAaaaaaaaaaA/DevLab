@@ -117,18 +117,6 @@ function BugbustForm({stageData, state, dispatch,activeTab}) {
   </div>
 </div>
 
-      {/* Hint */}
-      <div className="border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827]">
-        <h1 className="font-exo text-white text-[2rem] mb-[10px]">Hint:</h1>
-        <textarea
-          value={state.hint || stageData?.hint || ""}
-          onChange={(e) =>
-            dispatch({ type: "UPDATE_FIELD", field: "hint", value: e.target.value })
-          }
-          className="w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-          placeholder="Provide a hint for debugging here."
-        />
-      </div>
     </>
   );
 }

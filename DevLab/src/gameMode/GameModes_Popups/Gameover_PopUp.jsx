@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Gameover from "../../assets/Lottie/SadSignout.json";
 import Lottie from "lottie-react";
 import { callGameOver } from "../../components/BackEnd_Functions/callGameOver";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAttemptStore } from "../GameModes_Utils/useAttemptStore";
 import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 
@@ -28,6 +28,28 @@ function Gameover_PopUp({ gameOver, resetHearts, Back, subject, lessonId, levelI
       setLoading(false);
     }
   };
+
+useEffect(() => {
+  if (gameOver) {
+    window.history.pushState({ popup: true }, "");
+  }
+}, [gameOver]);
+
+
+  useEffect(() => {
+  const handlePop = (event) => {
+    event.preventDefault();
+    handleGoBack(); 
+    console.log("Bang")
+  };
+
+  window.addEventListener("popstate", handlePop);
+
+  return () => {
+    window.removeEventListener("popstate", handlePop);
+  };
+}, [gameOver, Back, subject, lessonId, levelId, stageId]);
+
 
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">

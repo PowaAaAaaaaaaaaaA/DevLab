@@ -7,6 +7,7 @@ import "../index.css";
 import JsImage from "../assets/Images/js-Icon-Big.png";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import LockAnimation from "../assets/Lottie/LockItem.json";
+import JsIcon from "../assets/navbarIcons/JavaScript.png"
 
 // UI
 import Lottie from "lottie-react";
@@ -120,7 +121,7 @@ function JavaScriptLessons() {
                               </div>
                             )}
                             <div className="bg-black text-white min-w-[60px] sm:min-w-[20%] h-[60px] sm:h-full flex justify-center items-center rounded-4xl font-bold text-xl sm:text-3xl">
-                              {level.symbol}
+                              <img src={JsIcon} alt={"JavaScript Icon"} className="w-10 h-10" />
                             </div>
                             <div className="flex flex-col justify-center gap-1 text-white font-exo flex-1 p-4 lg:p-0">
                               <p className="text-base sm:text-[1.2rem]">

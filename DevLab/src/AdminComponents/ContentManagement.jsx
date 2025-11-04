@@ -214,15 +214,13 @@ function ContentManagement() {
         {showForm && (
           <div
             onClick={() => setShowForm(false)}
-            className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center"
-          >
+            className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center">
             <motion.div
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0 }}
-              className="w-[95%] sm:w-[70%] lg:w-[40%] h-[90%] transition-all overflow-x-hidden rounded-2xl scrollbar-custom"
-            >
+              className="w-[95%] sm:w-[70%] lg:w-[40%] h-[90%] transition-all overflow-x-hidden rounded-2xl scrollbar-custom">
               <LessonEdit
                 subject={activeTab}
                 lessonId={`Lesson${lessonId}`}
