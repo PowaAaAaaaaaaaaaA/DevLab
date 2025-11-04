@@ -15,6 +15,8 @@ export default function ResetPassword({ onClose }) {
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
 
   const handleResetPassword = async () => {
     if (!currentPassword || !newPassword) {
@@ -110,20 +112,29 @@ export default function ResetPassword({ onClose }) {
               {showPassword ? <IoEyeOff /> : <IoEye />}
             </button>
 
-            {/* Info Icon Tooltip */}
-            <div className="relative group cursor-pointer ml-2">
-              <span className="text-gray-300 text-lg">ℹ️</span>
-              <div className="absolute right-0 top-6 hidden group-hover:block 
-                              bg-[#1E212F] text-white text-xs p-3 rounded-md w-56 
-                              border border-gray-700 shadow-lg z-20 leading-tight">
-                <p className="font-semibold mb-1 text-cyan-300">Password must contain:</p>
-                • At least 8 characters<br />
-                • One uppercase letter (A–Z)<br />
-                • One lowercase letter (a–z)<br />
-                • One number (0–9)<br />
-                • One special character (!@#$...)
-              </div>
-            </div>
+<div className="relative ml-2">
+  {/* Info Icon */}
+  <span
+    onClick={() => setShowTooltip(!showTooltip)}
+    className="text-gray-300 text-lg cursor-pointer">
+    ℹ️
+  </span>
+
+  {/* Tooltip */}
+  {showTooltip && (
+    <div className="absolute right-0 top-6 
+                    bg-[#1E212F] text-white text-xs p-3 rounded-md w-56
+                    border border-gray-700 shadow-lg z-20 leading-tight">
+      <p className="font-semibold mb-1 text-cyan-300">Password must contain:</p>
+      • At least 8 characters<br />
+      • One uppercase letter (A–Z)<br />
+      • One lowercase letter (a–z)<br />
+      • One number (0–9)<br />
+      • One special character (!@#$...)
+    </div>
+  )}
+</div>
+
           </div>
 
           {/* Reset Password Button */}

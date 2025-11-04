@@ -23,6 +23,8 @@ function Register() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showTooltip, setShowTooltip] = useState(false);
+
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -165,14 +167,21 @@ function Register() {
     <IoLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white" />
   </div>
 
-  {/* ✅ Hover Info Icon */}
-  <div className="relative group cursor-pointer">
-    <span className="text-gray-300 text-lg">ℹ️</span>
+<div className="relative">
+  {/* Info Icon */}
+  <span 
+    onClick={() => setShowTooltip(!showTooltip)}
+    className="text-gray-300 text-lg cursor-pointer"
+  >
+    ℹ️
+  </span>
 
-    {/* Tooltip */}
-    <div className="absolute right-0 top-6 hidden group-hover:block 
+  {/* Tooltip */}
+  {showTooltip && (
+    <div className="absolute right-0 top-6 
                     bg-[#1E212F] text-white text-xs p-3 rounded-md w-56 
                     border border-gray-700 shadow-lg z-20 leading-tight">
+
       <p className="font-semibold mb-1 text-cyan-300">Password must contain:</p>
       • At least 8 characters<br />
       • One uppercase letter (A–Z)<br />
@@ -180,7 +189,9 @@ function Register() {
       • One number (0–9)<br />
       • One special character (!@#$...)
     </div>
-  </div>
+  )}
+</div>
+
 
 </div>
 
