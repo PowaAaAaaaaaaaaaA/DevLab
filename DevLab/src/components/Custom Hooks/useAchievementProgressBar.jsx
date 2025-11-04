@@ -7,12 +7,24 @@ export default function useAchievementsProgressBar(userId, subject) {
   const { data: userAchievements, isLoading: loadingUser } = useUserAchievements(userId);
   const [animatedBar, setAnimatedBar] = useState(0);
 
+  //  Subject alias map to handle abbreviations
+  const subjectAliases = {
+    javascript: "js",
+    html: "html",
+    database: "db",
+    css: "css",
+  };
+
   useEffect(() => {
     if (loadingAll || loadingUser || !allAchievements) return;
 
-    // Filter unlocked achievements 
+    //  Normalize subject to match stored achievement prefixes
+    const normalizedSubject =
+      subjectAliases[subject?.toLowerCase()] || subject?.toLowerCase();
+
+    //  Filter unlocked achievements based on normalized subject prefix
     const unlockedForSubject = Object.keys(userAchievements || {}).filter((id) =>
-      id.toLowerCase().startsWith(subject.toLowerCase())
+      id.toLowerCase().startsWith(normalizedSubject)
     );
 
     const totalAchievements = allAchievements.length;
@@ -21,6 +33,7 @@ export default function useAchievementsProgressBar(userId, subject) {
     const progress =
       totalAchievements > 0 ? (unlockedCount / totalAchievements) * 100 : 0;
 
+    //  Smooth animation effect for progress bar
     let current = animatedBar;
     const target = progress;
 
@@ -33,10 +46,6 @@ export default function useAchievementsProgressBar(userId, subject) {
         setAnimatedBar(target);
       }
     };
-
-    console.log(
-      `Progress [${subject}]: ${unlockedCount}/${totalAchievements} => ${progress}%`
-    );
 
     requestAnimationFrame(step);
   }, [allAchievements, userAchievements, loadingAll, loadingUser, subject]);

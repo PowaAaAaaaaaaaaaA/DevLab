@@ -109,30 +109,37 @@ const runCode = () => {
   }
 
   setTimeout(() => {
-    const fullCode = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <style>${code.CSS}</style>
-      </head>
-      <body>
-        ${code.HTML}
-        <script>
-          // Override console.log to send logs to parent
-          const sendLog = (...args) => {
-            window.parent.postMessage({ type: 'console-log', args }, '*');
-          };
-          console.log = sendLog;
+const fullCode = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    const sendLog = (...args) => {
+      window.parent.postMessage({ type: 'console-log', args }, '*');
+    };
 
-          try {
-            ${code.JavaScript}
-          } catch (err) {
-            sendLog('Error:', err.message);
-          }
-        </script>
-      </body>
-      </html>
-    `;
+    console.log = (...args) => sendLog(...args);
+    console.error = (...args) => sendLog("Error:", ...args);
+    console.warn = (...args) => sendLog("Warning:", ...args);
+  </script>
+
+  <style>${code.CSS}</style>
+</head>
+
+<body>
+  ${code.HTML}
+
+  <script>
+    try {
+      ${code.JavaScript}
+    } catch (err) {
+      sendLog("Error:", err.message);
+    }
+  </script>
+</body>
+</html>
+`;
+
 
     if (iFrame.current) {
       iFrame.current.srcdoc = fullCode;

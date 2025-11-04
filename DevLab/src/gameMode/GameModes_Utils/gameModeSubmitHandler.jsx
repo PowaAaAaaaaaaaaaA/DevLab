@@ -17,6 +17,7 @@ export const gameModeSubmitHandlers = {
         subject,
       });
       if (result?.correct && result?.feedback) {
+        useGameStore.getState().setSingleFeedback(result.feedback);
           useGameStore.getState().addStageFeedback({
     stageId: stageId || "UnknownStage", 
     evaluation: result.correct ? "Correct" : "Incorrect",
@@ -27,7 +28,6 @@ export const gameModeSubmitHandlers = {
       setShowIsCorrect(true);
       console.log(result);
     } catch (error) {
-      console.error("BugBust handler error:", error);
       setIsCorrect(false);
       setShowIsCorrect(true);
     }
@@ -43,8 +43,9 @@ export const gameModeSubmitHandlers = {
         subject,
       });
       if (result?.correct && result?.feedback) {
+        useGameStore.getState().setSingleFeedback(result.feedback);
           useGameStore.getState().addStageFeedback({
-    stageId: stageId || "UnknownStage", // or pass this in params
+    stageId: stageId || "UnknownStage", 
     evaluation: result.correct ? "Correct" : "Incorrect",
     feedback: result.feedback,
   });
@@ -53,7 +54,6 @@ export const gameModeSubmitHandlers = {
       setShowIsCorrect(true);
       console.log(result);
     } catch (error) {
-      console.error(" CodeCrafter handler error:", error);
       setIsCorrect(false);
       setShowIsCorrect(true);
     }
@@ -72,8 +72,9 @@ export const gameModeSubmitHandlers = {
         subject,
       });
       if (result?.correct && result?.feedback) {
+        useGameStore.getState().setSingleFeedback(result.feedback);
           useGameStore.getState().addStageFeedback({
-    stageId: stageId || "UnknownStage", // or pass this in params
+    stageId: stageId || "UnknownStage", 
     evaluation: result.correct ? "Correct" : "Incorrect",
     feedback: result.feedback,
   });
@@ -82,7 +83,6 @@ export const gameModeSubmitHandlers = {
       setShowIsCorrect(true);
       console.log(result);
     } catch (error) {
-      console.error("CodeRush handler error:", error);
       setIsCorrect(false);
       setShowIsCorrect(true);
     }finally {

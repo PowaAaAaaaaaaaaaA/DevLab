@@ -7,15 +7,15 @@ import loadingDots from "../../assets/Lottie/LoadingDots.json"
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { playSound } from "../../components/Custom Hooks/DevlabSoundHandler";
 
-
 import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useAnimatedNumber from "../../components/Custom Hooks/useAnimatedNumber";
 import { unlockAchievement } from "../../components/Custom Hooks/UnlockAchievement";
 import { fetchLevelSummary } from "../../components/OpenAI Prompts/feedbackPrompt";
 import { unlockStage } from "../../components/BackEnd_Functions/unlockStage";
 import { useRewardStore } from "../../ItemsLogics/Items-Store/useRewardStore";
-
 import useFetchLevelsData from "../../components/BackEnd_Data/useFetchLevelsData";
+import { useAttemptStore } from "../GameModes_Utils/useAttemptStore";
+import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 
 function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLevelComplete, resetHearts }) {
   const navigate = useNavigate();
@@ -24,6 +24,8 @@ function LevelCompleted_PopUp({ subj, lessonId, LevelId, heartsRemaining, setLev
   const { lastReward } = useRewardStore();
   const { clearReward } = useRewardStore.getState();
   const { userData, refetch } = useFetchUserData();
+  const removeExtraLives = useAttemptStore((state) => state.removeExtraLives);
+  const removeBuff = useInventoryStore((state) => state.removeBuff);
 
   const [levelSummary, setLevelSummary] = useState(null);
 
@@ -114,27 +116,12 @@ return (
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0 }}
-      className="
-        bg-gradient-to-b from-cyan-400 to-purple-500 
-        rounded-2xl shadow-lg p-[1px] 
-        w-[92%] sm:w-[80%] md:w-[65%] lg:w-[55%] 
-        text-center z-2
-      "
-    >
+      className="bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl shadow-lg p-[1px] w-[92%] sm:w-[80%] md:w-[65%] lg:w-[55%] text-center z-2">
       <div
         className="
-          bg-[#111827] w-full rounded-2xl 
-          p-4 sm:p-6 md:p-8 
-          flex flex-col gap-5 items-center
-        "
-      >
+          bg-[#111827] w-full rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col gap-5 items-center">
         <h1
-          className="
-            font-exo font-bold 
-            text-2xl sm:text-3xl md:text-4xl lg:text-[3rem] 
-            text-[#F2FF43] text-center
-          "
-        >
+          className="font-exo font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[3rem] text-[#F2FF43] text-center">
           LEVEL COMPLETED
         </h1>
 
@@ -213,20 +200,16 @@ return (
 
         {/* BUTTONS */}
         <div
-          className="
-            w-full sm:w-[85%] 
-            flex flex-col sm:flex-row 
-            gap-4 sm:gap-0 
-            items-center justify-around 
-            p-4
-          "
-        >
+          className="w-full sm:w-[85%] flex flex-col sm:flex-row gap-4 sm:gap-0 items-center justify-around p-4">
           {/* BACK TO MAIN */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
             transition={{ bounceDamping: 100 }}
             onClick={() => {
+              removeBuff("extraLives");
+              removeExtraLives();      
+              resetHearts(); 
               setIsLoading(false);
               navigate("/Main", { replace: true });
               clearReward();
@@ -241,9 +224,7 @@ return (
               rounded-xl font-semibold 
               hover:bg-purple-700 
               hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] 
-              cursor-pointer
-            "
-          >
+              cursor-pointer">
             Back to Main
           </motion.button>
 
@@ -253,6 +234,9 @@ return (
             whileHover={{ scale: 1.05 }}
             transition={{ bounceDamping: 100 }}
             onClick={() => {
+              removeBuff("extraLives");
+              removeExtraLives();      
+              resetHearts();
               setIsLoading(true);
               clearReward();
               unlockNextLevel(true);
@@ -260,16 +244,7 @@ return (
                 await refetch();
               })();
             }}
-            className="
-              bg-[#36DB4F] 
-              w-full sm:min-w-[40%] sm:max-w-[45%] 
-              text-white px-6 py-3 
-              rounded-xl font-semibold 
-              hover:bg-[#2CBF45] 
-              hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] 
-              cursor-pointer
-            "
-          >
+            className="bg-[#36DB4F] w-full sm:min-w-[40%] sm:max-w-[45%] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#2CBF45] hover:drop-shadow-[0_0_10px_rgba(126,34,206,0.5)] cursor-pointer">
             Continue
           </motion.button>
         </div>
@@ -277,13 +252,12 @@ return (
     </motion.div>
 
     {isLoading && (
-      <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-        <Lottie
-          animationData={loadingDots}
-          loop
-          className="w-[60%] sm:w-[40%] md:w-[30%] lg:w-[20%]"
-        />
-      </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/98">
+          <Lottie
+            animationData={loadingDots}
+            loop={true}
+            className="w-[50%] h-[50%]"/>
+        </div>
     )}
   </div>
 );

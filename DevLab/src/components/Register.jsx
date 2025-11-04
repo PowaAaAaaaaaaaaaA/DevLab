@@ -10,6 +10,8 @@ import { toast } from 'react-toastify';
 import Lottie from 'lottie-react';
 import Loading from "../assets/Lottie/LoadingDots.json";
 
+import { validateEmail, validatePassword } from './Custom Hooks/validations';
+
 // react-icons
 import { IoMail, IoLockClosed, IoPerson } from 'react-icons/io5';
 import { FaUserPlus } from 'react-icons/fa';
@@ -32,6 +34,20 @@ function Register() {
       });
       return;
     }
+
+      // === Email Validation ===
+  const [emailStatus, emailMsg] = validateEmail(email);
+  if (emailStatus === "error") {
+    toast.error(emailMsg, { position: "top-center", theme: "colored" });
+    return;
+  }
+
+  // === Password Validation ===
+  const [passwordStatus, passwordMsg] = validatePassword(password);
+  if (passwordStatus === "error") {
+    toast.error(passwordMsg, { position: "top-center", theme: "colored" });
+    return;
+  }
     setLoading(true);
 
     try {
@@ -135,16 +151,40 @@ function Register() {
               <IoMail className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white" />
             </div>
 
-            {/* Password */}
-            <div className="w-[85%] relative">
-              <input
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                placeholder="Password"
-                className="bg-[#1E212F] text-white w-full h-12 rounded-2xl pl-12 pr-4 border-2 border-gray-700 focus:border-cyan-500 focus:outline-none"
-              />
-              <IoLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white" />
-            </div>
+<div className="w-[85%] flex items-center gap-2 relative">
+
+  {/* Password Input */}
+  <div className="relative flex-1">
+    <input
+      onChange={(e) => setPassword(e.target.value)}
+      type="password"
+      placeholder="Password"
+      className="bg-[#1E212F] text-white w-full h-12 rounded-2xl pl-12 pr-4 
+                 border-2 border-gray-700 focus:border-cyan-500 focus:outline-none"
+    />
+    <IoLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white" />
+  </div>
+
+  {/* ✅ Hover Info Icon */}
+  <div className="relative group cursor-pointer">
+    <span className="text-gray-300 text-lg">ℹ️</span>
+
+    {/* Tooltip */}
+    <div className="absolute right-0 top-6 hidden group-hover:block 
+                    bg-[#1E212F] text-white text-xs p-3 rounded-md w-56 
+                    border border-gray-700 shadow-lg z-20 leading-tight">
+      <p className="font-semibold mb-1 text-cyan-300">Password must contain:</p>
+      • At least 8 characters<br />
+      • One uppercase letter (A–Z)<br />
+      • One lowercase letter (a–z)<br />
+      • One number (0–9)<br />
+      • One special character (!@#$...)
+    </div>
+  </div>
+
+</div>
+
+
 
             {/* Confirm Password */}
             <div className="w-[85%] relative">

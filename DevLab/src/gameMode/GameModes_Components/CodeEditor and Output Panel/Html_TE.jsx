@@ -18,6 +18,7 @@ import { useParams } from "react-router-dom";
 import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
 import { extractTags } from "../../../components/Achievements Utils/Html_KeyExtract";
 import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
+import useFetchUserProgress from "../../../components/BackEnd_Data/useFetchUserProgress";
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
@@ -28,7 +29,7 @@ import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 function Html_TE() {
   // Data
   const { userData } = useFetchUserData();
-  const { gamemodeId } = useParams();
+const { gamemodeId, lessonId, levelId, stageId } = useParams();
   const { gameModeData, subject } = useFetchGameModeData();
   const [description, setDescription] = useState("");
 
@@ -45,6 +46,12 @@ function Html_TE() {
   const [showPopup, setShowPopup] = useState(false);
   //
   const [code, setCode] = useState("");
+
+  const { userStageCompleted } = useFetchUserProgress(subject);
+
+const stageKey = `${lessonId}-${levelId}-${stageId}`;
+const isStageCompleted = userStageCompleted?.[stageKey] === true;
+
 
   // Run Button
   const runCode = () => {
@@ -155,8 +162,7 @@ function Html_TE() {
             className="bg-[#9333EA] text-white font-bold rounded-xl p-2 sm:p-3 w-[45%] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] text-sm sm:text-base">
             RUN
           </motion.button>
-    {/* EVALUATE BUTTON — only for Lesson mode */}
-    {gamemodeId === "Lesson" && (
+    {(gamemodeId === "Lesson" || isStageCompleted) && (
       <motion.button
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.05, background: "#7e22ce" }}

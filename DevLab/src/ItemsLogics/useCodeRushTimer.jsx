@@ -25,7 +25,6 @@ useEffect(() => {
 // }, [timer, gamemodeId]);
 
   // Countdown logic
-  console.log(showPopup,isFrozen,pauseTimer);
 useEffect(() => {
   if (gamemodeId !== "CodeRush") return;
   if (timer <= 0 || showPopup || isFrozen || pauseTimer) return;
@@ -42,16 +41,6 @@ useEffect(() => {
 useEffect(() => {
   if (gamemodeId !== "CodeRush") return;
   if (!activeBuffs.length) return;
-
-  // Extra Time Buff (+30s)
-  if (activeBuffs.includes("extraTime")) {
-    setTimer((prev) => prev + 30);
-    setBuffApplied(true);
-    setBuffType("extraTime");
-
-    removeBuff("extraTime"); // update Zustand + Firestore
-    setTimeout(() => setBuffApplied(false), 1000);
-  }
 
   // Time Freeze Buff (pauses countdown for 5s)
   if (activeBuffs.includes("timeFreeze")) {

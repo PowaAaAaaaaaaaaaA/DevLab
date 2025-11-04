@@ -52,7 +52,6 @@ const runCode = () => {
     toast.error("Please enter your code before running.", { position: "top-right" });
     return;
   }
-
   try {
     setHasRunQuery(true);
 
@@ -62,6 +61,15 @@ const runCode = () => {
       .replace(/\bauto_increment\b/gi, "");
 
     const res = dbRef.current.exec(sanitizedQuery);
+
+    // Achievements / tracking
+    if (gamemodeId !== "Lesson") {
+      const usedTags = extractSqlKeywords(query); 
+      if (usedTags.length > 0) {
+        unlockAchievement(userData?.uid, "Database", "tagUsed", { usedTags });
+      }
+      console.log(usedTags)
+    }
 
     if (res.length === 0) {
       setOutputHtml(`
@@ -94,14 +102,6 @@ const runCode = () => {
     setOutputHtml(table);
     renderAllTables();
 
-    // Achievements / tracking
-    if (gamemodeId !== "Lesson") {
-      const usedTags = extractSqlKeywords(query); 
-      if (usedTags.length > 0) {
-        unlockAchievement(userData?.uid, "Database", "tagUsed", { usedTags, isCorrect });
-      }
-      console.log(usedTags)
-    }
 
   } catch (err) {
     setOutputHtml(`<span class="text-red-500 font-medium">${err.message}</span>`);
@@ -234,7 +234,6 @@ const handleEvaluate = async () => {
       description,
       subject,
     });
-    console.log("Database Evaluation Result:", result);
     setEvaluationResult(result);
     setShowPopup(true);
   } catch (error) {
@@ -273,7 +272,7 @@ return (
             whileHover={{ scale: 1.05 }}
             transition={{ bounceDamping: 100 }}
             onClick={runCode}
-            className="bg-[#9333EA] text-white font-bold rounded-xl py-3 w-full sm:w-[45%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+            className="bg-[#9333EA] text-white font-bold rounded-xl py-3 w-full sm:w-[45%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer"
           >
             RUN
           </motion.button>
@@ -286,7 +285,7 @@ return (
               transition={{ bounceDamping: 100 }}
               onClick={handleEvaluate}
               disabled={isEvaluating}
-              className={`bg-[#9333EA] text-white font-bold rounded-xl py-3 w-full sm:w-[45%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] ${
+              className={`bg-[#9333EA] text-white font-bold rounded-xl py-3 w-full sm:w-[45%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ${
                 isEvaluating ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

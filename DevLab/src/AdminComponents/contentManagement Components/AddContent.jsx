@@ -7,7 +7,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 function AddContent({ subject, closePopup }) {
   const [Lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState("");
-  const [selectedType, setSelectedType] = useState("FrontEnd");
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [coins, setCoins] = useState("");
@@ -44,23 +43,6 @@ function AddContent({ subject, closePopup }) {
         });
         return;
       }
-
-      let defaultS = "";
-      switch (subject) {
-        case "Html":
-          defaultS = "<>";
-          break;
-        case "Css":
-          defaultS = "#";
-          break;
-        case "JavaScript":
-          defaultS = "{ }";
-          break;
-        case "Database":
-          defaultS = "||||";
-          break;
-      }
-
       let lessonIdFinal = selectedLesson;
       // Handle creating a new lesson
       if (selectedLesson === "LessonAdd") {
@@ -100,11 +82,8 @@ function AddContent({ subject, closePopup }) {
         description: desc,
         coinsReward: parseInt(coins),
         expReward: parseInt(exp),
-        symbol: defaultS,
         levelOrder: nextLevelNum,
       };
-
-      if (subject === "JavaScript") levelData.type = selectedType;
 
       await setDoc(levelDocRef, levelData);
 
@@ -140,20 +119,12 @@ return (
         e.preventDefault();
         addLevelMutation.mutate();
       }}
-      className="relative border w-full m-auto bg-[#111827] border-[#56EBFF] 
-                 rounded-2xl p-5 sm:p-8 shadow-lg"
-    >
-
+      className="relative border w-full m-auto bg-[#111827] border-[#56EBFF] rounded-2xl p-5 sm:p-8 shadow-lg">
       {/* Close Button */}
       <button
         type="button"
         onClick={closePopup}
-        className="absolute top-3 right-3 text-white text-xl 
-                   bg-red-500 hover:bg-red-600
-                   w-5 h-5 sm:w-10 sm:h-10 rounded-full 
-                   flex items-center justify-center
-                   hover:scale-110 transition-all duration-300 shadow-md cursor-pointer"
-      >
+        className="absolute top-3 right-3 text-white text-xl bg-red-500 hover:bg-red-60 w-5 h-5 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all duration-300 shadow-md cursor-pointer">
         ✕
       </button>
 
@@ -176,20 +147,6 @@ return (
             <option value="LessonAdd">Add Lesson</option>
           </select>
         </div>
-
-        {/*  Type Selector only for JS */}
-        {subject === "JavaScript" && (
-          <div className="flex items-center gap-3">
-            <label className="text-white">Type:</label>
-            <select
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="bg-[#1f2937] text-white p-2 rounded-md focus:outline-0 cursor-pointer"
-            >
-              <option value="FrontEnd">Front End</option>
-              <option value="BackEnd">Back End</option>
-            </select>
-          </div>
-        )}
       </div>
       <div
         className={`mt-4 rounded-2xl bg-[#0d13207c] p-5 sm:p-7 border border-gray-700 
@@ -238,7 +195,7 @@ return (
                      focus:outline-gray-400"
         />
 
-        {/* ✅ Buttons Row */}
+        {/*  Buttons Row */}
         <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 w-full sm:w-[70%] mx-auto">
 
           <button

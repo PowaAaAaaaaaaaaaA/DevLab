@@ -79,48 +79,64 @@ function Settings() {
     }
   };
 
-  // ✅ Upload Image WITH Progress
-  const uploadImage = async (file, type = "profile") => {
-    const user = auth.currentUser;
-    if (!user) throw new Error("No user logged in.");
+  //  Upload Image WITH Progress
+const uploadImage = async (file, type = "profile") => {
+  const user = auth.currentUser;
+  if (!user) throw new Error("No user logged in.");
 
-    const fileRef = ref(storage, `userProfiles/${user.uid}/${type}.jpg`);
-    const uploadTask = uploadBytesResumable(fileRef, file);
+  // ✅ Validate file type
+  if (!file.type.startsWith("image/")) {
+    toast.error("Only image files are allowed!");
+    return;
+  }
 
-    setIsUploading(true);
-    setUploadProgress(0);
+  const fileRef = ref(storage, `userProfiles/${user.uid}/${type}.jpg`);
+  const uploadTask = uploadBytesResumable(fileRef, file);
 
-    return new Promise((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        },
-        (error) => {
-          setIsUploading(false);
-          reject(error);
-        },
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+  setIsUploading(true);
+  setUploadProgress(0);
 
-          await setDoc(
-            doc(db, "Users", user.uid),
-            { [`${type}Image`]: downloadURL },
-            { merge: true }
-          );
+  return new Promise((resolve, reject) => {
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(progress);
+      },
+      (error) => {
+        setIsUploading(false);
+        toast.error("Upload failed. Please try again.");
+        reject(error);
+      },
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-          setIsUploading(false);
-          resolve(downloadURL);
-        }
-      );
-    });
-  };
+        await setDoc(
+          doc(db, "Users", user.uid),
+          { [`${type}Image`]: downloadURL },
+          { merge: true }
+        );
+
+        setIsUploading(false);
+        toast.success(
+          type === "profile"
+            ? "Profile picture updated successfully!"
+            : "Background image updated successfully!",
+          { position: "top-center", theme: "colored" }
+        );
+
+        resolve(downloadURL);
+      }
+    );
+  });
+};
+
+
 
   return (
     <>
-      {/* ✅ Upload Progress Modal */}
+      {/*  Upload Progress Modal */}
       {isUploading && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-[#1E212F] p-6 rounded-2xl w-[80%] sm:w-[40%] text-center">
@@ -138,7 +154,7 @@ function Settings() {
         </div>
       )}
 
-      <div className="bg-[#111827] flex flex-col h-[95%] items-center gap-5 p-5 mx-auto mt-5 rounded-3xl border-2 shadow-2xl shadow-black w-full max-w-[600px] sm:max-w-[700px] md:max-w-[900px]">
+      <div className="bg-[#111827] flex flex-col h-[95%] items-center gap-5 p-5 mx-auto mt-5 rounded-3xl border-2 shadow-2xl shadow-black w-full max-w-[600px] sm:max-w-[700px] md:max-w-[900px] relative">
         
         {/* Profile Image */}
         <motion.div
@@ -159,7 +175,6 @@ function Settings() {
               if (e.target.files[0]) {
                 await uploadImage(e.target.files[0], "profile");
                 await refetch();
-                toast.success("Profile picture updated!");
               }
             }}
           />
@@ -184,7 +199,6 @@ function Settings() {
               if (e.target.files[0]) {
                 await uploadImage(e.target.files[0], "background");
                 await refetch();
-                toast.success("Background image updated!");
               }
             }}
           />
@@ -233,27 +247,38 @@ function Settings() {
           whileHover={{ scale: 1.05 }}
           transition={{ bounceDamping: 100 }}
           className="bg-[#FF6166] p-3 w-full sm:w-[60%] md:w-[43%] rounded-3xl font-exo font-bold text-white mt-1.5 hover:bg-[#E04C52] hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)] cursor-pointer"
-          onClick={() => setTimeout(() => setShowLogoutPopUp(true), 300)}
-        >
+          onClick={() => setTimeout(() => setShowLogoutPopUp(true), 300)}>
           Logout
         </motion.button>
 
         <button
           className="text-white text-sm hover:underline cursor-pointer"
-          onClick={() => setShowResetPass(true)}
-        >
+          onClick={() => setShowResetPass(true)}>
           Reset Password
         </button>
 
         <Link>
           <button
             onClick={() => setAdminPopup(true)}
-            className="text-white font-exo hover:text-red-500 hover:cursor-pointer transition duration-300 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]"
-          >
+            className="text-white font-exo hover:text-red-500 hover:cursor-pointer transition duration-300 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]">
             Login as Administrator
           </button>
         </Link>
+
+{/* Download Mobile App Button - Right Side */}
+<div className="w-full flex justify-end pr-3 relative">
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={{ scale: 1.05 }}
+    transition={{ bounceDamping: 100 }}
+    className="bg-[#7F5AF0] px-5 py-2 rounded-3xl font-exo font-bold text-white hover:bg-[#6A4CD4] hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.4)] cursor-pointer underline"
+    onClick={() => window.open("https://drive.google.com/file/d/1EQhmkRyEOiV8Vv-zJVzRXMLS6z99tT96/view?fbclid=IwY2xjawN0KAtleHRuA2FlbQIxMABicmlkETFwZk5qNVVjMG1lT2ZweHhOAR4n5O0TdGXdMvEQBZy9P5iNOJuW4pr797V0NQgL6wm2Hm9OfUtsuX8dTq4V0g_aem_2fjLapyiNy1egZ2Q0uE1Zg", "_blank")}>
+    Download Mobile App
+  </motion.button>
+</div>
       </div>
+
+
 
       {/* Logout Popup */}
       <AnimatePresence initial={false}>
@@ -263,14 +288,12 @@ function Settings() {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0 }}
-              className="bg-[#1E212F] text-white p-6 rounded-2xl text-center shadow-lg w-[80%] sm:w-[40%] md:w-[25%] flex flex-col items-center"
-            >
+              className="bg-[#1E212F] text-white p-6 rounded-2xl text-center shadow-lg w-[80%] sm:w-[40%] md:w-[25%] flex flex-col items-center">
               <h2 className="text-xl font-bold font-exo">Confirm Logout</h2>
               <Lottie
                 animationData={LogoutAnimation}
                 loop
-                className="w-[40%] h-[50%] mt-4"
-              />
+                className="w-[40%] h-[50%] mt-4"/>
               <p className="mb-6 font-exo">Are you sure you want to log out?</p>
               <div className="flex flex-col sm:flex-row justify-center gap-4 w-full">
                 <motion.button
@@ -278,8 +301,7 @@ function Settings() {
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}
                   onClick={logout}
-                  className="bg-[#FF6166] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)] cursor-pointer"
-                >
+                  className="bg-[#FF6166] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)] cursor-pointer">
                   Yes, Logout
                 </motion.button>
                 <motion.button
@@ -287,8 +309,7 @@ function Settings() {
                   whileHover={{ scale: 1.05 }}
                   transition={{ bounceDamping: 100 }}
                   onClick={() => setTimeout(() => setShowLogoutPopUp(false), 200)}
-                  className="bg-gray-500 p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(128,128,128,0.4)] cursor-pointer"
-                >
+                  className="bg-gray-500 p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(128,128,128,0.4)] cursor-pointer">
                   Cancel
                 </motion.button>
               </div>
@@ -337,6 +358,7 @@ function Settings() {
 
       {/* Reset Password */}
       {showResetPass && <ResetPassword onClose={() => setShowResetPass(false)} />}
+ 
     </>
   );
 }

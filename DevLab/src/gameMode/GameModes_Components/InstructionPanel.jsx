@@ -28,9 +28,6 @@ import useStoreLastOpenedLevel from "../../components/Custom Hooks/useStoreLastO
 import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
 
 
-// =================================================================
-// FIX: MOVED CODEBLOCK DEFINITION ABOVE MAIN COMPONENT
-// =================================================================
 
 const CodeBlock = ({ code, language, color }) => {
   const [copied, setCopied] = useState(false);
@@ -103,7 +100,6 @@ function InstructionPanel({
     const [aiHint, setAiHint] = useState("");
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const submittedCode = useGameStore((state) => state.submittedCode);
-console.log(submittedCode);
   console.log("Current active buffs:", activeBuffs);
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject,lessonId,levelId, stageId } = useFetchGameModeData();
@@ -209,7 +205,6 @@ useEffect(() => {
 
   useEffect(() => {
     if (!gameModeData?.choices) return;
-
     let optionsArray = Object.entries(gameModeData.choices)
       .filter(([key]) => key !== "correctAnswer")
       .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
@@ -223,6 +218,7 @@ useEffect(() => {
       setFilteredOptions(optionsArray);
     }
   }, [gameModeData, activeBuffs]);
+
 
   useEffect(() => {
   if (showCodeWhisper && gameModeData) {
@@ -259,7 +255,9 @@ const hasAnyCode =
 
 
   return (
-    // Thematic background, shadow, and responsive padding/font sizes
+
+    
+    <>
     <div className="h-full w-full border-[#2a3141] border-[1px] bg-gray-800/70 backdrop-blur-sm rounded-2xl text-white overflow-y-scroll p-4 md:p-6 flex flex-col gap-5 scrollbar-custom">
       {/* Responsive Title */}
       <h2 className="text-2xl md:text-[2rem] font-bold text-shadow-lg text-shadow-black text-[#E35460]">
@@ -413,7 +411,8 @@ const hasAnyCode =
         </div>
       )}
 
-      {/* Code Whisper */}
+    </div>
+          {/* Code Whisper */}
 <AnimatePresence>
   {showCodeWhisper && (
     <CodeWhisper
@@ -422,8 +421,7 @@ const hasAnyCode =
     />
   )}
 </AnimatePresence>
-
-    </div>
+    </>
   );
 }
 

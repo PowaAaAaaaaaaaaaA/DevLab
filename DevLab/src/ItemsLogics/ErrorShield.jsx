@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useInventoryStore } from "./Items-Store/useInventoryStore";
+import { toast } from "react-hot-toast";
 
 export const useErrorShield = () => {
   const { removeBuff } = useInventoryStore.getState();
@@ -12,10 +13,19 @@ export const useErrorShield = () => {
   const consumeErrorShield = useCallback(async () => {
     if (!hasShield || consuming) return false;
 
-    setConsuming(true);// prevent double-consume in same tick
+    setConsuming(true); // prevent double-consume in same tick
     try {
-          removeBuff("errorShield");
-          console.log("removing the area");
+      //  Remove the buff
+      removeBuff("errorShield");
+      console.log("ErrorShield consumed");
+
+      //  Toast notification
+toast.success("🛡️ Error Shield activated! This mistake won't count.", {
+  id: "errorShieldUsed",
+  position: "top-right",
+});
+
+
       return true;
     } finally {
       setConsuming(false);

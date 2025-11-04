@@ -3,38 +3,53 @@ import { useNavigate } from "react-router-dom";
 import Gameover from "../../assets/Lottie/SadSignout.json";
 import Lottie from "lottie-react";
 import { callGameOver } from "../../components/BackEnd_Functions/callGameOver";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAttemptStore } from "../GameModes_Utils/useAttemptStore";
+import { useInventoryStore } from "../../ItemsLogics/Items-Store/useInventoryStore";
 
 function Gameover_PopUp({ gameOver, resetHearts, Back, subject, lessonId, levelId, stageId }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const removeExtraLives = useAttemptStore((state) => state.removeExtraLives);
+  const removeBuff = useInventoryStore((state) => state.removeBuff);
+
 
   const handleGoBack = async () => {
     if (!gameOver || !Back) return;
     try {
       setLoading(true);
       await callGameOver(subject, lessonId, levelId, stageId); //  Call API before resetting
+      removeBuff("extraLives"); 
+      removeExtraLives();
       resetHearts();
       navigate(Back);
     } catch (error) {
-      console.error("Error calling gameOver API:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoDashboard = async () => {
-    try {
-      setLoading(true);
-      await callGameOver(subject, lessonId, levelId, stageId); //  Also call before dashboard
-      resetHearts();
-      navigate("/main");
-    } catch (error) {
-      console.error("Error calling gameOver API:", error);
-    } finally {
-      setLoading(false);
-    }
+useEffect(() => {
+  if (gameOver) {
+    window.history.pushState({ popup: true }, "");
+  }
+}, [gameOver]);
+
+
+  useEffect(() => {
+  const handlePop = (event) => {
+    event.preventDefault();
+    handleGoBack(); 
+    console.log("Bang")
   };
+
+  window.addEventListener("popstate", handlePop);
+
+  return () => {
+    window.removeEventListener("popstate", handlePop);
+  };
+}, [gameOver, Back, subject, lessonId, levelId, stageId]);
+
 
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
@@ -63,19 +78,6 @@ function Gameover_PopUp({ gameOver, resetHearts, Back, subject, lessonId, levelI
           } bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]`}
         >
           {loading ? "Processing..." : "Go back to the 1st Lesson"}
-        </motion.button>
-
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ bounceDamping: 100 }}
-          onClick={handleGoDashboard}
-          disabled={loading}
-          className={`${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          } bg-[#9333EA] text-white px-6 py-2 rounded-xl font-semibold hover:bg-purple-700 hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]`}
-        >
-          {loading ? "Processing..." : "Go Back to Dashboard"}
         </motion.button>
       </motion.div>
     </div>

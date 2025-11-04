@@ -1,6 +1,10 @@
-// Returns an array of SQL keywords used in a query
 export const extractSqlKeywords = (query) => {
-  const keywordRegex = /\b(SELECT|AND|NOT|UPDATE|LIKE|BETWEEN|DELETE)\b/gi;
+  //  Recreate the regex each time so it NEVER keeps old state
+  const keywordRegex = new RegExp(
+    "\\b(SELECT|AND|NOT|UPDATE|LIKE|BETWEEN|DELETE)\\b",
+    "gi"
+  );
+
   const keywords = [];
   let match;
 
@@ -8,5 +12,5 @@ export const extractSqlKeywords = (query) => {
     keywords.push(match[1].toUpperCase());
   }
 
-  return [...new Set(keywords)]; // remove duplicates
+  return [...new Set(keywords)]; //  remove duplicates
 };

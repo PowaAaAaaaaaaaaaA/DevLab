@@ -7,9 +7,22 @@ import axios from "axios";
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState(stageData?.replicationFile || "");
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+  const [localPreview, setLocalPreview] = useState("");
+
+
+const handleFileChange = (e) => {
+  const selected = e.target.files[0];
+  setFile(selected);
+
+  if (selected) {
+    const previewURL = URL.createObjectURL(selected);
+    setLocalPreview(previewURL);
+
+    // Clear old uploaded URL so the preview switches to the new file
+    setFileUrl("");
+  }
+};
+
 
   const handleUpload = async () => {
     if (!file) return;
@@ -31,6 +44,7 @@ import axios from "axios";
         },
       });
       setFileUrl(res.data.url);
+      setLocalPreview("");
       // Update local state so Save button has it
       dispatch({ type: "UPDATE_FIELD", field: "replicationFile", value: res.data.url });
     } catch (err) {
@@ -157,12 +171,12 @@ import axios from "axios";
           type="file" 
           accept=".html" 
           onChange={handleFileChange} 
-          className="text-white"/>
+          className="text-white border p-4 rounded-2xl cursor-pointer"/>
         <button
           type="button"
           onClick={handleUpload}
           disabled={uploading}
-          className="bg-[#7F5AF0] text-white rounded-lg p-2 hover:scale-105 transition">
+          className="bg-[#7F5AF0] text-white rounded-lg p-2 hover:scale-105 transition cursor-pointer">
           {uploading ? "Uploading..." : "Upload"}
         </button>
 
@@ -175,6 +189,16 @@ import axios from "axios";
             View Uploaded File
           </a>
         )}
+        {/* HTML PREVIEW */}
+{(localPreview || fileUrl || stageData?.replicationFile) && (
+  <iframe
+    key={localPreview || fileUrl || stageData?.replicationFile}
+    src={localPreview || fileUrl || stageData?.replicationFile}
+    className="w-full h-[400px] mt-4 rounded-xl border bg-white border-gray-700"
+    title="HTML Preview"
+  />
+)}
+
       </div>
         </div>
       </>

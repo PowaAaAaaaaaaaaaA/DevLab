@@ -1,5 +1,5 @@
 // Utils
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import '../index.css'
 // CodeMirror
@@ -28,6 +28,11 @@ function CodePlayground() {
   const [showPopup, setShowPopup] = useState(false);
   // useRef
   const iFrame = useRef(null);
+
+    // Console log states
+  const [logs, setLogs] = useState([]);
+  const consoleRef = useRef([]);
+
 
   // Initial Text Each Tab
   const [code, setCode] = useState({
@@ -63,29 +68,43 @@ function CodePlayground() {
   const runCode = () => {
     setRun(true); // trigger iframe to appear
     // Slight delay to allow iframe to mount first ( kase kelangan double click yung "run" btn kapag wlaang delay TT)
-    setTimeout(() => {
-      const fullCode = `<!DOCTYPE html>
+  setTimeout(() => {
+const fullCode = `
+<!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    const sendLog = (...args) => {
+      window.parent.postMessage({ type: 'console-log', args }, '*');
+    };
+
+    console.log = (...args) => sendLog(...args);
+    console.error = (...args) => sendLog("Error:", ...args);
+    console.warn = (...args) => sendLog("Warning:", ...args);
+  </script>
+
   <style>${code.CSS}</style>
 </head>
+
 <body>
   ${code.HTML}
+
   <script>
-  (() => {
-    ${code.JavaScript}
-  })();
+    try {
+      ${code.JavaScript}
+    } catch (err) {
+      sendLog("Error:", err.message);
+    }
   </script>
 </body>
-</html>`;
-      const iframe = iFrame.current;
-      if (iframe) {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write(fullCode);
-        doc.close();
-      }
-    }, 0);
+</html>
+`;
+
+
+    if (iFrame.current) {
+      iFrame.current.srcdoc = fullCode;
+    }
+  }, 0);
   };
 
 const [isEvaluating, setIsEvaluating] = useState(false);
@@ -106,6 +125,18 @@ const [isEvaluating, setIsEvaluating] = useState(false);
     setIsEvaluating(false);
   }
 };
+
+  // Listen for messages from iframe for console logs
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data.type === "console-log") {
+        consoleRef.current.push(event.data.args.join(" "));
+        setLogs([...consoleRef.current]);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
 
   return (
 <div className="bg-[#16161A] lg:h-screen xl:h-screen text-white font-exo h-auto flex flex-col p-3">
@@ -181,28 +212,42 @@ const [isEvaluating, setIsEvaluating] = useState(false);
         </motion.div>
       </div>
     </div>
-
-    {/* Output Panel */}
-    <div className="bg-[#F8F3FF] text-black w-full lg:w-[39%] h-[50vh] sm:h-full rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] overflow-auto">
-      {run ? (
-        <iframe
-          title="output"
-          ref={iFrame}
-          className="w-full h-full rounded-3xl"
-          sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
+<div className="w-full max-w-7xl mx-auto flex flex-col gap-4 lg:w-[60%] p-2 md:p-4">
+  {/* Output Panel */}
+  <div className="bg-[#F8F3FF] text-black w-full rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] overflow-auto flex-1 min-h-[300px] sm:min-h-[400px] md:min-h-[500px]">
+    {run ? (
+      <iframe
+        title="output"
+        ref={iFrame}
+        className="w-full h-full rounded-3xl"
+        sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
+      />
+    ) : (
+      <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl bg-[#F8F3FF] p-4">
+        <Lottie
+          animationData={Animation}
+          className="w-[70%] sm:w-[50%] md:w-[40%] h-auto"
         />
-      ) : (
-        <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl bg-[#F8F3FF] p-2">
-          <Lottie
-            animationData={Animation}
-            className="w-[50%] sm:w-[40%] h-[50%] sm:h-[40%]"
-          />
-          <p className="text-gray-700 font-bold text-center mt-2 text-sm sm:text-base px-2">
-            YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
-          </p>
-        </div>
-      )}
-    </div>
+        <p className="text-gray-700 font-bold text-center mt-4 text-sm sm:text-base md:text-lg px-2">
+          YOUR CODE RESULTS WILL APPEAR HERE WHEN YOU RUN YOUR PROJECT
+        </p>
+      </div>
+    )}
+  </div>
+
+  {/* Console Output */}
+  <div className="h-[250px] sm:h-[300px] md:h-[350px] p-3 bg-black text-gray-400 font-mono overflow-auto rounded-xl border border-[#2a3141] scrollbar-custom">
+    {!runCode ? (
+      <div className="text-gray-500">Console output will appear here...</div>
+    ) : logs.length > 0 ? (
+      logs.map((log, i) => <div key={i}>{log}</div>)
+    ) : (
+      <div className="text-gray-500">No console output</div>
+    )}
+  </div>
+</div>
+
+
   </div>
 
   <AnimatePresence>
