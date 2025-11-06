@@ -22,7 +22,7 @@ import LessonIcon from "../assets/navbarIcons/Lesson.png"
 export const Navbar_Data=[
     {
         key:'dashboard',
-        label:'Dashbaord',
+        label:'Dashboard',
         path:'/Main',
         icon:<img src={DasboardIcon} alt="Home Icon" className="w-6 h-6" />
     },{
