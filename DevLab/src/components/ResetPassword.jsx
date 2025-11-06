@@ -117,7 +117,7 @@ export default function ResetPassword({ onClose }) {
   <span
     onClick={() => setShowTooltip(!showTooltip)}
     className="text-gray-300 text-lg cursor-pointer">
-    ℹ️
+  ℹ️
   </span>
 
   {/* Tooltip */}

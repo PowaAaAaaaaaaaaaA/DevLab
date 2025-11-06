@@ -14,10 +14,6 @@ const initialState = {
     js: "",
     sql:"",
   },
-
-  // Bug Bust
-  hint: "",
-
   // Code Rush
   timer: undefined,
 

@@ -4,15 +4,19 @@ import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "../../Firebase/Firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { useAddLesson } from "./BackEndFuntions/useAddLesson";
+import { useAddLevel } from "./BackEndFuntions/useAddLevel";
+
 function AddContent({ subject, closePopup }) {
   const [Lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState("");
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
-  const [coins, setCoins] = useState("");
-  const [exp, setExp] = useState("");
 
   const queryClient = useQueryClient();
+
+  const addLessonMutation = useAddLesson(subject);
+  const addLevelMutationBack = useAddLevel(subject);
+
+
 
   // Fetch existing lessons
   const fetchLessonsData = async () => {
@@ -34,83 +38,64 @@ function AddContent({ subject, closePopup }) {
   }, [subject]);
 
   // Mutation for adding a level (and possibly a lesson)
-  const addLevelMutation = useMutation({
-    mutationFn: async () => {
-      if (!title || !desc) {
-        toast.error("Fill all the fields", {
-          position: "top-center",
-          theme: "colored",
-        });
-        return;
-      }
-      let lessonIdFinal = selectedLesson;
-      // Handle creating a new lesson
-      if (selectedLesson === "LessonAdd") {
-        const existingNums = Lessons.map((l) => {
-          const match = l.id?.match(/Lesson(\d+)/);
-          return match ? parseInt(match[1]) : 0;
-        });
-        const nextNum =
-          existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
-        lessonIdFinal = `Lesson${nextNum}`;
+const addLevelMutation = useMutation({
+  mutationFn: async () => {
 
-        const lessonDocRef = collection(db, subject);
-        await setDoc(doc(lessonDocRef, lessonIdFinal), { Lesson: nextNum });
+    //  Case 1 – Add Lesson
+    if (selectedLesson === "LessonAdd") {
+      return new Promise((resolve, reject) => {
+        addLessonMutation.mutate(
+          { category: subject },
+          {
+            onSuccess: async (res) => {
+              toast.success(res.message);
 
-        await fetchLessonsData();
-        setSelectedLesson(lessonIdFinal);
-        toast.success("Lesson Added", {
-          position: "top-center",
-          theme: "colored",
-        });
-      }
+              await fetchLessonsData();
 
-      // Add level
-      const levelCollection = collection(db, subject, lessonIdFinal, "Levels");
-      const levelSnapshot = await getDocs(levelCollection);
-      const levelNums = levelSnapshot.docs.map((doc) => {
-        const match = doc.id.match(/Level(\d+)/i);
-        return match ? parseInt(match[1]) : 0;
+              //  Extract lesson number from backend message
+const match = res.message.match(/Lesson\s(\d+)/i);
+const newLessonNumber = match ? parseInt(match[1]) : null;
+
+if (newLessonNumber) {
+  setSelectedLesson(`Lesson${newLessonNumber}`);
+}
+              closePopup && closePopup();
+              resolve();
+            },
+            onError: reject,
+          }
+        );
       });
-      const nextLevelNum =
-        levelNums.length > 0 ? Math.max(...levelNums) + 1 : 1;
-      const levelId = `Level${nextLevelNum}`;
-      const levelDocRef = doc(db, subject, lessonIdFinal, "Levels", levelId);
+    }
 
-      const levelData = {
-        title,
-        description: desc,
-        coinsReward: parseInt(coins),
-        expReward: parseInt(exp),
-        levelOrder: nextLevelNum,
-      };
+    // Case 2 – Add Level
+    if (!selectedLesson) {
+      toast.error("Please select a lesson.");
+      return;
+    }
 
-      await setDoc(levelDocRef, levelData);
+    return new Promise((resolve, reject) => {
+      addLevelMutationBack.mutate(
+        {
+          category: subject,
+          lessonId: selectedLesson
+        },
+        {
+          onSuccess: async (res) => {
+            toast.success(res.message);
 
-      // Clear form
-      setTitle("");
-      setDesc("");
-      setCoins("");
-      setExp("");
+            await fetchLessonsData();
+            closePopup && closePopup();
+            resolve();
+          },
+          onError: reject,
+        }
+      );
+    });
+  },
+});
 
-      return levelId;
-    },
-    onSuccess: (levelId) => {
-      toast.success("Level Added Successfully!", {
-        position: "top-center",
-        theme: "colored",
-      });
-      queryClient.invalidateQueries(["lessons", subject]); // if you have queries for lessons/levels
-      if (closePopup) closePopup();
-    },
-    onError: (error) => {
-      console.error(error);
-      toast.error("Failed to add level.", {
-        position: "top-center",
-        theme: "colored",
-      });
-    },
-  });
+
 
 return (
   <div className="h-auto p-2 flex flex-col w-full">
@@ -119,7 +104,7 @@ return (
         e.preventDefault();
         addLevelMutation.mutate();
       }}
-      className="relative border w-full m-auto bg-[#111827] border-[#56EBFF] rounded-2xl p-5 sm:p-8 shadow-lg">
+      className="relative border w-full h-auto m-auto bg-[#111827] border-[#56EBFF] rounded-2xl p-5 sm:p-8 shadow-lg">
       {/* Close Button */}
       <button
         type="button"
@@ -150,59 +135,18 @@ return (
       </div>
       <div
         className={`mt-4 rounded-2xl bg-[#0d13207c] p-5 sm:p-7 border border-gray-700 
-                    flex flex-col font-exo text-white min-h-[300px] sm:min-h-[350px]
+                    flex flex-col font-exo text-white h-auto
                     ${
                       selectedLesson === ""
                         ? "opacity-30 pointer-events-none"
                         : ""
-                    }`}
-      >
-        <label className="text-xl sm:text-2xl mb-2">Enter the Following</label>
-
-        <input
-          required
-          onChange={(e) => setTitle(e.target.value)}
-          type="text"
-          placeholder="Title"
-          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
-                     focus:outline-gray-400"
-        />
-
-        <input
-          required
-          onChange={(e) => setDesc(e.target.value)}
-          type="text"
-          placeholder="Description"
-          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
-                     focus:outline-gray-400"
-        />
-
-        <input
-          required
-          onChange={(e) => setCoins(e.target.value)}
-          type="number"
-          placeholder="Coin Reward"
-          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
-                     focus:outline-gray-400"
-        />
-
-        <input
-          required
-          onChange={(e) => setExp(e.target.value)}
-          type="number"
-          placeholder="Exp Reward"
-          className="border-gray-700 border p-3 rounded my-2 focus:outline-1 w-full 
-                     focus:outline-gray-400"
-        />
-
+                    }`}>
         {/*  Buttons Row */}
         <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 w-full sm:w-[70%] mx-auto">
 
           <button
             type="submit"
-            className="p-2 text-lg rounded-xl w-full sm:w-[45%] 
-                       bg-[#4CAF50] hover:bg-[#45a049] 
-                       hover:scale-105 transition-all duration-300 cursor-pointer"
+            className="p-2 text-lg rounded-xl w-full sm:w-[45%] bg-[#4CAF50] hover:bg-[#45a049] hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             Add Level
           </button>

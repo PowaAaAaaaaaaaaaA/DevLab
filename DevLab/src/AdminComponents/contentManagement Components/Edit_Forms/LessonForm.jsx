@@ -7,9 +7,15 @@ import axios from "axios";
 
 
 
-function LessonForm({stageData, state, dispatch,activeTab, subject, lessonId, levelId, stageId }) {
+function LessonForm({stageData, state, dispatch, subject, lessonId, levelId, stageId }) {
 
-
+  const visibleEditors = {
+  Html: ["html"],
+  Css: ["html", "css"],
+  JavaScript: ["html", "css", "js"],
+  Database: ["sql"]
+};
+const show = (field) => visibleEditors[subject]?.includes(field);
   const [localPreview, setLocalPreview] = useState("");
 
 
@@ -116,73 +122,89 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
       {/* Coding Interface */}
 {/* Coding Interface Section */}
 <div className="border-cyan-400 border rounded-2xl w-full p-4 bg-[#111827] mt-4">
-  <h1 className="font-exo text-white text-[2rem] mb-[10px]">Coding Interface</h1>
+  <h1 className="font-exo text-white text-[2rem] mb-[10px]">
+    Coding Interface
+  </h1>
 
   {/* HTML */}
-  <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">HTML:</h2>
-    <textarea
-      value={state.codingInterface.html || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "html",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter HTML code here..."
-    />
-  </div>
+  {show("html") && (
+    <div className="mt-4">
+      <h2 className="font-exo text-white text-lg mb-2">HTML:</h2>
+      <textarea
+        value={state.codingInterface.html || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "html",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter HTML code here..."
+      />
+    </div>
+  )}
 
   {/* CSS */}
-  <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">CSS:</h2>
-    <textarea
-      value={state.codingInterface.css || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "css",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter CSS code here..."
-    />
-  </div>
-
-  {/* JS */}
-  <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">JavaScript:</h2>
-    <textarea
-      value={state.codingInterface.js || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "js",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter JavaScript code here..."
-    />
-  </div>
+  {show("css") && (
     <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">SQL:</h2>
-    <textarea
-      value={state.codingInterface.sql || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "sql",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter SQL code here..."
-    />
-  </div>
+      <h2 className="font-exo text-white text-lg mb-2">CSS:</h2>
+      <textarea
+        value={state.codingInterface.css || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "css",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter CSS code here..."
+      />
+    </div>
+  )}
+
+  {/* JavaScript */}
+  {show("js") && (
+    <div className="mt-4">
+      <h2 className="font-exo text-white text-lg mb-2">JavaScript:</h2>
+      <textarea
+        value={state.codingInterface.js || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "js",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter JavaScript code here..."
+      />
+    </div>
+  )}
+
+  {/* SQL */}
+  {show("sql") && (
+    <div className="mt-4">
+      <h2 className="font-exo text-white text-lg mb-2">SQL:</h2>
+      <textarea
+        value={state.codingInterface.sql || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "sql",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter SQL code here..."
+      />
+    </div>
+  )}
 </div>
 
 

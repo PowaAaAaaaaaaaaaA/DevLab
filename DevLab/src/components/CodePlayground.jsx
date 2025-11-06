@@ -12,6 +12,7 @@ import { EditorView } from "@codemirror/view";
 // Ui
 import Lottie from "lottie-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { MdArrowBackIos } from "react-icons/md";
 // Assets
 import Animation from "../assets/Lottie/OutputLottie.json";
 // Components
@@ -140,10 +141,11 @@ const [isEvaluating, setIsEvaluating] = useState(false);
 
   return (
 <div className="bg-[#16161A] lg:h-screen xl:h-screen text-white font-exo h-auto flex flex-col p-3">
-  <div className="text-4xl sm:text-5xl font-bold p-4 sm:p-10">
+  <div className="text-4xl sm:text-5xl font-bold p-4 sm:p-10 flex items-center ">
     <span className="cursor-pointer" onClick={() => navigate("/main")}>
-      DEVLAB
+      <MdArrowBackIos/> 
     </span>
+    <span className="text-4xl sm:text-5xl font-bold">DevLab</span>
   </div>
 
   <div className="flex flex-col lg:flex-row p-1 gap-5 flex-1 min-h-0">

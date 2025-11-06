@@ -9,6 +9,7 @@ import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 // Ui
 import Lottie from "lottie-react";
 import { motion,AnimatePresence } from "framer-motion";
+import { MdArrowBackIos } from "react-icons/md";
 // assets
 import Animation from "../assets/Lottie/OutputLottie.json";
 // Components
@@ -192,11 +193,12 @@ VALUES
   };
 
   return (
-<div className="flex flex-col bg-[#16161A] h-atuo p-4 gap-3 xl:overflow-hidden xl:h-screen lg:overflow-hidden lg:h-screen">
-  <div className="text-4xl sm:text-5xl font-exo font-bold p-4 sm:p-10 text-white">
+<div className="flex flex-col bg-[#16161A] text-white font-exo h-atuo p-4 gap-3 xl:overflow-hidden xl:h-screen lg:overflow-hidden lg:h-screen">
+  <div className="text-4xl sm:text-5xl font-bold p-4 sm:p-10 flex items-center ">
     <span className="cursor-pointer" onClick={() => navigate("/main")}>
-      DEVLAB
+      <MdArrowBackIos/> 
     </span>
+    <span className="text-4xl sm:text-5xl font-bold">DevLab</span>
   </div>
 
   <div className="flex flex-col lg:flex-row w-full h-full gap-6 lg:gap-10">

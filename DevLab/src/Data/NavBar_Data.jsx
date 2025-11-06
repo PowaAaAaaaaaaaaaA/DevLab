@@ -1,10 +1,3 @@
-import { IoHomeOutline, 
-        IoLibraryOutline,
-        IoTrophyOutline,
-        IoCartOutline,
-        IoCodeSlash,
-        IoLayersOutline,
-} from "react-icons/io5";
 
 import cssIcon from "../assets/navbarIcons/css.png"
 import HtmlIcon from "../assets/navbarIcons/HTML.png"
@@ -22,7 +15,7 @@ import LessonIcon from "../assets/navbarIcons/Lesson.png"
 export const Navbar_Data=[
     {
         key:'dashboard',
-        label:'Dashbaord',
+        label:'Dashboard',
         path:'/Main',
         icon:<img src={DasboardIcon} alt="Home Icon" className="w-6 h-6" />
     },{
