@@ -20,6 +20,7 @@ import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
+import useFetchUserProgress from "../../../components/BackEnd_Data/useFetchUserProgress";
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 
@@ -27,7 +28,7 @@ import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 function Css_TE() {
   // Data
   const { userData } = useFetchUserData();
-  const { gamemodeId } = useParams();
+  const { gamemodeId, lessonId, levelId, stageId } = useParams();
   const { gameModeData, subject } = useFetchGameModeData();
   const [description, setDescription] = useState("");
     // Utils
@@ -73,7 +74,10 @@ const onChange = useCallback(
   [activeTab, setSubmittedCode]
 );
 
+const { userStageCompleted } = useFetchUserProgress(subject);
 
+const stageKey = `${lessonId}-${levelId}-${stageId}`;
+const isStageCompleted = userStageCompleted?.[stageKey] === true;
 
 // Run Button
   const runCode = () => {
@@ -206,28 +210,29 @@ return (
         </motion.button>
 
         {/* EVALUATE BUTTON — only for Lesson mode */}
-        {gamemodeId === "Lesson" && (
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05, background: "#7e22ce" }}
-            transition={{ bounceDamping: 100 }}
-            onClick={handleEvaluate}
-            disabled={isEvaluating}
-            className={`font-bold rounded-xl text-white p-2 sm:p-3 w-[45%] text-sm sm:text-base ${
-              isEvaluating
-                ? "bg-gray-600 opacity-50 cursor-not-allowed"
-                : "bg-[#9333EA] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            }`}
-          >
-            {isEvaluating ? "Evaluating..." : "EVALUATE"}
-          </motion.button>
-        )}
+    {(gamemodeId === "Lesson" || isStageCompleted) && (
+      <motion.button
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05, background: "#7e22ce" }}
+        transition={{ bounceDamping: 100 }}
+        onClick={handleEvaluate}
+        disabled={isEvaluating}
+        // RESPONSIVE PADDING/FONT SIZE
+        className={`font-bold rounded-xl text-white p-2 sm:p-3 w-[45%] text-sm sm:text-base ${
+          isEvaluating 
+            ? "bg-gray-600 opacity-50 cursor-not-allowed" 
+            : "bg-[#9333EA] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+        }`}
+      >
+        {isEvaluating ? "Evaluating..." : "EVALUATE"}
+      </motion.button>
+    )}
       </div>
     </div>
 
     {/* Output Panel */}
     <div 
-      className="h-[45%] mb-2 md:h-full w-full md:w-1/2 rounded-2xl p-2 bg-[#F8F3FF] border-[#2a3141] border-[1px]"
+      className="h-[45%] mb-2 md:h-full w-full md:w-1/2 rounded-2xl bg-[#F8F3FF] border-[#2a3141] border-[1px]"
     >
       {hasRunCode ? (
         <iframe

@@ -82,27 +82,31 @@ function LevelEdit({
           {/* Coins */}
           <div className="flex flex-col gap-2">
             <label className="text-lg font-semibold">Coins Reward</label>
-            <input
-              type="number"
-              value={state.coinsReward}
-              onChange={(e) => handleChange("coinsReward", e.target.value)}
-              className="w-full p-3 rounded-lg bg-[#1f2937] border border-gray-600 
-              focus:border-[#56EBFF] focus:outline-none transition-all"
-              placeholder="0"
-            />
+<input
+  type="number"
+  min="0"
+  value={state.coinsReward}
+  onChange={(e) => handleChange("coinsReward", Math.max(0, Number(e.target.value)))}
+  className="w-full p-3 rounded-lg bg-[#1f2937] border border-gray-600 
+  focus:border-[#56EBFF] focus:outline-none transition-all"
+  placeholder="0"
+/>
+
           </div>
 
           {/* EXP */}
           <div className="flex flex-col gap-2">
             <label className="text-lg font-semibold">EXP Reward</label>
-            <input
-              type="number"
-              value={state.expReward}
-              onChange={(e) => handleChange("expReward", e.target.value)}
-              className="w-full p-3 rounded-lg bg-[#1f2937] border border-gray-600 
-              focus:border-[#56EBFF] focus:outline-none transition-all"
-              placeholder="0"
-            />
+<input
+  type="number"
+  min="0"
+  value={state.expReward}
+  onChange={(e) => handleChange("expReward", Math.max(0, Number(e.target.value)))}
+  className="w-full p-3 rounded-lg bg-[#1f2937] border border-gray-600 
+  focus:border-[#56EBFF] focus:outline-none transition-all"
+  placeholder="0"
+/>
+
           </div>
         </div>
 

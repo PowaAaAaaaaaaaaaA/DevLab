@@ -69,6 +69,8 @@ function CodePlayground() {
   const runCode = () => {
     setRun(true); // trigger iframe to appear
     // Slight delay to allow iframe to mount first ( kase kelangan double click yung "run" btn kapag wlaang delay TT)
+      consoleRef.current = [];     // Clear stored logs
+  setLogs([]);
   setTimeout(() => {
 const fullCode = `
 <!DOCTYPE html>
@@ -140,7 +142,7 @@ const [isEvaluating, setIsEvaluating] = useState(false);
   }, []);
 
   return (
-<div className="bg-[#16161A] lg:h-screen xl:h-screen text-white font-exo h-auto flex flex-col p-3">
+<div className="bg-[#16161A] lg:h-screen xl:h-screen text-white font-exo sm: h-[150vh] flex flex-col p-3">
   <div className="text-4xl sm:text-5xl font-bold p-4 sm:p-10 flex items-center ">
     <span className="cursor-pointer" onClick={() => navigate("/main")}>
       <MdArrowBackIos/> 
@@ -150,7 +152,7 @@ const [isEvaluating, setIsEvaluating] = useState(false);
 
   <div className="flex flex-col lg:flex-row p-1 gap-5 flex-1 min-h-0">
     {/* Left Panel */}
-    <div className="flex flex-col lg:w-3/5 w-full md:h-[70vh] sm:h-[60vh] h-[90vh]">
+    <div className="flex flex-col lg:w-3/5 w-full md:h-[98%] sm:h-[60vh] h-[90%]">
       {/* Tabs */}
       <div className="flex flex-wrap sm:flex-nowrap p-2 text-[1rem] sm:text-[1.1rem] gap-2 sm:gap-10 w-full h-[10%]">
         {tabs.map((tab) => (
@@ -197,7 +199,7 @@ const [isEvaluating, setIsEvaluating] = useState(false);
             transition={{ bounceDamping: 100 }}
             onClick={handleEvaluate}
             disabled={isEvaluating}
-            className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-full sm:w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+            className="px-4 py-2 bg-[#7e22ce] rounded-xl text-white cursor-pointer w-full sm:w-[20%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
           >
             {isEvaluating ? "Evaluating..." : "EVALUATE"}
           </motion.button>
@@ -207,16 +209,16 @@ const [isEvaluating, setIsEvaluating] = useState(false);
             whileHover={{ scale: 1.05, background: "#9333EA" }}
             transition={{ bounceDamping: 100 }}
             onClick={runCode}
-            className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-full sm:w-[15%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+            className="px-4 py-2 bg-[#9333EA] rounded-xl text-white cursor-pointer w-full sm:w-[20%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
           >
             Run Code
           </motion.button>
         </motion.div>
       </div>
     </div>
-<div className="w-full max-w-7xl mx-auto flex flex-col gap-4 lg:w-[60%] p-2 md:p-4">
+<div className="w-full max-w-7xl mx-auto flex flex-col gap-4 lg:w-[60%]">
   {/* Output Panel */}
-  <div className="bg-[#F8F3FF] text-black w-full rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] overflow-auto flex-1 min-h-[300px] sm:min-h-[400px] md:min-h-[500px]">
+  <div className="bg-[#F8F3FF] text-black w-full rounded-3xl shadow-[0_5px_10px_rgba(147,_51,_234,_0.7)] overflow-auto flex-1 lg:h-[70%] md:h-[70%] sm:h-[60%]">
     {run ? (
       <iframe
         title="output"
@@ -238,7 +240,7 @@ const [isEvaluating, setIsEvaluating] = useState(false);
   </div>
 
   {/* Console Output */}
-  <div className="h-[250px] sm:h-[300px] md:h-[350px] p-3 bg-black text-gray-400 font-mono overflow-auto rounded-xl border border-[#2a3141] scrollbar-custom">
+  <div className="p-3 bg-black text-gray-400 font-mono overflow-auto rounded-xl border border-[#2a3141] scrollbar-custom lg:h-[20%] md:h-[20%] sm:h-[40%]">
     {!runCode ? (
       <div className="text-gray-500">Console output will appear here...</div>
     ) : logs.length > 0 ? (

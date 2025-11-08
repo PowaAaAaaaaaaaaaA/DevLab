@@ -48,10 +48,22 @@
   }.Shop-container{
     max-height: 450px;
   }
+
+  .JumpBackInCont{
+    height: 90%;
+  }.InventoryCont{
+height: 80%;
+  }
+
 }
-@media (max-height: 650px) {
+@media (max-height: 750px) {
 
   
+  .JumpBackInCont{
+    height: 75%;
+  }.InventoryCont{
+height: 65%;
+  }
 
   .large-heading {
     font-size: 2.8rem !important;  /* shrink big fonts */
@@ -80,6 +92,15 @@
   }
 }
 
+@media (max-height: 650px) {
+
+  
+  .JumpBackInCont{
+    height: 60%;
+  }.InventoryCont{
+height: 55%;
+  }
+}
 
 .scrollbar-custom::-webkit-scrollbar {
   width: 8px;

@@ -84,7 +84,6 @@ function Register() {
           userLevel: 1,
           coins: 0,
           bio: "",
-          isAdmin: false,
           lastOpenedLevel: {},
         });
 

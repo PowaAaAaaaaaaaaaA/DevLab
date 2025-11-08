@@ -163,7 +163,7 @@ if (loadingDashboard) {
       {/* Bottom Section: Jump Back In + Inventory */}
       <div className="flex flex-col lg:flex-row gap-2 lg:h-[55%] xl:h-[70%]">
         {/* Jump Back In */}
-        <div className="flex-1 h-full w-full lg:w-[75%] p-1 flex flex-col gap-4">
+        <div className="flex-1 h-full w-full lg:w-[75%] p-1 flex flex-col gap-4 JumpBackInCont">
           <h2 className="text-white font-exo font-bold text-[1.5rem] text-shadow-lg/60">Jump Back In</h2>
 
           {isLoading ? (
@@ -206,7 +206,7 @@ if (loadingDashboard) {
         </div>
 
         {/* Inventory */}
-<div className="bg-[#0B0F16] border border-gray-700/60 w-full lg:w-[25%] h-[88%] rounded-3xl p-3 flex flex-col mt-4">
+<div className="bg-[#0B0F16] border border-gray-700/60 w-full lg:w-[25%] h-[88%] rounded-3xl p-3 flex flex-col mt-4 InventoryCont">
   <h1 className="text-white font-exo text-[2em] font-bold mb-4 text-center tracking-wide">Inventory</h1>
   <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-4 scrollbar-custom">
     {inventory && inventory.length > 0 ? (

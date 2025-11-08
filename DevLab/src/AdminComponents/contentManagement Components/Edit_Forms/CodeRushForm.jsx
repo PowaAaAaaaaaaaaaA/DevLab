@@ -160,18 +160,25 @@ useEffect(() => {
 
   {/* Minutes */}
   <label className="text-white font-exo text-lg">Minutes</label>
-  <input
-    type="number"
-    value={minutes}
-    onChange={(e) => {
-      const m = Number(e.target.value);
-      setMinutes(m);
-      const totalSeconds = m * 60 + seconds;
-      dispatch({ type: "UPDATE_FIELD", field: "timer", value: totalSeconds });
-    }}
-    className="w-full p-3 text-white bg-[#0d13207c] rounded-2xl 
-               focus:border-cyan-500 border border-gray-700 focus:outline-none text-3xl mb-4"
-  />
+<input
+  type="number"
+  value={minutes}
+  onChange={(e) => {
+    let m = Number(e.target.value);
+
+    // prevent negative input
+    if (m < 0) m = 0;
+
+    setMinutes(m);
+
+    const totalSeconds = m * 60 + seconds;
+    dispatch({ type: "UPDATE_FIELD", field: "timer", value: totalSeconds });
+  }}
+  className="w-full p-3 text-white bg-[#0d13207c] rounded-2xl 
+             focus:border-cyan-500 border border-gray-700 focus:outline-none text-3xl mb-4"
+  min={0}
+/>
+
 
   {/* Seconds */}
   <label className="text-white font-exo text-lg">Seconds</label>

@@ -21,6 +21,7 @@ import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore
 // Data
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
+import useFetchUserProgress from "../../../components/BackEnd_Data/useFetchUserProgress";
 
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
@@ -28,7 +29,7 @@ import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
 function JavaScript_TE() {
   // Data
   const { userData } = useFetchUserData();
-  const { gamemodeId } = useParams();
+const { gamemodeId, lessonId, levelId, stageId } = useParams();
   const { gameModeData,subject } = useFetchGameModeData();
   const [description, setDescription] = useState("");
   // UTils
@@ -80,7 +81,10 @@ const onChange = useCallback(
 );
 
 
+const { userStageCompleted } = useFetchUserProgress(subject);
 
+const stageKey = `${lessonId}-${levelId}-${stageId}`;
+const isStageCompleted = userStageCompleted?.[stageKey] === true;
 
 // Run Button
 
@@ -104,8 +108,9 @@ const runCode = () => {
   if (gamemodeId !== "Lesson") {
     const usedTags = extractJsKeywords(code.JavaScript);
     if (usedTags.length > 0) {
-      unlockAchievement(userData?.uid, "JavaScript", "tagUsed", { usedTags, isCorrect });
+      unlockAchievement(userData?.uid, "JavaScript", "tagUsed", { usedTags });
     }
+    console.log(usedTags);
   }
 
   setTimeout(() => {
@@ -255,30 +260,31 @@ return (
         </motion.button>
 
         {/* EVALUATE BUTTON — only for Lesson mode */}
-        {gamemodeId === "Lesson" && (
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05, background: "#7e22ce" }}
-            transition={{ bounceDamping: 100 }}
-            onClick={handleEvaluate}
-            disabled={isEvaluating}
-            className={`font-bold rounded-xl text-white p-2 sm:p-3 w-[45%] text-sm sm:text-base ${
-              isEvaluating
-                ? "bg-gray-600 opacity-50 cursor-not-allowed"
-                : "bg-[#9333EA] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            }`}
-          >
-            {isEvaluating ? "Evaluating..." : "EVALUATE"}
-          </motion.button>
-        )}
+    {(gamemodeId === "Lesson" || isStageCompleted) && (
+      <motion.button
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05, background: "#7e22ce" }}
+        transition={{ bounceDamping: 100 }}
+        onClick={handleEvaluate}
+        disabled={isEvaluating}
+        // RESPONSIVE PADDING/FONT SIZE
+        className={`font-bold rounded-xl text-white p-2 sm:p-3 w-[45%] text-sm sm:text-base ${
+          isEvaluating 
+            ? "bg-gray-600 opacity-50 cursor-not-allowed" 
+            : "bg-[#9333EA] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+        }`}
+      >
+        {isEvaluating ? "Evaluating..." : "EVALUATE"}
+      </motion.button>
+    )}
       </div>
     </div>
 
     {/* Output + Console Panel */}
-    <div className="h-[50%] md:h-full w-full md:w-1/2 flex flex-col gap-3">
+    <div className="h-full md:h-full w-full md:w-1/2 flex flex-col gap-3">
       {/* Visual Output */}
       <div 
-        className="flex-1 rounded-2xl p-2 bg-[#F8F3FF] border-[#2a3141] border-[1px] h-[65%]"
+        className="flex-1 rounded-2xl bg-[#F8F3FF] border-[#2a3141] border-[1px]"
       >
         {hasRunCode ? (
           <iframe
@@ -298,7 +304,7 @@ return (
       </div>
 
       {/* Console Output */}
-      <div className="h-[40%] p-2 bg-black text-gray-400 font-mono overflow-auto rounded-xl border border-[#2a3141] scrollbar-custom">
+      <div className="h-40 p-2 bg-black text-gray-400 font-mono overflow-auto rounded-xl border border-[#2a3141] scrollbar-custom">
         {!hasRunCode ? (
           <div className="text-gray-500">Console output will appear here...</div>
         ) : logs.length > 0 ? (
