@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../Firebase/Firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiArrowDownTray } from "react-icons/hi2";
-import { GoPlus, GoTrash } from "react-icons/go";
+import { GoPlus, GoTrash, GoKebabHorizontal } from "react-icons/go";
 import Animation from "../assets/Lottie/LoadingLessonsLottie.json";
 import Lottie from "lottie-react";
 import { useIsMutating } from "@tanstack/react-query";
-import Loading from '../assets/Lottie/LoadingDots.json'
+import Loading from "../assets/Lottie/LoadingDots.json";
 
 import useFetchLevelsData from "../components/BackEnd_Data/useFetchLevelsData";
 import AddContent from "./contentManagement Components/AddContent";
 import LessonEdit from "./contentManagement Components/LessonEdit";
+import LevelEdit from "./contentManagement Components/LevelEdit";
 
 import { useDeleteLevel } from "./contentManagement Components/BackEndFuntions/useDeleteLevel";
 import { useAddStage } from "./contentManagement Components/BackEndFuntions/useAddStage";
@@ -23,12 +22,15 @@ function ContentManagement() {
   const subjects = ["Html", "Css", "JavaScript", "Database"];
 
   const [showForm, setShowForm] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+
   const [stageId, setStageId] = useState(null);
   const [levelId, setLevelId] = useState(null);
   const [lessonId, setLessonId] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [levelStages, setLevelStages] = useState({});
+  const [selectedLevelData, setSelectedLevelData] = useState(null);
 
   const deleteLevelMutation = useDeleteLevel(activeTab);
   const addStageMutation = useAddStage(activeTab);
@@ -65,7 +67,11 @@ function ContentManagement() {
     <div className="h-full overflow-hidden px-4 sm:px-6 lg:px-10">
       {isMutating > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
-          <Lottie animationData={Loading} loop={true} className="w-[60%] h-[60%] sm:w-[40%] sm:h-[40%]" />
+          <Lottie
+            animationData={Loading}
+            loop={true}
+            className="w-[60%] h-[60%] sm:w-[40%] sm:h-[40%]"
+          />
         </div>
       )}
 
@@ -110,7 +116,7 @@ function ContentManagement() {
           className="w-[80%] sm:w-[60%] h-[50vh] m-auto"
         />
       ) : (
-        <div className="h-[65vh] sm:h-[70%] p-4 sm:p-6 overflow-y-auto mt-4 scrollbar-custom">
+        <div className="h-[43vh] sm:h-[70%] p-4 sm:p-6 overflow-y-auto mt-4 scrollbar-custom">
           {levelsData.map((lesson) => (
             <div key={lesson.id} className="p-3 sm:p-5 flex flex-col gap-8">
               <h2 className="text-white font-exo text-3xl sm:text-5xl text-center sm:text-left bigText-laptop">
@@ -129,6 +135,18 @@ function ContentManagement() {
                         {level.title}
                       </h2>
                       <div className="flex justify-center sm:justify-end gap-3">
+                        <button
+                          className="text-white text-2xl hover:cursor-pointer hover:bg-green-500 rounded p-2 border-gray-500 border transition"
+                          onClick={() => {
+                            setShowEdit(true);
+                            setSelectedLevelData(level);
+                            setLessonId(`Lesson${lesson.Lesson}`);
+                            setLevelId(level.id);
+                          }}
+                        >
+                          <GoKebabHorizontal />
+                        </button>
+
                         <button
                           className="text-white text-2xl hover:cursor-pointer hover:bg-green-500 rounded p-2 border-gray-500 border transition"
                           onClick={() =>
@@ -163,7 +181,9 @@ function ContentManagement() {
                           const uniqueKey = `${lesson.Lesson}_${level.id}`;
                           const stages = levelStages[uniqueKey] || [];
                           return stages.length === 0 ? (
-                            <p className="text-white font-exo text-lg">No stages yet</p>
+                            <p className="text-white font-exo text-lg">
+                              No stages yet
+                            </p>
                           ) : (
                             stages.map((stage) => (
                               <div
@@ -201,32 +221,61 @@ function ContentManagement() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`w-[90%] sm:w-[60%] lg:w-[40%] h-[60%] transition-all duration-300 ${
+            className={`w-[90%] sm:w-[60%] lg:w-[40%] transition-all duration-300 ${
               popupVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"
             }`}
           >
-            <AddContent subject={activeTab} closePopup={() => setShowPopup(false)} />
+            <AddContent
+              subject={activeTab}
+              closePopup={() => setShowPopup(false)}
+            />
           </div>
         </div>
       )}
-
       <AnimatePresence>
         {showForm && (
           <div
             onClick={() => setShowForm(false)}
-            className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center">
+            className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center"
+          >
             <motion.div
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0 }}
-              className="w-[95%] sm:w-[70%] lg:w-[40%] h-[90%] transition-all overflow-x-hidden rounded-2xl scrollbar-custom">
+              className="w-[95%] sm:w-[70%] lg:w-[40%] h-[90%] transition-all overflow-x-hidden rounded-2xl scrollbar-custom"
+            >
               <LessonEdit
                 subject={activeTab}
                 lessonId={`Lesson${lessonId}`}
                 levelId={levelId}
                 stageId={stageId}
                 setShowForm={setShowForm}
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showEdit && (
+          <div
+            onClick={() => setShowEdit(false)}
+            className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center"
+          >
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              className="w-[95%] sm:w-[70%] lg:w-[40%] h-[90%] transition-all overflow-x-hidden rounded-2xl scrollbar-custom"
+            >
+              <LevelEdit
+                setShowEdit={setShowEdit}
+                category={activeTab}
+                lessonId={lessonId}
+                levelId={levelId}
+                defaultData={selectedLevelData}
               />
             </motion.div>
           </div>

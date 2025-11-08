@@ -9,7 +9,7 @@ import { auth, db, storage } from "../Firebase/Firebase";
 import { updateDoc, doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 // Utils
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 // Components
@@ -41,14 +41,6 @@ function Settings() {
     }
   };
 
-  // Admin Login
-  const admin = async () => {
-    try {
-      navigate("/AdminLogin");
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   // Username & Bio
   const [newUserName, setUserName] = useState("");
@@ -84,7 +76,7 @@ const uploadImage = async (file, type = "profile") => {
   const user = auth.currentUser;
   if (!user) throw new Error("No user logged in.");
 
-  // ✅ Validate file type
+  //  Validate file type
   if (!file.type.startsWith("image/")) {
     toast.error("Only image files are allowed!");
     return;
@@ -257,14 +249,6 @@ const uploadImage = async (file, type = "profile") => {
           Reset Password
         </button>
 
-        <Link>
-          <button
-            onClick={() => setAdminPopup(true)}
-            className="text-white font-exo hover:text-red-500 hover:cursor-pointer transition duration-300 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]">
-            Login as Administrator
-          </button>
-        </Link>
-
 {/* Download Mobile App Button - Right Side */}
 <div className="w-full flex justify-end pr-3 relative">
   <motion.button
@@ -318,43 +302,6 @@ const uploadImage = async (file, type = "profile") => {
         )}
       </AnimatePresence>
 
-      {/* Admin Popup */}
-      <AnimatePresence initial={false}>
-        {showAdminPopup && (
-          <div className="fixed inset-0 flex bg-black/80 backdrop-blur-sm items-center justify-center z-50">
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              className="bg-[#1E212F] w-[80%] sm:w-[50%] md:w-[25%] h-auto text-white rounded-2xl text-center p-4 flex flex-col items-center"
-            >
-              <h2 className="font-exo text-3xl">Admin Login</h2>
-              <Lottie animationData={AdminLogin} loop className="w-[40%] h-[50%] mt-4" />
-              <p className="font-exo text-[1rem] mt-2">Confirm Admin Login</p>
-              <div className="flex flex-col sm:flex-row justify-center gap-5 mt-5 w-full">
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ bounceDamping: 100 }}
-                  onClick={admin}
-                  className="bg-[#1EDB3E] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(30,219,62,0.4)] cursor-pointer"
-                >
-                  Proceed
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ bounceDamping: 100 }}
-                  onClick={() => setAdminPopup(false)}
-                  className="bg-[#FF6166] p-3 w-full sm:w-[40%] rounded-3xl font-exo font-bold text-white hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.4)] cursor-pointer"
-                >
-                  Cancel
-                </motion.button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       {/* Reset Password */}
       {showResetPass && <ResetPassword onClose={() => setShowResetPass(false)} />}

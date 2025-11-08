@@ -77,11 +77,7 @@ function AdminNavbar() {
   <div
     onClick={() => setOpen(false)}
     className="
-      fixed inset-0 z-40
-      bg-black/40 backdrop-blur-sm
-      transition-all duration-300
-      lg:hidden"
-  />
+      fixed inset-0 z-40bg-black/40 backdrop-blur-smtransition-all duration-300lg:hidden"/>
 )}
 
     </>

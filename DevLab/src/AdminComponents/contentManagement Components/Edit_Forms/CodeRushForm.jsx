@@ -1,7 +1,24 @@
+import { useEffect,useState} from "react";
+export default function CodeRushForm({stageData, state, dispatch ,subject}) {
 
+const visibleEditors = {
+  Html: ["html"],
+  Css: ["html", "css"],
+  JavaScript: ["html", "css", "js"],
+  Database: ["sql"]
+};
+const show = (field) => visibleEditors[subject]?.includes(field);
 
+const [minutes, setMinutes] = useState(0);
+const [seconds, setSeconds] = useState(0);
 
-export default function CodeRushForm({stageData, state, dispatch ,activeTab}) {
+useEffect(() => {
+  if (stageData?.timer) {
+    const total = stageData.timer;
+    setMinutes(Math.floor(total / 60));
+    setSeconds(total % 60);
+  }
+}, [stageData]);
 
 
   return (
@@ -50,91 +67,141 @@ export default function CodeRushForm({stageData, state, dispatch ,activeTab}) {
 
 {/* Coding Interface Section */}
 <div className="border-cyan-400 border rounded-2xl w-full p-4 bg-[#111827] mt-4">
-  <h1 className="font-exo text-white text-[2rem] mb-[10px]">Coding Interface</h1>
+  <h1 className="font-exo text-white text-[2rem] mb-[10px]">
+    Coding Interface
+  </h1>
 
   {/* HTML */}
-  <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">HTML:</h2>
-    <textarea
-      value={state.codingInterface.html || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "html",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter HTML code here..."
-    />
-  </div>
+  {show("html") && (
+    <div className="mt-4">
+      <h2 className="font-exo text-white text-lg mb-2">HTML:</h2>
+      <textarea
+        value={state.codingInterface.html || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "html",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter HTML code here..."
+      />
+    </div>
+  )}
 
   {/* CSS */}
-  <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">CSS:</h2>
-    <textarea
-      value={state.codingInterface.css || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "css",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter CSS code here..."
-    />
-  </div>
+  {show("css") && (
+    <div className="mt-4">
+      <h2 className="font-exo text-white text-lg mb-2">CSS:</h2>
+      <textarea
+        value={state.codingInterface.css || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "css",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter CSS code here..."
+      />
+    </div>
+  )}
 
-  {/* JS */}
-  <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">JavaScript:</h2>
-    <textarea
-      value={state.codingInterface.js || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "js",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter JavaScript code here..."
-    />
-  </div>
-      <div className="mt-4">
-    <h2 className="font-exo text-white text-lg mb-2">SQL:</h2>
-    <textarea
-      value={state.codingInterface.sql || ""}
-      onChange={(e) =>
-        dispatch({
-          type: "UPDATE_CODING_INTERFACE",
-          field: "sql",
-          value: e.target.value,
-        })
-      }
-      className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
-      placeholder="Enter SQL code here..."
-    />
-  </div>
+  {/* JavaScript */}
+  {show("js") && (
+    <div className="mt-4">
+      <h2 className="font-exo text-white text-lg mb-2">JavaScript:</h2>
+      <textarea
+        value={state.codingInterface.js || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "js",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter JavaScript code here..."
+      />
+    </div>
+  )}
+
+  {/* SQL */}
+  {show("sql") && (
+    <div className="mt-4">
+      <h2 className="font-exo text-white text-lg mb-2">SQL:</h2>
+      <textarea
+        value={state.codingInterface.sql || ""}
+        onChange={(e) =>
+          dispatch({
+            type: "UPDATE_CODING_INTERFACE",
+            field: "sql",
+            value: e.target.value,
+          })
+        }
+        className="w-full h-[6rem] p-3 text-white bg-[#0d13207c] rounded-2xl
+          focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+        placeholder="Enter SQL code here..."
+      />
+    </div>
+  )}
 </div>
 
       {/* Hint + Timer */}
       <div className="border-cyan-400 border rounded-2xl w-full p-4 bg-[#111827] flex flex-col gap-5">
         {/* Timer */}
-        <div className="h-[50%]">
-          <h1 className="font-exo text-white text-[2rem] mb-[10px]">Timer (seconds):</h1>
-          <input
-            value={state.timer || stageData?.timer || ""}
-            onChange={(e) =>
-              dispatch({ type: "UPDATE_FIELD", field: "timer", value: Number(e.target.value) })
-            }
-            type="number"
-            className="w-full h-[70%] p-4 text-white bg-[#0d13207c] rounded-2xl 
-                      focus:border-cyan-500 border border-gray-700 focus:outline-none text-5xl"
-            placeholder="Timer."
-          />
-        </div>
+<div className="h-[50%]">
+  <h1 className="font-exo text-white text-[2rem] mb-[10px]">Timer:</h1>
+
+  {/* Minutes */}
+  <label className="text-white font-exo text-lg">Minutes</label>
+<input
+  type="number"
+  value={minutes}
+  onChange={(e) => {
+    let m = Number(e.target.value);
+
+    // prevent negative input
+    if (m < 0) m = 0;
+
+    setMinutes(m);
+
+    const totalSeconds = m * 60 + seconds;
+    dispatch({ type: "UPDATE_FIELD", field: "timer", value: totalSeconds });
+  }}
+  className="w-full p-3 text-white bg-[#0d13207c] rounded-2xl 
+             focus:border-cyan-500 border border-gray-700 focus:outline-none text-3xl mb-4"
+  min={0}
+/>
+
+
+  {/* Seconds */}
+  <label className="text-white font-exo text-lg">Seconds</label>
+  <input
+    type="number"
+    value={seconds}
+    onChange={(e) => {
+      let s = Number(e.target.value);
+
+      // clamp between 0–59 to avoid weird values
+      if (s < 0) s = 0;
+      if (s > 59) s = 59;
+
+      setSeconds(s);
+
+      const totalSeconds = minutes * 60 + s;
+      dispatch({ type: "UPDATE_FIELD", field: "timer", value: totalSeconds });
+    }}
+    className="w-full p-3 text-white bg-[#0d13207c] rounded-2xl 
+               focus:border-cyan-500 border border-gray-700 focus:outline-none text-3xl"
+  />
+</div>
+
       </div>
     </>
   );

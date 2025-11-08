@@ -1,4 +1,4 @@
-import { LuAlignJustify } from "react-icons/lu";
+import { PiTreasureChest } from "react-icons/pi";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 
@@ -138,7 +138,7 @@ function ItemsUse({ setShowCodeWhisper, gamemodeId }) {
   return (
     <>
       {/* Toggle Button */}
-      <LuAlignJustify
+      <PiTreasureChest
         onClick={() => setShowInventory((prev) => !prev)}
         className="text-4xl cursor-pointer text-gray-300 hover:text-white transition-all duration-200"
       />

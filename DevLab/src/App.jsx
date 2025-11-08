@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 // FIREBASE
 import { auth } from "./Firebase/Firebase";
-import { db } from "./Firebase/Firebase";
-import { doc } from "firebase/firestore";
 // COMPONENTS
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
@@ -19,7 +17,6 @@ import Settings from "./components/Settings";
 import CodePlayground from "./components/CodePlayground";
 import DataqueriesPlayground from "./components/DataqueriesPlayground";
 // ADMIN
-import AdminLogin from "./components/AdminLogin";
 import AdminLayout from "./Layout/AdminLayout";
 import ContentManagement from "./AdminComponents/ContentManagement";
 import UserManagement from "./AdminComponents/UserManagement";
@@ -58,34 +55,26 @@ useEffect(() => {
   const unsubscribe = auth.onAuthStateChanged(async (user) => {
     if (!user) {
       setUser(null);
+      setAdmin(false);
       setLoading(false);
       return;
     }
 
     try {
-      //  Block unverified users
+      // Block unverified
       if (!user.emailVerified) {
         await auth.signOut();
         setUser(null);
+        setAdmin(false);
         setLoading(false);
         return;
       }
 
-      const userRef = doc(db, "Users", user.uid);
-      const userSnap = await getDoc(userRef);
-      const userData = userSnap.data();
+      const token = await user.getIdTokenResult(true);
+      const role = token.claims.role;
 
-      if (userData?.suspend) {
-        await auth.signOut();
-        toast.error("Your account is suspended.", {
-          position: "bottom-center",
-          theme: "colored",
-        });
-        setUser(null);
-      } else {
-        setUser(user);
-        setAdmin(!!userData?.isAdmin);
-      }
+      setUser(user);                   
+      setAdmin(role === "admin");      
     } catch (error) {
       console.log("Error fetching user data:", error);
     } finally {
@@ -93,8 +82,9 @@ useEffect(() => {
     }
   });
 
-  return () => unsubscribe();
+  return unsubscribe;
 }, []);
+
 
 
 
@@ -118,12 +108,23 @@ useEffect(() => {
           <Route
             path="/"
             element={!isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />}/>
-          <Route
-            path="/Login"
-            element={!isLoggedIn ? <Login /> : <Navigate to="/Main" replace />}/>
+<Route
+  path="/Login"
+  element={
+    !isLoggedIn ? (
+      <Login />
+    ) : isAdmin ? (
+      <Navigate to="/Admin" replace />
+    ) : (
+      <Navigate to="/Main" replace />
+    )
+  }
+/>
+
           <Route
             path="/Register"
             element={!isLoggedIn ? <Register /> : <Navigate to="/Main" replace />}/>
+
 
           {/* Protected Routes */}
           <Route
@@ -131,7 +132,7 @@ useEffect(() => {
             element={isLoggedIn ? <Layout /> : <Navigate to="/Login" replace />}>
             <Route index element={<Dashboard />} />
             <Route path="Lessons/Html" element={<HtmlLessons />} />
-            <Route path="Lessons/Css" element={<CssLessons />} />
+            <Route path="Lessons/Css" element={<CssLessons />} /> 
             <Route path="Lessons/JavaScript" element={<JavaScriptLessons />} />
             <Route path="Lessons/Database" element={<DataLessons />} />
 
@@ -160,7 +161,6 @@ useEffect(() => {
             }/>
 
           {/*ADmin*/}
-          <Route path="/AdminLogin" element={<AdminLogin />} />
           <Route
             path="/Admin"
             element={
@@ -177,14 +177,6 @@ useEffect(() => {
             <Route path="UserManagement" element={<UserManagement />} />
           </Route>
 
-          <Route
-            path="/Admin/ContentManagement/LessonEdit/:subject/:lessonId/:levelId/:topicId"
-            element={isLoggedIn && isAdmin ? <LessonEdit /> : <Login />}
-          />
-          <Route
-            path="/Admin/ContentManagement/:subject/AddContent"
-            element={isLoggedIn && isAdmin ? <AddContent /> : <Login />}
-          />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ToastContainer />

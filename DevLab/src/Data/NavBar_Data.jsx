@@ -1,10 +1,3 @@
-import { IoHomeOutline, 
-        IoLibraryOutline,
-        IoTrophyOutline,
-        IoCartOutline,
-        IoCodeSlash,
-        IoLayersOutline,
-} from "react-icons/io5";
 
 import cssIcon from "../assets/navbarIcons/css.png"
 import HtmlIcon from "../assets/navbarIcons/HTML.png"

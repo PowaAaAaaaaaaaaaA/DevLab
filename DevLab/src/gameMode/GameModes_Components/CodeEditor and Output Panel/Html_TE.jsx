@@ -184,7 +184,7 @@ const isStageCompleted = userStageCompleted?.[stageKey] === true;
 
       {/* Output Panel */}
       <div 
-        className="h-[45%] mb-2 md:h-full w-full md:w-1/2 rounded-2xl p-2 bg-[#F8F3FF] border-[#2a3141] border-[1px]">
+        className="h-[45%] mb-2 md:h-full w-full md:w-1/2 rounded-2xl bg-[#F8F3FF] border-[#2a3141] border-[1px]">
         {hasRunCode ? (
           <iframe
             ref={iFrame}

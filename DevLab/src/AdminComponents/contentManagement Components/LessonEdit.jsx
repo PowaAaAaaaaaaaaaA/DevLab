@@ -29,7 +29,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
   useEffect(() => {
     fetchStage();
   }, [subject, lessonId, levelId, stageId]);
-
   useEffect(() => {
     if (stageData?.type) {
       setActiveTab(stageData.type);
@@ -67,7 +66,6 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         type: stageData?.type || "",
         instruction: stageData?.instruction || "",
         codingInterface: stageData?.codingInterface || { html: "", css: "", js: "",sql:"" },
-        hint: stageData?.hint || "",
         timer: stageData?.timer || "",
         choices: stageData?.choices || [],
         blocks: stageData?.blocks || [],
@@ -91,7 +89,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
       case "Lesson":
         return { ...common, blocks: state.blocks };
       case "BugBust":
-        return { ...common, hint: state.hint };
+        return { ...common};
       case "CodeRush":
         return { ...common, timer: state.timer };
       case "BrainBytes":
@@ -102,23 +100,34 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         return common;
     }
   };
+const visibleEditors = {
+  Html: ["html"],
+  Css: ["html", "css"],
+  JavaScript: ["html", "css", "js"],
+  Database: ["sql"],
+};
 
   // Save handler
   const handleSave = async (e) => {
     e.preventDefault();
+    
     try {
       const token = await auth.currentUser.getIdToken(true);
       const hasImages = state.blocks?.some(
         (block) => block.type === "Image" && block.value instanceof File
       );
-
+let response;
       // Automatically set isHidden
       const updatedState = { ...state, isHidden: activeTab === "Lesson" ? false : true };
-
-      let response;
-
       if (!hasImages) {
         // JSON save
+        const allowedFields = visibleEditors[subject] || [];
+
+const cleanedCodingInterface = Object.fromEntries(
+  Object.entries(updatedState.codingInterface || {})
+    .filter(([key, val]) => allowedFields.includes(key) && val.trim() !== "")
+);
+        updatedState.codingInterface = cleanedCodingInterface;
         const filteredState = filterStateByGameMode(updatedState, activeTab);
         response = await axios.post(
           `
@@ -247,7 +256,6 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
                 state={state}
                 dispatch={dispatch}
                 stageData={stageData}
-                activeTab={activeTab}
                 subject={subject}
                 lessonId={lessonId}
                 levelId={levelId}
@@ -255,17 +263,16 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
               />
             )}
             {activeTab === "BugBust" && (
-              <BugBustForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
+              <BugBustForm state={state} dispatch={dispatch} stageData={stageData}subject={subject} />
             )}
             {activeTab === "CodeRush" && (
-              <CodeRushForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
+              <CodeRushForm state={state} dispatch={dispatch} stageData={stageData} subject={subject} />
             )}
             {activeTab === "CodeCrafter" && (
               <CodeCrafterForm
                 state={state}
                 dispatch={dispatch}
                 stageData={stageData}
-                activeTab={activeTab}
                 subject={subject}
                 lessonId={lessonId}
                 levelId={levelId}
@@ -278,20 +285,30 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
 
             {/* Buttons */}
             <div className="flex justify-between mt-6">
-              <button
-                type="button"
-                onClick={() =>
-                  deleteStageMutation.mutate(stageId, {
-                    onSuccess: () => setShowForm(false),
-                  })
-                }
-                className="font-exo font-bold text-white text-sm cursor-pointer
-                  w-[40%] sm:w-[30%] py-2 rounded-3xl bg-[#E35460] 
-                  hover:scale-105 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]
-                  transition duration-300 ease-in-out"
-              >
-                {deleteStageMutation.isLoading ? "Deleting..." : "Delete"}
-              </button>
+<button
+  type="button"
+  disabled={stageId === "Stage1"}
+  onClick={() => {
+    if (stageId === "Stage1") return; // extra safety
+    deleteStageMutation.mutate(stageId, {
+      onSuccess: () => setShowForm(false),
+    });
+  }}
+  className={`font-exo font-bold text-white text-sm cursor-pointer
+    w-[40%] sm:w-[30%] py-2 rounded-3xl transition duration-300 ease-in-out
+    ${
+      stageId === "Stage1"
+        ? "bg-gray-500 opacity-60 cursor-not-allowed"
+        : "bg-[#E35460] hover:scale-105 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]"
+    }`}
+>
+  {stageId === "Stage1"
+    ? "Locked"
+    : deleteStageMutation.isLoading
+    ? "Deleting..."
+    : "Delete"}
+</button>
+
 
               <button
                 type="button"

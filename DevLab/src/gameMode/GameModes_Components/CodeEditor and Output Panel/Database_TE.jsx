@@ -19,6 +19,7 @@ import { useParams } from "react-router-dom";
 import useFetchUserData from "../../../components/BackEnd_Data/useFetchUserData";
 import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameModeData";
 import { useGameStore } from "../../../components/OpenAI Prompts/useBugBustStore";
+import useFetchUserProgress from "../../../components/BackEnd_Data/useFetchUserProgress";
 //
 import lessonPromptDb from "../../../components/OpenAI Prompts/lessonPromptDb";
 
@@ -27,7 +28,7 @@ import lessonPromptDb from "../../../components/OpenAI Prompts/lessonPromptDb";
 function Database_TE() {
   //Data
   const { userData } = useFetchUserData();
-  const {gamemodeId} = useParams();
+  const { gamemodeId, lessonId, levelId, stageId } = useParams();
   // Output 
   const [outputHtml, setOutputHtml] = useState();
   const [hasRunQuery, setHasRunQuery] = useState(false);
@@ -45,6 +46,11 @@ const [evaluationResult, setEvaluationResult] = useState(null);
 const [showPopup, setShowPopup] = useState(false);
 const [description, setDescription] = useState("");
 const { gameModeData, subject } = useFetchGameModeData();
+
+const { userStageCompleted } = useFetchUserProgress(subject);
+
+const stageKey = `${lessonId}-${levelId}-${stageId}`;
+const isStageCompleted = userStageCompleted?.[stageKey] === true;
 
   // Run Button
 const runCode = () => {
@@ -278,20 +284,23 @@ return (
           </motion.button>
 
           {/* EVALUATE BUTTON — only for Lesson mode */}
-          {gamemodeId === "Lesson" && (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, background: "#7e22ce" }}
-              transition={{ bounceDamping: 100 }}
-              onClick={handleEvaluate}
-              disabled={isEvaluating}
-              className={`bg-[#9333EA] text-white font-bold rounded-xl py-3 w-full sm:w-[45%] hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)] cursor-pointer ${
-                isEvaluating ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {isEvaluating ? "Evaluating..." : "EVALUATE"}
-            </motion.button>
-          )}
+    {(gamemodeId === "Lesson" || isStageCompleted) && (
+      <motion.button
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05, background: "#7e22ce" }}
+        transition={{ bounceDamping: 100 }}
+        onClick={handleEvaluate}
+        disabled={isEvaluating}
+        // RESPONSIVE PADDING/FONT SIZE
+        className={`font-bold rounded-xl text-white p-2 sm:p-3 w-[45%] text-sm sm:text-base ${
+          isEvaluating 
+            ? "bg-gray-600 opacity-50 cursor-not-allowed" 
+            : "bg-[#9333EA] hover:cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+        }`}
+      >
+        {isEvaluating ? "Evaluating..." : "EVALUATE"}
+      </motion.button>
+    )}
         </div>
       </div>
 

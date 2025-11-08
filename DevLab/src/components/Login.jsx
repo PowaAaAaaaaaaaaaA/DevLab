@@ -74,12 +74,24 @@ function Login() {
         return;
       }
 
-      toast.success("Login successful!", {
-        position: "top-center",
-        theme: "colored",
-      });
+toast.success("Login successful!", {
+  position: "top-center",
+  theme: "colored",
+});
 
-      navigate("/Main");
+// Get custom claims (role)
+const tokenResult = await user.getIdTokenResult(true);
+const role = tokenResult.claims.role;
+console.log("ROLE:", role);
+
+//  Admin vs User redirect
+if (role === "admin") {
+  navigate("/Admin", { replace: true });
+} else {
+  navigate("/Main", { replace: true });
+}
+
+
     } catch (error) {
   const errorMap = {
     "auth/invalid-credential":"Invalid User Credentials",

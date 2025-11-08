@@ -17,8 +17,8 @@ export const unlockAchievement = async (userId, subject, actionType, payload = {
 
     for (const [achievementId, achievement] of Object.entries(achievementsMap)) {
       const condition = achievement?.unlockCondition;
-console.log(payload);
 let match = false;
+
 switch (actionType) {
   case "firstLevelComplete":
     match = condition?.levelId === payload?.LevelId && condition?.lessonId === payload?.lessonId && condition?.subject === subject;
@@ -28,15 +28,10 @@ switch (actionType) {
     break;
 case "tagUsed": {
   const usedTags = Array.isArray(payload.usedTags) ? payload.usedTags : [];
-  
-  // Normalize tagReq to always be an array
-  const requiredTags = Array.isArray(condition?.tagReq)
-    ? condition.tagReq
-    : [condition?.tagReq].filter(Boolean); // filter removes undefined/null
+  const requiredTags = Array.isArray(condition?.tagReq) ? condition.tagReq : [condition?.tagReq].filter(Boolean);
 
-  // Check if any required tag is in usedTags AND the answer is correct
-  match =
-    requiredTags.some(tag => usedTags.includes(tag)) 
+  // Check if at least one required tag is used AND answer is correct AND subject matches
+  match = subject === condition?.subject  && requiredTags.some(tag => usedTags.includes(tag));
   break;
 }
   case "itemUse":
@@ -49,6 +44,7 @@ case "tagUsed": {
     match = condition?.type === "subjectCompletion" && condition?.subject === subject;
     break;
 }
+console.log(match)
       if (match) {
         const userAchRef = doc(db, "Users", userId, "Achievements", achievementId);
         const userAchSnap = await getDoc(userAchRef);
