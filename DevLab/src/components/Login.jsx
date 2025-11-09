@@ -28,7 +28,7 @@ function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  // const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,10 +38,10 @@ function Login() {
     setLoading(true);
 
     try {
-      const persistence = rememberMe
-        ? browserLocalPersistence
-        : browserSessionPersistence;
-      await setPersistence(auth, persistence);
+      // const persistence = rememberMe
+      //   ? browserLocalPersistence
+      //   : browserSessionPersistence;
+      // await setPersistence(auth, persistence);
 
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -179,7 +179,7 @@ if (role === "admin") {
                 Forgot Password
               </button>
 
-              {/* Remember Me */}
+              {/* Remember Me
               <div className="flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
@@ -188,7 +188,7 @@ if (role === "admin") {
                   className="cursor-pointer"
                 />
                 <label className="text-white cursor-pointer">Remember Me</label>
-              </div>
+              </div> */}
 
               {/* Login Button */}
               <div className="w-[60%] mt-4">
