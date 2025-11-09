@@ -40,7 +40,6 @@ function GameFooter({
   const submittedCode = useGameStore((state) => state.submittedCode);
   const setIsCorrect = useGameStore((state) => state.setIsCorrect);
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
-  console.log(submittedCode);
   const [isLoading, setIsLoading] = useState(false);
 
   const buttonText =
