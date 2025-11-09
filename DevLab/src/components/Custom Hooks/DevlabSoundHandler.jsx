@@ -24,7 +24,7 @@ export const loadSounds = async () => {
       sounds[key] = audio;
     });
 
-    console.log(" DevLab sounds preloaded");
+    
   } catch (err) {
     console.error(" Error loading sounds:", err);
   }
