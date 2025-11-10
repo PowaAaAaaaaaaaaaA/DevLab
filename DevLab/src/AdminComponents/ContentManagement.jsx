@@ -15,11 +15,20 @@ import LevelEdit from "./contentManagement Components/LevelEdit";
 import { useDeleteLevel } from "./contentManagement Components/BackEndFuntions/useDeleteLevel";
 import { useAddStage } from "./contentManagement Components/BackEndFuntions/useAddStage";
 
+import { useAddLevel } from "./contentManagement Components/BackEndFuntions/useAddLevel";
+
+import NewLevelForm from "./contentManagement Components/AddNewForms/AddNewLevelForm";
+
 function ContentManagement() {
   const isMutating = useIsMutating();
   const [activeTab, setActiveTab] = useState("Html");
   const { levelsData, isLoading } = useFetchLevelsData(activeTab);
   const subjects = ["Html", "Css", "JavaScript", "Database"];
+  const addLevelMutation = useAddLevel(activeTab);
+
+  const [showNewLevelForm, setShowNewLevelForm] = useState(false);
+const [createLevelLessonId, setCreateLevelLessonId] = useState(null);
+
 
   const [showForm, setShowForm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -62,6 +71,23 @@ function ContentManagement() {
     setPopupVisible(false);
     setTimeout(() => setShowPopup(false), 100);
   };
+
+
+const getNextLevelId = (lesson) => {
+  if (!lesson.levels || lesson.levels.length === 0) return 1;
+
+  // extract numeric parts of IDs
+  const numericIds = lesson.levels
+    .map(lvl => {
+      const num = parseInt(lvl.id.replace(/\D/g, ""), 10); // remove non-digits
+      return isNaN(num) ? 0 : num;
+    });
+
+  const lastId = Math.max(...numericIds);
+  return lastId + 1;
+};
+
+
 
   return (
     <div className="h-full overflow-hidden px-4 sm:px-6 lg:px-10">
@@ -205,6 +231,22 @@ function ContentManagement() {
                     </div>
                   </div>
                 ))}
+
+                {/*  ADD NEW LEVEL BUTTON */}
+{/* ADD NEW LEVEL BUTTON */}
+<button
+  onClick={() => {
+    setCreateLevelLessonId(`Lesson${lesson.Lesson}`);
+    const nextLevelId = getNextLevelId(lesson); // get next level ID
+    setLevelId(nextLevelId); // pass next level ID to form
+    setShowNewLevelForm(true);
+  }}
+  className="border-2 border-green-500 text-green-400 font-exo px-6 py-4 rounded-xl text-lg hover:bg-green-600 hover:text-white transition-all duration-300 w-full"
+>
+  + Add Level
+</button>
+
+
               </div>
             </div>
           ))}
@@ -227,7 +269,7 @@ function ContentManagement() {
           >
             <AddContent
               subject={activeTab}
-              closePopup={() => setShowPopup(false)}
+              close={() => setShowPopup(false)}
             />
           </div>
         </div>
@@ -281,6 +323,31 @@ function ContentManagement() {
           </div>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+  {showNewLevelForm && (
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+      onClick={() => setShowNewLevelForm(false)}
+    >
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        className="w-[95%] sm:w-[70%] lg:w-[45%] h-[90%] rounded-2xl overflow-hidden"
+      >
+<NewLevelForm
+  subject={activeTab}
+  lessonId={createLevelLessonId}
+  levelId={levelId} // pass it here
+  close={() => setShowNewLevelForm(false)}
+/>
+      </motion.div>
+    </div>
+  )}
+</AnimatePresence>
+
     </div>
   );
 }

@@ -1,172 +1,302 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
+import axios from "axios";
 import { toast } from "react-toastify";
-import { collection, getDocs, setDoc, doc } from "firebase/firestore";
-import { db } from "../../Firebase/Firebase";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import InputSelector from "./Edit_Forms/InputSelector";
+import TestDropDownMenu from "./Edit_Forms/TestDropDownMenu";
+import { auth } from "../../Firebase/Firebase";
 
-import { useAddLesson } from "./BackEndFuntions/useAddLesson";
-import { useAddLevel } from "./BackEndFuntions/useAddLevel";
+export default function NewLessonForm({ subject, close }) {
+  const [lessonState, setLessonState] = useState({
+    title: "",
+    description: "",
+    coinsReward: 0,
+    expReward: 0,
+  });
 
-function AddContent({ subject, closePopup }) {
-  const [Lessons, setLessons] = useState([]);
-  const [selectedLesson, setSelectedLesson] = useState("");
+  const [stageState, setStageState] = useState({
+    title: "",
+    description: "",
+    instruction: "",
+    codingInterface: { html: "", css: "", js: "", sql: "" },
+    blocks: [],
+  });
 
-  const queryClient = useQueryClient();
+  const [videoFile, setVideoFile] = useState(null);
+  const [localPreview, setLocalPreview] = useState("");
+  const [files, setFiles] = useState({});
+  const [selectedItem, setSelectedItem] = useState("");
 
-  const addLessonMutation = useAddLesson(subject);
-  const addLevelMutationBack = useAddLevel(subject);
+  const visibleEditors = {
+    Html: ["html"],
+    Css: ["html", "css"],
+    JavaScript: ["html", "css", "js"],
+    Database: ["sql"],
+  };
+  const show = (field) => visibleEditors[subject]?.includes(field);
 
+  const addBlocks = () => {
+    if (!selectedItem) return;
+    const maxId = stageState.blocks.length
+      ? Math.max(...stageState.blocks.map((b) => b.id))
+      : 0;
+    const newId = maxId + 1;
+    const type = selectedItem.toLowerCase() === "image" ? "Image" : selectedItem;
+    setStageState((prev) => ({
+      ...prev,
+      blocks: [...prev.blocks, { id: newId, type, value: "" }],
+    }));
+    setSelectedItem("");
+  };
 
+  const updateBlock = (id, key, value) => {
+    setStageState((prev) => ({
+      ...prev,
+      blocks: prev.blocks.map((b) => (b.id === id ? { ...b, [key]: value } : b)),
+    }));
+  };
 
-  // Fetch existing lessons
-  const fetchLessonsData = async () => {
+  const removeBlock = (id) => {
+    setStageState((prev) => ({
+      ...prev,
+      blocks: prev.blocks.filter((b) => b.id !== id),
+    }));
+    setFiles((prev) => {
+      const newFiles = { ...prev };
+      delete newFiles[`image_${id}`];
+      return newFiles;
+    });
+  };
+
+  const handleFileChange = (id, file) => {
+    if (!file) return;
+    setFiles((prev) => ({ ...prev, [`image_${id}`]: file }));
+    updateBlock(id, "value", file);
+  };
+
+  const handleSubmit = async () => {
     try {
-      const subjDb = collection(db, subject);
-      const subjDocs = await getDocs(subjDb);
-      const lessons = subjDocs.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setLessons(lessons);
-    } catch (error) {
-      console.log(error);
+      if (!lessonState.title.trim() || !stageState.title.trim())
+        throw new Error("Lesson title and Stage title are required.");
+
+      const token = await auth.currentUser?.getIdToken(true);
+      const formData = new FormData();
+      formData.append("category", subject);
+      formData.append("lessonState", JSON.stringify(lessonState));
+
+      const allowedFields = visibleEditors[subject] || [];
+      const cleanedCodingInterface = Object.fromEntries(
+        Object.entries(stageState.codingInterface).filter(
+          ([key, val]) => allowedFields.includes(key) && val.trim() !== ""
+        )
+      );
+      const stageStateToSave = { ...stageState, codingInterface: cleanedCodingInterface };
+
+      const processedBlocks = stageStateToSave.blocks.map((block) => {
+        if (block.type === "Image" && block.value instanceof File) {
+          const file = block.value;
+          const ext = file.type.split("/")[1] || "png";
+          const fieldName = `image_${block.id}`;
+          formData.append(fieldName, file, `${fieldName}.${ext}`);
+          return { ...block, value: fieldName };
+        }
+        return block;
+      });
+
+      formData.append(
+        "stageState",
+        JSON.stringify({ ...stageStateToSave, blocks: processedBlocks })
+      );
+
+      const res = await axios.post(
+        "https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/addNEWLesson",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (videoFile) {
+        const videoForm = new FormData();
+        videoForm.append("video", videoFile);
+        videoForm.append("category", subject);
+        videoForm.append("lessonId", res.data.nextLessonId);
+        videoForm.append("levelId", "Level1");
+        videoForm.append("stageId", "Stage1");
+
+        await axios.post(
+          "https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVideo",
+          videoForm,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      toast.success("✅ Lesson created successfully!");
+      close();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Failed to create lesson.");
     }
   };
 
-  useEffect(() => {
-    fetchLessonsData();
-  }, [subject]);
+  return (
+    <div className="h-[90vh] bg-[#111827] text-white p-4 sm:p-6 font-exo overflow-y-auto rounded-2xl space-y-6">
+      {/* LESSON DETAILS */}
+      <section className="space-y-3">
+        <h2 className="text-2xl font-bold border-b border-gray-700 pb-2">Level Details</h2>
+        <input
+          placeholder="Lesson Title"
+          value={lessonState.title}
+          onChange={(e) => setLessonState({ ...lessonState, title: e.target.value })}
+          className="p-3 bg-gray-800 rounded-xl w-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+        <textarea
+          placeholder="Lesson Description"
+          value={lessonState.description}
+          onChange={(e) => setLessonState({ ...lessonState, description: e.target.value })}
+          className="p-3 bg-gray-800 rounded-xl w-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none h-20 sm:h-24"
+        />
+        <div className="flex flex-col sm:flex-row gap-3">
+<input
+  type="number"
+  min="0"
+  placeholder="Coins Reward"
+  value={lessonState.coinsReward}
+  onChange={(e) => {
+    const value = Number(e.target.value);
+    setLessonState({ ...lessonState, coinsReward: value < 0 ? 0 : value });
+  }}
+  className="flex-1 p-3 bg-gray-800 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+/>
+<input
+  type="number"
+  min="0"
+  placeholder="EXP Reward"
+  value={lessonState.expReward}
+  onChange={(e) => {
+    const value = Number(e.target.value);
+    setLessonState({ ...lessonState, expReward: value < 0 ? 0 : value });
+  }}
+  className="flex-1 p-3 bg-gray-800 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+/>
 
-  // Mutation for adding a level (and possibly a lesson)
-const addLevelMutation = useMutation({
-  mutationFn: async () => {
-
-    //  Case 1 – Add Lesson
-    if (selectedLesson === "LessonAdd") {
-      return new Promise((resolve, reject) => {
-        addLessonMutation.mutate(
-          { category: subject },
-          {
-            onSuccess: async (res) => {
-              toast.success(res.message);
-
-              await fetchLessonsData();
-
-              //  Extract lesson number from backend message
-const match = res.message.match(/Lesson\s(\d+)/i);
-const newLessonNumber = match ? parseInt(match[1]) : null;
-
-if (newLessonNumber) {
-  setSelectedLesson(`Lesson${newLessonNumber}`);
-}
-              closePopup && closePopup();
-              resolve();
-            },
-            onError: reject,
-          }
-        );
-      });
-    }
-
-    // Case 2 – Add Level
-    if (!selectedLesson) {
-      toast.error("Please select a lesson.");
-      return;
-    }
-
-    return new Promise((resolve, reject) => {
-      addLevelMutationBack.mutate(
-        {
-          category: subject,
-          lessonId: selectedLesson
-        },
-        {
-          onSuccess: async (res) => {
-            toast.success(res.message);
-
-            await fetchLessonsData();
-            closePopup && closePopup();
-            resolve();
-          },
-          onError: reject,
-        }
-      );
-    });
-  },
-});
-
-
-
-return (
-  <div className="h-auto p-2 flex flex-col w-full">
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        addLevelMutation.mutate();
-      }}
-      className="relative border w-full h-auto m-auto bg-[#111827] border-[#56EBFF] rounded-2xl p-5 sm:p-8 shadow-lg">
-      {/* Close Button */}
-      <button
-        type="button"
-        onClick={closePopup}
-        className="absolute top-3 right-3 text-white text-xl bg-red-500 hover:bg-red-60 w-5 h-5 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all duration-300 shadow-md cursor-pointer">
-        ✕
-      </button>
-
-      <div className="border h-auto py-4 px-5 sm:px-10 flex flex-col sm:flex-row 
-                      sm:items-center gap-4 sm:gap-6 rounded-2xl border-gray-700 
-                      bg-[#0d13207c] text-lg sm:text-xl font-exo">
-        <div className="flex items-center gap-3">
-          <label className="text-white">Lesson:</label>
-          <select
-            className="bg-[#1f2937] text-white p-2 rounded-md focus:outline-0 cursor-pointer"
-            value={selectedLesson}
-            onChange={(e) => setSelectedLesson(e.target.value)}
-          >
-            <option value="">-- Select Lesson --</option>
-            {Lessons.map((lesson) => (
-              <option key={lesson.id} value={lesson.id}>
-                {lesson.title || lesson.id}
-              </option>
-            ))}
-            <option value="LessonAdd">Add Lesson</option>
-          </select>
         </div>
-      </div>
-      <div
-        className={`mt-4 rounded-2xl bg-[#0d13207c] p-5 sm:p-7 border border-gray-700 
-                    flex flex-col font-exo text-white h-auto
-                    ${
-                      selectedLesson === ""
-                        ? "opacity-30 pointer-events-none"
-                        : ""
-                    }`}>
-        {/*  Buttons Row */}
-        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 w-full sm:w-[70%] mx-auto">
+      </section>
 
-          <button
-            type="submit"
-            className="p-2 text-lg rounded-xl w-full sm:w-[45%] bg-[#4CAF50] hover:bg-[#45a049] hover:scale-105 transition-all duration-300 cursor-pointer"
+      {/* STAGE DETAILS */}
+      <section className="space-y-3">
+        <h2 className="text-2xl font-bold border-b border-gray-700 pb-2">Stage Details</h2>
+        <input
+          placeholder="Stage Title"
+          value={stageState.title}
+          onChange={(e) => setStageState({ ...stageState, title: e.target.value })}
+          className="p-3 bg-gray-800 rounded-xl w-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+        <textarea
+          placeholder="Stage Description"
+          value={stageState.description}
+          onChange={(e) => setStageState({ ...stageState, description: e.target.value })}
+          className="p-3 bg-gray-800 rounded-xl w-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none h-20 sm:h-24"
+        />
+        <textarea
+          placeholder="Stage Instruction"
+          value={stageState.instruction}
+          onChange={(e) => setStageState({ ...stageState, instruction: e.target.value })}
+          className="p-3 bg-gray-800 rounded-xl w-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none h-20 sm:h-24"
+        />
+      </section>
+
+      {/* CODING INTERFACE */}
+      <section className="border border-cyan-400 rounded-2xl p-3 sm:p-4 space-y-4 bg-[#111827]">
+        <h2 className="text-2xl font-bold mb-2">Coding Interface</h2>
+        {["html", "css", "js", "sql"].map(
+          (lang) =>
+            show(lang) && (
+              <div key={lang} className="flex flex-col">
+                <label className="mb-1 font-semibold">{lang.toUpperCase()}:</label>
+                <textarea
+                  value={stageState.codingInterface[lang]}
+                  onChange={(e) =>
+                    setStageState((prev) => ({
+                      ...prev,
+                      codingInterface: { ...prev.codingInterface, [lang]: e.target.value },
+                    }))
+                  }
+                  className="w-full h-20 sm:h-24 p-3 bg-[#0d13207c] rounded-2xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+                  placeholder={`Enter ${lang.toUpperCase()} code...`}
+                />
+              </div>
+            )
+        )}
+      </section>
+
+      {/* VIDEO UPLOAD */}
+      <section className="border border-cyan-400 rounded-2xl p-3 sm:p-4 flex flex-col gap-3 bg-[#111827]">
+        <h2 className="text-lg font-bold">Upload Video (Optional)</h2>
+        <input
+          type="file"
+          accept="video/*"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            setVideoFile(file);
+            if (file) setLocalPreview(URL.createObjectURL(file));
+          }}
+          className="text-white border border-gray-600 rounded-2xl p-3 cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+        {localPreview && (
+          <video
+            controls
+            className="w-full max-h-52 sm:max-h-60 rounded-xl mt-2 border border-gray-700"
           >
-            Add Level
-          </button>
+            <source src={localPreview} type="video/mp4" />
+          </video>
+        )}
+      </section>
 
+      {/* BLOCKS */}
+      <section className="space-y-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-[#111827] border border-cyan-400 p-3 rounded-2xl">
+          <TestDropDownMenu selectedItem={selectedItem} setSelectedItem={setSelectedItem} />
           <button
+            onClick={addBlocks}
             type="button"
-            onClick={closePopup}
-            className="p-2 text-lg rounded-xl w-full sm:w-[45%] 
-                       bg-gray-700 hover:bg-gray-600 
-                       hover:scale-105 transition-all duration-300 cursor-pointer"
+            className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-xl transition font-semibold cursor-pointer"
           >
-            Cancel
+            Add Block
           </button>
-
         </div>
-      </div>
-    </form>
-  </div>
-);
+        <div className="flex flex-col gap-4">
+          {stageState.blocks.map((block) => (
+            <div key={block.id} className="flex flex-col gap-2 bg-gray-800 p-3 rounded-2xl">
+              <InputSelector
+                block={block}
+                dispatch={(action) => {
+                  if (action.type === "UPDATE_BLOCK") updateBlock(block.id, "value", action.payload.value);
+                  if (action.type === "REMOVE_BLOCK") removeBlock(block.id);
+                }}
+              />
+              {block.type === "Image" && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(block.id, e.target.files[0])}
+                  className="text-white border border-gray-600 rounded-2xl p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
 
+      {/* SUBMIT BUTTON */}
+      <button
+        onClick={handleSubmit}
+        className="w-full py-3 bg-blue-600 rounded-xl text-lg font-bold hover:bg-blue-700 transition cursor-pointer"
+      >
+        Create Lesson
+      </button>
+    </div>
+  );
 }
-
-export default AddContent;
