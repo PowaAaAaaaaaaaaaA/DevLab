@@ -4,8 +4,12 @@ import { toast } from "react-toastify";
 import InputSelector from "./Edit_Forms/InputSelector";
 import TestDropDownMenu from "./Edit_Forms/TestDropDownMenu";
 import { auth } from "../../Firebase/Firebase";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function NewLessonForm({ subject, close }) {
+  const queryClient = useQueryClient();
+
+  // ---------------- STATE
   const [lessonState, setLessonState] = useState({
     title: "",
     description: "",
@@ -32,8 +36,10 @@ export default function NewLessonForm({ subject, close }) {
     JavaScript: ["html", "css", "js"],
     Database: ["sql"],
   };
+
   const show = (field) => visibleEditors[subject]?.includes(field);
 
+  // ---------------- BLOCK LOGIC
   const addBlocks = () => {
     if (!selectedItem) return;
     const maxId = stageState.blocks.length
@@ -51,7 +57,9 @@ export default function NewLessonForm({ subject, close }) {
   const updateBlock = (id, key, value) => {
     setStageState((prev) => ({
       ...prev,
-      blocks: prev.blocks.map((b) => (b.id === id ? { ...b, [key]: value } : b)),
+      blocks: prev.blocks.map((b) =>
+        b.id === id ? { ...b, [key]: value } : b
+      ),
     }));
   };
 
@@ -73,10 +81,12 @@ export default function NewLessonForm({ subject, close }) {
     updateBlock(id, "value", file);
   };
 
-  const handleSubmit = async () => {
-    try {
-      if (!lessonState.title.trim() || !stageState.title.trim())
+  // ---------------- MUTATION LOGIC
+  const createLessonMutation = useMutation({
+    mutationFn: async () => {
+      if (!lessonState.title.trim() || !stageState.title.trim()) {
         throw new Error("Lesson title and Stage title are required.");
+      }
 
       const token = await auth.currentUser?.getIdToken(true);
       const formData = new FormData();
@@ -89,7 +99,11 @@ export default function NewLessonForm({ subject, close }) {
           ([key, val]) => allowedFields.includes(key) && val.trim() !== ""
         )
       );
-      const stageStateToSave = { ...stageState, codingInterface: cleanedCodingInterface };
+
+      const stageStateToSave = {
+        ...stageState,
+        codingInterface: cleanedCodingInterface,
+      };
 
       const processedBlocks = stageStateToSave.blocks.map((block) => {
         if (block.type === "Image" && block.value instanceof File) {
@@ -107,6 +121,7 @@ export default function NewLessonForm({ subject, close }) {
         JSON.stringify({ ...stageStateToSave, blocks: processedBlocks })
       );
 
+      // 🔹 Create the lesson
       const res = await axios.post(
         "https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/addNEWLesson",
         formData,
@@ -118,6 +133,7 @@ export default function NewLessonForm({ subject, close }) {
         }
       );
 
+      // 🔹 Upload video if present
       if (videoFile) {
         const videoForm = new FormData();
         videoForm.append("video", videoFile);
@@ -133,12 +149,23 @@ export default function NewLessonForm({ subject, close }) {
         );
       }
 
-      toast.success("✅ Lesson created successfully!");
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success("Lesson created successfully!");
+      queryClient.invalidateQueries(["lessons", subject]); // optional cache refresh
       close();
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error(err);
       toast.error(err.message || "Failed to create lesson.");
-    }
+    },
+  });
+
+  // ---------------- SUBMIT HANDLER
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createLessonMutation.mutate();
   };
 
   return (
@@ -235,16 +262,24 @@ export default function NewLessonForm({ subject, close }) {
       {/* VIDEO UPLOAD */}
       <section className="border border-cyan-400 rounded-2xl p-3 sm:p-4 flex flex-col gap-3 bg-[#111827]">
         <h2 className="text-lg font-bold">Upload Video (Optional)</h2>
-        <input
-          type="file"
-          accept="video/*"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            setVideoFile(file);
-            if (file) setLocalPreview(URL.createObjectURL(file));
-          }}
-          className="text-white border border-gray-600 rounded-2xl p-3 cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500"
-        />
+<input
+  type="file"
+  accept="video/*"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Validate that it's a video
+    if (!file.type.startsWith("video/")) {
+      toast.error("Only video files are allowed!");
+      e.target.value = null; // reset input so user can try again
+      return;
+    }
+    setVideoFile(file);
+    // Preview
+    setLocalPreview(URL.createObjectURL(file));
+  }}
+  className="text-white border border-gray-600 rounded-2xl p-3 cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500"
+/>
         {localPreview && (
           <video
             controls
@@ -293,9 +328,14 @@ export default function NewLessonForm({ subject, close }) {
       {/* SUBMIT BUTTON */}
       <button
         onClick={handleSubmit}
-        className="w-full py-3 bg-blue-600 rounded-xl text-lg font-bold hover:bg-blue-700 transition cursor-pointer"
+        disabled={createLessonMutation.isPending}
+        className={`w-full py-3 rounded-xl text-lg font-bold transition cursor-pointer ${
+          createLessonMutation.isPending
+            ? "bg-gray-600 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+        }`}
       >
-        Create Lesson
+        {createLessonMutation.isPending ? "Creating..." : "Create Lesson"}
       </button>
     </div>
   );

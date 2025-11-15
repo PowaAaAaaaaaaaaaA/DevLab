@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 function InputSelector({ block, dispatch }) {
   const [preview, setPreview] = useState(null);
@@ -22,14 +23,24 @@ function InputSelector({ block, dispatch }) {
     setPreview(null);
   }, [block.value, block.type]);
 
-  const handleChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    dispatch({
-      type: "UPDATE_BLOCK",
-      payload: { id: block.id, value: file },
-    });
-  };
+
+const handleChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  // Validate that the file is an image
+  if (!file.type.startsWith("image/")) {
+    toast.error("Only image files are allowed!");
+    e.target.value = null; // reset input so user can try again
+    return;
+  }
+  // Dispatch the file to your state management
+  dispatch({
+    type: "UPDATE_BLOCK",
+    payload: { id: block.id, value: file },
+  });
+
+
+};
 
   // Divider block
   if (block.type === "Divider") {

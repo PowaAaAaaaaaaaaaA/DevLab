@@ -18,12 +18,28 @@ import Lottie from "lottie-react";
 import LoadingAnim from "../../assets/Lottie/LoadingDots.json";
 
 function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
-  const gameModes = ["Lesson", "BugBust", "CodeRush", "CodeCrafter", "BrainBytes"];
+  const gameModes = [
+    "Lesson",
+    "BugBust",
+    "CodeRush",
+    "CodeCrafter",
+    "BrainBytes",
+  ];
   const { state, dispatch } = useEditStage();
 
   const [stageData, setStageData] = useState(null);
   const [activeTab, setActiveTab] = useState("Lesson");
   const [loading, setLoading] = useState(true);
+  const [videoFile, setVideoFile] = useState(null);
+
+  const [replicateFile, setReplicateFile] = useState(""); // new
+  const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    if (stageData?.replicationFile) {
+      setReplicateFile(stageData.replicationFile);
+    }
+  }, [stageData]);
 
   // Fetch stage
   useEffect(() => {
@@ -41,7 +57,15 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
   const fetchStage = async () => {
     try {
       setLoading(true);
-      const stageRef = doc(db, subject, lessonId, "Levels", levelId, "Stages", stageId);
+      const stageRef = doc(
+        db,
+        subject,
+        lessonId,
+        "Levels",
+        levelId,
+        "Stages",
+        stageId
+      );
       const stageSnap = await getDoc(stageRef);
       if (stageSnap.exists()) {
         setStageData(stageSnap.data());
@@ -52,7 +76,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
       console.error("Failed to fetch stage:", error);
       toast.error("Failed to load stage.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -65,7 +89,12 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         isHidden: stageData?.isHidden ?? activeTab !== "Lesson",
         type: stageData?.type || "",
         instruction: stageData?.instruction || "",
-        codingInterface: stageData?.codingInterface || { html: "", css: "", js: "",sql:"" },
+        codingInterface: stageData?.codingInterface || {
+          html: "",
+          css: "",
+          js: "",
+          sql: "",
+        },
         timer: stageData?.timer || "",
         choices: stageData?.choices || [],
         blocks: stageData?.blocks || [],
@@ -89,7 +118,7 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
       case "Lesson":
         return { ...common, blocks: state.blocks };
       case "BugBust":
-        return { ...common};
+        return { ...common };
       case "CodeRush":
         return { ...common, timer: state.timer };
       case "BrainBytes":
@@ -100,33 +129,37 @@ function LessonEdit({ subject, lessonId, levelId, stageId, setShowForm }) {
         return common;
     }
   };
-const visibleEditors = {
-  Html: ["html"],
-  Css: ["html", "css"],
-  JavaScript: ["html", "css", "js"],
-  Database: ["sql"],
-};
+  const visibleEditors = {
+    Html: ["html"],
+    Css: ["html", "css"],
+    JavaScript: ["html", "css", "js"],
+    Database: ["sql"],
+  };
 
   // Save handler
   const handleSave = async (e) => {
     e.preventDefault();
-    
+
     try {
       const token = await auth.currentUser.getIdToken(true);
       const hasImages = state.blocks?.some(
         (block) => block.type === "Image" && block.value instanceof File
       );
-let response;
+      let response;
       // Automatically set isHidden
-      const updatedState = { ...state, isHidden: activeTab === "Lesson" ? false : true };
+      const updatedState = {
+        ...state,
+        isHidden: activeTab === "Lesson" ? false : true,
+      };
       if (!hasImages) {
         // JSON save
         const allowedFields = visibleEditors[subject] || [];
 
-const cleanedCodingInterface = Object.fromEntries(
-  Object.entries(updatedState.codingInterface || {})
-    .filter(([key, val]) => allowedFields.includes(key) && val.trim() !== "")
-);
+        const cleanedCodingInterface = Object.fromEntries(
+          Object.entries(updatedState.codingInterface || {}).filter(
+            ([key, val]) => allowedFields.includes(key) && val.trim() !== ""
+          )
+        );
         updatedState.codingInterface = cleanedCodingInterface;
         const filteredState = filterStateByGameMode(updatedState, activeTab);
         response = await axios.post(
@@ -160,7 +193,11 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
           if (block.type === "Image" && block.value instanceof File) {
             const fileType = block.value.type.split("/")[1] || "png";
             const fieldName = `image_${block.id || index + 1}`;
-            formData.append(fieldName, block.value, `image_${block.id || index + 1}.${fileType}`);
+            formData.append(
+              fieldName,
+              block.value,
+              `image_${block.id || index + 1}.${fileType}`
+            );
             return { ...block, value: fieldName };
           }
           return block;
@@ -172,20 +209,22 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
         );
         formData.append("state", JSON.stringify(filteredState));
 
-response = await axios.post(
-  `
+        response = await axios.post(
+          `
 https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`,
-  formData,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`, 
-    },
-  }
-);
-
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
       }
 
-      toast.success("Stage updated successfully!", { position: "top-center", theme: "colored" });
+      toast.success("Stage updated successfully!", {
+        position: "top-center",
+        theme: "colored",
+      });
       await fetchStage();
     } catch (error) {
       console.error("Failed to save stage:", error);
@@ -193,7 +232,7 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
     }
   };
 
- return (
+  return (
     <div className="bg-[#25293B] rounded-2xl p-4 sm:p-6 relative min-h-[400px] flex items-center justify-center">
       {/* Close Button */}
       <button
@@ -207,7 +246,11 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
       {/*  Loading State */}
       {loading ? (
         <div className="flex flex-col items-center justify-center gap-3">
-          <Lottie animationData={LoadingAnim} loop={true} className="w-24 h-24" />
+          <Lottie
+            animationData={LoadingAnim}
+            loop={true}
+            className="w-24 h-24"
+          />
           <p className="text-white font-exo text-sm">Loading stage data...</p>
         </div>
       ) : (
@@ -218,14 +261,14 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
             </h1>
 
             <div className="flex flex-wrap sm:flex-nowrap justify-center sm:justify-between gap-3 mt-5 mb-5">
-{gameModes.map((gm) => {
-  const isLocked = stageId === "Stage1"; // only Lesson allowed
+              {gameModes.map((gm) => {
+                const isLocked = stageId === "Stage1"; // only Lesson allowed
 
-  return (
-    <button
-      key={gm}
-      disabled={isLocked && gm !== "Lesson"}
-      className={`font-exo text-white text-xs sm:text-sm font-bold cursor-pointer
+                return (
+                  <button
+                    key={gm}
+                    disabled={isLocked && gm !== "Lesson"}
+                    className={`font-exo text-white text-xs sm:text-sm font-bold cursor-pointer
         px-3 py-2 rounded-3xl min-w-[28%] sm:min-w-[18%]
         transition-all duration-500 
         ${
@@ -235,17 +278,20 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
             ? "bg-gray-500 opacity-60 cursor-not-allowed"
             : "bg-[#7F5AF0] hover:scale-110"
         }`}
-      onClick={() => {
-        if (isLocked && gm !== "Lesson") return; // block mode change
-        setActiveTab(gm);
-        dispatch({ type: "UPDATE_FIELD", field: "type", value: gm });
-      }}
-    >
-      {gm}
-    </button>
-  );
-})}
-
+                    onClick={() => {
+                      if (isLocked && gm !== "Lesson") return; // block mode change
+                      setActiveTab(gm);
+                      dispatch({
+                        type: "UPDATE_FIELD",
+                        field: "type",
+                        value: gm,
+                      });
+                    }}
+                  >
+                    {gm}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -260,13 +306,25 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
                 lessonId={lessonId}
                 levelId={levelId}
                 stageId={stageId}
+                videoFile={videoFile}
+                setVideoFile={setVideoFile}
               />
             )}
             {activeTab === "BugBust" && (
-              <BugBustForm state={state} dispatch={dispatch} stageData={stageData}subject={subject} />
+              <BugBustForm
+                state={state}
+                dispatch={dispatch}
+                stageData={stageData}
+                subject={subject}
+              />
             )}
             {activeTab === "CodeRush" && (
-              <CodeRushForm state={state} dispatch={dispatch} stageData={stageData} subject={subject} />
+              <CodeRushForm
+                state={state}
+                dispatch={dispatch}
+                stageData={stageData}
+                subject={subject}
+              />
             )}
             {activeTab === "CodeCrafter" && (
               <CodeCrafterForm
@@ -277,38 +335,46 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/editStage`
                 lessonId={lessonId}
                 levelId={levelId}
                 stageId={stageId}
+                file={file}
+                setFile={setFile}
+                replicateFile={replicateFile}
+                setReplicateFile={setReplicateFile}
               />
             )}
             {activeTab === "BrainBytes" && (
-              <BrainBytesForm state={state} dispatch={dispatch} stageData={stageData} activeTab={activeTab} />
+              <BrainBytesForm
+                state={state}
+                dispatch={dispatch}
+                stageData={stageData}
+                activeTab={activeTab}
+              />
             )}
 
             {/* Buttons */}
             <div className="flex justify-between mt-6">
-<button
-  type="button"
-  disabled={stageId === "Stage1"}
-  onClick={() => {
-    if (stageId === "Stage1") return; // extra safety
-    deleteStageMutation.mutate(stageId, {
-      onSuccess: () => setShowForm(false),
-    });
-  }}
-  className={`font-exo font-bold text-white text-sm cursor-pointer
+              <button
+                type="button"
+                disabled={stageId === "Stage1"}
+                onClick={() => {
+                  if (stageId === "Stage1") return; // extra safety
+                  deleteStageMutation.mutate(stageId, {
+                    onSuccess: () => setShowForm(false),
+                  });
+                }}
+                className={`font-exo font-bold text-white text-sm cursor-pointer
     w-[40%] sm:w-[30%] py-2 rounded-3xl transition duration-300 ease-in-out
     ${
       stageId === "Stage1"
         ? "bg-gray-500 opacity-60 cursor-not-allowed"
         : "bg-[#E35460] hover:scale-105 hover:drop-shadow-[0_0_6px_rgba(255,99,71,0.8)]"
     }`}
->
-  {stageId === "Stage1"
-    ? "Locked"
-    : deleteStageMutation.isLoading
-    ? "Deleting..."
-    : "Delete"}
-</button>
-
+              >
+                {stageId === "Stage1"
+                  ? "Locked"
+                  : deleteStageMutation.isLoading
+                  ? "Deleting..."
+                  : "Delete"}
+              </button>
 
               <button
                 type="button"

@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import InputSelector from "./InputSelector";
 import TestDropDownMenu from "./TestDropDownMenu";
 
+import { toast } from "react-toastify";
+
 import { auth } from "../../../Firebase/Firebase";
 import axios from "axios";
 
 
 
-function LessonForm({stageData, state, dispatch, subject, lessonId, levelId, stageId }) {
+function LessonForm({stageData, state, dispatch, subject, lessonId, levelId, stageId,videoFile, setVideoFile }) {
 
   const visibleEditors = {
   Html: ["html"],
@@ -16,7 +18,10 @@ function LessonForm({stageData, state, dispatch, subject, lessonId, levelId, sta
   Database: ["sql"]
 };
 const show = (field) => visibleEditors[subject]?.includes(field);
-  const [localPreview, setLocalPreview] = useState("");
+  const [localPreview, setLocalPreview] = useState(stageData?.videoPresentation || "");
+
+
+
 
 
   const lastBlockId = state.blocks?.length
@@ -48,8 +53,6 @@ const addBlocks = () => {
 };
 
 
-  
-  const [videoFile, setVideoFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
 
@@ -99,7 +102,7 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
           onChange={(e) =>
             dispatch({ type: "UPDATE_FIELD", field: "title", value: e.target.value || stageData?.title  })
           }
-          className="w-full h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl 
+          className="w-full h-auto p-4 text-white bg-[#0d13207c] rounded-2xl 
                     focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
           placeholder="Enter stage title here."
         />
@@ -216,7 +219,7 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
           onChange={(e) =>
             dispatch({ type: "UPDATE_FIELD", field: "instruction", value: e.target.value })
           }
-          className="w-full h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl 
+          className="w-full h-auto p-4 text-white bg-[#0d13207c] rounded-2xl 
                     focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
           placeholder="Enter instructions for this stage."
         />
@@ -229,12 +232,19 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
   accept="video/*"
   onChange={(e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("video/")) {
+      toast.error("Only video files are allowed!");
+      e.target.value = null; // reset input
+      return;
+    }
+
     setVideoFile(file);
 
-    if (file) {
-      const previewURL = URL.createObjectURL(file);
-      setLocalPreview(previewURL);
-    }
+    const previewURL = URL.createObjectURL(file);
+    setLocalPreview(previewURL);
   }}
   className="text-white border border-gray-600 rounded-2xl p-5 cursor-pointer"
 />
@@ -248,16 +258,13 @@ https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVide
       </button>
       {/* VIDEO PREVIEW */}
 {(localPreview || videoUrl || stageData?.videoPresentation) && (
-  <video
-    controls
-    className="w-full max-h-[300px] rounded-xl mt-4 border border-gray-700"
-  >
-    <source
-      src={localPreview || videoUrl || stageData.videoPresentation}
-      type="video/mp4"
-    />
-    Your browser does not support the video tag.
-  </video>
+<video
+  key={localPreview || videoUrl || stageData.videoPresentation} // forces reload
+  controls
+  className="w-full max-h-[300px] rounded-xl mt-4 border border-gray-700"
+  src={localPreview || videoUrl || stageData.videoPresentation}
+/>
+
 )}
 
 

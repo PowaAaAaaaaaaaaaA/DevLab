@@ -310,16 +310,27 @@ const createLevelMutation = useMutation({
   {/* VIDEO UPLOAD */}
   <section className="border border-cyan-400 rounded-2xl p-4 flex flex-col gap-3 bg-[#111827]">
     <h2 className="text-lg font-bold">Upload Video (Optional)</h2>
-    <input
-      type="file"
-      accept="video/*"
-      onChange={(e) => {
-        const file = e.target.files[0];
-        setVideoFile(file);
-        if (file) setLocalPreview(URL.createObjectURL(file));
-      }}
-      className="text-white border border-gray-600 rounded-2xl p-3 cursor-pointer"
-    />
+
+<input
+  type="file"
+  accept="video/*"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Validate that it's a video
+    if (!file.type.startsWith("video/")) {
+      toast.error("Only video files are allowed!");
+      e.target.value = null; // reset input
+      return;
+    }
+
+    setVideoFile(file);
+
+    // Preview
+    setLocalPreview(URL.createObjectURL(file));
+  }}
+  className="text-white border border-gray-600 rounded-2xl p-3 cursor-pointer"
+/>
     {localPreview && (
       <video
         controls

@@ -1,11 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
   import { auth } from "../../../Firebase/Firebase";
-  function CodeCrafterForm({stageData, state, dispatch, subject, lessonId, levelId, stageId}) {
+  function CodeCrafterForm({stageData, state, dispatch, subject, lessonId, levelId, stageId,  file,setFile,replicateFile,setReplicateFile,}) {
 
-  const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [fileUrl, setFileUrl] = useState(stageData?.replicationFile || "");
 
     const visibleEditors = {
   Html: ["html"],
@@ -18,49 +17,62 @@ const show = (field) => visibleEditors[subject]?.includes(field);
   const [localPreview, setLocalPreview] = useState("");
 
 
+
+
 const handleFileChange = (e) => {
   const selected = e.target.files[0];
-  setFile(selected);
+  if (!selected) return;
 
-  if (selected) {
-    const previewURL = URL.createObjectURL(selected);
-    setLocalPreview(previewURL);
-
-    // Clear old uploaded URL so the preview switches to the new file
-    setFileUrl("");
+  // Validate file type
+  if (!selected.name.endsWith(".html")) {
+    toast.error("Only .html files are allowed!");
+    e.target.value = null; // reset input so user can try again
+    return;
   }
+
+  setFile(selected); // from props
+
+  // Create preview URL if needed
+  const previewURL = URL.createObjectURL(selected);
+  setLocalPreview(previewURL);
+
+  setReplicateFile(""); // clear previous URL
 };
 
 
-  const handleUpload = async () => {
-    if (!file) return;
-    setUploading(true);
 
-    try {
-      const token = await auth.currentUser.getIdToken(true);
-      const formData = new FormData();
-      formData.append("replicateFile", file);
-      formData.append("category", subject);
-      formData.append("lessonId", lessonId);
-      formData.append("levelId", levelId);
-      formData.append("stageId", stageId);
+const handleUpload = async () => {
+  if (!file) return;
+  setUploading(true);
 
-      const res = await axios.post(`https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadFile`, formData, {
+  try {
+    const token = await auth.currentUser.getIdToken(true);
+    const formData = new FormData();
+    formData.append("replicateFile", file);
+    formData.append("category", subject);
+    formData.append("lessonId", lessonId);
+    formData.append("levelId", levelId);
+    formData.append("stageId", stageId);
+
+    const res = await axios.post(
+      `https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadFile`,
+      formData,
+      {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
-      });
-      setFileUrl(res.data.url);
-      setLocalPreview("");
-      // Update local state so Save button has it
-      dispatch({ type: "UPDATE_FIELD", field: "replicationFile", value: res.data.url });
-    } catch (err) {
-      console.error("File upload failed:", err);
-    } finally {
-      setUploading(false);
-    }
-  };
+      }
+    );
+    setReplicateFile(res.data.url);  // from props
+    setLocalPreview("");
+  } catch (err) {
+    console.error("File upload failed:", err);
+  } finally {
+    setUploading(false);
+  }
+};
+
     return (
       <>
         {/* Stage Title */}
@@ -71,7 +83,7 @@ const handleFileChange = (e) => {
             onChange={(e) =>
               dispatch({ type: "UPDATE_FIELD", field: "title", value: e.target.value })
             }
-            className="w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+            className="w-[100%] h-auto p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
             placeholder="Enter stage title here."
           />
         </div>
@@ -83,7 +95,7 @@ const handleFileChange = (e) => {
             onChange={(e) =>
               dispatch({ type: "UPDATE_FIELD", field: "description", value: e.target.value })
             }
-            className="w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+            className="w-[100%] h-auto p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
             placeholder="Enter stage description here."
           />
         </div>
@@ -96,7 +108,7 @@ const handleFileChange = (e) => {
             onChange={(e) =>
               dispatch({ type: "UPDATE_FIELD", field: "instruction", value: e.target.value })
             }
-            className="w-[100%] h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
+            className="w-[100%] h-auto p-4 text-white bg-[#0d13207c] rounded-2xl focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
             placeholder="Enter instructions for this stage."
           />
         </div>
@@ -195,33 +207,36 @@ const handleFileChange = (e) => {
           type="file" 
           accept=".html" 
           onChange={handleFileChange} 
-          className="text-white border p-4 rounded-2xl cursor-pointer"/>
+          className="text-white border p-4 rounded-2xl cursor-pointer "/>
         <button
           type="button"
           onClick={handleUpload}
           disabled={uploading}
-          className="bg-[#7F5AF0] text-white rounded-lg p-2 hover:scale-105 transition cursor-pointer">
+          className="bg-[#7F5AF0] text-white rounded-lg p-2 cursor-pointer">
           {uploading ? "Uploading..." : "Upload"}
         </button>
 
-        {fileUrl && (
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 underline mt-2">
-            View Uploaded File
-          </a>
-        )}
+{replicateFile && (
+  <a
+    href={replicateFile}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-400 underline mt-2"
+  >
+    View Uploaded File
+  </a>
+)}
+
         {/* HTML PREVIEW */}
-{(localPreview || fileUrl || stageData?.replicationFile) && (
+{(localPreview || replicateFile || stageData?.replicationFile) && (
   <iframe
-    key={localPreview || fileUrl || stageData?.replicationFile}
-    src={localPreview || fileUrl || stageData?.replicationFile}
+    key={localPreview || replicateFile || stageData?.replicationFile}
+    src={localPreview || replicateFile || stageData?.replicationFile}
     className="w-full h-[400px] mt-4 rounded-xl border bg-white border-gray-700"
     title="HTML Preview"
   />
 )}
+
 
       </div>
         </div>
