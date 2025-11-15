@@ -10,38 +10,48 @@ function ForgotPassword({ onClose }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      toast.error("Please enter your email address.", {
-        position: "bottom-center",
-        theme: "colored",
-      });
-      return;
+const handleForgotPassword = async () => {
+  if (!email) {
+    toast.error("Please enter your email address.", {
+      position: "bottom-center",
+      theme: "colored",
+    });
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const actionCodeSettings = {
+      url: `${window.location.origin}/reset-password`, // this must match your App route
+      handleCodeInApp: true,
+    };
+console.log(actionCodeSettings);
+    await sendPasswordResetEmail(auth, email, actionCodeSettings);
+
+    toast.success("Password reset email sent successfully!", {
+      position: "bottom-center",
+      theme: "colored",
+    });
+    onClose(); // close modal after success
+  } catch (error) {
+    console.error(error);
+    let message = "Something went wrong. Please try again.";
+    if (error.code === "auth/user-not-found") {
+      message = "No account found with that email.";
+    } else if (error.code === "auth/invalid-email") {
+      message = "Invalid email format.";
     }
-    setLoading(true);
-    try {
-      await sendPasswordResetEmail(auth, email);
-      toast.success("Password reset email sent successfully!", {
-        position: "bottom-center",
-        theme: "colored",
-      });
-      onClose(); // close modal after success
-    } catch (error) {
-      console.error(error);
-      let message = "Something went wrong. Please try again.";
-      if (error.code === "auth/user-not-found") {
-        message = "No account found with that email.";
-      } else if (error.code === "auth/invalid-email") {
-        message = "Invalid email format.";
-      }
-      toast.error(message, {
-        position: "bottom-center",
-        theme: "colored",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.error(message, {
+      position: "bottom-center",
+      theme: "colored",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 flex justify-center items-center">
