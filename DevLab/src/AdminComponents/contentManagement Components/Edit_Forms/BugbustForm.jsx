@@ -20,7 +20,7 @@ const show = (field) => visibleEditors[subject]?.includes(field);
           onChange={(e) =>
             dispatch({ type: "UPDATE_FIELD", field: "title", value: e.target.value || stageData?.title  })
           }
-          className="w-full h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl 
+          className="w-full h-auto p-4 text-white bg-[#0d13207c] rounded-2xl 
                     focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
           placeholder="Enter stage title here."
         />
@@ -34,7 +34,7 @@ const show = (field) => visibleEditors[subject]?.includes(field);
           onChange={(e) =>
             dispatch({ type: "UPDATE_FIELD", field: "description", value: e.target.value })
           }
-          className="w-full h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl 
+          className="w-full h-auto p-4 text-white bg-[#0d13207c] rounded-2xl 
                     focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
           placeholder="Enter stage description here."
         />
@@ -48,7 +48,7 @@ const show = (field) => visibleEditors[subject]?.includes(field);
           onChange={(e) =>
             dispatch({ type: "UPDATE_FIELD", field: "instruction", value: e.target.value })
           }
-          className="w-full h-[80%] p-4 text-white bg-[#0d13207c] rounded-2xl 
+          className="w-full h-auto p-4 text-white bg-[#0d13207c] rounded-2xl 
                     focus:border-cyan-500 border border-gray-700 focus:outline-none resize-none"
           placeholder="Enter instructions for this stage."
         />
