@@ -90,7 +90,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
 
   return (
     <>
-      <div key={roundKey} className="h-screen bg-[#0D1117] flex flex-col overflow-hidden">
+      <div className="h-screen bg-[#0D1117] flex flex-col overflow-hidden">
         {/* Header */}
         <GameHeader heart={heart} />
 

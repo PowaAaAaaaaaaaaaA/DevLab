@@ -199,7 +199,7 @@ const handleUpload = async () => {
   )}
 </div>
         {/* Hint & Replicate */}
-        <div className="border-cyan-400 border rounded-2xl w-[100%] h-[20%] p-4 bg-[#111827] flex flex-col gap-5">
+        <div className="border-cyan-400 border rounded-2xl w-[100%] h-auto p-4 bg-[#111827] flex flex-col gap-5">
       {/* Replicate (Optional) */}
       <div className="border-cyan-400 border rounded-2xl w-[100%] h-auto p-4 bg-[#111827] flex flex-col gap-5">
         <h1 className="font-exo text-white text-[2rem] mb-[10px]">Replicate (Optional):</h1>
@@ -232,7 +232,7 @@ const handleUpload = async () => {
   <iframe
     key={localPreview || replicateFile || stageData?.replicationFile}
     src={localPreview || replicateFile || stageData?.replicationFile}
-    className="w-full h-[400px] mt-4 rounded-xl border bg-white border-gray-700"
+    className="w-full h-auto mt-4 rounded-xl border bg-white border-gray-700"
     title="HTML Preview"
   />
 )}

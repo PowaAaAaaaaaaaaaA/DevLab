@@ -4,7 +4,7 @@ import Image from "../assets/Images/Login-Image.jpg";
 import Loading from "../assets/Lottie/LoadingDots.json";
 // Utils
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 // Firebase
 import {
@@ -23,12 +23,13 @@ import { IoPerson, IoLockOpen, IoEye, IoEyeOff } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 // Components
 import ForgotPassword from "./ForgotPassword";
+import { onAuthStateChanged } from "firebase/auth";
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,10 +39,10 @@ function Login() {
     setLoading(true);
 
     try {
-      // const persistence = rememberMe
-      //   ? browserLocalPersistence
-      //   : browserSessionPersistence;
-      // await setPersistence(auth, persistence);
+      const persistence = rememberMe
+        ? browserLocalPersistence
+        : browserSessionPersistence;
+      await setPersistence(auth, persistence);
 
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -82,7 +83,6 @@ toast.success("Login successful!", {
 // Get custom claims (role)
 const tokenResult = await user.getIdTokenResult(true);
 const role = tokenResult.claims.role;
-console.log("ROLE:", role);
 
 //  Admin vs User redirect
 if (role === "admin") {
@@ -110,6 +110,9 @@ if (role === "admin") {
       setLoading(false);
     }
   };
+
+  
+
 
   return (
     <>
@@ -179,16 +182,22 @@ if (role === "admin") {
                 Forgot Password
               </button>
 
-              {/* Remember Me
-              <div className="flex items-center gap-2 mt-2">
+                <div className="m-[2%]">
                 <input
                   type="checkbox"
+                  name="remember"
+                  id="remember"
+                  className="peer cursor-pointer"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="cursor-pointer"
                 />
-                <label className="text-white cursor-pointer">Remember Me</label>
-              </div> */}
+                <label
+                  htmlFor="remember"
+                  className="text-white pl-2 cursor-pointer transition-all duration-300 peer-checked:text-green-400 hover:drop-shadow-[0_0_6px_rgba(147,197,253,0.8)]"
+                >
+                  Remember Me
+                </label>
+              </div>
 
               {/* Login Button */}
               <div className="w-[60%] mt-4">

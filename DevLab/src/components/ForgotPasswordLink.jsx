@@ -8,33 +8,34 @@ import { auth } from "../Firebase/Firebase";
 import { validatePassword } from "./Custom Hooks/validations";
 // UI
 import { toast } from "react-toastify";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
-export default function ResetPassword() {
+export default function ResetPassword({ oobCode }) {
   const navigate = useNavigate();
-  const [oobCode, setOobCode] = useState("");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
 
+
+  // Toggle states for password visibility
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("oobCode");
-    if (!code) {
+    if (!oobCode) {
       toast.error("Reset code missing or invalid.");
       return;
     }
-    setOobCode(code);
-
     const verify = async () => {
       try {
-        const verifiedEmail = await verifyPasswordResetCode(auth, code);
+        const verifiedEmail = await verifyPasswordResetCode(auth, oobCode);
         setEmail(verifiedEmail);
         setVerified(true);
       } catch (err) {
         console.error(err);
-        toast.error("Invalid or expired password reset link.", { position: "bottom-center" });
+        toast.error("Invalid or expired password reset link.", { position: "top-right" });
       }
     };
 
@@ -58,7 +59,7 @@ export default function ResetPassword() {
 
     const [status, message] = validatePassword(newPassword);
     if (status === "error") {
-      toast.error(message, { position: "bottom-center" });
+      toast.error(message, { position: "top-right" });
       return;
     }
 
@@ -76,7 +77,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#0D1117]">
       <motion.div
         className="w-full max-w-md bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl p-[2px] shadow-lg text-white"
         initial={{ scale: 0.8, opacity: 0 }}
@@ -95,22 +96,43 @@ export default function ResetPassword() {
             {verified ? `Resetting password for ${email}` : "Verifying reset link..."}
           </p>
 
-          <input
-            type="password"
-            placeholder="New password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full p-2 rounded-md bg-[#2C2F3F] text-white outline-none mb-3 border border-gray-600 focus:border-cyan-400"
-            disabled={!verified || loading}
-          />
-          <input
-            type="password"
-            placeholder="Confirm password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-2 rounded-md bg-[#2C2F3F] text-white outline-none mb-4 border border-gray-600 focus:border-cyan-400"
-            disabled={!verified || loading}
-          />
+          {/* New Password */}
+          <div className="relative mb-3">
+            <input
+              type={showNewPassword ? "text" : "password"}
+              placeholder="New password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full p-2 rounded-md bg-[#2C2F3F] text-white outline-none border border-gray-600 focus:border-cyan-400"
+              disabled={!verified || loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-white text-xl hover:text-cyan-400"
+            >
+              {showNewPassword ? <IoEyeOff /> : <IoEye />}
+            </button>
+          </div>
+
+          {/* Confirm Password */}
+          <div className="relative mb-4">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full p-2 rounded-md bg-[#2C2F3F] text-white outline-none border border-gray-600 focus:border-cyan-400"
+              disabled={!verified || loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-white text-xl hover:text-cyan-400"
+            >
+              {showConfirmPassword ? <IoEyeOff /> : <IoEye />}
+            </button>
+          </div>
 
           <button
             onClick={handleSubmit}

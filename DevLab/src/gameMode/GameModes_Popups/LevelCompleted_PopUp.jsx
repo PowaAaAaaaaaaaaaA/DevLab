@@ -132,9 +132,7 @@ return (
             p-3 sm:p-4 
             font-exo w-[95%] md:w-[90%] 
             min-h-[100px] 
-            flex flex-col items-center justify-center
-          "
-        >
+            flex flex-col items-center justify-center">
           {levelSummary ? (
             <div
               className="
