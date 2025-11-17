@@ -10,36 +10,32 @@ import { validatePassword } from "./Custom Hooks/validations";
 import { toast } from "react-toastify";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 
-export default function ResetPassword() {
+export default function ResetPassword({ oobCode }) {
   const navigate = useNavigate();
-  const [oobCode, setOobCode] = useState("");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
 
+
   // Toggle states for password visibility
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("oobCode");
-    if (!code) {
+    if (!oobCode) {
       toast.error("Reset code missing or invalid.");
       return;
     }
-    setOobCode(code);
-
     const verify = async () => {
       try {
-        const verifiedEmail = await verifyPasswordResetCode(auth, code);
+        const verifiedEmail = await verifyPasswordResetCode(auth, oobCode);
         setEmail(verifiedEmail);
         setVerified(true);
       } catch (err) {
         console.error(err);
-        toast.error("Invalid or expired password reset link.", { position: "bottom-center" });
+        toast.error("Invalid or expired password reset link.", { position: "top-right" });
       }
     };
 
@@ -63,7 +59,7 @@ export default function ResetPassword() {
 
     const [status, message] = validatePassword(newPassword);
     if (status === "error") {
-      toast.error(message, { position: "bottom-center" });
+      toast.error(message, { position: "top-right" });
       return;
     }
 
@@ -81,7 +77,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#0D1117]">
       <motion.div
         className="w-full max-w-md bg-gradient-to-b from-cyan-400 to-purple-500 rounded-2xl p-[2px] shadow-lg text-white"
         initial={{ scale: 0.8, opacity: 0 }}

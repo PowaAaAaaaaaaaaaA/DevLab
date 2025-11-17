@@ -33,7 +33,7 @@ import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FullscreenLoader from "./components/FullScreenLoader";
 import { loadSounds } from "./components/Custom Hooks/DevlabSoundHandler";
-import ResetPassword from "./components/ForgotPasswordLink";
+import AuthActionHandler from "./components/AuthActionHandler";
 
 import NotFound from "./components/NotFound";
 const queryClient = new QueryClient();
@@ -134,7 +134,8 @@ useEffect(() => {
             path="/Register"
             element={!isLoggedIn ? <Register /> : <Navigate to="/Main" replace />}/>
           
-<Route path="/reset-password" element={<ResetPassword />} />
+<Route path="/handle-action" element={<AuthActionHandler />} />
+
           {/* Protected Routes */}
           <Route
             path="/Main"
