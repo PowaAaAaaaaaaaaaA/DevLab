@@ -94,13 +94,14 @@ function InstructionPanel({
   showCodeWhisper,
   setShowCodeWhisper,
   setTimesUp,
-  pauseTimer
+  pauseTimer,
+  resetTimerSignal
 }) {
   
     const [aiHint, setAiHint] = useState("");
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const submittedCode = useGameStore((state) => state.submittedCode);
-  console.log("Current active buffs:", activeBuffs);
+  // console.log("Current active buffs:", activeBuffs);
   const { gamemodeId } = useParams();
   const { gameModeData, levelData, subject,lessonId,levelId, stageId } = useFetchGameModeData();
   const [timer, buffApplied, buffType] = useCodeRushTimer(
@@ -108,7 +109,8 @@ function InstructionPanel({
     gamemodeId,
     gameModeData,
     showPopup,
-    pauseTimer
+    pauseTimer,
+    resetTimerSignal
   );
   const { animatedValue } = useAnimatedNumber(buffApplied ? 30 : 0);
   // Format the Code to Display

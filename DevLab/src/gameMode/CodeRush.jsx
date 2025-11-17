@@ -38,7 +38,6 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   const { subject, lessonId, levelId, stageId, gamemodeId } = useParams();
 
   // Popups
-  const [isNavigating, setIsNavigating] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
   const [alreadyComplete, setAlreadyComplete] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
@@ -49,6 +48,13 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
 
   const { userData } = useFetchUserData();
   const userId = userData?.uid;
+
+  const [resetTimerSignal, setResetTimerSignal] = useState(0);
+
+const resetTimer = () => {
+  setResetTimerSignal(prev => prev + 1);
+};
+
 
   //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
@@ -104,7 +110,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
   return (
     <>
       <div
-        key={roundKey}
+        
         className="h-screen bg-[#0D1117] flex flex-col overflow-hidden"
       >
         {/* Header */}
@@ -121,6 +127,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
               setShowCodeWhisper={setShowCodeWhisper}
               setTimesUp={setTimesUp}
               pauseTimer={pauseTimer}
+              resetTimerSignal={resetTimerSignal}
             />
           </div>
 
@@ -185,6 +192,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
             onClose={() => {
               setTimesUp(false); // close popup
               submitAttempt(false); // THEN lose HP
+              resetTimer(); // reset Time
             }}
             buttonText="Continue"
           />
@@ -268,6 +276,7 @@ function CodeRush({ heart, roundKey, gameOver, submitAttempt, resetHearts }) {
                           return; // Do NOT call submitAttempt(false)
                         }
                         submitAttempt(false);
+                        resetTimer();
                       }}
                       whileTap={{ scale: 0.95 }}
                       whileHover={{ scale: 1.05 }}

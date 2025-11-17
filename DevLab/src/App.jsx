@@ -33,7 +33,7 @@ import GameModeRouter from "./gameMode/GameModes_Utils/GameModeRouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FullscreenLoader from "./components/FullScreenLoader";
 import { loadSounds } from "./components/Custom Hooks/DevlabSoundHandler";
-import ResetPassword from "./components/ResePassword";
+import ResetPassword from "./components/ForgotPasswordLink";
 
 import NotFound from "./components/NotFound";
 const queryClient = new QueryClient();
@@ -104,9 +104,19 @@ useEffect(() => {
       <QueryClientProvider client={queryClient}>
         <Routes>
           {/* Public Routes */}
-          <Route
-            path="/"
-            element={!isLoggedIn ? <LandingPage /> : <Navigate to="/Main" replace />}/>
+       <Route
+  path="/"
+  element={
+    !isLoggedIn ? (
+      <LandingPage />
+    ) : isAdmin ? (
+      <Navigate to="/Admin" replace />
+    ) : (
+      <Navigate to="/Main" replace />
+    )
+  }
+/>
+
 <Route
   path="/Login"
   element={
