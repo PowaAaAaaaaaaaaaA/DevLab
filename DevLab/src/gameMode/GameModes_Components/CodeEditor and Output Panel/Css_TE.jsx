@@ -12,7 +12,7 @@ import Evaluation_Popup from "../../GameModes_Popups/Evaluation_Popup";
 import toast from "react-hot-toast";
 // Utils
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { checkCssAchievements } from "../../../components/Achievements Utils/Css_KeyExtract";
 import { unlockAchievement } from "../../../components/Custom Hooks/UnlockAchievement";
@@ -23,6 +23,7 @@ import useFetchGameModeData from "../../../components/BackEnd_Data/useFetchGameM
 import useFetchUserProgress from "../../../components/BackEnd_Data/useFetchUserProgress";
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
+import SplitPane from "react-split-pane";
 
 
 function Css_TE() {
@@ -160,12 +161,70 @@ const isStageCompleted = userStageCompleted?.[stageKey] === true;
     }
   };
 
+    const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+useEffect(() => {
+  const observer = new ResizeObserver(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth);
+    }
+  });
+
+  if (containerRef.current) observer.observe(containerRef.current);
+
+  return () => observer.disconnect();
+}, []);
+
+  useEffect(() => {
+    setContainerWidth(containerRef.current.offsetWidth);
+
+    const handleResize = () => {
+      setContainerWidth(containerRef.current.offsetWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const minLeft = containerWidth * 0.30; // 30% min for left pane
+  const minRight = containerWidth * 0.30; // 30% min for right pane
+  const defaultLeft = containerWidth * 0.5; // 50% default
+
+  // size TEXT
+   const [leftWidth, setLeftWidth] = useState(0);
+const [rightWidth, setRightWidth] = useState(0);
+
+useEffect(() => {
+  const width = containerRef.current.offsetWidth;
+  setLeftWidth(width * 0.5);   // default 50%
+  setRightWidth(width * 0.5);
+}, []);
+
+const handleDrag = (newLeftWidth) => {
+  setLeftWidth(newLeftWidth);
+  setRightWidth(containerRef.current.offsetWidth - newLeftWidth);
+};
+
 
 return (
-  <div className="flex flex-col md:flex-row gap-3 w-full lg:h-full md:h-full h-[100vh]">
+
+   <div  ref={containerRef}  className="flex flex-col md:flex-row gap-3 w-full lg:h-full md:h-full h-[100vh] relative ">
     {/* Code Editor Panel */}
+    <SplitPane
+  split="vertical"           // vertical split: editor left, output right
+  minSize={minLeft}      // left pane minimum width
+  maxSize={containerWidth - minRight}      // left pane maximum width         
+  defaultSize={defaultLeft}          // initial width of the left panel
+  paneStyle={{ overflow: "hidden" }} // prevent scroll issues
+  onChange={handleDrag}
+  resizerStyle={{
+    background: "transparent",
+    cursor: "col-resize",
+    width: "20px",
+  }}
+>
     <div 
-      className="bg-[#191a26] h-[55%] md:h-full w-full md:w-1/2 rounded-2xl flex flex-col gap-3 items-center p-3 border-[#2a3141] border-[1px]"
+      className="bg-[#191a26] h-[55%] md:h-full w-full  rounded-2xl flex flex-col gap-3 items-center p-3 border-[#2a3141] border-[1px]"
     >
       {/* Tabs */}
       <div className="flex justify-center items-center gap-4 w-full mb-2">
@@ -229,11 +288,14 @@ return (
     )}
       </div>
     </div>
-
+    
     {/* Output Panel */}
     <div 
-      className="h-[45%] mb-2 md:h-full w-full md:w-1/2 rounded-2xl bg-[#F8F3FF] border-[#2a3141] border-[1px]"
-    >
+      className="h-[45%] mb-2 md:h-full w-full rounded-2xl bg-[#F8F3FF] border-[#2a3141] border-[1px] relative">
+          {/* Real-time size display */}
+  <p className="text-sm font-mono mb-1 absolute bottom-0 right-2">
+    {Math.round((rightWidth-23))}px x 100% 
+  </p>
       {hasRunCode ? (
         <iframe
           ref={iFrame}
@@ -250,6 +312,7 @@ return (
         </div>
       )}
     </div>
+    </SplitPane>
 
     {/* Evaluation Popup */}
     <AnimatePresence>
@@ -265,6 +328,7 @@ return (
       )}
     </AnimatePresence>
   </div>
+
 );
 
 }

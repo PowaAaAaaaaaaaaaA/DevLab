@@ -12,7 +12,7 @@ const fetchUsers = async () => {
 
 try {
   const res = await axios.get(
-    `https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/getUsers`,
+    `https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/getUsers`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   console.log("Axios response:", res);

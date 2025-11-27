@@ -26,10 +26,12 @@ import codeWhisperPrompt from "../../components/OpenAI Prompts/codeWhisperPrompt
 // 
 import useStoreLastOpenedLevel from "../../components/Custom Hooks/useStoreLastOpenedLevel";
 import { useGameStore } from "../../components/OpenAI Prompts/useBugBustStore";
+import useFetchUserProgress from "../../components/BackEnd_Data/useFetchUserProgress";
 
 
 
 const CodeBlock = ({ code, language, color }) => {
+
   const [copied, setCopied] = useState(false);
 
   const handleCopyClick = () => {
@@ -98,19 +100,34 @@ function InstructionPanel({
   resetTimerSignal
 }) {
   
+  
     const [aiHint, setAiHint] = useState("");
   const activeBuffs = useInventoryStore((state) => state.activeBuffs);
   const submittedCode = useGameStore((state) => state.submittedCode);
   // console.log("Current active buffs:", activeBuffs);
-  const { gamemodeId } = useParams();
+  const {gamemodeId } = useParams();
   const { gameModeData, levelData, subject,lessonId,levelId, stageId } = useFetchGameModeData();
+  
+  const { userStageCompleted } = useFetchUserProgress(subject); // or however you fetch it
+const stageKey = `${lessonId}-${levelId}-${stageId}`;
+const isStageCompleted = userStageCompleted?.[stageKey] ?? false;
+
+// At the top of the component, after fetching gameModeData
+useEffect(() => {
+  if (isStageCompleted && gameModeData?.choices?.correctAnswer) {
+    setSelectedOption(gameModeData.choices.correctAnswer);
+  }
+}, [isStageCompleted, gameModeData]);
+
+
   const [timer, buffApplied, buffType] = useCodeRushTimer(
     gameModeData?.timer,
     gamemodeId,
     gameModeData,
     showPopup,
     pauseTimer,
-    resetTimerSignal
+    resetTimerSignal,
+    isStageCompleted
   );
   const { animatedValue } = useAnimatedNumber(buffApplied ? 30 : 0);
   // Format the Code to Display
@@ -133,6 +150,8 @@ useEffect(() => {
     });
   }
 }, [levelData, gameModeData, subject]);
+
+
 
  // This is for the Code Interface display
  // Runs once when data becomes available
@@ -265,6 +284,13 @@ const hasAnyCode =
       <h2 className="text-2xl md:text-[2rem] font-bold text-shadow-lg text-shadow-black text-[#E35460]">
         {levelData.levelOrder}. {gameModeData.title}
       </h2>
+
+      {isStageCompleted && (
+  <p className="text-sm text-green-400 font-exo mt-1">
+    This stage is already completed
+  </p>
+)}
+
       {/* Responsive Paragraph */}
       <p className="whitespace-pre-line text-justify leading-relaxed text-sm sm:text-[0.9rem] font-exo">
         {gameModeData.description}
@@ -279,42 +305,46 @@ const hasAnyCode =
             {gameModeData.instruction}
           </p>
           {/* Thematic options container */}
-          <div className="bg-gray-900 p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
-            <AnimatePresence>
-              {filtteredOpttions.map(([key, value]) => (
-                <motion.label
-                  key={key}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.5, opacity: 0 }}
-                  transition={{ duration: 0.3, type: "pop", stiffness: 300 }}
-                  className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl transition-all duration-300 ${
-                    selectedOption === key ? "bg-purple-700 shadow-lg" : "bg-gray-800 hover:bg-purple-900/50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="option"
-                    value={key}
-                    checked={selectedOption === key}
-                    onChange={() => setSelectedOption(key)}
-                    className="accent-purple-500 mt-1"
-                  />
-                  <span className="font-mono text-sm break-all">{key}: {value}</span>
-                </motion.label>
-              ))}
-            </AnimatePresence>
-          </div>
+<div className="bg-gray-900 p-3 rounded-xl text-white whitespace-pre-wrap flex flex-col justify-center overflow-hidden">
+  <AnimatePresence>
+    {filtteredOpttions.map(([key, value]) => (
+      <motion.label
+        key={key}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.5, opacity: 0 }}
+        transition={{ duration: 0.3, type: "pop", stiffness: 300 }}
+        className={`flex items-start gap-3 cursor-pointer p-3 m-2 rounded-xl transition-all duration-300 ${
+          selectedOption === key ? "bg-purple-700 shadow-lg" : "bg-gray-800 hover:bg-purple-900/50"
+        }`}
+      >
+        <input
+          type="radio"
+          name="option"
+          value={key}
+          checked={selectedOption === key}
+          onChange={() => setSelectedOption(key)}
+          className="accent-purple-500 mt-1"
+          disabled={isStageCompleted} // ✅ disable if stage is completed
+        />
+        <span className="font-mono text-sm break-all">{key}: {value}</span>
+      </motion.label>
+    ))}
+  </AnimatePresence>
+</div>
           {/* Thematic and responsive submit button */}
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05, background: "#7e22ce" }}
-            transition={{ bounceDamping: 100 }}
-            onClick={answerCheck}
-            className="w-1/2 sm:w-1/3 md:w-[30%] py-2 self-end rounded-xl font-exo font-bold bg-[#9333EA] hover:cursor-pointer hover:bg-[#7e22ce] transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]"
-          >
-            Submit
-          </motion.button>
+<motion.button
+  whileTap={{ scale: 0.95 }}
+  whileHover={{ scale: 1.05, background: "#7e22ce" }}
+  transition={{ bounceDamping: 100 }}
+  onClick={answerCheck}
+  disabled={isStageCompleted} // ✅ disable if completed
+  className={`w-1/2 sm:w-1/3 md:w-[30%] py-2 self-end rounded-xl font-exo font-bold bg-[#9333EA] 
+    ${isStageCompleted ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-[#7e22ce]'} 
+    transition duration-300 ease-in-out hover:drop-shadow-[0_0_6px_rgba(188,168,255,0.3)]`}
+>
+  Submit
+</motion.button>
         </div>
       ) : (
         <div className="mt-4 p-4 bg-gray-900 rounded-2xl">

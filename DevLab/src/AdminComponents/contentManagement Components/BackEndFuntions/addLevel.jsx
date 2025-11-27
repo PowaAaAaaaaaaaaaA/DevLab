@@ -5,7 +5,7 @@ const addLevel = async ({ category, lessonId }) => {
   const token = await auth.currentUser?.getIdToken(true);
 
   const res = await axios.post(
-    "https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/addLevel",
+    "https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/addLevel",
     { category, lessonId },
     {
       headers: {

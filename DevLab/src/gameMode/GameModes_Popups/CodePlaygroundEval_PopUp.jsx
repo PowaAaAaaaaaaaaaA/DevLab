@@ -57,7 +57,7 @@ return (
         <div className="flex justify-end">
           <button
             onClick={() => setShowPopup(false)}
-            className="bg-[#9333EA] text-white font-exo px-4 py-2 rounded-lg hover:bg-[#7e22ce] transition"
+            className="bg-[#9333EA] text-white font-exo px-4 py-2 rounded-lg hover:bg-[#7e22ce] transition cursor-pointer"
           >
             Close
           </button>

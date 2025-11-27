@@ -25,6 +25,7 @@ import useFetchUserProgress from "../../../components/BackEnd_Data/useFetchUserP
 
 // Open AI
 import lessonPrompt from "../../../components/OpenAI Prompts/lessonPrompt";
+import SplitPane from "react-split-pane";
 
 function JavaScript_TE() {
   // Data
@@ -119,9 +120,24 @@ const fullCode = `
 <html lang="en">
 <head>
   <script>
-    const sendLog = (...args) => {
-      window.parent.postMessage({ type: 'console-log', args }, '*');
-    };
+const sendLog = (...args) => {
+  const formatted = args.map((a) => {
+    if (typeof a === "object") {
+      try {
+        return JSON.stringify(a, null, 2);
+      } catch {
+        return String(a);
+      }
+    }
+    return a;
+  });
+
+  window.parent.postMessage(
+    { type: "console-log", args: formatted },
+    "*"
+  );
+};
+
 
     console.log = (...args) => sendLog(...args);
     console.error = (...args) => sendLog("Error:", ...args);
@@ -209,11 +225,71 @@ const fullCode = `
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
+
+
+   const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+useEffect(() => {
+  const observer = new ResizeObserver(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth);
+    }
+  });
+
+  if (containerRef.current) observer.observe(containerRef.current);
+
+  return () => observer.disconnect();
+}, []);
+
+  useEffect(() => {
+    setContainerWidth(containerRef.current.offsetWidth);
+
+    const handleResize = () => {
+      setContainerWidth(containerRef.current.offsetWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const minLeft = containerWidth * 0.30; // 30% min for left pane
+  const minRight = containerWidth * 0.30; // 30% min for right pane
+  const defaultLeft = containerWidth * 0.5; // 50% default
+
+  // size TEXT
+   const [leftWidth, setLeftWidth] = useState(0);
+const [rightWidth, setRightWidth] = useState(0);
+
+useEffect(() => {
+  const width = containerRef.current.offsetWidth;
+  setLeftWidth(width * 0.5);   // default 50%
+  setRightWidth(width * 0.5);
+}, []);
+
+const handleDrag = (newLeftWidth) => {
+  setLeftWidth(newLeftWidth);
+  setRightWidth(containerRef.current.offsetWidth - newLeftWidth);
+};
+
+
 return (
-  <div className="flex flex-col md:flex-row gap-3 w-full lg:h-full md:h-full h-[100vh]">
+  <div ref={containerRef} className="flex flex-col md:flex-row gap-3 w-full lg:h-full md:h-full h-[100vh] relative">
     {/* Code Editor Panel */}
+        <SplitPane
+  split="vertical"           // vertical split: editor left, output right
+  minSize={minLeft}      // left pane minimum width
+  maxSize={containerWidth - minRight}      // left pane maximum width         
+  defaultSize={defaultLeft}          // initial width of the left panel
+  paneStyle={{ overflow: "hidden" }} // prevent scroll issues
+  onChange={handleDrag}
+  resizerStyle={{
+    background: "transparent",
+    cursor: "col-resize",
+    width: "20px",
+  }}
+>
     <div 
-      className="bg-[#191a26] h-[55%] md:h-full w-full md:w-1/2 rounded-2xl flex flex-col gap-3 items-center p-3 
+      className="bg-[#191a26] h-full  w-full  rounded-2xl flex flex-col gap-3 items-center p-3 
                  border-[#2a3141] border-[1px]"
     >
       {/* Tabs */}
@@ -281,11 +357,13 @@ return (
     </div>
 
     {/* Output + Console Panel */}
-    <div className="h-full md:h-full w-full md:w-1/2 flex flex-col gap-3">
+    <div className="h-full w-full  flex flex-col gap-3">
       {/* Visual Output */}
       <div 
-        className="flex-1 rounded-2xl bg-[#F8F3FF] border-[#2a3141] border-[1px]"
-      >
+        className="flex-1 rounded-2xl bg-[#F8F3FF] border-[#2a3141] border-[1px] relative"
+      >  <p className="text-sm font-mono mb-1 absolute bottom-0 right-2">
+   width: {Math.round(rightWidth)}px
+  </p>
         {hasRunCode ? (
           <iframe
             ref={iFrame}
@@ -314,6 +392,8 @@ return (
         )}
       </div>
     </div>
+
+    </SplitPane>
 
     {/* Evaluation Popup */}
     <AnimatePresence>

@@ -123,7 +123,7 @@ export default function NewLessonForm({ subject, close }) {
 
       // 🔹 Create the lesson
       const res = await axios.post(
-        "https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/addNEWLesson",
+        "https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/addNEWLesson",
         formData,
         {
           headers: {
@@ -143,7 +143,7 @@ export default function NewLessonForm({ subject, close }) {
         videoForm.append("stageId", "Stage1");
 
         await axios.post(
-          "https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVideo",
+          "https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/uploadVideo",
           videoForm,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -169,7 +169,14 @@ export default function NewLessonForm({ subject, close }) {
   };
 
   return (
-    <div className="h-[90vh] bg-[#111827] text-white p-4 sm:p-6 font-exo overflow-y-auto rounded-2xl space-y-6">
+    <div className="h-[90vh] bg-[#111827] relative text-white p-4 sm:p-6 font-exo overflow-y-auto rounded-2xl space-y-6 scrollbar-custom">
+            <button
+        onClick={() => close()}
+        className="absolute top-3 right-3 text-white text-2xl bg-[#ff4d4d] hover:bg-[#e04444] 
+          w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-all duration-300 shadow-md cursor-pointer"
+      >
+        ✕
+      </button>
       {/* LESSON DETAILS */}
       <section className="space-y-3">
         <h2 className="text-2xl font-bold border-b border-gray-700 pb-2">Level Details</h2>

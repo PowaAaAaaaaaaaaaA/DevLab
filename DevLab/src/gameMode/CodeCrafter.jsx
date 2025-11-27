@@ -105,7 +105,7 @@ function CodeCrafter({ heart, roundKey, gameOver, submitAttempt,resetHearts }) {
           </div>
 
           {/* Code Editor */}
-          <div className="h-[60%] md:w-[80%] md:h-full w-full flex">
+          <div className="h-full md:w-[80%] md:h-full w-full flex">
             {renderEditor()}
           </div>
         </div>
@@ -223,7 +223,6 @@ Your mission:
           setShowIsCorrect(false);
           //  Check for Error Shield first
           if (await consumeErrorShield()) {
-            console.log("ErrorShield consumed! Preventing heart loss.");
             return; // Do NOT call submitAttempt(false)
           }
           submitAttempt(false);

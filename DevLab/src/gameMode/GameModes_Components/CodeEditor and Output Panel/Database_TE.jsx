@@ -249,6 +249,65 @@ const handleEvaluate = async () => {
   }
 };
 
+const initialSQL = `
+CREATE TABLE students (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  age INTEGER,
+  course TEXT
+);
+
+CREATE TABLE enrollments (
+  id INTEGER PRIMARY KEY,
+  student_id INTEGER,
+  subject TEXT,
+  grade INTEGER
+);
+
+INSERT INTO students VALUES
+  (1, 'Anna', 20, 'Computer Science'),
+  (2, 'Ben', 22, 'Information Technology'),
+  (3, 'Clara', 21, 'Software Engineering'),
+  (4, 'David', 23, 'Information Systems'),
+  (5, 'Ella', 20, 'Computer Science');
+
+INSERT INTO enrollments VALUES
+  (1, 1, 'Database Systems', 95),
+  (2, 2, 'Web Development', 88),
+  (3, 3, 'Operating Systems', 92),
+  (4, 1, 'Web Development', 89),
+  (5, 5, 'Database Systems', 85),
+  (6, 4, 'Data Structures', 91),
+  (7, 2, 'Networking', 90),
+  (8, 3, 'Database Systems', 87),
+  (9, 5, 'Programming 101', 93);
+`;
+const resetTables = () => {
+  if (!dbRef.current) return;
+
+  // Drop ALL tables
+  const tables = dbRef.current.exec(
+    "SELECT name FROM sqlite_master WHERE type='table';"
+  );
+  if (tables.length) {
+    tables[0].values.forEach(([tableName]) => {
+      dbRef.current.run(`DROP TABLE IF EXISTS ${tableName};`);
+    });
+  }
+
+  // Recreate original tables
+  initialSQL
+    .trim()
+    .split(";")
+    .forEach((stmt) => {
+      if (stmt.trim()) dbRef.current.run(stmt + ";");
+    });
+
+  renderAllTables();
+  toast.success("Tables have been reset!", { position: "top-right" });
+};
+
+
 
 return (
   <>
@@ -307,12 +366,26 @@ return (
       {/* RIGHT: DATABASE & OUTPUT PANEL */}
       <div className="h-auto lg:h-[100%] w-full lg:w-[47%] p-4 flex flex-col justify-center gap-7">
         {/* DATABASE TABLE VIEW */}
-        <div className="border-amber-50 w-full h-[40vh] lg:h-[45%] border overflow-scroll overflow-x-hidden rounded-3xl p-3 bg-[#F8F3FF] scrollbar-custom">
-          <div
-            dangerouslySetInnerHTML={{ __html: tablesHtml }}
-            className="text-black font-exo"
-          ></div>
-        </div>
+{/* DATABASE TABLE VIEW */}
+<div className="border-amber-50 w-full h-[40vh] lg:h-[45%] border overflow-scroll overflow-x-hidden rounded-3xl p-3 bg-[#F8F3FF] scrollbar-custom">
+  {/* REFRESH BUTTON */}
+  <div className="flex justify-end mb-2">
+    <motion.button
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.05 }}
+      onClick={resetTables} // <-- call your render function
+      className="bg-[#9333EA] text-white font-bold rounded-xl px-3 py-1 text-sm hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+    >
+      Refresh Tables
+    </motion.button>
+  </div>
+
+  <div
+    dangerouslySetInnerHTML={{ __html: tablesHtml }}
+    className="text-black font-exo"
+  ></div>
+</div>
+
 
         {/* OUTPUT TABLE */}
         <div className="w-full h-[40vh] lg:h-[45%]">

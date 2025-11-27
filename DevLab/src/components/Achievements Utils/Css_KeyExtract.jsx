@@ -32,5 +32,10 @@ export const checkCssAchievements = (cssCode) => {
     achievements.push("fontFanatic");
   }
 
+  // transitions
+if (/transition\s*:\s*[^;]+;/.test(cssCode)) {
+  achievements.push("transitionTechnician");
+}
+
   return achievements;
 };

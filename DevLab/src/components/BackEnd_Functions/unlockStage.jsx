@@ -10,7 +10,7 @@ export const unlockStage = async (subject, lessonId, levelId, stageId) => {
 
     const response = await axios.post(
       `
-https://devlab-server-railway-production.up.railway.app/fireBase/unlockStage`, 
+https://devlab-server-railway-master-production.up.railway.app/fireBase/unlockStage`, 
       { subject, lessonId, levelId, stageId },
       {
         headers: {

@@ -18,7 +18,7 @@ const lessonPromptDb = async ({
 
     const res = await axios.post(
       `
-https://devlab-server-railway-production.up.railway.app/openAI/lessonPromptDb`,
+https://devlab-server-railway-master-production.up.railway.app/openAI/lessonPromptDb`,
       {
         instructions: instruction,
         description,

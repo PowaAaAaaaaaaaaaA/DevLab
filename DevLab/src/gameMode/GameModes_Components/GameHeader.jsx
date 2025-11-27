@@ -31,7 +31,7 @@ function GameHeader({heart}) {
         </Link>
         {/* Responsive text size for DEVLAB title. Hide on extra-small screens. */}
         <h1 className="text-xl sm:text-2xl lg:text-[2.5rem] font-exo font-bold text-white hidden sm:block">
-            DEVLAB
+            DevLab
         </h1>
       </div>
 
