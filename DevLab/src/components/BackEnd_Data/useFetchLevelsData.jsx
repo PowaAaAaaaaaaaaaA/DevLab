@@ -14,7 +14,7 @@ export default function useFetchLevelsData(subject) {
     try {
       const res = await fetch(
         `
-https://devlab-server-railway-production.up.railway.app/fireBase/getAllData/${subject}`,
+https://devlab-server-railway-master-production.up.railway.app/fireBase/getAllData/${subject}`,
         {
           method: "GET",
           headers: {

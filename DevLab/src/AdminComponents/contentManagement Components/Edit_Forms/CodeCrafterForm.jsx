@@ -55,7 +55,7 @@ const handleUpload = async () => {
     formData.append("stageId", stageId);
 
     const res = await axios.post(
-      `https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadFile`,
+      `https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/uploadFile`,
       formData,
       {
         headers: {

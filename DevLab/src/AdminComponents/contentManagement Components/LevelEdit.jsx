@@ -48,7 +48,7 @@ function LevelEdit({
   return (
     <div className="mt-4">
       <div
-        className="rounded-2xl bg-[#1218247c] p-5 sm:p-7 border border-gray-700 
+        className="rounded-2xl bg-[#111827] p-5 sm:p-7 border border-gray-700 
         flex flex-col gap-6 font-exo text-white"
       >
         {/* Title */}

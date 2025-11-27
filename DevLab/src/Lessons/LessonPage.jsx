@@ -51,7 +51,7 @@ function LessonPage() {
 
   {/* Code Editor and Output Panel */}
   <div
-    className={`transition-all flex duration-500
+    className={`transition-all flex duration-500 
       ${isEditorVisible ? "h-[60%] md:w-[80%] md:h-full w-full" : "w-0 h-0 md:h-full"}`}>
     {isEditorVisible && renderEditor()}
   </div>

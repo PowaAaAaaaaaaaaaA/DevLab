@@ -44,7 +44,6 @@ case "tagUsed": {
     match = condition?.type === "subjectCompletion" && condition?.subject === subject;
     break;
 }
-console.log(match)
       if (match) {
         const userAchRef = doc(db, "Users", userId, "Achievements", achievementId);
         const userAchSnap = await getDoc(userAchRef);

@@ -14,7 +14,7 @@ const dbPlaygroundEval = async ({ sql }) => {
     const token = await currentUser?.getIdToken(true);
 
     const res = await axios.post(
-      `https://devlab-server-railway-production.up.railway.app/openAI/databasePlaygroundEval`,
+      `https://devlab-server-railway-master-production.up.railway.app/openAI/databasePlaygroundEval`,
       { sql },
       {
         headers: {

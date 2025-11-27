@@ -10,7 +10,7 @@ export const callGameOver = async (subject, lessonId, levelId, stageId) => {
 
     const response = await axios.post(
       `
-https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/gameOver`,
+https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/gameOver`,
       {
         id: user.uid,
         category: subject,

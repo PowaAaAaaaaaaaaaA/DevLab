@@ -14,7 +14,7 @@ const codePlaygroundEval = async ({ html, css, js }) => {
 
     const res = await axios.post(
       `
-https://devlab-server-railway-production.up.railway.app/openAI/codePlaygroundEval`,
+https://devlab-server-railway-master-production.up.railway.app/openAI/codePlaygroundEval`,
       { html, css, js },
       {
         headers: {

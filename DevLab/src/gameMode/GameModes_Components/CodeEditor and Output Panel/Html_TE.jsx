@@ -190,7 +190,6 @@ const isStageCompleted = userStageCompleted?.[stageKey] === true;
             ref={iFrame}
             title="output"
             className="w-full h-full rounded-xl"
-            sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-top-navigation-by-user-activation"
           />
         ) : (
           <div className="w-full h-full flex items-center flex-col justify-center">

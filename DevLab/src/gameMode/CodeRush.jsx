@@ -56,6 +56,8 @@ const resetTimer = () => {
 };
 
 
+
+
   //for OpenAI
   const isCorrect = useGameStore((state) => state.isCorrect);
   const { loading } = useGameStore();
@@ -189,10 +191,15 @@ const resetTimer = () => {
           <GameMode_Instruction_PopUp
             title="Time’s Up!"
             message="⏳ You ran out of time! Be quicker next round."
-            onClose={() => {
+            onClose={async() => {
               setTimesUp(false); // close popup
-              submitAttempt(false); // THEN lose HP
               resetTimer(); // reset Time
+                                                    if (await consumeErrorShield()) {
+                          console.log(
+                            "ErrorShield consumed! Preventing heart loss.");
+                          return; // Do NOT call submitAttempt(false)
+                        }
+              submitAttempt(false); // THEN lose HP
             }}
             buttonText="Continue"
           />
@@ -271,8 +278,7 @@ const resetTimer = () => {
                         //  Check for Error Shield first
                         if (await consumeErrorShield()) {
                           console.log(
-                            "ErrorShield consumed! Preventing heart loss."
-                          );
+                            "ErrorShield consumed! Preventing heart loss.");
                           return; // Do NOT call submitAttempt(false)
                         }
                         submitAttempt(false);

@@ -272,31 +272,35 @@ const getNextStageId = (level, lessonNumber) => {
         </div>
       )}
 
-      {/* Popups */}
-      {showPopup && (
-        <div
-          className={`fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50 transition-all duration-300 ${
-            popupVisible ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={closePopup}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className={`w-[90%] sm:w-[60%] lg:w-[40%] transition-all duration-300 ${
-              popupVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"
-            }`}
-          >
-            <AddContent
-              subject={activeTab}
-              close={() => setShowPopup(false)}
-            />
-          </div>
-        </div>
-      )}
+      {/*For Adding a Lesson*/}
+<AnimatePresence>
+  {showPopup && (
+    <motion.div
+      className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
+        className="w-[90%] sm:w-[60%] lg:w-[40%]"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+      >
+        <AddContent
+          subject={activeTab}
+          close={() => setShowPopup(false)}
+        />
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
+ {/*EDITTING A STAGE*/}
       <AnimatePresence>
         {showForm && (
           <div
-            onClick={() => setShowForm(false)}
             className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center"
           >
             <motion.div
@@ -317,11 +321,10 @@ const getNextStageId = (level, lessonNumber) => {
           </div>
         )}
       </AnimatePresence>
-
+{/*FOR EDITING LEVEL*/}
       <AnimatePresence>
         {showEdit && (
           <div
-            onClick={() => setShowEdit(false)}
             className="fixed inset-0 flex bg-black/80 backdrop-blur-1xl items-center justify-center"
           >
             <motion.div
@@ -343,11 +346,13 @@ const getNextStageId = (level, lessonNumber) => {
         )}
       </AnimatePresence>
 
+
+  {/*For Adding a LEVEL*/}
       <AnimatePresence>
   {showNewLevelForm && (
     <div
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
-      onClick={() => setShowNewLevelForm(false)}
+      
     >
       <motion.div
         onClick={(e) => e.stopPropagation()}
@@ -372,7 +377,6 @@ const getNextStageId = (level, lessonNumber) => {
   {showAddStageForm && (
     <div
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
-      onClick={() => setShowAddStageForm(false)}
     >
       <motion.div
         onClick={(e) => e.stopPropagation()}

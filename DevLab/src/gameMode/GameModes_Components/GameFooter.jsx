@@ -6,6 +6,7 @@ import { goToNextStage } from "../GameModes_Utils/Util_Navigation";
 import useFetchUserData from "../../components/BackEnd_Data/useFetchUserData";
 import useFetchGameModeData from "../../components/BackEnd_Data/useFetchGameModeData";
 import useFetchUserProgress from "../../components/BackEnd_Data/useFetchUserProgress";
+import { goToPreviousStage } from "../GameModes_Utils/goToPrev";
 
 // Motion
 import { motion } from "framer-motion";
@@ -42,6 +43,8 @@ function GameFooter({
   const setShowIsCorrect = useGameStore((state) => state.setShowIsCorrect);
   const [isLoading, setIsLoading] = useState(false);
 
+
+  console.log(submittedCode);
   const buttonText =
     gamemodeId === "Lesson" || gamemodeId === "BrainBytes" ? "Next" : "Submit";
   const showLoading = buttonText === "Next";
@@ -94,6 +97,14 @@ function GameFooter({
   const isBrainBytes = gamemodeId === "BrainBytes";
   const isDisabled = isBrainBytes && !isStageLocked;
 
+
+// true if stage is completed
+const isStageCompleted = userStageCompleted?.[stageKey] ?? false;
+
+// Disable previous if Stage1 or stage NOT completed AND not Lesson mode
+const isPrevDisabled = stageId === "Stage1" || (!isStageCompleted && gamemodeId !== "Lesson");
+
+
   return (
     <>
       {/* Loading Overlay (only for Next) */}
@@ -130,25 +141,45 @@ function GameFooter({
           </div>
         </div>
         {/* Button Section */}
-        <div className="w-1/3 sm:w-1/4 md:w-[15%] lg:w-[10%]">
-          {" "}
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={
-              !isDisabled ? { scale: 1.05, background: "#7e22ce" } : {}
-            }
-            transition={{ bounceDamping: 100 }}
-            onClick={!isDisabled ? handleClick : undefined}
-            disabled={isDisabled || isLoading} // disable if loading
-            className={`font-bold rounded-xl w-full py-2 text-sm sm:text-base ${
-              isDisabled || isLoading
-                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
-            }`}
-          >
-            {buttonText}
-          </motion.button>
-        </div>
+<div className="flex gap-2 w-1/2 sm:w-1/3 md:w-[20%] lg:w-[15%]">
+  {/* Previous Button */}
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={!isPrevDisabled ? { scale: 1.05, background: "#7e22ce" } : {}}
+    transition={{ bounceDamping: 100 }}
+    onClick={
+      !isPrevDisabled
+        ? () => goToPreviousStage({ subject, lessonId, levelId, stageId, navigate })
+        : undefined
+    }
+    disabled={isPrevDisabled || isLoading}
+    className={`font-bold rounded-xl w-full py-2 text-sm sm:text-base ${
+      isPrevDisabled || isLoading
+        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+        : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+    }`}
+  >
+    Previous
+  </motion.button>
+
+  {/* Existing Next/Submit Button */}
+  <motion.button
+    whileTap={{ scale: 0.95 }}
+    whileHover={!isDisabled ? { scale: 1.05, background: "#7e22ce" } : {}}
+    transition={{ bounceDamping: 100 }}
+    onClick={!isDisabled ? handleClick : undefined}
+    disabled={isDisabled || isLoading}
+    className={`font-bold rounded-xl w-full py-2 text-sm sm:text-base ${
+      isDisabled || isLoading
+        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+        : "bg-[#9333EA] cursor-pointer hover:drop-shadow-[0_0_6px_rgba(126,34,206,0.4)]"
+    }`}
+  >
+    {buttonText}
+  </motion.button>
+</div>
+
+
         {/* Right Section */}
         <div className="flex-shrink-0">
           <p className="text-base sm:text-lg font-bold">

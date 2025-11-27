@@ -78,35 +78,40 @@ export const goToNextStage = async ({subject,lessonId,levelId,stageId,navigate,s
 
     if (data.isNextStageUnlocked) {
       navigate(
-        `/Main/Lessons/${subject}/${lessonId}/${levelId}/${data.nextStageId}/${data.nextStageType}`,{
-          replace: true
-        });
-} else if (data.isNextLevelUnlocked) {
-  const { userProgress } = useUserProgressStore.getState();
-  const levelKey = `${lessonId}-${levelId}`;
-  const levelData = userProgress[levelKey];
-  const alreadyCompleted = levelData?.isCompleted === true;
+        `/Main/Lessons/${subject}/${lessonId}/${levelId}/${data.nextStageId}/${data.nextStageType}`,
+        { replace: true }
+      );
+    } else if (data.isNextLevelUnlocked) {
+      const { userProgress } = useUserProgressStore.getState();
+      const levelKey = `${lessonId}-${levelId}`;
+      const levelData = userProgress[levelKey];
+      const alreadyCompleted = levelData?.isCompleted === true;
 
-  if (alreadyCompleted) {
-    await setAlreadyComplete(true);
-  } else {
-    // Normal flow: mark as complete and grant rewards
-    
-    await handleRewardGrant(userId, subject, lessonId, levelId);
-    await setLevelComplete(true);
-  }
-}
-    else if (data.isNextLessonUnlocked) {
-      
-      await unlockAchievement(userId, subject, "lessonComplete", { lessonId });
-      await handleRewardGrant(userId, subject, lessonId, levelId);
-      await setLevelComplete(true);
-    } else if (data.isWholeTopicFinished) {
-      
-      await handleRewardGrant(userId, subject, lessonId, levelId); 
-      await setLevelComplete(true);
+      if (alreadyCompleted) {
+        await setAlreadyComplete(true);
+      } else {
+        await handleRewardGrant(userId, subject, lessonId, levelId);
+        await setLevelComplete(true);
+      }
+    } else if (data.isNextLessonUnlocked || data.isWholeTopicFinished) {
+      // Check if lesson or topic is already completed
+      const { userProgress } = useUserProgressStore.getState();
+      const levelKey = `${lessonId}-${levelId}`;
+      const levelData = userProgress[levelKey];
+      const alreadyCompleted = levelData?.isCompleted === true;
+
+      if (alreadyCompleted) {
+        await setAlreadyComplete(true);
+      } else {
+        if (data.isNextLessonUnlocked) {
+          await unlockAchievement(userId, subject, "lessonComplete", { lessonId });
+        }
+        await handleRewardGrant(userId, subject, lessonId, levelId);
+        await setLevelComplete(true);
+      }
     }
   } catch (error) {
     console.error("Error in goToNextStage:", error.message);
   }
 };
+

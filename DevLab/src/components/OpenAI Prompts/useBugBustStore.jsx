@@ -41,4 +41,12 @@ export const useGameStore = create((set, get) => ({
     })),
   getAllFeedbacks: () => get().stageFeedbacks,
   clearAllFeedbacks: () => set({ stageFeedbacks: [] }),
+
+lastGamemode: null,
+setLastGamemode: (mode) => set({ lastGamemode: mode }),
+
+
+  
 }));
+
+

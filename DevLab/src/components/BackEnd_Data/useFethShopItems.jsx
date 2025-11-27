@@ -11,7 +11,7 @@ export const fetchShopItems = async () => {
 
   try {
     const res = await fetch(
-      "https://devlab-server-railway-production.up.railway.app/fireBase/Shop",
+      "https://devlab-server-railway-master-production.up.railway.app/fireBase/Shop",
       {
         method: "GET",
         headers: {

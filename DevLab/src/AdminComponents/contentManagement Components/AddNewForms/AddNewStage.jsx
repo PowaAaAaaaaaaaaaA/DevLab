@@ -81,7 +81,7 @@ console.log(stageId)
       if (!hasImages) {
         //  JSON request
         return axios.post(
-          `https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/addNEWStage`,
+          `https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/addNEWStage`,
           {
             category: subject,
             lessonId,
@@ -120,7 +120,7 @@ console.log(stageId)
         formData.append("stageState", JSON.stringify(filteredStateWithBlocks));
 
         return axios.post(
-          `https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/addNEWStage`,
+          `https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/addNEWStage`,
           formData,
           {
             headers: {
@@ -148,7 +148,7 @@ onSuccess: async (res) => {
       formData.append("stageId", newStageId);
 
       await axios.post(
-        `https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadVideo`,
+        `https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/uploadVideo`,
         formData,
         {
           headers: { "x-source": "mobile-app", Authorization: `Bearer ${token}` },
@@ -170,7 +170,7 @@ if (file) {
     formData.append("stageId", newStageId);
 
     const res = await axios.post(
-      "https://devlab-server-railway-production.up.railway.app/fireBaseAdmin/uploadFile",
+      "https://devlab-server-railway-master-production.up.railway.app/fireBaseAdmin/uploadFile",
       formData,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -199,7 +199,7 @@ if (file) {
 
   // --------------------- UI
   return (
-    <div className="bg-[#25293B] rounded-2xl p-4 sm:p-6 relative flex items-center justify-center h-full overflow-auto">
+    <div className="bg-[#25293B] rounded-2xl p-4 sm:p-6 relative flex items-center justify-center h-full overflow-auto scrollbar-custom">
       {/* Close */}
       <button
         onClick={() => close(false)}
