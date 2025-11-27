@@ -132,6 +132,7 @@ return (
             p-3 sm:p-4 
             font-exo w-[95%] md:w-[90%] 
             min-h-[100px] 
+            
             flex flex-col items-center justify-center">
           {levelSummary ? (
             <div
@@ -142,7 +143,7 @@ return (
               "
             >
               {["recap", "strengths", "improvements", "encouragement"].map((key, i) => (
-                <p key={i} className="text-sm sm:text-base md:text-lg">
+                <p key={i} className="text-sm sm:text-base md:text-lg LevelComplete">
                   <span
                     className={`font-semibold ${
                       key === "recap"
