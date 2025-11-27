@@ -58,6 +58,10 @@ height: 80%;
 }
 @media (max-height: 750px) {
 
+
+  .LevelComplete{
+    font-size: 0.9rem;
+  }
   
   .JumpBackInCont{
     height: 75%;
