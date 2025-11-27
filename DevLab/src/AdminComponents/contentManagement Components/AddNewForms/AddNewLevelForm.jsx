@@ -189,6 +189,7 @@ const createLevelMutation = useMutation({
         }
       />
       <div className="flex gap-3">
+        <p>Coins Reward</p>
 <input
   type="number"
   className="flex-1 p-3 bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-gray-400"
@@ -199,6 +200,7 @@ const createLevelMutation = useMutation({
     setLevelState({ ...levelState, coinsReward: value < 0 ? 0 : value });
   }}
 />
+<p>Exp Reward</p>
 <input
   type="number"
   className="flex-1 p-3 bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-gray-400"

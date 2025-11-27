@@ -193,6 +193,7 @@ export default function NewLessonForm({ subject, close }) {
           className="p-3 bg-gray-800 rounded-xl w-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none h-20 sm:h-24"
         />
         <div className="flex flex-col sm:flex-row gap-3">
+          <p>Coins Reward</p>
 <input
   type="number"
   min="0"
@@ -204,6 +205,7 @@ export default function NewLessonForm({ subject, close }) {
   }}
   className="flex-1 p-3 bg-gray-800 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
 />
+<p>Exp Reward</p>
 <input
   type="number"
   min="0"
